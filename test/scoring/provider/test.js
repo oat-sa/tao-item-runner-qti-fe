@@ -17,7 +17,6 @@
  *
  */
 define([
-
     'lodash',
     'taoItems/scoring/api/scorer',
     'taoQtiItem/scoring/provider/qti',
@@ -35,7 +34,6 @@ define([
     'json!taoQtiItem/test/samples/json/customrp/andAnd.json',
     'json!taoQtiItem/test/samples/json/customrp/custom_record.json'
 ], function(
-
     _,
     scorer,
     qtiScoringProvider,
