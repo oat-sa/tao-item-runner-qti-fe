@@ -23,6 +23,7 @@ import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
 import cssResolve from './css-resolve';
 import externalAlias from './external-alias';
 import resolve from 'rollup-plugin-node-resolve';
+import json from 'rollup-plugin-json';
 
 const { srcDir, outputDir, aliases } = require('./path');
 const Handlebars = require('handlebars');
@@ -61,10 +62,43 @@ export default inputs.map(input => {
             format: 'amd',
             name
         },
-        external: ['jquery', 'lodash', ...localExternals],
+        external: [
+            'jquery',
+            'lodash',
+            'handlebars',
+            'i18n',
+            'module',
+            'context',
+
+            'raphael',
+            'scale.raphael',
+            'lib/gamp/gamp',
+            'class',
+            'mathJax',
+            'nouislider',
+            'interact',
+            'select2',
+            'ckeditor',
+
+            'taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy',
+            'taoQtiItem/portableElementRegistry/ciRegistry',
+            'taoQtiItem/portableElementRegistry/icRegistry',
+            'taoQtiItem/qtiRunner/core/Renderer',
+            'taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration',
+            'taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory',
+
+            'taoItems/runner/api/itemRunner',
+            'taoItems/assets/manager',
+            'taoItems/assets/strategies',
+
+            'qtiInfoControlContext',
+            'qtiCustomInteractionContext',
+
+            ...localExternals
+        ],
         plugins: [
             cssResolve(),
-            externalAlias(['core', 'util']),
+            externalAlias(['core', 'util', 'ui']),
             alias({
                 resolve: ['.js', '.json', '.tpl'],
                 ...aliases
@@ -79,6 +113,9 @@ export default inputs.map(input => {
                     module: Handlebars
                 },
                 templateExtension: '.tpl'
+            }),
+            json({
+                preferConst: false
             })
         ]
     };

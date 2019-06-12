@@ -13,22 +13,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2017 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  */
-
 /**
- * This file contains path definitions for build scripts.
+ * @author Christophe Noël <christophe@taotesting.com>
  */
-const path = require('path');
-const rootPath = path.resolve(__dirname, '..');
-const srcDir = path.resolve(rootPath, 'src');
+import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/printedVariable';
+import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 
-module.exports = {
-    rootPath,
-    srcDir,
-    testDir: path.resolve(rootPath, 'test'),
-    scssVendorDir: path.resolve(rootPath, 'scss'),
-    outputDir: path.resolve(rootPath, 'dist'),
-    testOutputDir: path.resolve(rootPath, 'test'),
-    aliases: { taoQtiItem: srcDir }
+export default {
+    qtiClass: 'printedVariable',
+    template: tpl,
+    getContainer: containerHelper.get
 };

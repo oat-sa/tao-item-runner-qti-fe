@@ -13,22 +13,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
  */
+import QtiContainerChoice from 'taoQtiItem/qtiItem/core/choices/ContainerChoice';
 
-/**
- * This file contains path definitions for build scripts.
- */
-const path = require('path');
-const rootPath = path.resolve(__dirname, '..');
-const srcDir = path.resolve(rootPath, 'src');
-
-module.exports = {
-    rootPath,
-    srcDir,
-    testDir: path.resolve(rootPath, 'test'),
-    scssVendorDir: path.resolve(rootPath, 'scss'),
-    outputDir: path.resolve(rootPath, 'dist'),
-    testOutputDir: path.resolve(rootPath, 'test'),
-    aliases: { taoQtiItem: srcDir }
-};
+var QtiGapText = QtiContainerChoice.extend({
+    qtiClass: 'gapText'
+});
+export default QtiGapText;

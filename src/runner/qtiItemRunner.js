@@ -1,4 +1,4 @@
-/**
+/*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
@@ -13,22 +13,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2014 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ *
  */
 
 /**
- * This file contains path definitions for build scripts.
+ * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-const path = require('path');
-const rootPath = path.resolve(__dirname, '..');
-const srcDir = path.resolve(rootPath, 'src');
+import itemRunner from 'taoItems/runner/api/itemRunner';
+import qtiRuntimeProvider from 'taoQtiItem/runner/provider/qti';
 
-module.exports = {
-    rootPath,
-    srcDir,
-    testDir: path.resolve(rootPath, 'test'),
-    scssVendorDir: path.resolve(rootPath, 'scss'),
-    outputDir: path.resolve(rootPath, 'dist'),
-    testOutputDir: path.resolve(rootPath, 'test'),
-    aliases: { taoQtiItem: srcDir }
-};
+//register the QTI Provider
+itemRunner.register('qti', qtiRuntimeProvider);
+
+/**
+ * Expose the itemRunner with the QTI provider registered
+ * @exports taoQtiItem/runner/qtiItemRunner
+ */
+export default itemRunner;
