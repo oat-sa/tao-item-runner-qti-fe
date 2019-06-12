@@ -25,6 +25,7 @@ requirejs.config({
 
         /* TEST related */
         'qunit-parameterize': '/environment/qunit2-parameterize',
+        'qunit-assert-close': '/environment/qunit-assert-close',
         qunit: '/node_modules/qunit/qunit',
         'taoQtiItem/test': '/test',
         taoQtiItem: '/dist',
@@ -62,13 +63,16 @@ requirejs.config({
     shim: {
         'qunit-parameterize': {
             deps: ['qunit/qunit']
+        },
+        'qunit-assert-close': {
+            deps: ['qunit/qunit']
         }
     },
     waitSeconds: 15
 });
 
 define('qunitLibs', ['qunit/qunit', 'css!qunit/qunit.css']);
-define('qunitEnv', ['qunitLibs', 'qunit-parameterize'], function() {
+define('qunitEnv', ['qunitLibs', 'qunit-parameterize', 'qunit-assert-close'], function() {
     requirejs.config({ nodeIdCompat: true });
 });
 
