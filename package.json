@@ -42,6 +42,7 @@
         "@oat-sa/browserslist-config-tao": "^0.1.0",
         "@oat-sa/tao-core-libs": "^0.1.0",
         "@oat-sa/tao-core-sdk": "^0.3.0",
+        "@oat-sa/tao-item-runner": "github:oat-sa/tao-item-runner-fe#feature/NEX-132_vendorization-of-item-runner",
         "autoprefixer": "^9.6.0",
         "eslint": "^5.16.0",
         "eslint-plugin-es": "^1.4.0",

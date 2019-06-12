@@ -101,7 +101,7 @@ export default inputs.map(input => {
         ],
         plugins: [
             cssResolve(),
-            externalAlias(['core', 'util', 'ui', 'taoItems']),
+            externalAlias(['core', 'util', 'ui', 'taoItems/runner', 'taoItems/assets']),
             alias({
                 resolve: ['.js', '.json', '.tpl'],
                 ...aliases

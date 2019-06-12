@@ -32,6 +32,8 @@ requirejs.config({
         core: '/node_modules/@oat-sa/tao-core-sdk/dist/core',
         util: '/node_modules/@oat-sa/tao-core-sdk/dist/util',
         lib: '/node_modules/@oat-sa/tao-core-libs/dist',
+        'taoItems/runner': '/node_modules/@oat-sa/tao-item-runner/dist/runner',
+        'taoItems/assets': '/node_modules/@oat-sa/tao-item-runner/dist/assets',
         jquery: '/node_modules/jquery/jquery',
         lodash: '/node_modules/lodash/lodash'
         // moment: '/node_modules/moment/min/moment-with-locales',
