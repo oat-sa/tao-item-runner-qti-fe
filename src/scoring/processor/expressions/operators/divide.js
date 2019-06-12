@@ -23,67 +23,64 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns the divide.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/divide
+ */
+var divideProcessor = {
+
+    constraints: {
+        minOperand: 2,
+        maxOperand: 2,
+        cardinality: ['single'],
+        baseType: ['integer', 'float']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the divide.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/divide
+     * Process the divide of the operands.
+     * @returns {?ProcessingValue} the divide or null
      */
-    var divideProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand : 2,
-            maxOperand : 2,
-            cardinality : ['single'],
-            baseType : ['integer', 'float']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'float'
+        };
 
-        operands   : [],
-
-        /**
-         * Process the divide of the operands.
-         * @returns {?ProcessingValue} the divide or null
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType : 'float'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            result.value = this.preProcessor
-                .mapNumbers(this.operands)
-                .reduce(function(f, s){
-                    var result =  f / s;
-
-                    if (s === 0){
-                        return null;
-                    }
-
-                    if (result === 0 && f !== 0) {
-                        return null;
-                    }
-
-                    return result;
-
-                });
-
-            if (_.isNull(result.value)){
-                return null;
-            }
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return divideProcessor;
-});
+        result.value = this.preProcessor
+            .mapNumbers(this.operands)
+            .reduce(function(f, s) {
+                var result = f / s;
+
+                if (s === 0) {
+                    return null;
+                }
+
+                if (result === 0 && f !== 0) {
+                    return null;
+                }
+
+                return result;
+
+            });
+
+        if (_.isNull(result.value)) {
+            return null;
+        }
+
+        return result;
+    }
+};
+
+export default divideProcessor;

@@ -23,49 +23,46 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns the random.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/random
+ */
+var randomProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: 1,
+        cardinality: ['multiple', 'ordered'],
+        baseType: ['identifier', 'boolean', 'integer', 'string', 'point', 'pair', 'directedPair', 'file', 'uri', 'intOrIdentifier', 'duration', 'float']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the random.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/random
+     * Process the random of the operands.
+     * @returns {?ProcessingValue} the random
      */
-    var randomProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand : 1,
-            maxOperand : 1,
-            cardinality : ['multiple','ordered'],
-            baseType    : ['identifier', 'boolean', 'integer', 'string', 'point', 'pair', 'directedPair', 'file', 'uri', 'intOrIdentifier', 'duration', 'float']
-        },
+        var result = {
+            cardinality: 'single'
+        };
 
-        operands   : [],
-
-        /**
-         * Process the random of the operands.
-         * @returns {?ProcessingValue} the random
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            var op = this.preProcessor.parseVariable(this.operands[0]);
-            result.value = op.value[_.random(0, op.value.length-1)];
-            result.baseType = op.baseType;
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return randomProcessor;
-});
+        var op = this.preProcessor.parseVariable(this.operands[0]);
+        result.value = op.value[_.random(0, op.value.length - 1)];
+        result.baseType = op.baseType;
+
+        return result;
+    }
+};
+
+export default randomProcessor;

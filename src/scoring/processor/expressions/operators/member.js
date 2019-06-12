@@ -23,69 +23,66 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(_, errorHandler){
-    'use strict';
+import _ from 'lodash';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
+
+
+/**
+ * Process operands and returns member result.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/member
+ */
+var memberProcessor = {
+
+    constraints: {
+        minOperand: 2,
+        maxOperand: 2,
+        cardinality: ['multiple', 'ordered', 'single'],
+        baseType: ['identifier', 'boolean', 'integer', 'string', 'point', 'pair', 'directedPair', 'file', 'uri', 'intOrIdentifier']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns member result.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/member
+     * @returns {?ProcessingValue} a single boolean
      */
-    var memberProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand  : 2,
-            maxOperand  : 2,
-            cardinality : ['multiple', 'ordered', 'single'],
-            baseType    : ['identifier', 'boolean', 'integer', 'string', 'point', 'pair', 'directedPair', 'file', 'uri', 'intOrIdentifier']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
-        operands   : [],
-
-        /**
-         * @returns {?ProcessingValue} a single boolean
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType    : 'boolean'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            if (Object.keys(_.countBy(this.operands, 'baseType')).length !== 1) {
-                errorHandler.throw('scoring', new Error('operands must be of the same baseType'));
-                return null;
-            }
-
-            if (this.operands[0].cardinality !== 'single' || ['multiple', 'ordered'].indexOf(this.operands[1].cardinality) === -1) {
-                errorHandler.throw('scoring', new Error('operands must be single and multiply|ordered cardinality respectively'));
-                return null;
-            }
-
-            var op1 = this.preProcessor.parseVariable(this.operands[0]).value,
-                op2 = this.preProcessor.parseVariable(this.operands[1]).value;
-
-
-            if (_.isArray(op1)) {
-                result.value = _.flatten(op2).join().indexOf(op1) !== -1;
-            } else {
-                result.value = op2.indexOf(op1) !== -1;
-            }
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
 
-    };
+        if (Object.keys(_.countBy(this.operands, 'baseType')).length !== 1) {
+            errorHandler.throw('scoring', new Error('operands must be of the same baseType'));
+            return null;
+        }
+
+        if (this.operands[0].cardinality !== 'single' || ['multiple', 'ordered'].indexOf(this.operands[1].cardinality) === -1) {
+            errorHandler.throw('scoring', new Error('operands must be single and multiply|ordered cardinality respectively'));
+            return null;
+        }
+
+        var op1 = this.preProcessor.parseVariable(this.operands[0]).value,
+            op2 = this.preProcessor.parseVariable(this.operands[1]).value;
 
 
-    return memberProcessor;
-});
+        if (_.isArray(op1)) {
+            result.value = _.flatten(op2).join().indexOf(op1) !== -1;
+        } else {
+            result.value = op2.indexOf(op1) !== -1;
+        }
+
+        return result;
+    }
+
+};
+
+
+export default memberProcessor;
 

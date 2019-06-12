@@ -24,105 +24,102 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'taoQtiItem/scoring/processor/expressions/isPointInShape',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(_, isPointInShape, errorHandler){
-    'use strict';
+import _ from 'lodash';
+import isPointInShape from 'taoQtiItem/scoring/processor/expressions/isPointInShape';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
+
+
+/**
+ * The MapResponsePoint Processor
+ * @type {ExpressionProcesssor}
+ * @exports taoQtiItem/scoring/processor/expressions/mapResponsePoint
+ */
+var mapResponseProcessor = {
 
     /**
-     * The MapResponsePoint Processor
-     * @type {ExpressionProcesssor}
-     * @exports taoQtiItem/scoring/processor/expressions/mapResponsePoint
+     * Process the expression
+     * @returns {ProcessingValue} the value from the expression
      */
-    var mapResponseProcessor = {
+    process: function() {
 
-        /**
-         * Process the expression
-         * @returns {ProcessingValue} the value from the expression
-         */
-        process : function(){
+        var self = this;
+        var points,
+            defaultValue,
+            lowerBound,
+            upperBound,
+            filtered;
+        var identifier = this.expression.attributes.identifier;
+        var variable = this.state[identifier];
+        var result = {
+            cardinality: 'single',
+            baseType: 'float'
+        };
 
-            var self = this;
-            var points,
-                defaultValue,
-                lowerBound,
-                upperBound,
-                filtered;
-            var identifier = this.expression.attributes.identifier;
-            var variable   = this.state[identifier];
-            var result     = {
-                cardinality : 'single',
-                baseType    : 'float'
-            };
-
-            if(typeof variable === 'undefined' || variable === null){
-                 return null;
-            }
-
-            if(typeof variable.mapping === 'undefined' || variable.mapping.qtiClass !== 'areaMapping'){
-                 return errorHandler.throw('scoring', new Error('The variable ' + identifier + ' has no areaMapping, how can I execute a mapResponsePoint on it?'));
-            }
-
-            if(variable.baseType !== 'point'){
-                 return errorHandler.throw('scoring', new Error('The variable ' + identifier + ' must be of type point, but it is a ' + variable.baseType));
-            }
-
-            //cast the variable value
-            variable = this.preProcessor.parseVariable(variable);
-
-
-            //retrieve attributes
-            defaultValue = parseFloat(variable.mapping.attributes.defaultValue) || 0;
-            if(typeof variable.mapping.attributes.lowerBound !== 'undefined'){
-                lowerBound = parseFloat(variable.mapping.attributes.lowerBound);
-            }
-            if(typeof variable.mapping.attributes.upperBound !== 'undefined'){
-                upperBound = parseFloat(variable.mapping.attributes.upperBound);
-            }
-
-            //points are in an array
-            if(variable.cardinality === 'single'){
-                points = [variable.value];
-            } else {
-                points = variable.value;
-            }
-
-            //resolve the mapping
-
-            //filter entries that match
-            filtered = _.filter(variable.mapping.mapEntries, function(mapEntry){
-                    var found = _.filter(points, function(point){
-                        var coords = _.map(mapEntry.coords.split(','), parseFloat);
-
-                        return isPointInShape(mapEntry.shape, point, coords);
-                    });
-                    return found.length > 0;
-                });
-
-            //then sum the entries values
-            if(filtered.length){
-                result.value = _.reduce(filtered, function(acc, mapEntry){
-                    var value = parseFloat(mapEntry.mappedValue);
-                    return acc + (_.isNaN(value) ? 0 : value);
-                }, 0);
-            }
-
-            // apply attributes
-            if(!_.isNumber(result.value)){
-                result.value = defaultValue;
-            }
-            if(_.isNumber(lowerBound) && result.value < lowerBound){
-               result.value = lowerBound;
-            }
-            if(_.isNumber(upperBound) && result.value > upperBound){
-               result.value = upperBound;
-            }
-
-            return result;
+        if (typeof variable === 'undefined' || variable === null) {
+            return null;
         }
-    };
 
-    return mapResponseProcessor;
-});
+        if (typeof variable.mapping === 'undefined' || variable.mapping.qtiClass !== 'areaMapping') {
+            return errorHandler.throw('scoring', new Error('The variable ' + identifier + ' has no areaMapping, how can I execute a mapResponsePoint on it?'));
+        }
+
+        if (variable.baseType !== 'point') {
+            return errorHandler.throw('scoring', new Error('The variable ' + identifier + ' must be of type point, but it is a ' + variable.baseType));
+        }
+
+        //cast the variable value
+        variable = this.preProcessor.parseVariable(variable);
+
+
+        //retrieve attributes
+        defaultValue = parseFloat(variable.mapping.attributes.defaultValue) || 0;
+        if (typeof variable.mapping.attributes.lowerBound !== 'undefined') {
+            lowerBound = parseFloat(variable.mapping.attributes.lowerBound);
+        }
+        if (typeof variable.mapping.attributes.upperBound !== 'undefined') {
+            upperBound = parseFloat(variable.mapping.attributes.upperBound);
+        }
+
+        //points are in an array
+        if (variable.cardinality === 'single') {
+            points = [variable.value];
+        } else {
+            points = variable.value;
+        }
+
+        //resolve the mapping
+
+        //filter entries that match
+        filtered = _.filter(variable.mapping.mapEntries, function(mapEntry) {
+            var found = _.filter(points, function(point) {
+                var coords = _.map(mapEntry.coords.split(','), parseFloat);
+
+                return isPointInShape(mapEntry.shape, point, coords);
+            });
+            return found.length > 0;
+        });
+
+        //then sum the entries values
+        if (filtered.length) {
+            result.value = _.reduce(filtered, function(acc, mapEntry) {
+                var value = parseFloat(mapEntry.mappedValue);
+                return acc + (_.isNaN(value) ? 0 : value);
+            }, 0);
+        }
+
+        // apply attributes
+        if (!_.isNumber(result.value)) {
+            result.value = defaultValue;
+        }
+        if (_.isNumber(lowerBound) && result.value < lowerBound) {
+            result.value = lowerBound;
+        }
+        if (_.isNumber(upperBound) && result.value > upperBound) {
+            result.value = upperBound;
+        }
+
+        return result;
+    }
+};
+
+export default mapResponseProcessor;

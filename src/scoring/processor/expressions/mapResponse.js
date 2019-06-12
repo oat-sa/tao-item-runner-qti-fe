@@ -24,117 +24,114 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(_, errorHandler){
-    'use strict';
+import _ from 'lodash';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
+
+
+/**
+ * The MapResponse Processor
+ * @type {ExpressionProcesssor}
+ * @exports taoQtiItem/scoring/processor/expressions/mapResponse
+ */
+var mapResponseProcessor = {
 
     /**
-     * The MapResponse Processor
-     * @type {ExpressionProcesssor}
-     * @exports taoQtiItem/scoring/processor/expressions/mapResponse
+     * Process the expression
+     * @returns {ProcessingValue} the value from the expression
      */
-    var mapResponseProcessor = {
+    process: function() {
 
-        /**
-         * Process the expression
-         * @returns {ProcessingValue} the value from the expression
-         */
-        process : function(){
+        var self = this;
+        var mapEntries,
+            mapResult,
+            defaultValue,
+            lowerBound,
+            upperBound;
+        var identifier = this.expression.attributes.identifier;
+        var variable = this.state[identifier];
+        var result = {
+            cardinality: 'single',
+            baseType: 'float'
+        };
 
-            var self = this;
-            var mapEntries,
-                mapResult,
-                defaultValue,
-                lowerBound,
-                upperBound;
-            var identifier = this.expression.attributes.identifier;
-            var variable   = this.state[identifier];
-            var result     = {
-                cardinality : 'single',
-                baseType    : 'float'
-            };
+        if (typeof variable === 'undefined') {
+            return null;
+        }
 
-            if(typeof variable === 'undefined'){
-                 return null;
-            }
+        if (variable === null || typeof variable.mapping === 'undefined' || variable.mapping.qtiClass !== 'mapping') {
+            return errorHandler.throw('scoring', new Error('The variable ' + identifier + ' has no mapping, how can I execute a mapResponse on it?'));
+        }
 
-            if(variable === null || typeof variable.mapping === 'undefined' || variable.mapping.qtiClass !== 'mapping'){
-                 return errorHandler.throw('scoring', new Error('The variable ' + identifier + ' has no mapping, how can I execute a mapResponse on it?'));
-            }
+        //cast the variable value
+        variable = this.preProcessor.parseVariable(variable);
 
-            //cast the variable value
-            variable = this.preProcessor.parseVariable(variable);
+        //cast each map value
+        mapEntries = _.map(variable.mapping.mapEntries, function(mapEntry) {
+            mapEntry.mapKey = self.preProcessor.parseValue(mapEntry.mapKey, variable.baseType, 'single');
+            return mapEntry;
+        });
 
-            //cast each map value
-            mapEntries = _.map(variable.mapping.mapEntries, function(mapEntry){
-                mapEntry.mapKey = self.preProcessor.parseValue(mapEntry.mapKey, variable.baseType, 'single');
-                return mapEntry;
+        //retrieve attributes
+        defaultValue = parseFloat(variable.mapping.attributes.defaultValue) || 0;
+        if (typeof variable.mapping.attributes.lowerBound !== 'undefined') {
+            lowerBound = parseFloat(variable.mapping.attributes.lowerBound);
+        }
+        if (typeof variable.mapping.attributes.upperBound !== 'undefined') {
+            upperBound = parseFloat(variable.mapping.attributes.upperBound);
+        }
+
+        //resolve the mapping
+        if (variable.cardinality === 'single') {
+
+            //find the map entry that matches with the value
+            mapResult = _.find(mapEntries, function(mapEntry) {
+                if (variable.baseType === 'string' && mapEntry.attributes.caseSensitive === false) {
+                    return _.isEqual(mapEntry.mapKey.toLowerCase(), variable.value.toLowerCase());
+                }
+                return _.isEqual(mapEntry.mapKey, variable.value);
             });
 
-            //retrieve attributes
-            defaultValue = parseFloat(variable.mapping.attributes.defaultValue) || 0;
-            if(typeof variable.mapping.attributes.lowerBound !== 'undefined'){
-                lowerBound = parseFloat(variable.mapping.attributes.lowerBound);
-            }
-            if(typeof variable.mapping.attributes.upperBound !== 'undefined'){
-                upperBound = parseFloat(variable.mapping.attributes.upperBound);
+            if (mapResult !== undefined) {
+                result.value = parseFloat(mapResult.mapValue);
             }
 
-            //resolve the mapping
-            if(variable.cardinality === 'single'){
+        } else if (variable.cardinality === 'multiple' || variable.cardinality === 'ordered') {
 
-                //find the map entry that matches with the value
-                mapResult = _.find(mapEntries, function(mapEntry){
-                    if(variable.baseType === 'string' && mapEntry.attributes.caseSensitive === false){
-                        return _.isEqual(mapEntry.mapKey.toLowerCase(), variable.value.toLowerCase());
+            //get the entries that matches and sum their values
+            mapResult = _(mapEntries)
+                .filter(function(mapEntry) {
+                    var found;
+                    if (variable.baseType === 'string' && mapEntry.attributes.caseSensitive === false) {
+                        return _.contains(_.invoke(variable.value, 'toLowerCase'), mapEntry.mapKey.toLowerCase());
                     }
-                    return _.isEqual(mapEntry.mapKey, variable.value);
-                });
+                    if (_.isArray(mapEntry.mapKey)) {
+                        found = _.find(variable.value, mapEntry.mapKey);
+                        return found && found.length > 0;
+                    }
+                    return _.contains(variable.value, mapEntry.mapKey);
+                })
+                .reduce(function(sum, mapEntry) {
+                    return sum + parseFloat(mapEntry.mapValue);
+                }, 0);
 
-                if(mapResult !== undefined){
-                    result.value = parseFloat(mapResult.mapValue);
-                }
-
-            } else if (variable.cardinality === 'multiple' || variable.cardinality === 'ordered'){
-
-                //get the entries that matches and sum their values
-                mapResult = _(mapEntries)
-                    .filter(function(mapEntry){
-                        var found;
-                        if(variable.baseType === 'string' && mapEntry.attributes.caseSensitive === false){
-                            return _.contains( _.invoke(variable.value, 'toLowerCase'),  mapEntry.mapKey.toLowerCase());
-                        }
-                        if(_.isArray(mapEntry.mapKey)){
-                            found = _.find(variable.value, mapEntry.mapKey);
-                            return found && found.length > 0;
-                        }
-                        return _.contains(variable.value,  mapEntry.mapKey);
-                    })
-                    .reduce(function(sum, mapEntry){
-                        return sum + parseFloat(mapEntry.mapValue);
-                    }, 0);
-
-                if(mapResult !== undefined){
-                    result.value = mapResult;
-                }
+            if (mapResult !== undefined) {
+                result.value = mapResult;
             }
-
-            // apply attributes
-            if(!_.isNumber(result.value)){
-                result.value = defaultValue;
-            }
-            if(_.isNumber(lowerBound) && result.value < lowerBound){
-               result.value = lowerBound;
-            }
-            if(_.isNumber(upperBound) && result.value > upperBound){
-               result.value = upperBound;
-            }
-
-            return result;
         }
-    };
 
-    return mapResponseProcessor;
-});
+        // apply attributes
+        if (!_.isNumber(result.value)) {
+            result.value = defaultValue;
+        }
+        if (_.isNumber(lowerBound) && result.value < lowerBound) {
+            result.value = lowerBound;
+        }
+        if (_.isNumber(upperBound) && result.value > upperBound) {
+            result.value = upperBound;
+        }
+
+        return result;
+    }
+};
+
+export default mapResponseProcessor;

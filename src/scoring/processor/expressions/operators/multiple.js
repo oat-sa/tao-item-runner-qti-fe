@@ -23,59 +23,56 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(_, errorHandler){
-    'use strict';
+import _ from 'lodash';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
+
+
+/**
+ * Process operands and returns multiple result.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/multiple
+ */
+var multipleProcessor = {
+
+    constraints: {
+        minOperand: 0,
+        maxOperand: -1,
+        cardinality: ['single', 'multiple'],
+        baseType: ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'duration', 'file', 'uri', 'intOrIdentifier']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns multiple result.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/multiple
+     * @returns {?ProcessingValue} a single boolean
      */
-    var multipleProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand  : 0,
-            maxOperand  : -1,
-            cardinality : ['single', 'multiple'],
-            baseType    : ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'duration', 'file', 'uri', 'intOrIdentifier']
-        },
+        var result = {
+            cardinality: 'multiple'
+        };
 
-        operands   : [],
-
-        /**
-         * @returns {?ProcessingValue} a single boolean
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'multiple'
-            };
-
-            //if all one operands are null or no operands, then break and return null
-            if(_.every(this.operands, _.isNull) === true || this.operands.length === 0 ){
-                return null;
-            }
-
-            var filteredOperands = _(this.operands).filter(_.isObject).value();
-
-            if (Object.keys(_.countBy(filteredOperands, 'baseType')).length !== 1) {
-                errorHandler.throw('scoring', new Error('operands must be of the same type'));
-                return null;
-            }
-
-            result.baseType = this.operands[0].baseType;
-
-            result.value = this.preProcessor.parseOperands(filteredOperands).value();
-
-            return result;
+        //if all one operands are null or no operands, then break and return null
+        if (_.every(this.operands, _.isNull) === true || this.operands.length === 0) {
+            return null;
         }
 
-    };
+        var filteredOperands = _(this.operands).filter(_.isObject).value();
+
+        if (Object.keys(_.countBy(filteredOperands, 'baseType')).length !== 1) {
+            errorHandler.throw('scoring', new Error('operands must be of the same type'));
+            return null;
+        }
+
+        result.baseType = this.operands[0].baseType;
+
+        result.value = this.preProcessor.parseOperands(filteredOperands).value();
+
+        return result;
+    }
+
+};
 
 
-    return multipleProcessor;
-});
+export default multipleProcessor;
 

@@ -23,51 +23,48 @@
 
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    "use strict";
+import _ from 'lodash';
 
-    /**
-     * Process operands and returns the truncate.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/truncate
-     */
-    var truncateProcessor = {
 
-        constraints : {
-            minOperand : 1,
-            maxOperand : 1,
-            cardinality : ['single'],
-            baseType : ['integer', 'float']
-        },
+/**
+ * Process operands and returns the truncate.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/truncate
+ */
+var truncateProcessor = {
 
-        operands   : [],
+    constraints: {
+        minOperand: 1,
+        maxOperand: 1,
+        cardinality: ['single'],
+        baseType: ['integer', 'float']
+    },
 
-        process : function(){
+    operands: [],
 
-            var result = {
-                cardinality : 'single',
-                baseType : 'float'
-            };
+    process: function() {
 
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
+        var result = {
+            cardinality: 'single',
+            baseType: 'float'
+        };
 
-            var value = this.preProcessor
-                .parseOperands(this.operands).value()[0];
-
-            if ( _.isNaN(value) ) {
-                return null;
-            }
-
-            result.value = _.isFinite(value) ? parseInt(value, 10) : value;
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return truncateProcessor;
-});
+        var value = this.preProcessor
+            .parseOperands(this.operands).value()[0];
+
+        if (_.isNaN(value)) {
+            return null;
+        }
+
+        result.value = _.isFinite(value) ? parseInt(value, 10) : value;
+
+        return result;
+    }
+};
+
+export default truncateProcessor;

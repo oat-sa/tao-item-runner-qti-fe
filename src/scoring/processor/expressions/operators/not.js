@@ -23,48 +23,45 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns the NOT.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/not
+ */
+var notProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: 1,
+        cardinality: ['single'],
+        baseType: ['boolean']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the NOT.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/not
+     * Process the not of the operands.
+     * @returns {?ProcessingValue} the Not or null
      */
-    var notProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand : 1,
-            maxOperand : 1,
-            cardinality : ['single'],
-            baseType : ['boolean']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
-        operands   : [],
-
-        /**
-         * Process the not of the operands.
-         * @returns {?ProcessingValue} the Not or null
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType : 'boolean'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            result.value = !this.preProcessor.parseVariable(this.operands[0]).value;
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return notProcessor;
-});
+        result.value = !this.preProcessor.parseVariable(this.operands[0]).value;
+
+        return result;
+    }
+};
+
+export default notProcessor;

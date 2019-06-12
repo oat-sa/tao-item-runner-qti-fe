@@ -23,57 +23,54 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'taoQtiItem/scoring/processor/expressions/isPointInShape',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(_, isPointInShape, errorHandler){
-    'use strict';
+import _ from 'lodash';
+import isPointInShape from 'taoQtiItem/scoring/processor/expressions/isPointInShape';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
+
+
+/**
+ * Process operands and returns the inside.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/inside
+ */
+var insideProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: 1,
+        cardinality: ['single', 'ordered', 'multiple'],
+        baseType: ['point']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the inside.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/inside
+     * Process the inside of the operands.
+     * @returns {?ProcessingValue} is inside or null
      */
-    var insideProcessor = {
+    process: function() {
 
-        constraints: {
-            minOperand: 1,
-            maxOperand: 1,
-            cardinality: ['single', 'ordered', 'multiple'],
-            baseType: ['point']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
-        operands   : [],
-
-        /**
-         * Process the inside of the operands.
-         * @returns {?ProcessingValue} is inside or null
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType : 'boolean'
-            };
-
-            var attributes  = this.expression.attributes;
-            var shape  = attributes.shape || 'default';
-            var coords = _.map(attributes.coords.split(','), parseFloat);
+        var attributes = this.expression.attributes;
+        var shape = attributes.shape || 'default';
+        var coords = _.map(attributes.coords.split(','), parseFloat);
 
 
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            var point = this.preProcessor.parseVariable(this.operands[0]).value;
-
-            result.value = isPointInShape(shape,point, coords);
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return insideProcessor;
-});
+        var point = this.preProcessor.parseVariable(this.operands[0]).value;
+
+        result.value = isPointInShape(shape, point, coords);
+
+        return result;
+    }
+};
+
+export default insideProcessor;

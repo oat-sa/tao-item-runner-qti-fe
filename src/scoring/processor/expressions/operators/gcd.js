@@ -22,76 +22,72 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
 
-    /**
-     * Process operands and returns the gcd.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/gcd
-     */
-    var gcdProcessor = {
 
-        constraints : {
-            minOperand : 1,
-            gcdOperand : -1,
-            cardinality : ['single', 'multiple', 'ordered'],
-            baseType : ['integer']
-        },
+/**
+ * Process operands and returns the gcd.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/gcd
+ */
+var gcdProcessor = {
 
-        operands   : [],
+    constraints: {
+        minOperand: 1,
+        gcdOperand: -1,
+        cardinality: ['single', 'multiple', 'ordered'],
+        baseType: ['integer']
+    },
 
-        process : function(){
+    operands: [],
 
-            var result = {
-                cardinality : 'single',
-                baseType : 'integer'
-            };
+    process: function() {
 
-            //if at least one operand is null or infinity, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
+        var result = {
+            cardinality: 'single',
+            baseType: 'integer'
+        };
 
-            var castedOperands  = this.preProcessor.parseOperands(this.operands);
+        //if at least one operand is null or infinity, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
+        }
 
-            //if at least one operand is a not a number,  then break and return null
-            if (!castedOperands.every(this.preProcessor.isNumber)) {
-                return null;
-            }
+        var castedOperands = this.preProcessor.parseOperands(this.operands);
 
-            if (castedOperands.max().value() === 0 && castedOperands.min().value() === 0) {
-                result.value = 0;
-                return result;
-            }
+        //if at least one operand is a not a number,  then break and return null
+        if (!castedOperands.every(this.preProcessor.isNumber)) {
+            return null;
+        }
 
-            result.value = gcd(castedOperands.value());
-
+        if (castedOperands.max().value() === 0 && castedOperands.min().value() === 0) {
+            result.value = 0;
             return result;
         }
-    };
 
-    /**
-     * Helps to calculate greatest common divisor for two ore more numbers
-     * @param {Array<number|Number>}
-     * @returns {number} greatest common divisor
-     */
-    function gcd(numbers)
-    {
-        var n = numbers.length,
-            y = 0,
-            x = Math.abs(numbers[0]);
-        for (var i = 1; i < n; i++) {
-            y = Math.abs(numbers[i]);
-            while (x && y) {
-                x > y ? x %= y : y %= x;
-            }
-            x += y;
-        }
-        return x;
+        result.value = gcd(castedOperands.value());
+
+        return result;
     }
+};
 
-    return gcdProcessor;
-});
+/**
+ * Helps to calculate greatest common divisor for two ore more numbers
+ * @param {Array<number|Number>}
+ * @returns {number} greatest common divisor
+ */
+function gcd(numbers) {
+    var n = numbers.length,
+        y = 0,
+        x = Math.abs(numbers[0]);
+    for (var i = 1; i < n; i++) {
+        y = Math.abs(numbers[i]);
+        while (x && y) {
+            x > y ? x %= y : y %= x;
+        }
+        x += y;
+    }
+    return x;
+}
+
+export default gcdProcessor;

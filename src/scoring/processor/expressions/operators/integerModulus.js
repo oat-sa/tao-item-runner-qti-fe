@@ -23,63 +23,60 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns the integerModulus.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/integerModulus
+ */
+var integerModulusProcessor = {
+
+    constraints: {
+        minOperand: 2,
+        maxOperand: 2,
+        cardinality: ['single'],
+        baseType: ['integer']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the integerModulus.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/integerModulus
+     * Process the integerModulus of the operands.
+     * @returns {?ProcessingValue} the integerModulus or null
      */
-    var integerModulusProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand : 2,
-            maxOperand : 2,
-            cardinality : ['single'],
-            baseType : ['integer']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'integer'
+        };
 
-        operands   : [],
-
-        /**
-         * Process the integerModulus of the operands.
-         * @returns {?ProcessingValue} the integerModulus or null
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType : 'integer'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            result.value = this.preProcessor
-                .mapNumbers(this.operands)
-                .reduce(function(f, s){
-                    var result =  f % s;
-
-                    if (s === 0){
-                        return null;
-                    }
-
-                    return result;
-
-                });
-
-            if (_.isNull(result.value)){
-                return null;
-            }
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return integerModulusProcessor;
-});
+        result.value = this.preProcessor
+            .mapNumbers(this.operands)
+            .reduce(function(f, s) {
+                var result = f % s;
+
+                if (s === 0) {
+                    return null;
+                }
+
+                return result;
+
+            });
+
+        if (_.isNull(result.value)) {
+            return null;
+        }
+
+        return result;
+    }
+};
+
+export default integerModulusProcessor;

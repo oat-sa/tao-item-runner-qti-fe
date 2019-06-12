@@ -23,63 +23,60 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(_, errorHandler){
-    'use strict';
+import _ from 'lodash';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
+
+
+/**
+ * Process operands and returns index result.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/index
+ */
+var indexProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: 1,
+        cardinality: ['ordered'],
+        baseType: ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'file', 'uri', 'intOrIdentifier', 'duration']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns index result.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/index
+     * @returns {?ProcessingValue} a single boolean
      */
-    var indexProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand  : 1,
-            maxOperand  : 1,
-            cardinality : ['ordered'],
-            baseType    : ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'file', 'uri', 'intOrIdentifier', 'duration']
-        },
+        var result = {
+            cardinality: 'single'
+        };
 
-        operands   : [],
-
-        /**
-         * @returns {?ProcessingValue} a single boolean
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single'
-            };
-
-            var n = this.preProcessor.parseValue(this.expression.attributes.n, 'integerOrVariableRef');
+        var n = this.preProcessor.parseValue(this.expression.attributes.n, 'integerOrVariableRef');
 
 
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            if (n < 1) {
-                errorHandler.throw('scoring', new Error('n must be greater than 0'));
-                return null;
-            }
-
-            var op1 = this.preProcessor.parseVariable(this.operands[0]);
-
-            if (_.isUndefined(op1.value[n - 1])) {
-                return null;
-            }
-            result.value = op1.value[n - 1];
-            result.baseType = op1.baseType;
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
 
-    };
+        if (n < 1) {
+            errorHandler.throw('scoring', new Error('n must be greater than 0'));
+            return null;
+        }
 
-    return indexProcessor;
-});
+        var op1 = this.preProcessor.parseVariable(this.operands[0]);
+
+        if (_.isUndefined(op1.value[n - 1])) {
+            return null;
+        }
+        result.value = op1.value[n - 1];
+        result.baseType = op1.baseType;
+
+        return result;
+    }
+
+};
+
+export default indexProcessor;
 

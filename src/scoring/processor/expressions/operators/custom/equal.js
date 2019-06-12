@@ -25,88 +25,85 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(_, errorHandler){
-    'use strict';
+import _ from 'lodash';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
+
+
+/**
+ * Process operands and returns the equal.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/custom/equal
+ */
+var equalCProcessor = {
+
+    //equality algos based on different tolerance modes
+    engines: {
+        exact: function(x, y) {
+            return x === y;
+        },
+        absolute: function(x, y, includeLowerBound, includeUpperBound, tolerance) {
+            var lower = includeLowerBound ? y >= x - tolerance[0] : y > x - tolerance[0],
+                upper = includeUpperBound ? y <= x + tolerance[1] : y < x + tolerance[1];
+            return lower && upper;
+        },
+        relative: function(x, y, includeLowerBound, includeUpperBound, tolerance) {
+            var lower = includeLowerBound ? y >= x - (1 - tolerance[0] / 100) : y > x - (1 - tolerance[0] / 100),
+                upper = includeUpperBound ? y <= x + (1 - tolerance[1] / 100) : y < x + (1 - tolerance[1] / 100);
+            return lower && upper;
+        }
+    },
+
+    constraints: {
+        minOperand: 2,
+        maxOperand: 2,
+        cardinality: ['single'],
+        baseType: ['integer', 'float']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the equal.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/custom/equal
+     * Process the equal of the operands.
+     * @returns {?ProcessingValue} is equal or null
      */
-    var equalCProcessor = {
+    process: function() {
 
-        //equality algos based on different tolerance modes
-        engines: {
-            exact: function (x, y) {
-                return x === y;
-            },
-            absolute: function (x, y, includeLowerBound, includeUpperBound, tolerance) {
-                var lower = includeLowerBound ? y >= x - tolerance[0] : y > x - tolerance[0],
-                    upper = includeUpperBound ? y <= x + tolerance[1] : y < x + tolerance[1];
-                return lower && upper;
-            },
-            relative: function (x, y, includeLowerBound, includeUpperBound, tolerance) {
-                var lower = includeLowerBound ? y >= x - (1 - tolerance[0] / 100) : y > x - (1 - tolerance[0] / 100),
-                    upper = includeUpperBound ? y <= x + (1 - tolerance[1] / 100) : y < x + (1 - tolerance[1] / 100);
-                return lower && upper;
-            }
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
-        constraints : {
-            minOperand : 2,
-            maxOperand : 2,
-            cardinality : ['single'],
-            baseType : ['integer', 'float']
-        },
-
-        operands   : [],
-
-        /**
-         * Process the equal of the operands.
-         * @returns {?ProcessingValue} is equal or null
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType : 'boolean'
-            };
-
-            var attributes          = this.expression.attributes;
-            var toleranceMode       = attributes.toleranceMode || 'exact';
-            var engine              = this.engines[toleranceMode];
-            var tolerance           = attributes.tolerance ? attributes.tolerance.toString().split(' ') : [];
-            var includeLowerBound   = _.isString(attributes.includeLowerBound) || _.isBoolean(attributes.includeLowerBound) ? this.preProcessor.parseValue(attributes.includeLowerBound, 'boolean') : true;
-            var includeUpperBound   = _.isString(attributes.includeUpperBound) || _.isBoolean(attributes.includeUpperBound) ? this.preProcessor.parseValue(attributes.includeUpperBound, 'boolean') : true;
+        var attributes = this.expression.attributes;
+        var toleranceMode = attributes.toleranceMode || 'exact';
+        var engine = this.engines[toleranceMode];
+        var tolerance = attributes.tolerance ? attributes.tolerance.toString().split(' ') : [];
+        var includeLowerBound = _.isString(attributes.includeLowerBound) || _.isBoolean(attributes.includeLowerBound) ? this.preProcessor.parseValue(attributes.includeLowerBound, 'boolean') : true;
+        var includeUpperBound = _.isString(attributes.includeUpperBound) || _.isBoolean(attributes.includeUpperBound) ? this.preProcessor.parseValue(attributes.includeUpperBound, 'boolean') : true;
 
 
-            if (!_.isFunction(engine) || (_.contains(['absolute', 'relative'], toleranceMode) && tolerance.length === 0)) {
-                return errorHandler.throw('scoring', new Error('tolerance must me specified'));
-            }
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            tolerance = _(tolerance).map(function (t) {
-                return equalCProcessor.preProcessor.parseValue(t, 'floatOrVariableRef');
-            }).value();
-
-            // if only one tolerance bound is given it is used for both.
-            if (tolerance.length === 1) {
-                tolerance.push(tolerance[0]);
-            }
-
-            result.value = engine(this.preProcessor.parseVariable(this.operands[0]).value,
-                this.preProcessor.parseVariable(this.operands[1]).value, includeLowerBound, includeUpperBound, tolerance);
-
-            return result;
+        if (!_.isFunction(engine) || (_.contains(['absolute', 'relative'], toleranceMode) && tolerance.length === 0)) {
+            return errorHandler.throw('scoring', new Error('tolerance must me specified'));
         }
-    };
 
-    return equalCProcessor;
-});
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
+        }
+
+        tolerance = _(tolerance).map(function(t) {
+            return equalCProcessor.preProcessor.parseValue(t, 'floatOrVariableRef');
+        }).value();
+
+        // if only one tolerance bound is given it is used for both.
+        if (tolerance.length === 1) {
+            tolerance.push(tolerance[0]);
+        }
+
+        result.value = engine(this.preProcessor.parseVariable(this.operands[0]).value,
+            this.preProcessor.parseVariable(this.operands[1]).value, includeLowerBound, includeUpperBound, tolerance);
+
+        return result;
+    }
+};
+
+export default equalCProcessor;

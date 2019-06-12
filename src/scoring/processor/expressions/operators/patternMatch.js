@@ -23,61 +23,58 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns the patternMatch.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/patternMatch
+ */
+var patternMatchProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: 1,
+        cardinality: ['single'],
+        baseType: ['string']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the patternMatch.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/patternMatch
+     * Process the patternMatch of the operands.
+     * @returns {?ProcessingValue} the patternMatch or null
      */
-    var patternMatchProcessor = {
+    process: function() {
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
-        constraints : {
-            minOperand : 1,
-            maxOperand : 1,
-            cardinality : ['single'],
-            baseType : ['string']
-        },
-
-        operands   : [],
-
-        /**
-         * Process the patternMatch of the operands.
-         * @returns {?ProcessingValue} the patternMatch or null
-         */
-        process : function(){
-            var result = {
-                cardinality : 'single',
-                baseType : 'boolean'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            //escape $ and ^
-            var pattern = this.preProcessor.parseValue(this.expression.attributes.pattern, 'stringOrVariableRef')
-                .replace(/[\^\$]/g, "\\$&");
-
-            if (!pattern.match(/^(\.\*)/)) {
-                pattern = '^' + pattern;
-            }
-
-            if (!pattern.match(/(\.\*)$/)) {
-                pattern = pattern + '$';
-            }
-
-            var regexp = new RegExp(pattern);
-            result.value = regexp.test(this.preProcessor.parseVariable(this.operands[0]).value);
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
+
+        //escape $ and ^
+        var pattern = this.preProcessor.parseValue(this.expression.attributes.pattern, 'stringOrVariableRef')
+            .replace(/[\^\$]/g, "\\$&");
+
+        if (!pattern.match(/^(\.\*)/)) {
+            pattern = '^' + pattern;
+        }
+
+        if (!pattern.match(/(\.\*)$/)) {
+            pattern = pattern + '$';
+        }
+
+        var regexp = new RegExp(pattern);
+        result.value = regexp.test(this.preProcessor.parseVariable(this.operands[0]).value);
+
+        return result;
+    }
 
 };
 
-    return patternMatchProcessor;
-});
+export default patternMatchProcessor;

@@ -23,52 +23,49 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns the match.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/substring
+ */
+var matchProcessor = {
+
+    constraints: {
+        minOperand: 2,
+        maxOperand: 2,
+        cardinality: ['single', 'multiple', 'ordered'],
+        baseType: ['string', 'identifier', 'boolean', 'integer', 'float', 'pair', 'directedPair']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the match.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/substring
+     * Process the match of the operands.
+     * @returns {?ProcessingValue} the match or null
      */
-    var matchProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand : 2,
-            maxOperand : 2,
-            cardinality : ['single', 'multiple', 'ordered'],
-            baseType : ['string', 'identifier', 'boolean', 'integer', 'float', 'pair', 'directedPair']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
-        operands   : [],
-
-        /**
-         * Process the match of the operands.
-         * @returns {?ProcessingValue} the match or null
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType : 'boolean'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            result.value = _.isEqual(
-                this.preProcessor.parseVariable(this.operands[0]),
-                this.preProcessor.parseVariable(this.operands[1])
-            );
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
+
+        result.value = _.isEqual(
+            this.preProcessor.parseVariable(this.operands[0]),
+            this.preProcessor.parseVariable(this.operands[1])
+        );
+
+        return result;
+    }
 
 };
 
-    return matchProcessor;
-});
+export default matchProcessor;

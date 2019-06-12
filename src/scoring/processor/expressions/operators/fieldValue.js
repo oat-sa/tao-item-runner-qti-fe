@@ -23,53 +23,49 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+
+
+/**
+ * Process operands and returns fieldValue result.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/fieldValue
+ */
+var fieldValueProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: 1,
+        cardinality: ['record'],
+        baseType: [undefined]
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns fieldValue result.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/fieldValue
+     * @returns {?ProcessingValue} a single boolean
      */
-    var fieldValueProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand  : 1,
-            maxOperand  : 1,
-            cardinality : ['record'],
-            baseType    : [undefined]
-        },
+        var result = {};
 
-        operands   : [],
+        var fieldIdentifier = this.expression.attributes.fieldIdentifier;
 
-        /**
-         * @returns {?ProcessingValue} a single boolean
-         */
-        process : function(){
+        var record = this.preProcessor
+            .parseVariable(this.operands[0]).value;
+        //.parseOperands(this.operands).valueOf()[0];
 
-            var result = {};
-
-            var fieldIdentifier = this.expression.attributes.fieldIdentifier;
-
-            var record = this.preProcessor
-                .parseVariable(this.operands[0]).value;
-                //.parseOperands(this.operands).valueOf()[0];
-
-            if (!record[fieldIdentifier]) {
-                return null;
-            }
-
-            result.value = record[fieldIdentifier].value;
-            result.baseType = record[fieldIdentifier].baseType;
-            result.cardinality = record[fieldIdentifier].cardinality;
-            return result;
+        if (!record[fieldIdentifier]) {
+            return null;
         }
 
-    };
+        result.value = record[fieldIdentifier].value;
+        result.baseType = record[fieldIdentifier].baseType;
+        result.cardinality = record[fieldIdentifier].cardinality;
+        return result;
+    }
+
+};
 
 
-    return fieldValueProcessor;
-});
+export default fieldValueProcessor;
 

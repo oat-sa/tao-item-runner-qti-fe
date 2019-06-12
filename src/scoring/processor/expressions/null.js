@@ -23,24 +23,20 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([], function(){
-    'use strict';
+/**
+ * Null expression
+ * @type {ExpressionProcesssor}
+ * @exports taoQtiItem/scoring/processor/expressions/null
+ */
+var nullProcessor = {
 
     /**
-     * Null expression
-     * @type {ExpressionProcesssor}
-     * @exports taoQtiItem/scoring/processor/expressions/null
+     * Process the expression
+     * @returns {null}
      */
-    var nullProcessor = {
+    process: function() {
+        return null;
+    }
+};
 
-        /**
-         * Process the expression
-         * @returns {null}
-         */
-        process : function(){
-            return null;
-        }
-    };
-
-    return nullProcessor;
-});
+export default nullProcessor;

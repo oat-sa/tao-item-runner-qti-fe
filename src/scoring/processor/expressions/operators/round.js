@@ -23,60 +23,57 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_, preProcessor){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns round result.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/round
+ */
+var roundProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: 1,
+        cardinality: ['single'],
+        baseType: ['integer', 'float']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns round result.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/round
+     * @returns {?ProcessingValue} a single boolean
      */
-    var roundProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand  : 1,
-            maxOperand  : 1,
-            cardinality : ['single'],
-            baseType    : ['integer', 'float']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'float'
+        };
 
-        operands   : [],
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
+        }
 
-        /**
-         * @returns {?ProcessingValue} a single boolean
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType    : 'float'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            var value = this.preProcessor
-                .parseOperands(this.operands).value()[0];
+        var value = this.preProcessor
+            .parseOperands(this.operands).value()[0];
 
 
-            if ( _.isNaN(value) ) {
-                return null;
-            }
+        if (_.isNaN(value)) {
+            return null;
+        }
 
-            if ( !_.isFinite(value) ) {
-                result.value = value;
-                return result;
-            }
-
-            result.value = Math.round(value);
+        if (!_.isFinite(value)) {
+            result.value = value;
             return result;
         }
-    };
 
-    return roundProcessor;
-});
+        result.value = Math.round(value);
+        return result;
+    }
+};
+
+export default roundProcessor;
 

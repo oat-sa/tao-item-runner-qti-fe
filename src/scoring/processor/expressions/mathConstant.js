@@ -23,35 +23,31 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([], function(){
-    'use strict';
+/**
+ * BaseValue expression
+ * @type {ExpressionProcesssor}
+ * @exports taoQtiItem/scoring/processor/expressions/mathConstant
+ */
+var mathConstantProcessor = {
 
     /**
-     * BaseValue expression
-     * @type {ExpressionProcesssor}
-     * @exports taoQtiItem/scoring/processor/expressions/mathConstant
+     * Process the expression
+     * @returns {ProcessingValue} the value from the expression
      */
-    var mathConstantProcessor = {
-
-        /**
-         * Process the expression
-         * @returns {ProcessingValue} the value from the expression
-         */
-        process : function(){
-            var value;
-            if(this.expression.attributes.name === 'e'){
-                value = Math.E;
-            }
-            if(this.expression.attributes.name === 'pi'){
-                value = Math.PI;
-            }
-            return {
-                cardinality : 'single',
-                baseType    : 'float',
-                value       : value
-            };
+    process: function() {
+        var value;
+        if (this.expression.attributes.name === 'e') {
+            value = Math.E;
         }
-    };
+        if (this.expression.attributes.name === 'pi') {
+            value = Math.PI;
+        }
+        return {
+            cardinality: 'single',
+            baseType: 'float',
+            value: value
+        };
+    }
+};
 
-    return mathConstantProcessor;
-});
+export default mathConstantProcessor;

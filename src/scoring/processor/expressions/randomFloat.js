@@ -24,52 +24,49 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(_, errorHandler){
-    'use strict';
+import _ from 'lodash';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
+
+
+/**
+ * Correct expression
+ * @type {ExpressionProcesssor}
+ * @exports taoQtiItem/scoring/processor/expressions/randomFloat
+ */
+var randomFloatProcessor = {
 
     /**
-     * Correct expression
-     * @type {ExpressionProcesssor}
-     * @exports taoQtiItem/scoring/processor/expressions/randomFloat
+     * Process the expression
+     * @returns {ProcessingValue} the value from the expression
      */
-    var randomFloatProcessor = {
+    process: function() {
 
-        /**
-         * Process the expression
-         * @returns {ProcessingValue} the value from the expression
-         */
-        process : function(){
+        var range;
+        var min = this.preProcessor.parseValue(this.expression.attributes.min, 'floatOrVariableRef');
+        var max = this.preProcessor.parseValue(this.expression.attributes.max, 'floatOrVariableRef');
 
-            var range;
-            var min         = this.preProcessor.parseValue(this.expression.attributes.min, 'floatOrVariableRef');
-            var max         = this.preProcessor.parseValue(this.expression.attributes.max, 'floatOrVariableRef');
+        var result = {
+            cardinality: 'single',
+            baseType: 'float'
+        };
 
-            var result = {
-                cardinality : 'single',
-                baseType    : 'float'
-            };
-
-            //verfiy attributes
-            if(_.isNaN(min) || !_.isFinite(min)){
-                min = 0;
-            }
-            if(_.isNaN(max) || !_.isFinite(max)){
-                return errorHandler.throw('scoring', new Error('The max value of a randomFloat expresssion should be a finite integer.'));
-            }
-
-            if(min > max){
-                return errorHandler.throw('scoring', new Error('Come on! How am I supposed to generate a random number from a negative range : min > max'));
-            }
-
-            //get the random value
-            result.value = _.random(min, max, true);
-
-            return result;
+        //verfiy attributes
+        if (_.isNaN(min) || !_.isFinite(min)) {
+            min = 0;
         }
-    };
+        if (_.isNaN(max) || !_.isFinite(max)) {
+            return errorHandler.throw('scoring', new Error('The max value of a randomFloat expresssion should be a finite integer.'));
+        }
 
-    return randomFloatProcessor;
-});
+        if (min > max) {
+            return errorHandler.throw('scoring', new Error('Come on! How am I supposed to generate a random number from a negative range : min > max'));
+        }
+
+        //get the random value
+        result.value = _.random(min, max, true);
+
+        return result;
+    }
+};
+
+export default randomFloatProcessor;

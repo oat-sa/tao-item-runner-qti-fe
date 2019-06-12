@@ -23,54 +23,51 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function (_) {
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns the stringMatch.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/stringMatch
+ */
+var stringMatchProcessor = {
+
+    constraints: {
+        minOperand: 2,
+        maxOperand: 2,
+        cardinality: ['single'],
+        baseType: ['string']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the stringMatch.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/stringMatch
+     * Process the stringMatch of the operands.
+     * @returns {?ProcessingValue} the stringMatch or null
      */
-    var stringMatchProcessor = {
+    process: function() {
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
-        constraints: {
-            minOperand: 2,
-            maxOperand: 2,
-            cardinality: ['single'],
-            baseType: ['string']
-        },
-
-        operands: [],
-
-        /**
-         * Process the stringMatch of the operands.
-         * @returns {?ProcessingValue} the stringMatch or null
-         */
-        process: function () {
-            var result = {
-                cardinality: 'single',
-                baseType: 'boolean'
-            };
-
-            //if at least one operand is null, then break and return null
-            if (_.some(this.operands, _.isNull) === true) {
-                return null;
-            }
-            var values = this.operands,
-                caseSensitive = _.isBoolean(this.expression.attributes.caseSensitive) ? this.expression.attributes.caseSensitive : true;
-
-            var v1 = this.preProcessor.parseVariable(values[0]).value,
-                v2 = this.preProcessor.parseVariable(values[1]).value;
-
-
-            result.value = caseSensitive ? v1 === v2 : v1.toUpperCase() === v2.toUpperCase();
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
+        var values = this.operands,
+            caseSensitive = _.isBoolean(this.expression.attributes.caseSensitive) ? this.expression.attributes.caseSensitive : true;
 
-    };
+        var v1 = this.preProcessor.parseVariable(values[0]).value,
+            v2 = this.preProcessor.parseVariable(values[1]).value;
 
-    return stringMatchProcessor;
-});
+
+        result.value = caseSensitive ? v1 === v2 : v1.toUpperCase() === v2.toUpperCase();
+
+        return result;
+    }
+
+};
+
+export default stringMatchProcessor;

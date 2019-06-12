@@ -1,6 +1,6 @@
 # tao-qti-item-runner-fe
 
-QTI Item frontend library of TAO.
+QTI Item Runner frontend library of TAO.
 
 Available scripts in the project:
 

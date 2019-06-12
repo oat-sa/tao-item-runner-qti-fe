@@ -22,41 +22,37 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'taoQtiItem/scoring/processor/responseRules/exitResponse',
-    'taoQtiItem/scoring/processor/responseRules/responseCondition',
-    'taoQtiItem/scoring/processor/responseRules/setOutcomeValue',
-], function(exitResponse, responseCondition, setOutcomeValue){
-    'use strict';
+import exitResponse from 'taoQtiItem/scoring/processor/responseRules/exitResponse';
+import responseCondition from 'taoQtiItem/scoring/processor/responseRules/responseCondition';
+import setOutcomeValue from 'taoQtiItem/scoring/processor/responseRules/setOutcomeValue';
 
-    /**
-     * An ResponseRuleProcessor
-     * @typedef ResponseRuleProcessor
-     * @property {Object} rule - the response rule definition
-     * @property {Object} state - the item state (response, outcomes and friends)
-     * @property {Funtion} process - the processing
-     */
 
-    /**
-     * Mock a processor only to make some responseRules supported but do nothing
-     * (when the behavior is implemented somewhere else)
-     * @private
-     */
-    var _noopProcessor = {
-        process : function(){}
-    };
+/**
+ * An ResponseRuleProcessor
+ * @typedef ResponseRuleProcessor
+ * @property {Object} rule - the response rule definition
+ * @property {Object} state - the item state (response, outcomes and friends)
+ * @property {Funtion} process - the processing
+ */
 
-    /**
-     * Lists all available response rule processors
-     * @exports taoQtiItem/scoring/processor/responseRules/rules
-     */
-    return {
-        'exitResponse'      : exitResponse,
-        'responseCondition' : responseCondition,
-        'responseIf'        : _noopProcessor,
-        'responseElse'      : _noopProcessor,
-        'responseElseIf'    : _noopProcessor,
-        'setOutcomeValue'   : setOutcomeValue,
-    };
+/**
+ * Mock a processor only to make some responseRules supported but do nothing
+ * (when the behavior is implemented somewhere else)
+ * @private
+ */
+var _noopProcessor = {
+    process: function() {}
+};
 
-});
+/**
+ * Lists all available response rule processors
+ * @exports taoQtiItem/scoring/processor/responseRules/rules
+ */
+export default {
+    'exitResponse': exitResponse,
+    'responseCondition': responseCondition,
+    'responseIf': _noopProcessor,
+    'responseElse': _noopProcessor,
+    'responseElseIf': _noopProcessor,
+    'setOutcomeValue': setOutcomeValue,
+};

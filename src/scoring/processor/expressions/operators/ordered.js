@@ -23,64 +23,61 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(_, errorHandler){
-    'use strict';
+import _ from 'lodash';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
+
+
+/**
+ * Process operands and returns ordered result.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/ordered
+ */
+var orderedProcessor = {
+
+    constraints: {
+        minOperand: 0,
+        maxOperand: -1,
+        cardinality: ['single', 'ordered'],
+        baseType: ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'duration', 'file', 'uri', 'intOrIdentifier']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns ordered result.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/ordered
+     * @returns {?ProcessingValue} a single boolean
      */
-    var orderedProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand  : 0,
-            maxOperand  : -1,
-            cardinality : ['single', 'ordered'],
-            baseType    : ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'duration', 'file', 'uri', 'intOrIdentifier']
-        },
+        var result = {
+            cardinality: 'ordered'
+        };
 
-        operands   : [],
-
-        /**
-         * @returns {?ProcessingValue} a single boolean
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'ordered'
-            };
-
-            //if all one operands are null or no operands, then break and return null
-            if(_.every(this.operands, _.isNull) === true || this.operands.length === 0 ){
-                return null;
-            }
-
-            var filteredOperands = _(this.operands).filter(_.isObject).value();
-
-            if (Object.keys(_.countBy(filteredOperands, 'baseType')).length !== 1) {
-                errorHandler.throw('scoring', new Error('operands must be of the same type'));
-                return null;
-            }
-
-            result.baseType = this.operands[0].baseType;
-
-            result.value = this.preProcessor
-                .parseOperands(filteredOperands)
-                .reduce(function (acc, current) {
-                    acc.push(current);
-                    return acc;
-                }, []);
-
-            return result;
+        //if all one operands are null or no operands, then break and return null
+        if (_.every(this.operands, _.isNull) === true || this.operands.length === 0) {
+            return null;
         }
 
-    };
+        var filteredOperands = _(this.operands).filter(_.isObject).value();
+
+        if (Object.keys(_.countBy(filteredOperands, 'baseType')).length !== 1) {
+            errorHandler.throw('scoring', new Error('operands must be of the same type'));
+            return null;
+        }
+
+        result.baseType = this.operands[0].baseType;
+
+        result.value = this.preProcessor
+            .parseOperands(filteredOperands)
+            .reduce(function(acc, current) {
+                acc.push(current);
+                return acc;
+            }, []);
+
+        return result;
+    }
+
+};
 
 
-    return orderedProcessor;
-});
+export default orderedProcessor;
 

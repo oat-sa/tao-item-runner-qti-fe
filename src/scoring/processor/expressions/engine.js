@@ -22,123 +22,120 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'taoQtiItem/scoring/processor/expressions/processor',
-    'taoQtiItem/scoring/processor/expressions/expressions',
-    'taoQtiItem/scoring/processor/expressions/operators/operators'
-], function(_, processorFactory, expressionProcessors, operatorProcessors){
-    'use strict';
-
-    //get the list of available operators
-    var operators = _.keys(operatorProcessors);
-
-    //regsiter all processors
-    _.forEach(expressionProcessors, function(expressionProcessor, name){
-        processorFactory.register(name, processorFactory.types.EXPRESSION, expressionProcessor);
-    });
-    _.forEach(operatorProcessors, function(operatorProcessor, name){
-        processorFactory.register(name, processorFactory.types.OPERATOR, operatorProcessor);
-    });
+import _ from 'lodash';
+import processorFactory from 'taoQtiItem/scoring/processor/expressions/processor';
+import expressionProcessors from 'taoQtiItem/scoring/processor/expressions/expressions';
+import operatorProcessors from 'taoQtiItem/scoring/processor/expressions/operators/operators';
 
 
-    /**
-     * Creates an engine that can look over the expressions and execute them accordingy.
-     *
-     * @exports taoQtiItem/scoring/processor/expressions/engine
-     * @param {Object} state - the item session state (response and outcome variables)
-     * @returns {Object} the expression engine
-     */
-    var expressionEngineFactory = function expressionEngineFactory(state){
+//get the list of available operators
+var operators = _.keys(operatorProcessors);
 
-        var trail = [];
-        var marker = [];
-        var operands = [];
+//regsiter all processors
+_.forEach(expressionProcessors, function(expressionProcessor, name) {
+    processorFactory.register(name, processorFactory.types.EXPRESSION, expressionProcessor);
+});
+_.forEach(operatorProcessors, function(operatorProcessor, name) {
+    processorFactory.register(name, processorFactory.types.OPERATOR, operatorProcessor);
+});
 
-        var isMarked = function isMarked(expression){
-            return _.contains(marker, expression);
-        };
 
-        var mark = function mark(expression){
-            marker.push(expression);
-        };
+/**
+ * Creates an engine that can look over the expressions and execute them accordingy.
+ *
+ * @exports taoQtiItem/scoring/processor/expressions/engine
+ * @param {Object} state - the item session state (response and outcome variables)
+ * @returns {Object} the expression engine
+ */
+var expressionEngineFactory = function expressionEngineFactory(state) {
 
-        var isOperator = function isOperator(expression){
-            return _.contains(operators, expression.qtiClass);
-        };
+    var trail = [];
+    var marker = [];
+    var operands = [];
 
-        var pushSubExpressions = function pushSubExpressions(expression){
-            _.forEach(expression.expressions, function(subExpression){
-                trail.push(subExpression);
-            });
-        };
-
-        var popOperands = function popOperands(expression){
-            var r = _.reduce(expression.expressions, function(result){
-                if(operands.length){
-                    result.push(_.clone(operands.pop()));
-                }
-                return result;
-            }, []);
-            return r;
-        };
-
-        return {
-
-            /**
-             * Execute the engine on the given expression tree
-             * @param {Object} expression - the expression to process
-             * @return {?ProcessingValue} the result of the expression evaluation in the form of a variable
-             */
-            execute : function(expression){
-
-                var currentExpression,
-                    currentProcessor,
-
-                    result;
-
-                var baseExpression = expression.qtiClass;
-
-                trail.push(expression);
-
-                //TODO remove the limit and add a timeout
-                while(trail.length > 0){
-
-                    currentExpression = trail.pop();
-                    currentProcessor = null;
-
-                    if(!isMarked(currentExpression) && isOperator(currentExpression)){
-
-                        mark(currentExpression);
-
-                        trail.push(currentExpression);
-
-                        //reverse push sub expressions
-                        pushSubExpressions(currentExpression);
-
-                    } else if (isMarked(currentExpression)){
-
-                        // Operator, second pass. Process it.
-                        currentProcessor = processorFactory(currentExpression, state, popOperands(currentExpression));
-                        result = currentProcessor.process();
-
-                        //add the result to the operand stack
-                        operands.push(result);
-
-                    } else {
-
-                        // Simple expression, process it.
-                        currentProcessor = processorFactory(currentExpression, state);
-                        result = currentProcessor.process();
-
-                        //add the result to the operand stack
-                        operands.push(result);
-                    }
-                }
-                return result;
-            }
-        };
+    var isMarked = function isMarked(expression) {
+        return _.contains(marker, expression);
     };
 
-    return expressionEngineFactory;
-});
+    var mark = function mark(expression) {
+        marker.push(expression);
+    };
+
+    var isOperator = function isOperator(expression) {
+        return _.contains(operators, expression.qtiClass);
+    };
+
+    var pushSubExpressions = function pushSubExpressions(expression) {
+        _.forEach(expression.expressions, function(subExpression) {
+            trail.push(subExpression);
+        });
+    };
+
+    var popOperands = function popOperands(expression) {
+        var r = _.reduce(expression.expressions, function(result) {
+            if (operands.length) {
+                result.push(_.clone(operands.pop()));
+            }
+            return result;
+        }, []);
+        return r;
+    };
+
+    return {
+
+        /**
+         * Execute the engine on the given expression tree
+         * @param {Object} expression - the expression to process
+         * @return {?ProcessingValue} the result of the expression evaluation in the form of a variable
+         */
+        execute: function(expression) {
+
+            var currentExpression,
+                currentProcessor,
+
+                result;
+
+            var baseExpression = expression.qtiClass;
+
+            trail.push(expression);
+
+            //TODO remove the limit and add a timeout
+            while (trail.length > 0) {
+
+                currentExpression = trail.pop();
+                currentProcessor = null;
+
+                if (!isMarked(currentExpression) && isOperator(currentExpression)) {
+
+                    mark(currentExpression);
+
+                    trail.push(currentExpression);
+
+                    //reverse push sub expressions
+                    pushSubExpressions(currentExpression);
+
+                } else if (isMarked(currentExpression)) {
+
+                    // Operator, second pass. Process it.
+                    currentProcessor = processorFactory(currentExpression, state, popOperands(currentExpression));
+                    result = currentProcessor.process();
+
+                    //add the result to the operand stack
+                    operands.push(result);
+
+                } else {
+
+                    // Simple expression, process it.
+                    currentProcessor = processorFactory(currentExpression, state);
+                    result = currentProcessor.process();
+
+                    //add the result to the operand stack
+                    operands.push(result);
+                }
+            }
+            return result;
+        }
+    };
+};
+
+export default expressionEngineFactory;

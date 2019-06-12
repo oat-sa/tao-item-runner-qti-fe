@@ -23,57 +23,56 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns the sum.
+ * @type {OperatorProcesssor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/sum
+ */
+var sumProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: -1,
+        cardinality: ['single', 'multiple', 'ordered'],
+        baseType: ['integer', 'float']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the sum.
-     * @type {OperatorProcesssor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/sum
+     * Process the sum of the operands.
+     * @returns {?ProcessingValue} the sum or null
      */
-    var sumProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand : 1,
-            maxOperand : -1,
-            cardinality : ['single', 'multiple', 'ordered'],
-            baseType : ['integer', 'float']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'integer'
+        };
 
-        operands   : [],
-
-        /**
-         * Process the sum of the operands.
-         * @returns {?ProcessingValue} the sum or null
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType : 'integer'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            //if at least one operand is a float , the result is a float
-            if(_.some(this.operands, { baseType : 'float' })){
-                result.baseType = 'float';
-            }
-
-            result.value = this.preProcessor
-                .mapNumbers(this.operands)
-                .reduce(function(sum, value){
-                    return sum + value;
-                });
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return sumProcessor;
-});
+        //if at least one operand is a float , the result is a float
+        if (_.some(this.operands, {
+                baseType: 'float'
+            })) {
+            result.baseType = 'float';
+        }
+
+        result.value = this.preProcessor
+            .mapNumbers(this.operands)
+            .reduce(function(sum, value) {
+                return sum + value;
+            });
+
+        return result;
+    }
+};
+
+export default sumProcessor;

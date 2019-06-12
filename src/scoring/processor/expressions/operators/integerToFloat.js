@@ -23,48 +23,45 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns integerToFloat result.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/integerToFloat
+ */
+var integerToFloatProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: 1,
+        cardinality: ['single'],
+        baseType: ['integer']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns integerToFloat result.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/integerToFloat
+     * Convert to float
+     * @returns {?ProcessingValue} a single boolean
      */
-    var integerToFloatProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand  : 1,
-            maxOperand  : 1,
-            cardinality : ['single'],
-            baseType    : ['integer']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'float'
+        };
 
-        operands   : [],
-
-        /**
-         * Convert to float
-         * @returns {?ProcessingValue} a single boolean
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType    : 'float'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            result.value = this.preProcessor.parseValue(this.operands[0].value, 'float');
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return integerToFloatProcessor;
-});
+        result.value = this.preProcessor.parseValue(this.operands[0].value, 'float');
+
+        return result;
+    }
+};
+
+export default integerToFloatProcessor;

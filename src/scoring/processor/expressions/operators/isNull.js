@@ -23,46 +23,42 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+
+
+/**
+ * Process operands and returns a boolean of the  isNull.
+ * @type {OperatorProcesssor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/isNull
+ */
+var isNullProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: 1,
+        cardinality: ['single', 'multiple', 'ordered', 'record'],
+        baseType: ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'duration', 'file', 'uri', 'intOrIdentifier']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns a boolean of the  isNull.
-     * @type {OperatorProcesssor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/isNull
+     * Check if the unique operand is null.
+     * @returns {?ProcessingValue} a single boolean
      */
-    var isNullProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand  : 1,
-            maxOperand  : 1,
-            cardinality : ['single', 'multiple', 'ordered', 'record'],
-            baseType    : ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'duration', 'file', 'uri', 'intOrIdentifier']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean',
+            value: false
+        };
 
-        operands   : [],
-
-        /**
-         * Check if the unique operand is null.
-         * @returns {?ProcessingValue} a single boolean
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType    : 'boolean',
-                value       : false
-            };
-
-            if(this.operands[0] === null || this.operands[0].value === null){
-                result.value = true;
-            }
-
-            return result;
+        if (this.operands[0] === null || this.operands[0].value === null) {
+            result.value = true;
         }
-    };
 
-    return isNullProcessor;
-});
+        return result;
+    }
+};
+
+export default isNullProcessor;

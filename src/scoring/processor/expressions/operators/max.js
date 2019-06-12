@@ -22,51 +22,50 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
 
-    var maxProcessor = {
 
-        constraints : {
-            minOperand : 1,
-            maxOperand : -1,
-            cardinality : ['single', 'multiple', 'ordered'],
-            baseType : ['integer', 'float']
-        },
+var maxProcessor = {
 
-        operands   : [],
+    constraints: {
+        minOperand: 1,
+        maxOperand: -1,
+        cardinality: ['single', 'multiple', 'ordered'],
+        baseType: ['integer', 'float']
+    },
 
-        process : function(){
+    operands: [],
 
-            var result = {
-                cardinality : 'single',
-                baseType : 'integer'
-            };
+    process: function() {
 
-            //if at least one operand is null or infinity, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
+        var result = {
+            cardinality: 'single',
+            baseType: 'integer'
+        };
 
-            //if at least one operand is a float , the result is a float
-            if(_.some(this.operands, { baseType : 'float' })){
-                result.baseType = 'float';
-            }
-
-            var castedOperands  = this.preProcessor.parseOperands(this.operands);
-
-            //if at least one operand is a not a number,  then break and return null
-            if (!castedOperands.every(this.preProcessor.isNumber)) {
-                return null;
-            }
-
-            result.value = castedOperands.max().value();
-
-            return result;
+        //if at least one operand is null or infinity, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return maxProcessor;
-});
+        //if at least one operand is a float , the result is a float
+        if (_.some(this.operands, {
+                baseType: 'float'
+            })) {
+            result.baseType = 'float';
+        }
+
+        var castedOperands = this.preProcessor.parseOperands(this.operands);
+
+        //if at least one operand is a not a number,  then break and return null
+        if (!castedOperands.every(this.preProcessor.isNumber)) {
+            return null;
+        }
+
+        result.value = castedOperands.max().value();
+
+        return result;
+    }
+};
+
+export default maxProcessor;

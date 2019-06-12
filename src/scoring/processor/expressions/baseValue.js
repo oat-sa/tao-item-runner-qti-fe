@@ -23,28 +23,24 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([], function(){
-    'use strict';
+/**
+ * BaseValue expression
+ * @type {ExpressionProcesssor}
+ * @exports taoQtiItem/scoring/processor/expressions/baseValue
+ */
+var baseValueProcessor = {
 
     /**
-     * BaseValue expression
-     * @type {ExpressionProcesssor}
-     * @exports taoQtiItem/scoring/processor/expressions/baseValue
+     * Process the expression
+     * @returns {ProcessingValue} the value from the expression
      */
-    var baseValueProcessor = {
+    process: function() {
+        return this.preProcessor.parseVariable({
+            cardinality: 'single',
+            baseType: this.expression.attributes.baseType,
+            value: this.expression.value
+        });
+    }
+};
 
-        /**
-         * Process the expression
-         * @returns {ProcessingValue} the value from the expression
-         */
-        process : function(){
-            return this.preProcessor.parseVariable({
-                cardinality : 'single',
-                baseType : this.expression.attributes.baseType,
-                value : this.expression.value
-            });
-        }
-    };
-
-    return baseValueProcessor;
-});
+export default baseValueProcessor;

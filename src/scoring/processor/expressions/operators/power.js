@@ -23,63 +23,60 @@
 
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    "use strict";
+import _ from 'lodash';
 
-    /**
-     * Process operands and returns the power.
-     * @type {OperatorProcesssor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/power
-     */
-    var powerProcessor = {
 
-        constraints : {
-            minOperand : 2,
-            maxOperand : 2,
-            cardinality : ['single'],
-            baseType : ['integer', 'float']
-        },
+/**
+ * Process operands and returns the power.
+ * @type {OperatorProcesssor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/power
+ */
+var powerProcessor = {
 
-        operands   : [],
+    constraints: {
+        minOperand: 2,
+        maxOperand: 2,
+        cardinality: ['single'],
+        baseType: ['integer', 'float']
+    },
 
-        process : function(){
+    operands: [],
 
-            var result = {
-                cardinality : 'single',
-                baseType : 'float'
-            };
+    process: function() {
 
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
+        var result = {
+            cardinality: 'single',
+            baseType: 'float'
+        };
 
-            result.value = this.preProcessor
-                .mapNumbers(this.operands)
-                .reduce(function(base, exp){
-                    var result = Math.pow(base, exp);
-
-                    //checking for float overflow, if happens returns null
-                    if ( !_.isFinite(result) && _.isFinite(base) ) {
-                        result = null;
-                    }
-
-                    if (result === 0 && base !== 0) {
-                        result = null;
-                    }
-
-                    return result;
-                });
-
-            if (_.isNull(result.value)) {
-                return null;
-            }
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return powerProcessor;
-});
+        result.value = this.preProcessor
+            .mapNumbers(this.operands)
+            .reduce(function(base, exp) {
+                var result = Math.pow(base, exp);
+
+                //checking for float overflow, if happens returns null
+                if (!_.isFinite(result) && _.isFinite(base)) {
+                    result = null;
+                }
+
+                if (result === 0 && base !== 0) {
+                    result = null;
+                }
+
+                return result;
+            });
+
+        if (_.isNull(result.value)) {
+            return null;
+        }
+
+        return result;
+    }
+};
+
+export default powerProcessor;

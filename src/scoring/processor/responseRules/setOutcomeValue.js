@@ -23,40 +23,35 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'taoQtiItem/scoring/processor/expressions/engine',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(expressionEngineFactory, errorHandler){
-    'use strict';
+import expressionEngineFactory from 'taoQtiItem/scoring/processor/expressions/engine';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
+
+
+/**
+ * The rule processor.
+ *
+ * @type {responseRuleProcessor}
+ * @exports taoQtiItem/scoring/processor/responseRules/setOutcomeValue
+ */
+var setOutcomeValueProcessor = {
 
     /**
-     * The rule processor.
-     *
-     * @type {responseRuleProcessor}
-     * @exports taoQtiItem/scoring/processor/responseRules/setOutcomeValue
+     * Process the rule
      */
-    var setOutcomeValueProcessor = {
+    process: function() {
+        var identifier = this.rule.attributes.identifier;
+        var variable = this.state[identifier];
+        var expressionEngine = expressionEngineFactory(this.state);
+        var result = expressionEngine.execute(this.rule.expression);
 
-        /**
-         * Process the rule
-         */
-        process : function(){
-            var identifier = this.rule.attributes.identifier;
-            var variable   = this.state[identifier];
-            var expressionEngine = expressionEngineFactory(this.state);
-
-            if(!variable || !variable.baseType){
-                return errorHandler.throw('scoring', new TypeError('No variable found with identifier ' + identifier ));
-            }
-
-            var result = expressionEngine.execute(this.rule.expression);
-
-            if(result && typeof result.value !== 'undefined'){
-
-                variable.value = result.value;
-            }
+        if (!variable || !variable.baseType) {
+            return errorHandler.throw('scoring', new TypeError('No variable found with identifier ' + identifier));
         }
-    };
 
-    return setOutcomeValueProcessor;
-});
+        if (result && typeof result.value !== 'undefined') {
+            variable.value = result.value;
+        }
+    }
+};
+
+export default setOutcomeValueProcessor;

@@ -23,52 +23,49 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns the AND.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/and
+ */
+var andProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: -1,
+        cardinality: ['single'],
+        baseType: ['boolean']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the AND.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/and
+     * Process the AND of the operands.
+     * @returns {?ProcessingValue} the and or null
      */
-    var andProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand : 1,
-            maxOperand : -1,
-            cardinality : ['single'],
-            baseType : ['boolean']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
-        operands   : [],
-
-        /**
-         * Process the AND of the operands.
-         * @returns {?ProcessingValue} the and or null
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType : 'boolean'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            result.value = this.preProcessor
-                .parseOperands(this.operands)
-                .reduce(function(f, s){
-                    return f && s;
-                });
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return andProcessor;
-});
+        result.value = this.preProcessor
+            .parseOperands(this.operands)
+            .reduce(function(f, s) {
+                return f && s;
+            });
+
+        return result;
+    }
+};
+
+export default andProcessor;

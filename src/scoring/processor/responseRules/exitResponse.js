@@ -24,26 +24,21 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-], function(){
-    'use strict';
+/**
+ * The rule processor.
+ *
+ * @type {responseRuleProcessor}
+ * @exports taoQtiItem/scoring/processor/responseRules/exitResponse
+ */
+var exitResponseProcessor = {
 
     /**
-     * The rule processor.
-     *
-     * @type {responseRuleProcessor}
-     * @exports taoQtiItem/scoring/processor/responseRules/exitResponse
+     * Process the rule
+     * @returns {Boolean} false to break the processing
      */
-    var exitResponseProcessor = {
+    process: function() {
+        return false;
+    }
+};
 
-        /**
-         * Process the rule
-         * @returns {Boolean} false to break the processing
-         */
-        process : function(){
-            return false;
-        }
-    };
-
-    return exitResponseProcessor;
-});
+export default exitResponseProcessor;

@@ -23,49 +23,46 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns the durationLT.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/durationLT
+ */
+var durationLTProcessor = {
+
+    constraints: {
+        minOperand: 2,
+        maxOperand: 2,
+        cardinality: ['single'],
+        baseType: ['duration']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the durationLT.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/durationLT
+     * Process the durationLT of the operands.
+     * @returns {?ProcessingValue} the durationLT or null
      */
-    var durationLTProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand : 2,
-            maxOperand : 2,
-            cardinality : ['single'],
-            baseType : ['duration']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
-        operands   : [],
-
-        /**
-         * Process the durationLT of the operands.
-         * @returns {?ProcessingValue} the durationLT or null
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType : 'boolean'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            result.value = this.preProcessor
-                .parseVariable(this.operands[0]).value < this.preProcessor.parseVariable(this.operands[1]).value;
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return durationLTProcessor;
-});
+        result.value = this.preProcessor
+            .parseVariable(this.operands[0]).value < this.preProcessor.parseVariable(this.operands[1]).value;
+
+        return result;
+    }
+};
+
+export default durationLTProcessor;

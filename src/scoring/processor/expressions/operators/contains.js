@@ -23,63 +23,60 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(_, errorHandler){
-    'use strict';
+import _ from 'lodash';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
+
+
+/**
+ * Process operands and returns contains result.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/contains
+ */
+var containsProcessor = {
+
+    constraints: {
+        minOperand: 2,
+        maxOperand: 2,
+        cardinality: ['multiple', 'ordered'],
+        baseType: ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'file', 'uri', 'intOrIdentifier']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns contains result.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/contains
+     * @returns {?ProcessingValue} a single boolean
      */
-    var containsProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand  : 2,
-            maxOperand  : 2,
-            cardinality : ['multiple', 'ordered'],
-            baseType    : ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'file', 'uri', 'intOrIdentifier']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
-        operands   : [],
-
-        /**
-         * @returns {?ProcessingValue} a single boolean
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType    : 'boolean'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-            if (Object.keys(_.countBy(this.operands, 'baseType')).length !== 1) {
-                errorHandler.throw('scoring', new Error('operands must be of the same baseType'));
-                return null;
-            }
-
-            if (Object.keys(_.countBy(this.operands, 'cardinality')).length !== 1) {
-                errorHandler.throw('scoring', new Error('operands must be of the same cardinality'));
-                return null;
-            }
-
-            var op1 = _.flatten(this.preProcessor.parseVariable(this.operands[0]).value).join(),
-                op2 = _.flatten(this.preProcessor.parseVariable(this.operands[1]).value).join();
-
-            result.value = _.contains(op1, op2);
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
+        }
+        if (Object.keys(_.countBy(this.operands, 'baseType')).length !== 1) {
+            errorHandler.throw('scoring', new Error('operands must be of the same baseType'));
+            return null;
         }
 
-    };
+        if (Object.keys(_.countBy(this.operands, 'cardinality')).length !== 1) {
+            errorHandler.throw('scoring', new Error('operands must be of the same cardinality'));
+            return null;
+        }
+
+        var op1 = _.flatten(this.preProcessor.parseVariable(this.operands[0]).value).join(),
+            op2 = _.flatten(this.preProcessor.parseVariable(this.operands[1]).value).join();
+
+        result.value = _.contains(op1, op2);
+
+        return result;
+    }
+
+};
 
 
-    return containsProcessor;
-});
+export default containsProcessor;
 

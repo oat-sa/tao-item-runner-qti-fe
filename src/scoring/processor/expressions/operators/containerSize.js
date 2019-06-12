@@ -23,52 +23,49 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns containerSize result.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/containerSize
+ */
+var containerSizeProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: 1,
+        cardinality: ['multiple', 'ordered'],
+        baseType: ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'duration', 'file', 'uri', 'intOrIdentifier']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns containerSize result.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/containerSize
+     * @returns {?ProcessingValue} a single boolean
      */
-    var containerSizeProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand  : 1,
-            maxOperand  : 1,
-            cardinality : ['multiple', 'ordered'],
-            baseType    : ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'duration', 'file', 'uri', 'intOrIdentifier']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'integer',
+            value: 0
+        };
 
-        operands   : [],
-
-        /**
-         * @returns {?ProcessingValue} a single boolean
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType    : 'integer',
-                value       : 0
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return result;
-            }
-
-            result.value = this.preProcessor
-                .parseVariable(this.operands[0]).value.length;
-
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
             return result;
         }
 
-    };
+        result.value = this.preProcessor
+            .parseVariable(this.operands[0]).value.length;
+
+        return result;
+    }
+
+};
 
 
-    return containerSizeProcessor;
-});
+export default containerSizeProcessor;
 

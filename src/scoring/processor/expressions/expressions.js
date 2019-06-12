@@ -25,43 +25,40 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'taoQtiItem/scoring/processor/expressions/baseValue',
-    'taoQtiItem/scoring/processor/expressions/correct',
-    'taoQtiItem/scoring/processor/expressions/default',
-    'taoQtiItem/scoring/processor/expressions/mapResponse',
-    'taoQtiItem/scoring/processor/expressions/mapResponsePoint',
-    'taoQtiItem/scoring/processor/expressions/mathConstant',
-    'taoQtiItem/scoring/processor/expressions/null',
-    'taoQtiItem/scoring/processor/expressions/randomFloat',
-    'taoQtiItem/scoring/processor/expressions/randomInteger',
-    'taoQtiItem/scoring/processor/expressions/variable'
-], function(baseValue, correct, defaultt, mapResponse, mapResponsePoint, mathConstant, nulll, randomFloat, randomInteger, variable){
-    'use strict';
+import baseValue from 'taoQtiItem/scoring/processor/expressions/baseValue';
+import correct from 'taoQtiItem/scoring/processor/expressions/correct';
+import defaultt from 'taoQtiItem/scoring/processor/expressions/default';
+import mapResponse from 'taoQtiItem/scoring/processor/expressions/mapResponse';
+import mapResponsePoint from 'taoQtiItem/scoring/processor/expressions/mapResponsePoint';
+import mathConstant from 'taoQtiItem/scoring/processor/expressions/mathConstant';
+import nulll from 'taoQtiItem/scoring/processor/expressions/null';
+import randomFloat from 'taoQtiItem/scoring/processor/expressions/randomFloat';
+import randomInteger from 'taoQtiItem/scoring/processor/expressions/randomInteger';
+import variable from 'taoQtiItem/scoring/processor/expressions/variable';
 
-    /**
-     * An ExpressionProcessor
-     * @typedef ExpressionProcessor
-     * @property {Object} exression - the expression definition
-     * @property {Object} preProcessor - helps you to parse and manipulate values
-     * @property {Object} state - the session state (responses and variables)
-     * @property {Funtion} process - the processing
-     */
 
-    /**
-     * Lists all available expression processors
-     * @exports taoQtiItem/scoring/processor/expressions/expressions
-     */
-    return {
-        'baseValue'         : baseValue,
-        'correct'           : correct,
-        'default'           : defaultt,
-        'mapResponse'       : mapResponse,
-        'mapResponsePoint'  : mapResponsePoint,
-        'mathConstant'      : mathConstant,
-        'null'              : nulll,
-        'randomFloat'       : randomFloat,
-        'randomInteger'     : randomInteger,
-        'variable'          : variable
-    };
-});
+/**
+ * An ExpressionProcessor
+ * @typedef ExpressionProcessor
+ * @property {Object} exression - the expression definition
+ * @property {Object} preProcessor - helps you to parse and manipulate values
+ * @property {Object} state - the session state (responses and variables)
+ * @property {Funtion} process - the processing
+ */
+
+/**
+ * Lists all available expression processors
+ * @exports taoQtiItem/scoring/processor/expressions/expressions
+ */
+export default {
+    'baseValue': baseValue,
+    'correct': correct,
+    'default': defaultt,
+    'mapResponse': mapResponse,
+    'mapResponsePoint': mapResponsePoint,
+    'mathConstant': mathConstant,
+    'null': nulll,
+    'randomFloat': randomFloat,
+    'randomInteger': randomInteger,
+    'variable': variable
+};

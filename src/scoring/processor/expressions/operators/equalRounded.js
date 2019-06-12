@@ -23,97 +23,94 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(_, errorHandler){
-    'use strict';
+import _ from 'lodash';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
-    /**
-     * Process operands and returns equalRounded result.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/equalRounded
-     */
-    var equalRoundedProcessor = {
 
-        engines: {
-            significantFigures: function (value, exp) {
-                return decimalAdjust('round', value, exp);
-            },
-            decimalPlaces: function (value, exp) {
-                return decimalAdjust('floor', value, exp);
-            }
+/**
+ * Process operands and returns equalRounded result.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/equalRounded
+ */
+var equalRoundedProcessor = {
+
+    engines: {
+        significantFigures: function(value, exp) {
+            return decimalAdjust('round', value, exp);
         },
-
-        constraints : {
-            minOperand  : 2,
-            maxOperand  : 2,
-            cardinality : ['single'],
-            baseType    : ['integer', 'float']
-        },
-
-        operands   : [],
-
-        /**
-         * @returns {?ProcessingValue} a single boolean
-         */
-        process : function(){
-
-            var attributes   = this.expression.attributes || {};
-            var roundingMode = attributes.roundingMode || 'significantFigures';
-            var roundingEngine = _.isFunction(this.engines[roundingMode]) ? this.engines[roundingMode] : this.engines.significantFigures;
-            var figures = this.preProcessor.parseValue(this.expression.attributes.figures, 'integerOrVariableRef');
-
-            if (!this.preProcessor.isNumber(figures)) {
-                errorHandler.throw('scoring', new Error('figures must me numeric'));
-                return null;
-            }
-
-            if (figures <= 1 && roundingMode === 'significantFigures') {
-                errorHandler.throw('scoring', new Error('significantFigures must me numeric'));
-                return null;
-            }
-
-            var result = {
-                cardinality : 'single',
-                baseType    : 'boolean'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            var op1 = this.preProcessor.parseVariable(this.operands[0]).value,
-                op2 = this.preProcessor.parseVariable(this.operands[1]).value;
-
-            result.value = roundingEngine(op1, figures) === roundingEngine(op2, figures);
-
-            return result;
+        decimalPlaces: function(value, exp) {
+            return decimalAdjust('floor', value, exp);
         }
-    };
+    },
 
+    constraints: {
+        minOperand: 2,
+        maxOperand: 2,
+        cardinality: ['single'],
+        baseType: ['integer', 'float']
+    },
+
+    operands: [],
 
     /**
-     * Decimal adjustment of a number.
-     *
-     * @param {String}  type  The type of adjustment.
-     * @param {Number}  value The number.
-     * @param {Integer} exp   The exponent (the 10 logarithm of the adjustment base).
-     * @returns {Number} The adjusted value.
-     * @private
+     * @returns {?ProcessingValue} a single boolean
      */
-    function decimalAdjust(type, value, exp) {
+    process: function() {
 
-        // Shift
-        value = value.toString().split('e');
-        value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp)));
+        var attributes = this.expression.attributes || {};
+        var roundingMode = attributes.roundingMode || 'significantFigures';
+        var roundingEngine = _.isFunction(this.engines[roundingMode]) ? this.engines[roundingMode] : this.engines.significantFigures;
+        var figures = this.preProcessor.parseValue(this.expression.attributes.figures, 'integerOrVariableRef');
 
-        // Shift back
-        value = value.toString().split('e');
-        return +(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp));
+        if (!this.preProcessor.isNumber(figures)) {
+            errorHandler.throw('scoring', new Error('figures must me numeric'));
+            return null;
+        }
+
+        if (figures <= 1 && roundingMode === 'significantFigures') {
+            errorHandler.throw('scoring', new Error('significantFigures must me numeric'));
+            return null;
+        }
+
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
+
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
+        }
+
+        var op1 = this.preProcessor.parseVariable(this.operands[0]).value,
+            op2 = this.preProcessor.parseVariable(this.operands[1]).value;
+
+        result.value = roundingEngine(op1, figures) === roundingEngine(op2, figures);
+
+        return result;
     }
+};
 
-    return equalRoundedProcessor;
-});
+
+/**
+ * Decimal adjustment of a number.
+ *
+ * @param {String}  type  The type of adjustment.
+ * @param {Number}  value The number.
+ * @param {Integer} exp   The exponent (the 10 logarithm of the adjustment base).
+ * @returns {Number} The adjusted value.
+ * @private
+ */
+function decimalAdjust(type, value, exp) {
+
+    // Shift
+    value = value.toString().split('e');
+    value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp)));
+
+    // Shift back
+    value = value.toString().split('e');
+    return +(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp));
+}
+
+export default equalRoundedProcessor;
 

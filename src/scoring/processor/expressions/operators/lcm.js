@@ -22,72 +22,72 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
 
-    var lcmProcessor = {
 
-        constraints : {
-            minOperand : 1,
-            lcmOperand : -1,
-            cardinality : ['single', 'multiple', 'ordered'],
-            baseType : ['integer']
-        },
+var lcmProcessor = {
 
-        operands   : [],
+    constraints: {
+        minOperand: 1,
+        lcmOperand: -1,
+        cardinality: ['single', 'multiple', 'ordered'],
+        baseType: ['integer']
+    },
 
-        /**
-         * Process operands and returns the lcm.
-         * @type {OperatorProcessor}
-         * @exports taoQtiItem/scoring/processor/expressions/operators/lcm
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType : 'integer'
-            };
-
-            //if at least one operand is null or infinity, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            var castedOperands  = this.preProcessor.parseOperands(this.operands);
-
-            //if at least one operand is a not a number,  then break and return null
-            if (!castedOperands.every(this.preProcessor.isNumber)) {
-                return null;
-            }
-
-            if (castedOperands.value().indexOf(0) !== -1 ) {
-                result.value = 0;
-                return result;
-            }
-
-            result.value = lcm(castedOperands.value());
-
-            return result;
-        }
-    };
+    operands: [],
 
     /**
-     * Calculates least common multiple for two ore more integers
-     * @param {Array<number|Number>}numbers
-     * @returns {number} least common multiple
+     * Process operands and returns the lcm.
+     * @type {OperatorProcessor}
+     * @exports taoQtiItem/scoring/processor/expressions/operators/lcm
      */
-    function lcm(numbers)
-    {
-        var n = numbers.length, a = Math.abs(numbers[0]);
-        for (var i = 1; i < n; i++)
-        { var b = Math.abs(numbers[i]), c = a;
-            while (a && b){ a > b ? a %= b : b %= a; }
-            a = Math.abs(c*numbers[i])/(a+b);
-        }
-        return a;
-    }
+    process: function() {
 
-    return lcmProcessor;
-});
+        var result = {
+            cardinality: 'single',
+            baseType: 'integer'
+        };
+
+        //if at least one operand is null or infinity, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
+        }
+
+        var castedOperands = this.preProcessor.parseOperands(this.operands);
+
+        //if at least one operand is a not a number,  then break and return null
+        if (!castedOperands.every(this.preProcessor.isNumber)) {
+            return null;
+        }
+
+        if (castedOperands.value().indexOf(0) !== -1) {
+            result.value = 0;
+            return result;
+        }
+
+        result.value = lcm(castedOperands.value());
+
+        return result;
+    }
+};
+
+/**
+ * Calculates least common multiple for two ore more integers
+ * @param {Array<number|Number>}numbers
+ * @returns {number} least common multiple
+ */
+function lcm(numbers) {
+    var n = numbers.length,
+        a = Math.abs(numbers[0]);
+    for (var i = 1; i < n; i++) {
+        var b = Math.abs(numbers[i]),
+            c = a;
+        while (a && b) {
+            a > b ? a %= b : b %= a;
+        }
+        a = Math.abs(c * numbers[i]) / (a + b);
+    }
+    return a;
+}
+
+export default lcmProcessor;

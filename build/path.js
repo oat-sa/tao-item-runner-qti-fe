@@ -17,15 +17,21 @@
  */
 
 /**
-  * This file contains path definitions for build scripts.
-  */
- const path = require("path");
- const rootPath = path.resolve(__dirname, "..");
- 
+ * This file contains path definitions for build scripts.
+ */
+const path = require('path');
+const rootPath = path.resolve(__dirname, '..');
+const srcDir = path.resolve(rootPath, 'src');
+
 module.exports = {
-    srcDir: path.resolve(rootPath, "src"),
-    testDir: path.resolve(rootPath, "test"),
-    outputDir: path.resolve(rootPath, "dist"),
-    testOutputDir: path.resolve(rootPath, "test")
+    rootPath,
+    srcDir,
+    testDir: path.resolve(rootPath, 'test'),
+    scssVendorDir: path.resolve(rootPath, 'scss'),
+    outputDir: path.resolve(rootPath, 'dist'),
+    testOutputDir: path.resolve(rootPath, 'test'),
+    aliases: {
+        taoQtiItem: srcDir,
+        taoItems: path.resolve(rootPath, '../taoItems/views/node_modules/@oat-sa/tao-item-runner/src')
+    }
 };
- 

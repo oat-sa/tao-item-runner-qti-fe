@@ -23,63 +23,61 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'taoQtiItem/scoring/processor/expressions/engine',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(expressionEngineFactory, errorHandler){
-    'use strict';
+import expressionEngineFactory from 'taoQtiItem/scoring/processor/expressions/engine';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
+
+
+/**
+ * The rule processor.
+ *
+ * @type {responseRuleProcessor}
+ * @exports taoQtiItem/scoring/processor/responseRules/responseCondition
+ */
+var responseConditionProcessor = {
 
     /**
-     * The rule processor.
-     *
-     * @type {responseRuleProcessor}
-     * @exports taoQtiItem/scoring/processor/responseRules/responseCondition
+     * Process the rule
+     * @returns {Array}
      */
-    var responseConditionProcessor = {
+    process: function() {
 
-        /**
-         * Process the rule
-         */
-        process : function(){
+        var index = 0;
+        var expressionEngine = expressionEngineFactory(this.state);
 
-            var index = 0;
-            var expressionEngine = expressionEngineFactory(this.state);
-
-            //eval a condition using the expression engine
-            var evalRuleCondition = function evalRuleCondition(rule){
-                var expressionResult;
-                if(!rule.expression){
-                    return false;
-                }
-
-                expressionResult = expressionEngine.execute(rule.expression);
-
-                return expressionResult && expressionResult.value === true;
-            };
-
-
-            //the if condition
-            if(evalRuleCondition(this.rule.responseIf)){
-                return this.rule.responseIf.responseRules;
+        //eval a condition using the expression engine
+        var evalRuleCondition = function evalRuleCondition(rule) {
+            var expressionResult;
+            if (!rule.expression) {
+                return false;
             }
 
-            //else if conditions
-            if(this.rule.responseElseIfs){
+            expressionResult = expressionEngine.execute(rule.expression);
 
-                for(index in this.rule.responseElseIfs){
-                    if(evalRuleCondition(this.rule.responseElseIfs[index])){
-                        return this.rule.responseElseIfs[index].responseRules;
-                    }
-                }
-            }
+            return expressionResult && expressionResult.value === true;
+        };
 
-            //the else otherwise
-            if(this.rule.responseElse){
-                return this.rule.responseElse.responseRules;
-            }
-            return [];
+
+        //the if condition
+        if (evalRuleCondition(this.rule.responseIf)) {
+            return this.rule.responseIf.responseRules;
         }
-    };
 
-    return responseConditionProcessor;
-});
+        //else if conditions
+        if (this.rule.responseElseIfs) {
+
+            for (index in this.rule.responseElseIfs) {
+                if (evalRuleCondition(this.rule.responseElseIfs[index])) {
+                    return this.rule.responseElseIfs[index].responseRules;
+                }
+            }
+        }
+
+        //the else otherwise
+        if (this.rule.responseElse) {
+            return this.rule.responseElse.responseRules;
+        }
+        return [];
+    }
+};
+
+export default responseConditionProcessor;

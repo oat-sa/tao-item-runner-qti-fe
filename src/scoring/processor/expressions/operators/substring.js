@@ -23,58 +23,55 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns the substring.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/substring
+ */
+var substringProcessor = {
+
+    constraints: {
+        minOperand: 2,
+        maxOperand: 2,
+        cardinality: ['single'],
+        baseType: ['string']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the substring.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/substring
+     * Process the substring of the operands.
+     * @returns {?ProcessingValue} the subtract or null
      */
-    var substringProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand : 2,
-            maxOperand : 2,
-            cardinality : ['single'],
-            baseType : ['string']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
-        operands   : [],
+        var caseSensitive = _.isBoolean(this.expression.attributes.caseSensitive) ? this.expression.attributes.caseSensitive : true;
 
-        /**
-         * Process the substring of the operands.
-         * @returns {?ProcessingValue} the subtract or null
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType : 'boolean'
-            };
-
-            var caseSensitive = _.isBoolean(this.expression.attributes.caseSensitive) ? this.expression.attributes.caseSensitive : true;
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            result.value = this.preProcessor
-                .parseOperands(this.operands)
-                .reduce(function(f, s){
-                    if (!caseSensitive){
-                        return f.toLowerCase().indexOf(s.toLowerCase()) !== -1;
-                    }
-                    return f.indexOf(s) !== -1;
-                });
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
+
+        result.value = this.preProcessor
+            .parseOperands(this.operands)
+            .reduce(function(f, s) {
+                if (!caseSensitive) {
+                    return f.toLowerCase().indexOf(s.toLowerCase()) !== -1;
+                }
+                return f.indexOf(s) !== -1;
+            });
+
+        return result;
+    }
 
 };
 
-    return substringProcessor;
-});
+export default substringProcessor;

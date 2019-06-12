@@ -23,56 +23,52 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+
+
+/**
+ * Process operands and returns the anyN.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/anyN
+ */
+var anyNProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: -1,
+        cardinality: ['single'],
+        baseType: ['boolean']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the anyN.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/anyN
+     * Process the anyN of the operands.
+     * @returns {?ProcessingValue} is anyN or null
      */
-    var anyNProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand : 1,
-            maxOperand : -1,
-            cardinality : ['single'],
-            baseType : ['boolean']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
-        operands   : [],
+        var min = this.preProcessor.parseValue(this.expression.attributes.min, 'integerOrVariableRef'),
+            max = this.preProcessor.parseValue(this.expression.attributes.max, 'integerOrVariableRef');
 
-        /**
-         * Process the anyN of the operands.
-         * @returns {?ProcessingValue} is anyN or null
-         */
-        process : function(){
+        var counted = this.preProcessor.parseOperands(this.operands).countBy().value();
+        if (counted.true >= min && counted.true <= max) {
+            result.value = true;
+        } else
 
-            var result = {
-                cardinality : 'single',
-                baseType : 'boolean'
-            };
-
-            var min = this.preProcessor.parseValue(this.expression.attributes.min, 'integerOrVariableRef'),
-                max = this.preProcessor.parseValue(this.expression.attributes.max, 'integerOrVariableRef');
-
-            var counted = this.preProcessor.parseOperands(this.operands).countBy().value();
-            if (counted.true >= min && counted.true <= max ){
-                result.value = true;
-            }else
-
-            if (counted.true + counted.null >= min && counted.true + counted.null <= max) {
-                // It could have match if nulls were true values.
-                return null;
-            }else{
-                result.value = false;
-            }
-
-            return result;
+        if (counted.true + counted.null >= min && counted.true + counted.null <= max) {
+            // It could have match if nulls were true values.
+            return null;
+        } else {
+            result.value = false;
         }
-    };
 
-    return anyNProcessor;
-});
+        return result;
+    }
+};
+
+export default anyNProcessor;

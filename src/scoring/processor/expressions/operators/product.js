@@ -23,57 +23,56 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns the product.
+ * @type {OperatorProcesssor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/product
+ */
+var productProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: -1,
+        cardinality: ['single', 'multiple', 'ordered'],
+        baseType: ['integer', 'float']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the product.
-     * @type {OperatorProcesssor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/product
+     * Process the product of the operands.
+     * @returns {?ProcessingValue} the product or null
      */
-    var productProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand : 1,
-            maxOperand : -1,
-            cardinality : ['single', 'multiple', 'ordered'],
-            baseType : ['integer', 'float']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'integer'
+        };
 
-        operands   : [],
-
-        /**
-         * Process the product of the operands.
-         * @returns {?ProcessingValue} the product or null
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType : 'integer'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            //if at least one operand is a float , the result is a float
-            if(_.some(this.operands, { baseType : 'float' })){
-                result.baseType = 'float';
-            }
-
-            result.value = this.preProcessor
-                .mapNumbers(this.operands)
-                .reduce(function(product, value){
-                    return product * value;
-                });
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return productProcessor;
-});
+        //if at least one operand is a float , the result is a float
+        if (_.some(this.operands, {
+                baseType: 'float'
+            })) {
+            result.baseType = 'float';
+        }
+
+        result.value = this.preProcessor
+            .mapNumbers(this.operands)
+            .reduce(function(product, value) {
+                return product * value;
+            });
+
+        return result;
+    }
+};
+
+export default productProcessor;

@@ -22,84 +22,81 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'taoQtiItem/scoring/processor/responseRules/processor',
-    'taoQtiItem/scoring/processor/responseRules/rules'
-], function(_, processorFactory, rules){
-    'use strict';
+import _ from 'lodash';
+import processorFactory from 'taoQtiItem/scoring/processor/responseRules/processor';
+import rules from 'taoQtiItem/scoring/processor/responseRules/rules';
 
-    //regsiter rules processors
-    _.forEach(rules, function(rule, name){
-        processorFactory.register(name, rule);
-    });
 
-    //list supported rules
-    var supportedRules = _.keys(rules);
+//list supported rules
+var supportedRules = _.keys(rules);
 
-    /**
-     * Creates an engine that can look over the rule and execute them accordingy.
-     *
-     * @exports taoQtiItem/scoring/processor/expressions/engine
-     * @param {Object} state - the item session state (response and outcome variables)
-     * @returns {Object} the rule engine that expose an execute method
-     */
-    var ruleEngineFactory = function ruleEngineFactory (state){
+/**
+ * Creates an engine that can look over the rule and execute them accordingy.
+ *
+ * @exports taoQtiItem/scoring/processor/expressions/engine
+ * @param {Object} state - the item session state (response and outcome variables)
+ * @returns {Object} the rule engine that expose an execute method
+ */
+var ruleEngineFactory = function ruleEngineFactory(state) {
 
-        return {
+    return {
 
-            /**
-             * Check if rule is supported by the engine
-             * @param {string} rule
-             * @returns {Boolean}
-             */
-            isRuleSupported: function isRuleSupported(rule) {
-                return _.contains(supportedRules, rule.qtiClass);
-            },
+        /**
+         * Check if rule is supported by the engine
+         * @param {string} rule
+         * @returns {Boolean}
+         */
+        isRuleSupported: function isRuleSupported(rule) {
+            return _.contains(supportedRules, rule.qtiClass);
+        },
 
-            /**
-             * Execute the engine on the given rule tree
-             * @param {Array<Object>} rules - the rules to process
-             * @return {Object} the modified state (it may not be necessary as the ref is modified)
-             */
-            execute : function(rules){
-                if(rules){
-                    if(!_.isArray(rules)){
-                        rules = [rules];
-                    }
-
-                    _.forEach(rules, function processRule(rule){
-
-                        var currentRule,
-                            currentProcessor,
-                            processResult;
-                        var trail = [rule];
-
-                        //TODO remove the limit and add a timeout
-                        while(trail.length > 0){
-
-                            currentRule = trail.pop();
-
-                            //process response rule
-                            currentProcessor = processorFactory(currentRule, state);
-                            processResult = currentProcessor.process();
-
-                            //a processor can exit the all processing by returning false
-                            if(processResult === false){
-                                break;
-                            }
-
-                            //if it returns response rules, then we add them to the trail
-                            if(_.isArray(processResult)){
-                                trail = trail.concat(_.filter(processResult, ruleEngineFactory.isRuleSupported).reverse());
-                            }
-                        }
-                    });
+        /**
+         * Execute the engine on the given rule tree
+         * @param {Array<Object>} rules - the rules to process
+         * @returns {Object} the modified state (it may not be necessary as the ref is modified)
+         */
+        execute: function(rules) {
+            if (rules) {
+                if (!_.isArray(rules)) {
+                    rules = [rules];
                 }
-                return state;
-            }
-        };
-    };
 
-    return ruleEngineFactory;
+                _.forEach(rules, function processRule(rule) {
+
+                    var currentRule,
+                        currentProcessor,
+                        processResult;
+                    var trail = [rule];
+
+                    //TODO remove the limit and add a timeout
+                    while (trail.length > 0) {
+
+                        currentRule = trail.pop();
+
+                        //process response rule
+                        currentProcessor = processorFactory(currentRule, state);
+                        processResult = currentProcessor.process();
+
+                        //a processor can exit the all processing by returning false
+                        if (processResult === false) {
+                            break;
+                        }
+
+                        //if it returns response rules, then we add them to the trail
+                        if (_.isArray(processResult)) {
+                            trail = trail.concat(_.filter(processResult, ruleEngineFactory.isRuleSupported).reverse());
+                        }
+                    }
+                });
+            }
+            return state;
+        }
+    };
+};
+
+//register rules processors
+_.forEach(rules, function(rule, name) {
+    processorFactory.register(name, rule);
 });
+
+export default ruleEngineFactory;

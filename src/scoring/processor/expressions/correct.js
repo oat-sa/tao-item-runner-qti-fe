@@ -23,36 +23,32 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([], function(){
-    'use strict';
+/**
+ * Correct expression
+ * @type {ExpressionProcesssor}
+ * @exports taoQtiItem/scoring/processor/expressions/correct
+ */
+var correctProcessor = {
 
     /**
-     * Correct expression
-     * @type {ExpressionProcesssor}
-     * @exports taoQtiItem/scoring/processor/expressions/correct
+     * Process the expression
+     * @returns {ProcessingValue} the value from the expression
      */
-    var correctProcessor = {
+    process: function() {
 
-        /**
-         * Process the expression
-         * @returns {ProcessingValue} the value from the expression
-         */
-        process : function(){
+        var identifier = this.expression.attributes.identifier;
+        var variable = this.state[identifier];
 
-            var identifier = this.expression.attributes.identifier;
-            var variable   = this.state[identifier];
-
-            if(typeof variable === 'undefined' || variable === null || typeof variable.correctResponse === 'undefined'){
-                return null;
-            }
-
-            return this.preProcessor.parseVariable({
-                cardinality : variable.cardinality,
-                baseType    : variable.baseType,
-                value       : variable.correctResponse
-            });
+        if (typeof variable === 'undefined' || variable === null || typeof variable.correctResponse === 'undefined') {
+            return null;
         }
-    };
 
-    return correctProcessor;
-});
+        return this.preProcessor.parseVariable({
+            cardinality: variable.cardinality,
+            baseType: variable.baseType,
+            value: variable.correctResponse
+        });
+    }
+};
+
+export default correctProcessor;

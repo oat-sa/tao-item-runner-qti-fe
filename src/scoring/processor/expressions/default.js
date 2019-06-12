@@ -23,37 +23,33 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([], function(){
-    'use strict';
+/**
+ * Default expression
+ * @type {ExpressionProcesssor}
+ * @exports taoQtiItem/scoring/processor/expressions/default
+ */
+var defaultProcessor = {
 
     /**
-     * Default expression
-     * @type {ExpressionProcesssor}
-     * @exports taoQtiItem/scoring/processor/expressions/default
+     * Process the expression
+     * @returns {ProcessingValue} the value from the expression
      */
-    var defaultProcessor = {
+    process: function() {
 
-        /**
-         * Process the expression
-         * @returns {ProcessingValue} the value from the expression
-         */
-        process : function(){
+        var identifier = this.expression.attributes.identifier;
+        var variable = this.state[identifier];
 
-            var identifier = this.expression.attributes.identifier;
-            var variable   = this.state[identifier];
-
-            if(typeof variable === 'undefined' || variable === null || typeof variable.defaultValue === 'undefined'){
-                return null;
-            }
-
-            //todo cast value
-            return {
-                cardinality : variable.cardinality,
-                baseType    : variable.baseType,
-                value       : variable.defaultValue
-            };
+        if (typeof variable === 'undefined' || variable === null || typeof variable.defaultValue === 'undefined') {
+            return null;
         }
-    };
 
-    return defaultProcessor;
-});
+        //todo cast value
+        return {
+            cardinality: variable.cardinality,
+            baseType: variable.baseType,
+            value: variable.defaultValue
+        };
+    }
+};
+
+export default defaultProcessor;

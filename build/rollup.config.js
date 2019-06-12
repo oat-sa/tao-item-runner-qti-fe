@@ -19,21 +19,36 @@
 import path from 'path';
 import glob from 'glob';
 import alias from 'rollup-plugin-alias';
-import json from 'rollup-plugin-json';
-import copy from 'rollup-plugin-copy';
+import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
+import cssResolve from './css-resolve';
+import externalAlias from './external-alias';
+import resolve from 'rollup-plugin-node-resolve';
 
-const { srcDir, outputDir } = require('./path');
+const { srcDir, outputDir, aliases } = require('./path');
+const Handlebars = require('handlebars');
 
-const inputs = glob.sync(path.join(srcDir, '!(lib)', '**', '*.js'));
-const inputGlobalNames = inputs.reduce((memo, input) => {
-    const moduleName = path.relative(srcDir, input).replace(/\.js$/, '');
-    return { ...memo, [moduleName]: moduleName };
-}, {});
+/**
+ * Support of handlebars 1.3.0
+ * TODO remove once migrated to hbs >= 3.0.0
+ */
+const originalVisitor = Handlebars.Visitor;
+Handlebars.Visitor = function() {
+    return originalVisitor.call(this);
+};
+Handlebars.Visitor.prototype = Object.create(originalVisitor.prototype);
+Handlebars.Visitor.prototype.accept = function() {
+    try {
+        originalVisitor.prototype.accept.apply(this, arguments);
+    } catch (e) {}
+};
+/* --------------------------------------------------------- */
 
-const localExternals = inputs.map(input => path.relative(srcDir, input).replace(/\.js$/, ''));
+const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
 
-const libs = glob.sync(path.join(srcDir, 'lib', '**', '*.js'));
-const libExternals = libs.map(input => path.relative(srcDir, input).replace(/\.js$/, ''));
+/**
+ * Define all modules as external, so rollup won't bundle them together.
+ */
+const localExternals = inputs.map(input => `ui/${path.relative(srcDir, input).replace(/\.js$/, '')}`);
 
 export default inputs.map(input => {
     const name = path.relative(srcDir, input).replace(/\.js$/, '');
@@ -43,55 +58,27 @@ export default inputs.map(input => {
         input,
         output: {
             dir: path.join(outputDir, dir),
-            format: 'umd',
-            name,
-            globals: {
-                jquery: '$',
-                lodash: '_',
-                context: 'context',
-                module: 'module',
-                moment: 'moment',
-                i18n: '__',
-                async: 'async',
-                handlebars: 'handlebars',
-                'lib/uuid': 'lib/uuid',
-                'lib/store/idbstore': 'lib/store/idbstore',
-                'lib/decimal/decimal': 'lib/decimal/decimal',
-                'lib/expr-eval/expr-eval': 'lib/expr-eval/expr-eval',
-                'lib/polyfill/es6-promise': 'lib/polyfill/es6-promise',
-                ...inputGlobalNames
-            }
+            format: 'amd',
+            name
         },
-        external: [
-            ...localExternals,
-            ...libExternals,
-            'jquery',
-            'lodash',
-            'handlebars',
-            'moment',
-            'i18n',
-            'async',
-            'jquery.fileDownload',
-            'module',
-            'context',
-            'lib/uuid',
-            'lib/store/idbstore',
-            'lib/decimal/decimal',
-            'lib/expr-eval/expr-eval'
-        ],
+        external: ['jquery', 'lodash', 'require', ...localExternals],
         plugins: [
+            cssResolve(),
+            externalAlias(['core', 'util']),
             alias({
-                resolve: ['.js', '.json'],
-                core: path.resolve(srcDir, 'core'),
-                util: path.resolve(srcDir, 'util'),
-                lib: path.resolve(srcDir, 'lib')
+                resolve: ['.js', '.json', '.tpl'],
+                ...aliases
             }),
-            json({
-                preferConst: false
-            }),
-            copy({
-                targets: [path.resolve(srcDir, 'lib')],
-                outputFolder: outputDir
+            resolve(),
+            handlebarsPlugin({
+                handlebars: {
+                    id: 'handlebars',
+                    options: {
+                        sourceMap: false
+                    },
+                    module: Handlebars
+                },
+                templateExtension: '.tpl'
             })
         ]
     };

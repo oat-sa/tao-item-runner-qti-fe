@@ -23,52 +23,49 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash'
-], function(_){
-    'use strict';
+import _ from 'lodash';
+
+
+/**
+ * Process operands and returns the OR.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/or
+ */
+var orProcessor = {
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: -1,
+        cardinality: ['single'],
+        baseType: ['boolean']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the OR.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/or
+     * Process the OR of the operands.
+     * @returns {?ProcessingValue} the OR or null
      */
-    var orProcessor = {
+    process: function() {
 
-        constraints : {
-            minOperand : 1,
-            maxOperand : -1,
-            cardinality : ['single'],
-            baseType : ['boolean']
-        },
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
-        operands   : [],
-
-        /**
-         * Process the OR of the operands.
-         * @returns {?ProcessingValue} the OR or null
-         */
-        process : function(){
-
-            var result = {
-                cardinality : 'single',
-                baseType : 'boolean'
-            };
-
-            //if at least one operand is null, then break and return null
-            if(_.some(this.operands, _.isNull) === true){
-                return null;
-            }
-
-            result.value = this.preProcessor
-                .parseOperands(this.operands)
-                .reduce(function(f, s){
-                    return f || s;
-                });
-
-            return result;
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
         }
-    };
 
-    return orProcessor;
-});
+        result.value = this.preProcessor
+            .parseOperands(this.operands)
+            .reduce(function(f, s) {
+                return f || s;
+            });
+
+        return result;
+    }
+};
+
+export default orProcessor;

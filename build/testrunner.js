@@ -28,11 +28,11 @@ const { testDir } = require('./path');
 const TESTNAME = process.argv[2] || '*';
 
 let hasFailed = false;
-const limit = promiseLimit(5);
+const limit = promiseLimit(process.env.PARALLEL_TESTS || 5);
 
 webServer.then(({ host, port }) =>
     Promise.all(
-        glob.sync(path.join(testDir, '**', TESTNAME, '**', '*.html')).map(testFile => {
+        glob.sync(path.join(testDir, '**', TESTNAME, '**', 'test.html')).map(testFile => {
             const test = path.relative(testDir, testFile);
             const qunitArgs = {
                 // Path to qunit tests suite
@@ -40,7 +40,13 @@ webServer.then(({ host, port }) =>
                 // (optional, 30000 by default) global timeout for the tests suite
                 timeout: 30000,
                 // (optional, false by default) should the browser console be redirected or not
-                redirectConsole: false
+                redirectConsole: false,
+                puppeteerArgs: [
+                    '--no-sandbox',
+                    '--disable-gpu',
+                    '--disable-popup-blocking',
+                    '--autoplay-policy=no-user-gesture-required'
+                ]
             };
 
             return limit(() =>

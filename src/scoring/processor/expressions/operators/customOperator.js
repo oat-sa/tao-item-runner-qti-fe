@@ -23,54 +23,51 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-define([
-    'lodash',
-    'require',
-    'taoQtiItem/scoring/processor/errorHandler',
-    'taoQtiItem/scoring/processor/expressions/operators/constraintValidator'
-], function (_, require, errorHandler, constraintValidator) {
-    'use strict';
+import _ from 'lodash';
+import require from 'require';
+import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
+import constraintValidator from 'taoQtiItem/scoring/processor/expressions/operators/constraintValidator';
+
+
+/**
+ * Process operands and returns the customOperator.
+ * @type {OperatorProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/customOperator
+ */
+var customOperatorProcessor = {
+
+    constraints: {
+        minOperand: -1,
+        maxOperand: -1,
+        cardinality: ['single', 'multiple'],
+        baseType: ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'duration', 'file', 'uri', 'intOrIdentifier']
+    },
+
+    operands: [],
 
     /**
-     * Process operands and returns the customOperator.
-     * @type {OperatorProcessor}
-     * @exports taoQtiItem/scoring/processor/expressions/operators/customOperator
+     * Process the customOperator of the operands.
+     * @returns {?ProcessingValue} the customOperator or null
      */
-    var customOperatorProcessor = {
+    process: function() {
 
-        constraints: {
-            minOperand: -1,
-            maxOperand: -1,
-            cardinality: ['single', 'multiple'],
-            baseType: ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'duration', 'file', 'uri', 'intOrIdentifier']
-        },
+        var classs = this.expression.attributes['class'];
+        var definition = this.expression.attributes.definition; //not used
 
-        operands: [],
-
-        /**
-         * Process the customOperator of the operands.
-         * @returns {?ProcessingValue} the customOperator or null
-         */
-        process: function () {
-
-            var classs = this.expression.attributes['class'];
-            var definition = this.expression.attributes.definition;//not used
-
-            if (!require.defined(classs)) {
-                return errorHandler.throw('scoring', new Error('Class must be specified for custom operator'));
-            }
-
-            var custom = require(classs);
-            if (constraintValidator(custom, customOperatorProcessor.operands)) {
-                custom.preProcessor = customOperatorProcessor.preProcessor;
-                custom.operands = customOperatorProcessor.operands;
-                custom.expression = [];
-                custom.expression.attributes = customOperatorProcessor.expression.attributes;
-
-                return custom.process();
-            }
+        if (!require.defined(classs)) {
+            return errorHandler.throw('scoring', new Error('Class must be specified for custom operator'));
         }
-    };
 
-    return customOperatorProcessor;
-});
+        var custom = require(classs);
+        if (constraintValidator(custom, customOperatorProcessor.operands)) {
+            custom.preProcessor = customOperatorProcessor.preProcessor;
+            custom.operands = customOperatorProcessor.operands;
+            custom.expression = [];
+            custom.expression.attributes = customOperatorProcessor.expression.attributes;
+
+            return custom.process();
+        }
+    }
+};
+
+export default customOperatorProcessor;
