@@ -1,0 +1,70 @@
+{
+    "name": "@oat-sa/tao-item-runner-qti",
+    "version": "0.1.0",
+    "displayName": "TAO Item Runner QTI",
+    "files": [
+        "dist",
+        "src"
+    ],
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "test:keepAlive": "node ./build/webserver.js",
+        "test": "node ./build/testrunner.js",
+        "build": "rollup --config ./build/rollup.config.js",
+        "buildScss": "node ./build/scss.js",
+        "lint": "eslint src test",
+        "prepare": "npm run buildScss && npm run build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/oat-sa/tao-item-runner-qti-fe.git"
+    },
+    "keywords": [
+        "tao",
+        "item",
+        "runner",
+        "qti",
+        "fe",
+        "frontend"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "license": "GPL-2.0",
+    "bugs": {
+        "url": "https://github.com/oat-sa/tao-item-runner-qti-fe/issues"
+    },
+    "homepage": "https://github.com/oat-sa/tao-item-runner-qti-fe#readme",
+    "devDependencies": {
+        "@csstools/postcss-sass": "^4.0.0",
+        "@oat-sa/browserslist-config-tao": "^0.1.0",
+        "@oat-sa/tao-core-libs": "^0.1.0",
+        "@oat-sa/tao-core-sdk": "^0.3.0",
+        "autoprefixer": "^9.6.0",
+        "eslint": "^5.16.0",
+        "eslint-plugin-es": "^1.4.0",
+        "eslint-plugin-jsdoc": "^8.0.1",
+        "fs-extra": "^8.0.1",
+        "glob": "^7.1.4",
+        "handlebars": "^1.3.0",
+        "http-server": "^0.11.1",
+        "jquery": "^1.9.1",
+        "lodash": "^2.4.1",
+        "moment": "^2.11.1",
+        "node-qunit-puppeteer": "^1.0.12",
+        "postcss": "^7.0.17",
+        "postcss-scss": "^2.0.0",
+        "promise-limit": "^2.7.0",
+        "qunit": "^2.9.2",
+        "require-css": "^0.1.10",
+        "rollup": "^1.15.1",
+        "rollup-plugin-alias": "^1.5.2",
+        "rollup-plugin-handlebars-plus": "^0.2.4",
+        "rollup-plugin-node-resolve": "^5.0.1"
+    },
+    "browserslist": [
+        "extends @oat-sa/browserslist-config-tao"
+    ]
+}
