@@ -24,7 +24,7 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
-import Promise from 'core/promise';
+
 import strLimiter from 'util/strLimiter';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/extendedTextInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';

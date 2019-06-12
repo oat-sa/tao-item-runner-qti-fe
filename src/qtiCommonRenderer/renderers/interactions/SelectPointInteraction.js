@@ -24,7 +24,7 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
-import Promise from 'core/promise';
+
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/selectPointInteraction';
 import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/Graphic';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';

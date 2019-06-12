@@ -1,4 +1,4 @@
-/**
+/*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
@@ -13,20 +13,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2016 (original work) Open Assessment Technologies SA;
+ *
  */
+import _ from 'lodash';
+import ciRegistry from 'taoQtiItem/portableElementRegistry/factory/ciRegistry';
+import module from 'module';
 
-import 'ui/waitForMedia';
-import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/img';
-import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
+//create a preregistered singleton of ciRegistry
+var registry = ciRegistry();
+var providers = [];
+var config = module.config();
 
-export default {
-    qtiClass: 'img',
-    template: tpl,
-    getContainer: containerHelper.get,
-    render: function render(img, data) {
-        return new Promise(function(resolve, reject) {
-            containerHelper.get(img).waitForMedia(resolve);
-        });
+if (config && config.providers) {
+    providers = config.providers;
+}
+
+_.each(providers, function(provider) {
+    if (provider.name && provider.module) {
+        registry.registerProvider(provider.module);
     }
-};
+});
+
+export default registry;

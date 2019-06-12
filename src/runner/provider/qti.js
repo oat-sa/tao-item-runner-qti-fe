@@ -23,7 +23,7 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import context from 'context';
-import Promise from 'core/promise';
+
 import QtiLoader from 'taoQtiItem/qtiItem/core/Loader';
 import Element from 'taoQtiItem/qtiItem/core/Element';
 import ciRegistry from 'taoQtiItem/portableElementRegistry/ciRegistry';

@@ -20,7 +20,6 @@
  */
 import _ from 'lodash';
 import module from 'module';
-import Promise from 'core/promise';
 
 export default {
     /**

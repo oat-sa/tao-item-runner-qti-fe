@@ -69,6 +69,7 @@ export default inputs.map(input => {
             'i18n',
             'module',
             'context',
+            'async',
 
             'raphael',
             'scale.raphael',
@@ -79,17 +80,19 @@ export default inputs.map(input => {
             'interact',
             'select2',
             'ckeditor',
+            'iframeNotifier',
 
-            'taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy',
-            'taoQtiItem/portableElementRegistry/ciRegistry',
-            'taoQtiItem/portableElementRegistry/icRegistry',
-            'taoQtiItem/qtiRunner/core/Renderer',
+            // 'taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy', //move the whole directory
+            // 'taoQtiItem/portableElementRegistry/ciRegistry',
+            // 'taoQtiItem/portableElementRegistry/icRegistry',
+            // 'taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory',
+            // 'taoQtiItem/qtiRunner/core/Renderer', //move it
             'taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration',
-            'taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory',
+            'taoQtiItem/qtiCreator/helper/qtiElements',
 
-            'taoItems/runner/api/itemRunner',
-            'taoItems/assets/manager',
-            'taoItems/assets/strategies',
+            // 'taoItems/runner/api/itemRunner',
+            // 'taoItems/assets/manager',
+            // 'taoItems/assets/strategies',
 
             'qtiInfoControlContext',
             'qtiCustomInteractionContext',
@@ -98,7 +101,7 @@ export default inputs.map(input => {
         ],
         plugins: [
             cssResolve(),
-            externalAlias(['core', 'util', 'ui']),
+            externalAlias(['core', 'util', 'ui', 'taoItems']),
             alias({
                 resolve: ['.js', '.json', '.tpl'],
                 ...aliases

@@ -24,7 +24,7 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import Promise from 'core/promise';
+
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/math';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import MathJax from 'mathJax';
