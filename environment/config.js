@@ -20,15 +20,15 @@ requirejs.config({
     baseUrl: '/',
     paths: {
         css: '/node_modules/require-css/css',
-        // json: '/node_modules/requirejs-plugins/src/json',
-        // text: '/node_modules/text/text',
+        json: '/node_modules/requirejs-plugins/src/json',
+        text: '/node_modules/requirejs-plugins/lib/text',
 
         /* TEST related */
         'qunit-parameterize': '/environment/qunit2-parameterize',
         qunit: '/node_modules/qunit/qunit',
-        'test/taoItems': '/test',
-
-        taoItems: '/dist',
+        'taoQtiItem/test': '/test',
+        taoQtiItem: '/dist',
+        taoItems: '/node_modules/@oat-sa/tao-item-runner/dist',
         core: '/node_modules/@oat-sa/tao-core-sdk/dist/core',
         util: '/node_modules/@oat-sa/tao-core-sdk/dist/util',
         lib: '/node_modules/@oat-sa/tao-core-libs/dist',
