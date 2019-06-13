@@ -18,7 +18,7 @@
  */
 //@todo : move this to the ../helper directory
 import _ from 'lodash';
-import Class from 'class';
+import 'class';
 import qtiClasses from 'taoQtiItem/qtiItem/core/qtiClasses';
 import Element from 'taoQtiItem/qtiItem/core/Element';
 import xmlNsHandler from 'taoQtiItem/qtiItem/helper/xmlNsHandler';

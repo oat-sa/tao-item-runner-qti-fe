@@ -18,7 +18,7 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
-import Class from 'class';
+import 'class';
 import loggerFactory from 'core/logger';
 import util from 'taoQtiItem/qtiItem/helper/util';
 import rendererConfig from 'taoQtiItem/qtiItem/helper/rendererConfig';

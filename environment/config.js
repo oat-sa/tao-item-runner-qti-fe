@@ -20,42 +20,44 @@ requirejs.config({
     baseUrl: '/',
     paths: {
         css: '/node_modules/require-css/css',
-        // json: '/node_modules/requirejs-plugins/src/json',
-        // text: '/node_modules/text/text',
+        json: '/node_modules/requirejs-plugins/src/json',
+        text: '/node_modules/text/text',
 
         /* TEST related */
         'qunit-parameterize': '/environment/qunit2-parameterize',
         qunit: '/node_modules/qunit/qunit',
-        'test/taoItems': '/test',
+        'test/taoQtiItem': '/test',
 
-        taoItems: '/dist',
+        taoQtiItem: '/dist',
         core: '/node_modules/@oat-sa/tao-core-sdk/dist/core',
         util: '/node_modules/@oat-sa/tao-core-sdk/dist/util',
+        ui: '/node_modules/@oat-sa/tao-core-ui/dist',
         lib: '/node_modules/@oat-sa/tao-core-libs/dist',
         'taoItems/runner': '/node_modules/@oat-sa/tao-item-runner/dist/runner',
         'taoItems/assets': '/node_modules/@oat-sa/tao-item-runner/dist/assets',
         jquery: '/node_modules/jquery/jquery',
-        lodash: '/node_modules/lodash/lodash'
-        // moment: '/node_modules/moment/min/moment-with-locales',
-        // handlebars: '/node_modules/handlebars/dist/handlebars.amd',
+        lodash: '/node_modules/lodash/lodash',
+        moment: '/node_modules/moment/min/moment-with-locales',
+        handlebars: '/node_modules/handlebars/dist/handlebars.amd',
 
         /* LIBS */
         // tpl: '/lib/tpl',
         // 'jquery.autocomplete': '/node_modules/devbridge-autocomplete/dist/jquery.autocomplete',
         // 'jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
         // 'jquery.fileDownload': '/lib/jquery.fileDownload',
-        // 'lib/popper/tooltip': '/node_modules/tooltip.js/dist/umd/tooltip',
-        // popper: '/node_modules/popper.js/dist/umd/popper',
-        // select2: '/node_modules/select2/select2',
-        // interact: '/node_modules/interactjs/dist/interact',
-        // 'lib/dompurify/purify': '/node_modules/dompurify/dist/purify',
-        // 'lib/gamp/gamp': '/node_modules/gamp/src/gamp',
+        'lib/popper/tooltip': '/node_modules/tooltip.js/dist/umd/tooltip',
+        popper: '/node_modules/popper.js/dist/umd/popper',
+        select2: '/node_modules/select2/select2',
+        interact: '/node_modules/interactjs/dist/interact',
+        'lib/dompurify/purify': '/node_modules/dompurify/dist/purify',
+        'lib/gamp/gamp': '/node_modules/gamp/src/gamp',
         // 'lib/flatpickr': '/node_modules/flatpickr/dist',
         // 'lib/moo/moo': '/node_modules/moo/moo',
         // 'lib/decimal/decimal': '/node_modules/decimal.js/decimal',
         // 'lib/expr-eval/expr-eval': '/node_modules/@oat-sa/expr-eval/dist/bundle',
-        // iframeNotifier: '/lib/iframeNotifier',
-        // async: '/node_modules/async/lib/async',
+        iframeNotifier: '/lib/iframeNotifier',
+        class: 'lib/class',
+        async: '/node_modules/async/lib/async'
         // nouislider: '/lib/sliders/jquery.nouislider',
         // helpers: '/lib/helpers',
         // lib: '/lib',
@@ -79,3 +81,5 @@ define('context', ['module'], function(module) {
 });
 
 define('i18n', [], () => text => text);
+
+define('taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration', [], () => {});

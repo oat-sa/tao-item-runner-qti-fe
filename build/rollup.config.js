@@ -88,7 +88,8 @@ export default inputs.map(input => {
             // 'taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory',
             // 'taoQtiItem/qtiRunner/core/Renderer', //move it
             'taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration',
-            'taoQtiItem/qtiCreator/helper/qtiElements',
+
+            // 'taoQtiItem/qtiCreator/helper/qtiElements',
 
             // 'taoItems/runner/api/itemRunner',
             // 'taoItems/assets/manager',
