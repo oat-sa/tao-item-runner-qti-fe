@@ -64,7 +64,11 @@ export default inputs.map(input => {
         external: ['jquery', 'lodash', 'require', ...localExternals],
         plugins: [
             cssResolve(),
-            externalAlias(['core', 'util']),
+            externalAlias([
+                'core',
+                'util',
+                'taoItems'
+            ]),
             alias({
                 resolve: ['.js', '.json', '.tpl'],
                 ...aliases

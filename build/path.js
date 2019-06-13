@@ -31,7 +31,6 @@ module.exports = {
     outputDir: path.resolve(rootPath, 'dist'),
     testOutputDir: path.resolve(rootPath, 'test'),
     aliases: {
-        taoQtiItem: srcDir,
-        taoItems: path.resolve(rootPath, '../taoItems/views/node_modules/@oat-sa/tao-item-runner/src')
+        taoQtiItem: srcDir
     }
 };

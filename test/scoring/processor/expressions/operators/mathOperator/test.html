@@ -6,7 +6,8 @@
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
-                require(['qunitEnv'], function() {
+                // QUnit assert.close provided by plugin for this test only:
+                require(['qunitEnv', 'qunit-assert-close'], function() {
                     require(['test/scoring/processor/expressions/operators/mathOperator/test'], function() {
                         QUnit.start();
                     });

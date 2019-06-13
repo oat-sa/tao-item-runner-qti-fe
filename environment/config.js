@@ -25,9 +25,11 @@ requirejs.config({
 
         /* TEST related */
         'qunit-parameterize': '/environment/qunit2-parameterize',
-        'qunit-assert-close': '/environment/qunit-assert-close',
-        qunit: '/node_modules/qunit/qunit',
+        'qunit-assert-close': '/node_modules/qunit-assert-close/qunit-assert-close',
+        qunit: '/node_modules/qunit/qunit/qunit',
+        qunitStyle: '/node_modules/qunit/qunit/qunit',
         'taoQtiItem/test': '/test',
+
         taoQtiItem: '/dist',
         taoItems: '/node_modules/@oat-sa/tao-item-runner/dist',
         core: '/node_modules/@oat-sa/tao-core-sdk/dist/core',
@@ -62,17 +64,17 @@ requirejs.config({
     },
     shim: {
         'qunit-parameterize': {
-            deps: ['qunit/qunit']
+            deps: ['qunit']
         },
         'qunit-assert-close': {
-            deps: ['qunit/qunit']
+            deps: ['qunit']
         }
     },
     waitSeconds: 15
 });
 
-define('qunitLibs', ['qunit/qunit', 'css!qunit/qunit.css']);
-define('qunitEnv', ['qunitLibs', 'qunit-parameterize', 'qunit-assert-close'], function() {
+define('qunitLibs', ['qunit', 'css!qunitStyle']);
+define('qunitEnv', ['qunitLibs', 'qunit-parameterize'], function() {
     requirejs.config({ nodeIdCompat: true });
 });
 
