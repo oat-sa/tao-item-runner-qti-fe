@@ -26,7 +26,8 @@ requirejs.config({
         /* TEST related */
         'qunit-parameterize': '/environment/qunit2-parameterize',
         qunit: '/node_modules/qunit/qunit',
-        'test/taoQtiItem': '/test',
+        'taoQtiItem/test': '/test',
+        'taoQtiItem/portableLib': '/test/portableLib',
 
         taoQtiItem: '/dist',
         core: '/node_modules/@oat-sa/tao-core-sdk/dist/core',
@@ -57,8 +58,9 @@ requirejs.config({
         // 'lib/expr-eval/expr-eval': '/node_modules/@oat-sa/expr-eval/dist/bundle',
         iframeNotifier: '/lib/iframeNotifier',
         class: 'lib/class',
-        async: '/node_modules/async/lib/async'
-        // nouislider: '/lib/sliders/jquery.nouislider',
+        async: '/node_modules/async/lib/async',
+        nouislider: '/lib/sliders/jquery.nouislider',
+        ckeditor: '/node_modules/ckeditor/ckeditor'
         // helpers: '/lib/helpers',
         // lib: '/lib',
         /* LIBS END */

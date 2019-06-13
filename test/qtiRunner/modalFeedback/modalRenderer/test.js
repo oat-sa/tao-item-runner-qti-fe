@@ -6,7 +6,7 @@ define([
     'taoQtiItem/qtiCommonRenderer/renderers/Renderer',
     'taoQtiItem/qtiCommonRenderer/helpers/container',
     'taoQtiItem/qtiRunner/modalFeedback/modalRenderer',
-    'json!test/taoQtiItem/samples/json/inlineModalFeedback.json'
+    'json!taoQtiItem/test/samples/json/inlineModalFeedback.json'
 ], function($, _, Element, QtiLoader, QtiRenderer, containerHelper, modalRenderer, itemData) {
     var containerId = '#item-container';
     var item;

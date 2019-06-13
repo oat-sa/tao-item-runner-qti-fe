@@ -2,12 +2,12 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>QTI Item "Modal" Modal Feedback renderer Test</title>
+        <title>QTI Item Runner Test</title>
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
-                    require(['taoQtiItem/test/qtiRunner/modalFeedback/modalRenderer/test'], function() {
+                    require(['taoQtiItem/test/runner/qtiItemRunner/test'], function() {
                         QUnit.config.reorder = false;
                         QUnit.start();
                     });
@@ -20,6 +20,5 @@
         <div id="qunit-fixture">
             <div id="item-container"></div>
         </div>
-        <div id="outside-container"></div>
     </body>
 </html>

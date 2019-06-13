@@ -102,7 +102,7 @@ export default inputs.map(input => {
         ],
         plugins: [
             cssResolve(),
-            externalAlias(['core', 'util', 'ui', 'taoItems/runner', 'taoItems/assets']),
+            externalAlias(['core', 'util', 'ui', 'lib', 'taoItems/runner', 'taoItems/assets']),
             alias({
                 resolve: ['.js', '.json', '.tpl'],
                 ...aliases
@@ -116,6 +116,7 @@ export default inputs.map(input => {
                     },
                     module: Handlebars
                 },
+                helpers: ['build/tpl.js'],
                 templateExtension: '.tpl'
             }),
             json({

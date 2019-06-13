@@ -13,22 +13,28 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
  */
+define([
+    'taoQtiItem/portableLib/OAT/util/xml',
+    'taoQtiItem/portableLib/OAT/util/math',
+    'taoQtiItem/portableLib/OAT/util/tooltip'
+], function(xml, math, tooltip){
+    'use strict';
 
-/**
- * This file contains path definitions for build scripts.
- */
-const path = require('path');
-const rootPath = path.resolve(__dirname, '..');
-const srcDir = path.resolve(rootPath, 'src');
+    return {
+        render : function render($container){
+            var markup = $container.html();
 
-module.exports = {
-    rootPath,
-    srcDir,
-    testDir: path.resolve(rootPath, 'test'),
-    scssVendorDir: path.resolve(rootPath, 'scss'),
-    outputDir: path.resolve(rootPath, 'dist'),
-    testOutputDir: path.resolve(rootPath, 'test'),
-    aliases: { taoQtiItem: srcDir, build: path.resolve(rootPath, 'build') }
-};
+            //remove xml ns (would break jquery selector otherwise)
+            markup = xml.removeNamespace(markup);
+            $container.html(markup);
+
+            //render math
+            math.render($container);
+
+            //render tooltip
+            tooltip.render($container);
+        }
+    };
+});

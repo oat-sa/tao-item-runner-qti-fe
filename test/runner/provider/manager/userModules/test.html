@@ -2,13 +2,12 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>QTI Item "Modal" Modal Feedback renderer Test</title>
+        <title>User Modules</title>
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
-                    require(['taoQtiItem/test/qtiRunner/modalFeedback/modalRenderer/test'], function() {
-                        QUnit.config.reorder = false;
+                    require(['taoQtiItem/test/runner/provider/manager/userModules/test'], function() {
                         QUnit.start();
                     });
                 });
@@ -17,9 +16,6 @@
     </head>
     <body>
         <div id="qunit"></div>
-        <div id="qunit-fixture">
-            <div id="item-container"></div>
-        </div>
-        <div id="outside-container"></div>
+        <div id="qunit-fixture"></div>
     </body>
 </html>
