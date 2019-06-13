@@ -23,6 +23,7 @@ import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
 import cssResolve from './css-resolve';
 import externalAlias from './external-alias';
 import resolve from 'rollup-plugin-node-resolve';
+import json from 'rollup-plugin-json';
 
 const { srcDir, outputDir, aliases } = require('./path');
 const Handlebars = require('handlebars');
@@ -61,14 +62,48 @@ export default inputs.map(input => {
             format: 'amd',
             name
         },
-        external: ['jquery', 'lodash', 'require', ...localExternals],
+        external: [
+            'jquery',
+            'lodash',
+            'handlebars',
+            'i18n',
+            'module',
+            'context',
+            'async',
+            'require',
+
+            'raphael',
+            'scale.raphael',
+            'lib/gamp/gamp',
+            'class',
+            'mathJax',
+            'nouislider',
+            'interact',
+            'select2',
+            'ckeditor',
+            'iframeNotifier',
+
+            // 'taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy', //move the whole directory
+            // 'taoQtiItem/portableElementRegistry/ciRegistry',
+            // 'taoQtiItem/portableElementRegistry/icRegistry',
+            // 'taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory',
+            // 'taoQtiItem/qtiRunner/core/Renderer', //move it
+            'taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration',
+
+            // 'taoQtiItem/qtiCreator/helper/qtiElements',
+
+            // 'taoItems/runner/api/itemRunner',
+            // 'taoItems/assets/manager',
+            // 'taoItems/assets/strategies',
+
+            'qtiInfoControlContext',
+            'qtiCustomInteractionContext',
+
+            ...localExternals
+        ],
         plugins: [
             cssResolve(),
-            externalAlias([
-                'core',
-                'util',
-                'taoItems'
-            ]),
+            externalAlias(['core', 'util', 'ui', 'taoItems/runner', 'taoItems/assets', 'taoItems/scoring']),
             alias({
                 resolve: ['.js', '.json', '.tpl'],
                 ...aliases
@@ -83,6 +118,9 @@ export default inputs.map(input => {
                     module: Handlebars
                 },
                 templateExtension: '.tpl'
+            }),
+            json({
+                preferConst: false
             }),
             /**
              * The following hack is necessary because expressions.js wants to export an object
