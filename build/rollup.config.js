@@ -82,13 +82,9 @@ export default inputs.map(input => {
             'ckeditor',
             'iframeNotifier',
 
-            // 'taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy', //move the whole directory
-            // 'taoQtiItem/portableElementRegistry/ciRegistry',
-            // 'taoQtiItem/portableElementRegistry/icRegistry',
-            // 'taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory',
-            'taoQtiItem/qtiRunner/core/Renderer', //move it
-            'taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration',
+            'taoQtiItem/qtiRunner/core/Renderer',
 
+            'taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration',
             'taoQtiItem/qtiCreator/helper/qtiElements',
 
             'qtiInfoControlContext',

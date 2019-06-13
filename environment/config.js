@@ -27,7 +27,7 @@ requirejs.config({
         'qunit-parameterize': '/environment/qunit2-parameterize',
         qunit: '/node_modules/qunit/qunit',
         'taoQtiItem/test': '/test',
-        'taoQtiItem/portableLib': '/test/portableLib',
+        'taoQtiItem/portableLib': '/portableLib',
 
         taoQtiItem: '/dist',
         core: '/node_modules/@oat-sa/tao-core-sdk/dist/core',
