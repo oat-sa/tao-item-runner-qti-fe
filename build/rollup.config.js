@@ -79,7 +79,23 @@ export default inputs.map(input => {
                     module: Handlebars
                 },
                 templateExtension: '.tpl'
-            })
+            }),
+            /**
+             * The following hack is necessary because expressions.js wants to export an object
+             * containing a key named 'default', and expressions/engine.js needs to import the whole thing.
+             * By omitting a line from Rollup's generated bundle, we can preserve the full object.
+             */
+            {
+                name: 'expressions_helper',
+                generateBundle(options, bundle) {
+                    if (options.name.indexOf('expressions/engine') !== -1) {
+                        bundle['engine.js'].code = bundle['engine.js'].code.replace(
+                            /expressionProcessors\.hasOwnProperty\('default'\)/,
+                            false
+                        );
+                    }
+                }
+            }
         ]
     };
 });
