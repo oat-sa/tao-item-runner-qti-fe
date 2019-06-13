@@ -86,14 +86,10 @@ export default inputs.map(input => {
             // 'taoQtiItem/portableElementRegistry/ciRegistry',
             // 'taoQtiItem/portableElementRegistry/icRegistry',
             // 'taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory',
-            // 'taoQtiItem/qtiRunner/core/Renderer', //move it
+            'taoQtiItem/qtiRunner/core/Renderer', //move it
             'taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration',
 
-            // 'taoQtiItem/qtiCreator/helper/qtiElements',
-
-            // 'taoItems/runner/api/itemRunner',
-            // 'taoItems/assets/manager',
-            // 'taoItems/assets/strategies',
+            'taoQtiItem/qtiCreator/helper/qtiElements',
 
             'qtiInfoControlContext',
             'qtiCustomInteractionContext',

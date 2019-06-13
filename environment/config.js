@@ -84,4 +84,10 @@ define('context', ['module'], function(module) {
 
 define('i18n', [], () => text => text);
 
-define('taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration', [], () => {});
+define('taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration', [
+    'taoQtiItem/qtiItem/core/variables/VariableDeclaration'
+], VariableDeclaration =>
+    VariableDeclaration.extend({
+        qtiClass: 'outcomeDeclaration'
+    }));
+define('taoQtiItem/qtiCreator/helper/qtiElements', [], () => {});
