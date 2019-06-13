@@ -41,7 +41,6 @@ var randomFloatProcessor = {
      */
     process: function() {
 
-        var range;
         var min = this.preProcessor.parseValue(this.expression.attributes.min, 'floatOrVariableRef');
         var max = this.preProcessor.parseValue(this.expression.attributes.max, 'floatOrVariableRef');
 

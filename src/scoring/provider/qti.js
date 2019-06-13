@@ -41,6 +41,36 @@ var qtiPciCardinalities = {
 };
 
 /**
+ * Format the scoring state using the PCI response format.
+ *
+ * @param {Object} state - the scoring state
+ * @returns {Object} the state formated in PCI
+ */
+var stateToPci = function stateToPci(state) {
+    var pciState = {};
+
+    _.forEach(state, function(variable, identifier) {
+        var pciCardinality = qtiPciCardinalities[variable.cardinality];
+        var baseType = variable.baseType;
+        if (pciCardinality) {
+            pciState[identifier] = {};
+            if (pciCardinality === 'base') {
+                if (variable.value === null || typeof variable.value === 'undefined') {
+                    pciState[identifier].base = null;
+                } else {
+                    pciState[identifier].base = {};
+                    pciState[identifier].base[baseType] = variable.value;
+                }
+            } else {
+                pciState[identifier][pciCardinality] = {};
+                pciState[identifier][pciCardinality][baseType] = variable.value;
+            }
+        }
+    });
+    return pciState;
+};
+
+/**
  * Format a pci record array :
  *  [
  *      {name : 'fieldA', base : {string : 'yes'}},
@@ -215,36 +245,6 @@ var stateBuilder = function stateBuilder(responses, itemData) {
 };
 
 /**
- * Format the scoring state using the PCI response format.
- *
- * @param {Object} state - the scoring state
- * @returns {Object} the state formated in PCI
- */
-var stateToPci = function stateToPci(state) {
-    var pciState = {};
-
-    _.forEach(state, function(variable, identifier) {
-        var pciCardinality = qtiPciCardinalities[variable.cardinality];
-        var baseType = variable.baseType;
-        if (pciCardinality) {
-            pciState[identifier] = {};
-            if (pciCardinality === 'base') {
-                if (variable.value === null || typeof variable.value === 'undefined') {
-                    pciState[identifier].base = null;
-                } else {
-                    pciState[identifier].base = {};
-                    pciState[identifier].base[baseType] = variable.value;
-                }
-            } else {
-                pciState[identifier][pciCardinality] = {};
-                pciState[identifier][pciCardinality][baseType] = variable.value;
-            }
-        }
-    });
-    return pciState;
-};
-
-/**
  * Looking for custom operation used in item and load appropriate definitions
  * @param {Array} rules to be parsed
  * @param {Function} done callback on finish
@@ -275,9 +275,9 @@ var loadCustomOperators = function loadCustomOperators(rules, done) {
         done();
     }
 };
-
 /**
  * The QTI scoring provider.
+ *
  *
  * @exports taoQtiItem/scoring/provider/qti
  */

@@ -24,7 +24,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import expressionEngineFactory from 'taoQtiItem/scoring/processor/expressions/engine';
-import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
 
 /**

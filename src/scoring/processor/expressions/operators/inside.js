@@ -25,7 +25,6 @@
  */
 import _ from 'lodash';
 import isPointInShape from 'taoQtiItem/scoring/processor/expressions/isPointInShape';
-import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
 
 /**

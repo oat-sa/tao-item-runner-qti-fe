@@ -70,10 +70,10 @@ var errorHandler = {
         }
     },
 
-    'listen': function listenInContext(name, type, handler) {
+    'listen': function listenInContext(name, ...args) {
         var context = this.getContext(name);
         if (context) {
-            context.listen.apply(context, [].slice.call(arguments, 1));
+            context.listen(...args);
         }
     },
 

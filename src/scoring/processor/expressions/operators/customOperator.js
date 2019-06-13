@@ -23,7 +23,6 @@
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-import _ from 'lodash';
 import require from 'require';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 import constraintValidator from 'taoQtiItem/scoring/processor/expressions/operators/constraintValidator';

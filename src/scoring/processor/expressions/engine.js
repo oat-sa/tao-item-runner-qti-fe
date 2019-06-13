@@ -31,15 +31,6 @@ import operatorProcessors from 'taoQtiItem/scoring/processor/expressions/operato
 //get the list of available operators
 var operators = _.keys(operatorProcessors);
 
-//regsiter all processors
-_.forEach(expressionProcessors, function(expressionProcessor, name) {
-    processorFactory.register(name, processorFactory.types.EXPRESSION, expressionProcessor);
-});
-_.forEach(operatorProcessors, function(operatorProcessor, name) {
-    processorFactory.register(name, processorFactory.types.OPERATOR, operatorProcessor);
-});
-
-
 /**
  * Creates an engine that can look over the expressions and execute them accordingy.
  *
@@ -86,7 +77,7 @@ var expressionEngineFactory = function expressionEngineFactory(state) {
         /**
          * Execute the engine on the given expression tree
          * @param {Object} expression - the expression to process
-         * @return {?ProcessingValue} the result of the expression evaluation in the form of a variable
+         * @returns {?ProcessingValue} the result of the expression evaluation in the form of a variable
          */
         execute: function(expression) {
 
@@ -137,5 +128,13 @@ var expressionEngineFactory = function expressionEngineFactory(state) {
         }
     };
 };
+
+//register all processors
+_.forEach(expressionProcessors, function(expressionProcessor, name) {
+    processorFactory.register(name, processorFactory.types.EXPRESSION, expressionProcessor);
+});
+_.forEach(operatorProcessors, function(operatorProcessor, name) {
+    processorFactory.register(name, processorFactory.types.OPERATOR, operatorProcessor);
+});
 
 export default expressionEngineFactory;

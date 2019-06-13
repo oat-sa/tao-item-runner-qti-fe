@@ -42,7 +42,6 @@ var mapResponseProcessor = {
      */
     process: function() {
 
-        var self = this;
         var points,
             defaultValue,
             lowerBound,
