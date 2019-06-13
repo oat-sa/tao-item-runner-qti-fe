@@ -52,6 +52,7 @@ requirejs.config({
         interact: '/node_modules/interactjs/dist/interact',
         'lib/dompurify/purify': '/node_modules/dompurify/dist/purify',
         'lib/gamp/gamp': '/node_modules/gamp/src/gamp',
+        'lib/simulator': '/lib/simulator',
         // 'lib/flatpickr': '/node_modules/flatpickr/dist',
         // 'lib/moo/moo': '/node_modules/moo/moo',
         // 'lib/decimal/decimal': '/node_modules/decimal.js/decimal',
@@ -60,7 +61,9 @@ requirejs.config({
         class: 'lib/class',
         async: '/node_modules/async/lib/async',
         nouislider: '/lib/sliders/jquery.nouislider',
-        ckeditor: '/node_modules/ckeditor/ckeditor'
+        ckeditor: '/lib/ckeditor/ckeditor',
+        raphael: '/node_modules/raphael/raphael',
+        'scale.raphael': '/lib/raphael/scale.raphael'
         // helpers: '/lib/helpers',
         // lib: '/lib',
         /* LIBS END */
@@ -68,6 +71,9 @@ requirejs.config({
     shim: {
         'qunit-parameterize': {
             deps: ['qunit/qunit']
+        },
+        ckeditor: {
+            exports: 'CKEDITOR'
         }
     },
     waitSeconds: 15
