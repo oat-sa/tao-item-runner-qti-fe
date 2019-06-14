@@ -24,7 +24,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
 import module from 'module';
-
+import 'core/mouseEvent';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/graphicGapMatchInteraction';
 import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/Graphic';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';

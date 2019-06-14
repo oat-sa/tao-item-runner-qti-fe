@@ -24,7 +24,6 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
-
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/mediaInteraction';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';

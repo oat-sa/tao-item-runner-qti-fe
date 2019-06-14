@@ -24,7 +24,6 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
-
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/associateInteraction';
 import pairTpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/associateInteraction.pair';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';

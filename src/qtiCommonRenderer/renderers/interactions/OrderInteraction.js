@@ -24,6 +24,7 @@
 import _ from 'lodash';
 import $ from 'jquery';
 import __ from 'i18n';
+import 'core/mouseEvent';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/orderInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';

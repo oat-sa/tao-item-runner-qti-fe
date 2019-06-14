@@ -23,7 +23,6 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
-
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/hotspotInteraction';
 import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/Graphic';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';

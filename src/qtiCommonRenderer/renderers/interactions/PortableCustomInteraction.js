@@ -22,7 +22,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/customInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import PortableElement from 'taoQtiItem/qtiCommonRenderer/helpers/PortableElement';

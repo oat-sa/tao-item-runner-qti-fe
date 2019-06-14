@@ -24,7 +24,6 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
-
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/selectPointInteraction';
 import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/Graphic';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';

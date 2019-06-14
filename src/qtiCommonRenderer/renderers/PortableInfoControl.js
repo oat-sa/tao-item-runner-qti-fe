@@ -21,7 +21,6 @@
  * Portable Info Control Common Renderer
  */
 import _ from 'lodash';
-
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/infoControl';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import PortableElement from 'taoQtiItem/qtiCommonRenderer/helpers/PortableElement';
