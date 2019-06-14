@@ -20,7 +20,6 @@ import path from 'path';
 import glob from 'glob';
 import alias from 'rollup-plugin-alias';
 import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
-import cssResolve from './css-resolve';
 import externalAlias from './external-alias';
 import resolve from 'rollup-plugin-node-resolve';
 import json from 'rollup-plugin-json';
@@ -93,7 +92,6 @@ export default inputs.map(input => {
             ...localExternals
         ],
         plugins: [
-            cssResolve(),
             externalAlias(['core', 'util', 'ui', 'lib', 'taoItems/runner', 'taoItems/assets']),
             alias({
                 resolve: ['.js', '.json', '.tpl'],

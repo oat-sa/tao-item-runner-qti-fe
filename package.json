@@ -15,7 +15,7 @@
         "build": "rollup --config ./build/rollup.config.js",
         "buildScss": "node ./build/scss.js",
         "lint": "eslint src test",
-        "prepare": "npm run buildScss && npm run build"
+        "prepare": "npm run build"
     },
     "repository": {
         "type": "git",
@@ -38,14 +38,12 @@
     },
     "homepage": "https://github.com/oat-sa/tao-item-runner-qti-fe#readme",
     "devDependencies": {
-        "@csstools/postcss-sass": "^4.0.0",
         "@oat-sa/browserslist-config-tao": "^0.1.0",
         "@oat-sa/tao-core-libs": "^0.1.0",
         "@oat-sa/tao-core-sdk": "^0.3.0",
         "@oat-sa/tao-core-ui": "github:oat-sa/tao-core-ui-fe#feature/NEX-131_update-ui-modules-from-tao-core",
         "@oat-sa/tao-item-runner": "github:oat-sa/tao-item-runner-fe#feature/NEX-132_vendorization-of-item-runner",
         "async": "^0.2.10",
-        "autoprefixer": "^9.6.0",
         "dompurify": "^1.0.10",
         "eslint": "^5.16.0",
         "eslint-plugin-es": "^1.4.0",
@@ -61,7 +59,6 @@
         "moment": "^2.11.1",
         "node-qunit-puppeteer": "^1.0.12",
         "popper.js": "^1.14.5",
-        "postcss": "^7.0.17",
         "postcss-scss": "^2.0.0",
         "promise-limit": "^2.7.0",
         "qunit": "^2.9.2",
@@ -79,5 +76,6 @@
     },
     "browserslist": [
         "extends @oat-sa/browserslist-config-tao"
-    ]
+    ],
+    "dependencies": {}
 }

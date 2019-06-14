@@ -42,10 +42,6 @@ requirejs.config({
         handlebars: '/node_modules/handlebars/dist/handlebars.amd',
 
         /* LIBS */
-        // tpl: '/lib/tpl',
-        // 'jquery.autocomplete': '/node_modules/devbridge-autocomplete/dist/jquery.autocomplete',
-        // 'jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
-        // 'jquery.fileDownload': '/lib/jquery.fileDownload',
         'lib/popper/tooltip': '/node_modules/tooltip.js/dist/umd/tooltip',
         popper: '/node_modules/popper.js/dist/umd/popper',
         select2: '/node_modules/select2/select2',
@@ -53,10 +49,6 @@ requirejs.config({
         'lib/dompurify/purify': '/node_modules/dompurify/dist/purify',
         'lib/gamp/gamp': '/node_modules/gamp/src/gamp',
         'lib/simulator': '/lib/simulator',
-        // 'lib/flatpickr': '/node_modules/flatpickr/dist',
-        // 'lib/moo/moo': '/node_modules/moo/moo',
-        // 'lib/decimal/decimal': '/node_modules/decimal.js/decimal',
-        // 'lib/expr-eval/expr-eval': '/node_modules/@oat-sa/expr-eval/dist/bundle',
         iframeNotifier: '/lib/iframeNotifier',
         class: 'lib/class',
         async: '/node_modules/async/lib/async',
@@ -64,8 +56,6 @@ requirejs.config({
         ckeditor: '/lib/ckeditor/ckeditor',
         raphael: '/node_modules/raphael/raphael',
         'scale.raphael': '/lib/raphael/scale.raphael'
-        // helpers: '/lib/helpers',
-        // lib: '/lib',
         /* LIBS END */
     },
     shim: {
@@ -96,4 +86,5 @@ define('taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration', [
     VariableDeclaration.extend({
         qtiClass: 'outcomeDeclaration'
     }));
+
 define('taoQtiItem/qtiCreator/helper/qtiElements', [], () => {});
