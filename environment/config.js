@@ -87,8 +87,6 @@ define('taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration', [
         qtiClass: 'outcomeDeclaration'
     }));
 
-define('taoQtiItem/qtiCreator/helper/qtiElements', [], () => {});
-
 define('taoQtiItem/portableElementRegistry/ciRegistry', [], () => ({
     resetProviders() {
         throw new Error('Not implemented');
