@@ -29,7 +29,6 @@ requirejs.config({
         qunit: '/node_modules/qunit/qunit/qunit',
         qunitStyle: '/node_modules/qunit/qunit/qunit',
         'taoQtiItem/test': '/test',
-        'test/taoQtiItem': '/test',
 
         taoQtiItem: '/dist',
         core: '/node_modules/@oat-sa/tao-core-sdk/dist/core',
