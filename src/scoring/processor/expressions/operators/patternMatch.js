@@ -25,7 +25,6 @@
  */
 import _ from 'lodash';
 
-
 /**
  * Process operands and returns the patternMatch.
  * @type {OperatorProcessor}
@@ -51,6 +50,8 @@ var patternMatchProcessor = {
             cardinality: 'single',
             baseType: 'boolean'
         };
+        var pattern;
+        var regexp;
 
         //if at least one operand is null, then break and return null
         if (_.some(this.operands, _.isNull) === true) {
@@ -58,7 +59,7 @@ var patternMatchProcessor = {
         }
 
         //escape $ and ^
-        var pattern = this.preProcessor.parseValue(this.expression.attributes.pattern, 'stringOrVariableRef')
+        pattern = this.preProcessor.parseValue(this.expression.attributes.pattern, 'stringOrVariableRef')
             .replace(/[\^\$]/g, "\\$&");
 
         if (!pattern.match(/^(\.\*)/)) {
@@ -69,7 +70,7 @@ var patternMatchProcessor = {
             pattern = pattern + '$';
         }
 
-        var regexp = new RegExp(pattern);
+        regexp = new RegExp(pattern);
         result.value = regexp.test(this.preProcessor.parseVariable(this.operands[0]).value);
 
         return result;

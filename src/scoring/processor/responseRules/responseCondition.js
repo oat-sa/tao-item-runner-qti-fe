@@ -25,7 +25,6 @@
  */
 import expressionEngineFactory from 'taoQtiItem/scoring/processor/expressions/engine';
 
-
 /**
  * The rule processor.
  *
@@ -54,7 +53,6 @@ var responseConditionProcessor = {
 
             return expressionResult && expressionResult.value === true;
         };
-
 
         //the if condition
         if (evalRuleCondition(this.rule.responseIf)) {

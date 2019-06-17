@@ -26,7 +26,6 @@ import _ from 'lodash';
 import processorFactory from 'taoQtiItem/scoring/processor/responseRules/processor';
 import rules from 'taoQtiItem/scoring/processor/responseRules/rules';
 
-
 //list supported rules
 var supportedRules = _.keys(rules);
 

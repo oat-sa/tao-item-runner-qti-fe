@@ -24,7 +24,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 
-
 /**
  * Process operands and returns the anyN.
  * @type {OperatorProcessor}
@@ -58,9 +57,7 @@ var anyNProcessor = {
         var counted = this.preProcessor.parseOperands(this.operands).countBy().value();
         if (counted.true >= min && counted.true <= max) {
             result.value = true;
-        } else
-
-        if (counted.true + counted.null >= min && counted.true + counted.null <= max) {
+        } else if (counted.true + counted.null >= min && counted.true + counted.null <= max) {
             // It could have match if nulls were true values.
             return null;
         } else {

@@ -25,7 +25,6 @@
  */
 import _ from 'lodash';
 
-
 /**
  * Process operands and returns the integerDivide.
  * @type {OperatorProcessor}
@@ -61,14 +60,13 @@ var integerDivideProcessor = {
         result.value = this.preProcessor
             .mapNumbers(this.operands)
             .reduce(function(f, s) {
-                var result = Math.floor(f / s);
+                var divResult = Math.floor(f / s);
 
                 if (s === 0) {
                     return null;
                 }
 
-                return result;
-
+                return divResult;
             });
 
         if (_.isNull(result.value)) {

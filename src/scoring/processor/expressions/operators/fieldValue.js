@@ -24,7 +24,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 
-
 /**
  * Process operands and returns fieldValue result.
  * @type {OperatorProcessor}
@@ -63,9 +62,6 @@ var fieldValueProcessor = {
         result.cardinality = record[fieldIdentifier].cardinality;
         return result;
     }
-
 };
 
-
 export default fieldValueProcessor;
-

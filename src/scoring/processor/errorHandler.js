@@ -24,7 +24,6 @@
  */
 import _ from 'lodash';
 
-
 //TODO comment out and raise to tao-core
 
 var errorHandlerContext = function() {
@@ -89,7 +88,5 @@ var errorHandler = {
             this._contexts = _.omit(this._contexts, name);
         }
     }
-
 };
 export default errorHandler;
-

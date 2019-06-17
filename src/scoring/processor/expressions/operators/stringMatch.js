@@ -25,7 +25,6 @@
  */
 import _ from 'lodash';
 
-
 /**
  * Process operands and returns the stringMatch.
  * @type {OperatorProcessor}
@@ -51,23 +50,22 @@ var stringMatchProcessor = {
             cardinality: 'single',
             baseType: 'boolean'
         };
+        var values, caseSensitive, v1, v2;
 
         //if at least one operand is null, then break and return null
         if (_.some(this.operands, _.isNull) === true) {
             return null;
         }
-        var values = this.operands,
-            caseSensitive = _.isBoolean(this.expression.attributes.caseSensitive) ? this.expression.attributes.caseSensitive : true;
+        values = this.operands;
+        caseSensitive = _.isBoolean(this.expression.attributes.caseSensitive) ? this.expression.attributes.caseSensitive : true;
 
-        var v1 = this.preProcessor.parseVariable(values[0]).value,
-            v2 = this.preProcessor.parseVariable(values[1]).value;
-
+        v1 = this.preProcessor.parseVariable(values[0]).value;
+        v2 = this.preProcessor.parseVariable(values[1]).value;
 
         result.value = caseSensitive ? v1 === v2 : v1.toUpperCase() === v2.toUpperCase();
 
         return result;
     }
-
 };
 
 export default stringMatchProcessor;

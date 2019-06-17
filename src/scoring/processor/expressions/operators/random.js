@@ -25,7 +25,6 @@
  */
 import _ from 'lodash';
 
-
 /**
  * Process operands and returns the random.
  * @type {OperatorProcessor}
@@ -51,13 +50,14 @@ var randomProcessor = {
         var result = {
             cardinality: 'single'
         };
+        var op;
 
         //if at least one operand is null, then break and return null
         if (_.some(this.operands, _.isNull) === true) {
             return null;
         }
 
-        var op = this.preProcessor.parseVariable(this.operands[0]);
+        op = this.preProcessor.parseVariable(this.operands[0]);
         result.value = op.value[_.random(0, op.value.length - 1)];
         result.baseType = op.baseType;
 

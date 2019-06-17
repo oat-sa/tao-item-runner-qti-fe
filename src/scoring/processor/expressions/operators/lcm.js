@@ -24,7 +24,6 @@
  */
 import _ from 'lodash';
 
-
 var lcmProcessor = {
 
     constraints: {
@@ -47,13 +46,14 @@ var lcmProcessor = {
             cardinality: 'single',
             baseType: 'integer'
         };
+        var castedOperands;
 
         //if at least one operand is null or infinity, then break and return null
         if (_.some(this.operands, _.isNull) === true) {
             return null;
         }
 
-        var castedOperands = this.preProcessor.parseOperands(this.operands);
+        castedOperands = this.preProcessor.parseOperands(this.operands);
 
         //if at least one operand is a not a number,  then break and return null
         if (!castedOperands.every(this.preProcessor.isNumber)) {
@@ -78,10 +78,14 @@ var lcmProcessor = {
  */
 function lcm(numbers) {
     var n = numbers.length,
-        a = Math.abs(numbers[0]);
-    for (var i = 1; i < n; i++) {
-        var b = Math.abs(numbers[i]),
-            c = a;
+        a = Math.abs(numbers[0]),
+        b,
+        c,
+        i;
+
+    for (i = 1; i < n; i++) {
+        b = Math.abs(numbers[i]);
+        c = a;
         while (a && b) {
             a > b ? a %= b : b %= a;
         }

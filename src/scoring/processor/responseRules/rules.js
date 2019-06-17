@@ -26,7 +26,6 @@ import exitResponse from 'taoQtiItem/scoring/processor/responseRules/exitRespons
 import responseCondition from 'taoQtiItem/scoring/processor/responseRules/responseCondition';
 import setOutcomeValue from 'taoQtiItem/scoring/processor/responseRules/setOutcomeValue';
 
-
 /**
  * An ResponseRuleProcessor
  * @typedef ResponseRuleProcessor

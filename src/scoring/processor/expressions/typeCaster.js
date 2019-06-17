@@ -23,7 +23,6 @@
  */
 import _ from 'lodash';
 
-
 /**
  * @type {Object.<string,function>}
  */
@@ -52,7 +51,6 @@ var castingMap = {
 var typeCaster = function typeCast(type) {
     return castingMap[type] || _.constant;
 };
-
 
 /**
  * Wrap parseInt. It can't be used unwrapped as a map callback
@@ -97,7 +95,6 @@ function toDirectedPair(value) {
 function toPair(value) {
     return toDirectedPair(value).sort();
 }
-
 
 /**
  * Cat to a boolean
@@ -149,6 +146,7 @@ function toFloatOrVariableRef(value, state) {
  * Cast the value by either get the string of it doesn't refer to a variable that contains a string
  * @private
  * @param {String} value - the value to cast to an string
+ * @param {Object} state
  * @returns {String} the string
  */
 function toStringOrVariableRef(value, state) {

@@ -26,7 +26,6 @@
 import _ from 'lodash';
 import isPointInShape from 'taoQtiItem/scoring/processor/expressions/isPointInShape';
 
-
 /**
  * Process operands and returns the inside.
  * @type {OperatorProcessor}
@@ -53,18 +52,18 @@ var insideProcessor = {
             cardinality: 'single',
             baseType: 'boolean'
         };
+        var point;
 
         var attributes = this.expression.attributes;
         var shape = attributes.shape || 'default';
         var coords = _.map(attributes.coords.split(','), parseFloat);
-
 
         //if at least one operand is null, then break and return null
         if (_.some(this.operands, _.isNull) === true) {
             return null;
         }
 
-        var point = this.preProcessor.parseVariable(this.operands[0]).value;
+        point = this.preProcessor.parseVariable(this.operands[0]).value;
 
         result.value = isPointInShape(shape, point, coords);
 

@@ -26,7 +26,6 @@
 import _ from 'lodash';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
-
 /**
  * Process operands and returns equalRounded result.
  * @type {OperatorProcessor}
@@ -61,6 +60,11 @@ var equalRoundedProcessor = {
         var roundingMode = attributes.roundingMode || 'significantFigures';
         var roundingEngine = _.isFunction(this.engines[roundingMode]) ? this.engines[roundingMode] : this.engines.significantFigures;
         var figures = this.preProcessor.parseValue(this.expression.attributes.figures, 'integerOrVariableRef');
+        var op1, op2;
+        var result = {
+            cardinality: 'single',
+            baseType: 'boolean'
+        };
 
         if (!this.preProcessor.isNumber(figures)) {
             errorHandler.throw('scoring', new Error('figures must me numeric'));
@@ -72,25 +76,19 @@ var equalRoundedProcessor = {
             return null;
         }
 
-        var result = {
-            cardinality: 'single',
-            baseType: 'boolean'
-        };
-
         //if at least one operand is null, then break and return null
         if (_.some(this.operands, _.isNull) === true) {
             return null;
         }
 
-        var op1 = this.preProcessor.parseVariable(this.operands[0]).value,
-            op2 = this.preProcessor.parseVariable(this.operands[1]).value;
+        op1 = this.preProcessor.parseVariable(this.operands[0]).value;
+        op2 = this.preProcessor.parseVariable(this.operands[1]).value;
 
         result.value = roundingEngine(op1, figures) === roundingEngine(op2, figures);
 
         return result;
     }
 };
-
 
 /**
  * Decimal adjustment of a number.

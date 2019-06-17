@@ -25,7 +25,6 @@
  */
 import _ from 'lodash';
 
-
 /**
  * Process operands and returns containerSize result.
  * @type {OperatorProcessor}
@@ -66,6 +65,4 @@ var containerSizeProcessor = {
 
 };
 
-
 export default containerSizeProcessor;
-

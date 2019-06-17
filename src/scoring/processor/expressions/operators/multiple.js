@@ -26,7 +26,6 @@
 import _ from 'lodash';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
-
 /**
  * Process operands and returns multiple result.
  * @type {OperatorProcessor}
@@ -51,13 +50,14 @@ var multipleProcessor = {
         var result = {
             cardinality: 'multiple'
         };
+        var filteredOperands;
 
         //if all one operands are null or no operands, then break and return null
         if (_.every(this.operands, _.isNull) === true || this.operands.length === 0) {
             return null;
         }
 
-        var filteredOperands = _(this.operands).filter(_.isObject).value();
+        filteredOperands = _(this.operands).filter(_.isObject).value();
 
         if (Object.keys(_.countBy(filteredOperands, 'baseType')).length !== 1) {
             errorHandler.throw('scoring', new Error('operands must be of the same type'));
@@ -70,9 +70,6 @@ var multipleProcessor = {
 
         return result;
     }
-
 };
 
-
 export default multipleProcessor;
-

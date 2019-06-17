@@ -25,7 +25,6 @@
  */
 import _ from 'lodash';
 
-
 /**
  * Process operands and returns the statsOperator.
  * @type {OperandProcessor}
@@ -60,18 +59,21 @@ var statsOperator = {
             cardinality: 'single',
             baseType: 'float'
         };
+        var operand;
+        var name;
 
         //if at least one operand is null, then break and return null
         if (_.some(this.operands, _.isNull) === true) {
             return null;
         }
 
-        var operand = this.preProcessor.parseVariable(this.operands[0]).value;
+        operand = this.preProcessor.parseVariable(this.operands[0]).value;
+
         if (!_.every(operand, this.preProcessor.isNumber)) {
             return null;
         }
 
-        var name = this.expression.attributes.name;
+        name = this.expression.attributes.name;
 
         result.value = _.isFunction(this.algorithms[name]) ? this.algorithms[name](operand) : null;
 
@@ -137,11 +139,13 @@ function popSD(values) {
  * @returns {*}
  */
 function getVariance(values, c) {
+    var mean2 = mean(values);
+    var s = 0;
+
     if (values.length === 1) {
         return null;
     }
-    var mean2 = mean(values),
-        s = 0;
+
     return _.reduce(values, function(s, v) {
         return s + Math.pow(mean2 - v, 2);
     }, s) / (c ? values.length - 1 : values.length);
@@ -154,11 +158,13 @@ function getVariance(values, c) {
  * @returns {*}
  */
 function getDeviation(values, c) {
+    var mean2 = mean(values);
+    var s = 0;
+
     if (values.length === 1) {
         return null;
     }
-    var mean2 = mean(values),
-        s = 0;
+
     return Math.sqrt(_.reduce(values, function(s, v) {
         return s + Math.pow(mean2 - v, 2);
     }, s) / (c ? values.length - 1 : values.length));

@@ -28,7 +28,6 @@ import _ from 'lodash';
 import isPointInShape from 'taoQtiItem/scoring/processor/expressions/isPointInShape';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
-
 /**
  * The MapResponsePoint Processor
  * @type {ExpressionProcesssor}
@@ -68,7 +67,6 @@ var mapResponseProcessor = {
 
         //cast the variable value
         variable = this.preProcessor.parseVariable(variable);
-
 
         //retrieve attributes
         defaultValue = parseFloat(variable.mapping.attributes.defaultValue) || 0;

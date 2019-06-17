@@ -28,7 +28,6 @@
 import _ from 'lodash';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
-
 /**
  * Process operands and returns the equal.
  * @type {OperatorProcessor}
@@ -79,7 +78,6 @@ var equalCProcessor = {
         var tolerance = attributes.tolerance ? attributes.tolerance.toString().split(' ') : [];
         var includeLowerBound = _.isString(attributes.includeLowerBound) || _.isBoolean(attributes.includeLowerBound) ? this.preProcessor.parseValue(attributes.includeLowerBound, 'boolean') : true;
         var includeUpperBound = _.isString(attributes.includeUpperBound) || _.isBoolean(attributes.includeUpperBound) ? this.preProcessor.parseValue(attributes.includeUpperBound, 'boolean') : true;
-
 
         if (!_.isFunction(engine) || (_.contains(['absolute', 'relative'], toleranceMode) && tolerance.length === 0)) {
             return errorHandler.throw('scoring', new Error('tolerance must me specified'));

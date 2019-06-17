@@ -25,7 +25,6 @@
  */
 import _ from 'lodash';
 
-
 /**
  * Process operands and returns round result.
  * @type {OperatorProcessor}
@@ -51,15 +50,16 @@ var roundProcessor = {
             cardinality: 'single',
             baseType: 'float'
         };
+        var value;
 
         //if at least one operand is null, then break and return null
         if (_.some(this.operands, _.isNull) === true) {
             return null;
         }
 
-        var value = this.preProcessor
-            .parseOperands(this.operands).value()[0];
-
+        value = this.preProcessor
+            .parseOperands(this.operands)
+            .value()[0];
 
         if (_.isNaN(value)) {
             return null;
@@ -76,4 +76,3 @@ var roundProcessor = {
 };
 
 export default roundProcessor;
-

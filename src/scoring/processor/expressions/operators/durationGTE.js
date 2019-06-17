@@ -25,7 +25,6 @@
  */
 import _ from 'lodash';
 
-
 /**
  * Process operands and returns the durationGTE.
  * @type {OperatorProcessor}

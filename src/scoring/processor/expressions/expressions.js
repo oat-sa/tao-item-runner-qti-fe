@@ -36,7 +36,6 @@ import randomFloat from 'taoQtiItem/scoring/processor/expressions/randomFloat';
 import randomInteger from 'taoQtiItem/scoring/processor/expressions/randomInteger';
 import variable from 'taoQtiItem/scoring/processor/expressions/variable';
 
-
 /**
  * An ExpressionProcessor
  * @typedef ExpressionProcessor

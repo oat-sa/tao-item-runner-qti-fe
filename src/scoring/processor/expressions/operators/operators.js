@@ -68,8 +68,6 @@ import subtract from 'taoQtiItem/scoring/processor/expressions/operators/subtrac
 import sum from 'taoQtiItem/scoring/processor/expressions/operators/sum';
 import truncate from 'taoQtiItem/scoring/processor/expressions/operators/truncate';
 
-
-
 /**
  * An OperatorProcessor process operands to gives you a result.
  * @typedef OperatorProcessor

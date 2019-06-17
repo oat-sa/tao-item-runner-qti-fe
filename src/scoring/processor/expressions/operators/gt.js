@@ -25,7 +25,6 @@
  */
 import _ from 'lodash';
 
-
 /**
  * Process operands and returns the gt.
  * @type {OperatorProcesssor}
@@ -57,7 +56,6 @@ var gtProcessor = {
         if (_.some(this.operands, _.isNull) === true) {
             return null;
         }
-
 
         result.value = this.preProcessor
             .mapNumbers(this.operands)

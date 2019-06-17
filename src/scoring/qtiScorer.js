@@ -25,7 +25,6 @@
 import scorer from 'taoItems/scoring/api/scorer';
 import qtiScoringProvider from 'taoQtiItem/scoring/provider/qti';
 
-
 //register the QTI Provider
 scorer.register('qti', qtiScoringProvider);
 

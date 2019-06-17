@@ -27,7 +27,6 @@ import require from 'require';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 import constraintValidator from 'taoQtiItem/scoring/processor/expressions/operators/constraintValidator';
 
-
 /**
  * Process operands and returns the customOperator.
  * @type {OperatorProcessor}
@@ -52,12 +51,13 @@ var customOperatorProcessor = {
 
         var classs = this.expression.attributes['class'];
         var definition = this.expression.attributes.definition; //not used
+        var custom;
 
         if (!require.defined(classs)) {
             return errorHandler.throw('scoring', new Error('Class must be specified for custom operator'));
         }
 
-        var custom = require(classs);
+        custom = require(classs);
         if (constraintValidator(custom, customOperatorProcessor.operands)) {
             custom.preProcessor = customOperatorProcessor.preProcessor;
             custom.operands = customOperatorProcessor.operands;

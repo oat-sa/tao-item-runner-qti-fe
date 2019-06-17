@@ -26,7 +26,6 @@
 import _ from 'lodash';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
-
 /**
  * Process operands and returns contains result.
  * @type {OperatorProcessor}
@@ -52,6 +51,7 @@ var containsProcessor = {
             cardinality: 'single',
             baseType: 'boolean'
         };
+        var op1, op2;
 
         //if at least one operand is null, then break and return null
         if (_.some(this.operands, _.isNull) === true) {
@@ -67,16 +67,13 @@ var containsProcessor = {
             return null;
         }
 
-        var op1 = _.flatten(this.preProcessor.parseVariable(this.operands[0]).value).join(),
-            op2 = _.flatten(this.preProcessor.parseVariable(this.operands[1]).value).join();
+        op1 = _.flatten(this.preProcessor.parseVariable(this.operands[0]).value).join();
+        op2 = _.flatten(this.preProcessor.parseVariable(this.operands[1]).value).join();
 
         result.value = _.contains(op1, op2);
 
         return result;
     }
-
 };
 
-
 export default containsProcessor;
-

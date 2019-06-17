@@ -26,7 +26,6 @@
 import _ from 'lodash';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
-
 /**
  * Process operands and returns repeat result.
  * @type {OperatorProcessor}
@@ -53,6 +52,8 @@ var repeatProcessor = {
             cardinality: 'ordered',
             value: []
         };
+        var filteredOperands;
+        var value;
 
         var numberRepeats = this.preProcessor.parseValue(this.expression.attributes.numberRepeats, 'integerOrVariableRef');
 
@@ -61,7 +62,7 @@ var repeatProcessor = {
             return null;
         }
 
-        var filteredOperands = _(this.operands).filter(_.isObject).value();
+        filteredOperands = _(this.operands).filter(_.isObject).value();
 
         if (Object.keys(_.countBy(filteredOperands, 'baseType')).length !== 1) {
             errorHandler.throw('scoring', new Error('operands must be of the same type'));
@@ -70,7 +71,7 @@ var repeatProcessor = {
 
         result.baseType = this.operands[0].baseType;
 
-        var value = this.preProcessor.parseOperands(filteredOperands).value();
+        value = this.preProcessor.parseOperands(filteredOperands).value();
 
         while (numberRepeats-- > 0) {
             result.value.push(value);
@@ -80,9 +81,6 @@ var repeatProcessor = {
 
         return result;
     }
-
 };
 
-
 export default repeatProcessor;
-

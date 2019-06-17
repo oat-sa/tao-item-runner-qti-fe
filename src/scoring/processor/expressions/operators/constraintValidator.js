@@ -23,7 +23,6 @@
 import _ from 'lodash';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
-
 /**
  * Validate if operator match constraints
  * @type {OperatorProcessor}

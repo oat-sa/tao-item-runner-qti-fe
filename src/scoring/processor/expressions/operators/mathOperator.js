@@ -25,66 +25,6 @@
  */
 import _ from 'lodash';
 
-
-/**
- * Process operands and returns the mathOperator result.
- * @type {OperandProcessor}
- * @exports taoQtiItem/scoring/processor/expressions/operators/mathOperator
- */
-var mathOperatorProcessor = {
-
-    accuracy: 0.00000000000001,
-
-    constraints: {
-        minOperand: 1,
-        maxOperand: -1,
-        cardinality: ['single'],
-        baseType: ['float', 'integer']
-    },
-
-    operands: [],
-
-    /**
-     * Process the mathOperator of the operands.
-     * @returns {?ProcessingValue} the and or null
-     */
-    process: function() {
-
-        var result = {
-            cardinality: 'single',
-            baseType: 'float'
-        };
-
-        //if at least one operand is null, then break and return null
-        if (_.some(this.operands, _.isNull) === true) {
-            return null;
-        }
-
-        var name = this.expression.attributes.name;
-
-        if (!_.contains(Object.keys(functions), name)) {
-            return null;
-        }
-
-        var operands = this.preProcessor.parseOperands(this.operands).value();
-
-        if (_.some(operands, _.isNaN)) {
-            return null;
-        }
-
-        if (_.isFunction(functions[name])) {
-            result.value = functions[name](operands[0]);
-        } else {
-            result.value = functions[name].func(operands);
-        }
-
-        if (_.isNull(result.value) || _.isNaN(result.value)) {
-            return null;
-        }
-        return result;
-    }
-};
-
 var functions = {
     sin: Math.sin,
     cos: Math.cos,
@@ -116,6 +56,67 @@ var functions = {
     ceil: Math.ceil,
     toDegrees: toDegrees,
     toRadians: toRadians
+};
+
+/**
+ * Process operands and returns the mathOperator result.
+ * @type {OperandProcessor}
+ * @exports taoQtiItem/scoring/processor/expressions/operators/mathOperator
+ */
+var mathOperatorProcessor = {
+
+    accuracy: 0.00000000000001,
+
+    constraints: {
+        minOperand: 1,
+        maxOperand: -1,
+        cardinality: ['single'],
+        baseType: ['float', 'integer']
+    },
+
+    operands: [],
+
+    /**
+     * Process the mathOperator of the operands.
+     * @returns {?ProcessingValue} the and or null
+     */
+    process: function() {
+
+        var result = {
+            cardinality: 'single',
+            baseType: 'float'
+        };
+        var name;
+        var operands;
+
+        //if at least one operand is null, then break and return null
+        if (_.some(this.operands, _.isNull) === true) {
+            return null;
+        }
+
+        name = this.expression.attributes.name;
+
+        if (!_.contains(Object.keys(functions), name)) {
+            return null;
+        }
+
+        operands = this.preProcessor.parseOperands(this.operands).value();
+
+        if (_.some(operands, _.isNaN)) {
+            return null;
+        }
+
+        if (_.isFunction(functions[name])) {
+            result.value = functions[name](operands[0]);
+        } else {
+            result.value = functions[name].func(operands);
+        }
+
+        if (_.isNull(result.value) || _.isNaN(result.value)) {
+            return null;
+        }
+        return result;
+    }
 };
 
 /**
@@ -195,12 +196,14 @@ function cosh(operand) {
  * @returns {Number}
  */
 function tanh(operand) {
+    var y;
+
     if (operand === Infinity) {
         return 1;
     } else if (operand === -Infinity) {
         return -1;
     } else {
-        var y = Math.exp(2 * operand);
+        y = Math.exp(2 * operand);
         return (y - 1) / (y + 1);
     }
 }

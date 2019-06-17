@@ -24,8 +24,6 @@
  */
 import _ from 'lodash';
 
-
-
 /**
  * Check wheter a point is in a shape
  *

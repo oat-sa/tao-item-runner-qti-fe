@@ -27,7 +27,6 @@ import preProcessorFactory from 'taoQtiItem/scoring/processor/expressions/prepro
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 import constraintValidator from 'taoQtiItem/scoring/processor/expressions/operators/constraintValidator';
 
-
 /**
  * All values handled by a processor
  * @typedef ProcessingValue

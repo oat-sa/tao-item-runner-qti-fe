@@ -25,7 +25,6 @@
  */
 import _ from 'lodash';
 
-
 /**
  * Process operands and returns the truncate.
  * @type {OperatorProcessor}
@@ -48,13 +47,14 @@ var truncateProcessor = {
             cardinality: 'single',
             baseType: 'float'
         };
+        var value;
 
         //if at least one operand is null, then break and return null
         if (_.some(this.operands, _.isNull) === true) {
             return null;
         }
 
-        var value = this.preProcessor
+        value = this.preProcessor
             .parseOperands(this.operands).value()[0];
 
         if (_.isNaN(value)) {

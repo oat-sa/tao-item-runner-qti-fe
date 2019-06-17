@@ -27,7 +27,6 @@ import processorFactory from 'taoQtiItem/scoring/processor/expressions/processor
 import expressionProcessors from 'taoQtiItem/scoring/processor/expressions/expressions';
 import operatorProcessors from 'taoQtiItem/scoring/processor/expressions/operators/operators';
 
-
 //get the list of available operators
 var operators = _.keys(operatorProcessors);
 

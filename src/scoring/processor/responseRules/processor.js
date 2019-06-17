@@ -25,8 +25,6 @@
 import _ from 'lodash';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
-
-
 //keeps the references of processors (this is something we may load dynamically)
 var processors = {};
 

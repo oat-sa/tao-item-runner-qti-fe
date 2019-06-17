@@ -24,7 +24,6 @@
  */
 import _ from 'lodash';
 
-
 var maxProcessor = {
 
     constraints: {
@@ -42,6 +41,7 @@ var maxProcessor = {
             cardinality: 'single',
             baseType: 'integer'
         };
+        var castedOperands;
 
         //if at least one operand is null or infinity, then break and return null
         if (_.some(this.operands, _.isNull) === true) {
@@ -55,7 +55,7 @@ var maxProcessor = {
             result.baseType = 'float';
         }
 
-        var castedOperands = this.preProcessor.parseOperands(this.operands);
+        castedOperands = this.preProcessor.parseOperands(this.operands);
 
         //if at least one operand is a not a number,  then break and return null
         if (!castedOperands.every(this.preProcessor.isNumber)) {

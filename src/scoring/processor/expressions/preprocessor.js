@@ -25,7 +25,6 @@
 import _ from 'lodash';
 import typeCaster from 'taoQtiItem/scoring/processor/expressions/typeCaster';
 
-
 /**
  * The preprocessor factory creates a preprocessor object that has access to the state
  * @param {Object} state - the item session state
@@ -46,6 +45,9 @@ var preProcessorFactory = function preProcessorFactory(state) {
             return _(operands)
                 //cast value type, like if they were all arrays, and infer the result type
                 .map(function(operand) {
+                    var caster;
+                    var multiple;
+                    var value;
 
                     if (_.isNull(operand)) {
                         return operand;
@@ -55,9 +57,9 @@ var preProcessorFactory = function preProcessorFactory(state) {
                         return _.mapValues(operand.value, preProcessor.parseVariable);
                     }
 
-                    var caster = _.partialRight(typeCaster(operand.baseType), state);
-                    var multiple = operand.cardinality === 'multiple' || operand.cardinality === 'ordered' && _.isArray(operand.value);
-                    var value = multiple ? operand.value : [operand.value];
+                    caster = _.partialRight(typeCaster(operand.baseType), state);
+                    multiple = operand.cardinality === 'multiple' || operand.cardinality === 'ordered' && _.isArray(operand.value);
+                    value = multiple ? operand.value : [operand.value];
 
                     if (operand.cardinality === 'multiple') {
                         value = value.sort(); //sort for
@@ -84,16 +86,16 @@ var preProcessorFactory = function preProcessorFactory(state) {
          * Parse a value regarding a type and a cardinality
          * @param {*} value - the value to parse
          * @param {String} baseType - in the QTI baseTypes
-         * @param {String} [cardinality = 'single'] - either single, multiple, ordered or record
+         * @param {String} [cardinality='single'] - either single, multiple, ordered or record
          * @returns {*} the parsed value
          */
         parseValue: function(value, baseType, cardinality) {
+            var caster = typeCaster(baseType);
+
             if (value !== null) {
                 if (cardinality === 'record') {
                     return _.mapValues(value, preProcessor.parseVariable);
                 }
-
-                var caster = typeCaster(baseType);
                 cardinality = cardinality || 'single';
 
                 if (cardinality === 'single') {
@@ -122,7 +124,7 @@ var preProcessorFactory = function preProcessorFactory(state) {
 
         /**
          * Check if value is really numeric
-         * @param value
+         * @param {Number} value
          * @returns {Boolean|boolean}
          */
         isNumber: function isNumber(value) {

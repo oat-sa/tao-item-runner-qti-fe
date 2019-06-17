@@ -24,7 +24,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 
-
 /**
  * Process operands and returns a boolean of the  isNull.
  * @type {OperatorProcesssor}

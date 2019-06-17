@@ -25,7 +25,6 @@
  */
 import _ from 'lodash';
 
-
 /**
  * Process operands and returns the power.
  * @type {OperatorProcesssor}
@@ -57,18 +56,18 @@ var powerProcessor = {
         result.value = this.preProcessor
             .mapNumbers(this.operands)
             .reduce(function(base, exp) {
-                var result = Math.pow(base, exp);
+                var powerResult = Math.pow(base, exp);
 
                 //checking for float overflow, if happens returns null
-                if (!_.isFinite(result) && _.isFinite(base)) {
-                    result = null;
+                if (!_.isFinite(powerResult) && _.isFinite(base)) {
+                    powerResult = null;
                 }
 
-                if (result === 0 && base !== 0) {
-                    result = null;
+                if (powerResult === 0 && base !== 0) {
+                    powerResult = null;
                 }
 
-                return result;
+                return powerResult;
             });
 
         if (_.isNull(result.value)) {

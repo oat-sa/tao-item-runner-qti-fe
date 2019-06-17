@@ -25,7 +25,6 @@
  */
 import _ from 'lodash';
 
-
 /**
  * Process operands and returns the integerModulus.
  * @type {OperatorProcessor}
@@ -61,14 +60,13 @@ var integerModulusProcessor = {
         result.value = this.preProcessor
             .mapNumbers(this.operands)
             .reduce(function(f, s) {
-                var result = f % s;
+                var modulusResult = f % s;
 
                 if (s === 0) {
                     return null;
                 }
 
-                return result;
-
+                return modulusResult;
             });
 
         if (_.isNull(result.value)) {

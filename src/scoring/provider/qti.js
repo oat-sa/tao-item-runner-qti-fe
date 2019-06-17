@@ -29,7 +29,6 @@ import ruleEngineFactory from 'taoQtiItem/scoring/processor/responseRules/engine
 import preProcessor from 'taoQtiItem/scoring/processor/expressions/preprocessor';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
-
 /**
  * The mapping between PCI and QTI cardinalities
  */

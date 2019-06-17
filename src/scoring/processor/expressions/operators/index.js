@@ -26,7 +26,6 @@
 import _ from 'lodash';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
-
 /**
  * Process operands and returns index result.
  * @type {OperatorProcessor}
@@ -51,9 +50,9 @@ var indexProcessor = {
         var result = {
             cardinality: 'single'
         };
+        var op1;
 
         var n = this.preProcessor.parseValue(this.expression.attributes.n, 'integerOrVariableRef');
-
 
         //if at least one operand is null, then break and return null
         if (_.some(this.operands, _.isNull) === true) {
@@ -65,7 +64,7 @@ var indexProcessor = {
             return null;
         }
 
-        var op1 = this.preProcessor.parseVariable(this.operands[0]);
+        op1 = this.preProcessor.parseVariable(this.operands[0]);
 
         if (_.isUndefined(op1.value[n - 1])) {
             return null;
@@ -75,8 +74,6 @@ var indexProcessor = {
 
         return result;
     }
-
 };
 
 export default indexProcessor;
-

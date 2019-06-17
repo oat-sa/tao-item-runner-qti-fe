@@ -27,7 +27,6 @@
 import _ from 'lodash';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
-
 /**
  * The MapResponse Processor
  * @type {ExpressionProcesssor}

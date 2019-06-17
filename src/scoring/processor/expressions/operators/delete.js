@@ -26,7 +26,6 @@
 import _ from 'lodash';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
 
-
 /**
  * Process operands and returns delete result.
  * @type {OperatorProcessor}
@@ -49,6 +48,7 @@ var deleteProcessor = {
     process: function() {
 
         var result = {};
+        var op1, op2;
 
         //if at least one operand is null, then break and return null
         if (_.some(this.operands, _.isNull) === true) {
@@ -64,8 +64,8 @@ var deleteProcessor = {
             return null;
         }
 
-        var op1 = this.preProcessor.parseVariable(this.operands[0]),
-            op2 = this.preProcessor.parseVariable(this.operands[1]);
+        op1 = this.preProcessor.parseVariable(this.operands[0]);
+        op2 = this.preProcessor.parseVariable(this.operands[1]);
 
         result.value = _.reject(op2.value, function(e) {
             return op1.value === e;
