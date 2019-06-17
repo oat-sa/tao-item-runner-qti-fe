@@ -1,10 +1,8 @@
 define([
-
     'lodash',
     'taoQtiItem/scoring/processor/expressions/preprocessor',
-    'taoQtiItem/scoring/processor/expressions/correct',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(_, preProcessorFactory, correctProcessor, errorHandler) {
+    'taoQtiItem/scoring/processor/expressions/correct'
+], function(_, preProcessorFactory, correctProcessor) {
     'use strict';
 
     QUnit.module('API');

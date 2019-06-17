@@ -1,5 +1,4 @@
 define([
-
     'lodash',
     'taoQtiItem/scoring/processor/expressions/preprocessor',
     'taoQtiItem/scoring/processor/expressions/randomInteger',
@@ -28,7 +27,7 @@ define([
             attributes: {min: 2, max: 2, step: 1}
         };
 
-	    assert.deepEqual(randomIntegerProcessor.process(), expectedResult, 'The processor result is a single integer');
+        assert.deepEqual(randomIntegerProcessor.process(), expectedResult, 'The processor result is a single integer');
     });
 
     QUnit.test('Fails if there aren\'t any attributes', function(assert) {

@@ -1,5 +1,4 @@
 define([
-
     'lodash',
     'taoQtiItem/scoring/processor/expressions/mathConstant'
 ], function(_, mathConstantProcessor) {

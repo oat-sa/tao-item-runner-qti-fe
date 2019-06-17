@@ -1,5 +1,4 @@
 define([
-
     'lodash',
     'taoQtiItem/scoring/processor/expressions/preprocessor',
     'taoQtiItem/scoring/processor/expressions/operators/and'

@@ -1,9 +1,7 @@
 define([
-
     'lodash',
     'taoQtiItem/scoring/processor/expressions/default',
-    'taoQtiItem/scoring/processor/errorHandler'
-], function(_, defaultProcessor, errorHandler) {
+], function(_, defaultProcessor) {
     'use strict';
 
     QUnit.module('API');

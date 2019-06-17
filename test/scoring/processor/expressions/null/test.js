@@ -1,5 +1,4 @@
 define([
-
     'lodash',
     'taoQtiItem/scoring/processor/expressions/null'
 ], function(_, nullProcessor) {

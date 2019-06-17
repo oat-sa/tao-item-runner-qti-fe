@@ -1,11 +1,9 @@
 define([
-
     'lodash',
     'taoQtiItem/scoring/processor/expressions/preprocessor',
     'taoQtiItem/scoring/processor/expressions/mapResponsePoint',
     'taoQtiItem/scoring/processor/errorHandler'
 ], function(
-
     _,
     preProcessorFactory,
     mapResponsePointProcessor,

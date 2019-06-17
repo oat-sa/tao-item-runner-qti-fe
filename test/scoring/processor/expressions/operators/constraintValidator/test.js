@@ -1,5 +1,4 @@
 define([
-
     'lodash',
     'taoQtiItem/scoring/processor/expressions/operators/constraintValidator',
     'taoQtiItem/scoring/processor/errorHandler'
