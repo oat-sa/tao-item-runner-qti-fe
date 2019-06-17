@@ -21,7 +21,7 @@ requirejs.config({
     paths: {
         css: '/node_modules/require-css/css',
         json: '/node_modules/requirejs-plugins/src/json',
-        text: '/node_modules/text/text',
+        text: '/node_modules/requirejs-plugins/lib/text',
 
         /* TEST related */
         'qunit-parameterize': '/environment/qunit2-parameterize',
