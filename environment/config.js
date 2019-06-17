@@ -88,3 +88,22 @@ define('taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration', [
     }));
 
 define('taoQtiItem/qtiCreator/helper/qtiElements', [], () => {});
+
+define('taoQtiItem/portableElementRegistry/ciRegistry', [], () => ({
+    resetProviders() {
+        throw new Error('Not implemented');
+    },
+    registerProvider() {
+        throw new Error('Not implemented');
+    }
+}));
+define('taoQtiItem/portableElementRegistry/icRegistry', [], () => ({
+    resetProviders() {
+        throw new Error('Not implemented');
+    },
+    registerProvider() {
+        throw new Error('Not implemented');
+    }
+}));
+define('taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory', [], () => {});
+define('taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy', [], () => {});

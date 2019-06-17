@@ -81,8 +81,6 @@ export default inputs.map(input => {
             'ckeditor',
             'iframeNotifier',
 
-            'taoQtiItem/qtiRunner/core/Renderer',
-
             'taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration',
             'taoQtiItem/qtiCreator/helper/qtiElements',
 
@@ -92,7 +90,15 @@ export default inputs.map(input => {
             ...localExternals
         ],
         plugins: [
-            externalAlias(['core', 'util', 'ui', 'lib', 'taoItems/runner', 'taoItems/assets']),
+            externalAlias([
+                'core',
+                'util',
+                'ui',
+                'lib',
+                'taoItems/runner',
+                'taoItems/assets',
+                'taoQtiItem/portableElementRegistry'
+            ]),
             alias({
                 resolve: ['.js', '.json', '.tpl'],
                 ...aliases
