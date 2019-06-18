@@ -14,7 +14,6 @@
         "test:keepAlive": "node ./build/webserver.js",
         "test": "node ./build/testrunner.js",
         "build": "rollup --config ./build/rollup.config.js",
-        "buildScss": "node ./build/scss.js",
         "lint": "eslint src test",
         "prepare": "npm run build"
     },
