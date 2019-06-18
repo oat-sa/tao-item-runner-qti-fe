@@ -42,7 +42,7 @@
         "@oat-sa/tao-core-libs": "^0.1.0",
         "@oat-sa/tao-core-sdk": "^0.3.0",
         "@oat-sa/tao-core-ui": "^0.1.1",
-        "@oat-sa/tao-item-runner": "github:oat-sa/tao-item-runner-fe#feature/NEX-132_vendorization-of-item-runner",
+        "@oat-sa/tao-item-runner": "github:oat-sa/tao-item-runner-fe#develop",
         "async": "^0.2.10",
         "dompurify": "^1.0.10",
         "eslint": "^5.16.0",
