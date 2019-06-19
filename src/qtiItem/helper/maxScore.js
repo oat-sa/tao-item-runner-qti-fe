@@ -19,7 +19,7 @@
 import _ from 'lodash';
 import gamp from 'lib/gamp/gamp';
 import responseHelper from 'taoQtiItem/qtiItem/helper/response';
-import OutcomeDeclaration from 'taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration';
+import OutcomeDeclaration from 'taoQtiItem/qtiItem/core/variables/OutcomeDeclaration';
 
 /**
  * This variable allow to globally define if the minCHoice needs to be taken into consideration.

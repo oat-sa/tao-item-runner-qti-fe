@@ -79,13 +79,6 @@ define('context', ['module'], function(module) {
 
 define('i18n', [], () => text => text);
 
-define('taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration', [
-    'taoQtiItem/qtiItem/core/variables/VariableDeclaration'
-], VariableDeclaration =>
-    VariableDeclaration.extend({
-        qtiClass: 'outcomeDeclaration'
-    }));
-
 define('taoQtiItem/portableElementRegistry/ciRegistry', [], () => ({
     resetProviders() {
         throw new Error('Not implemented');

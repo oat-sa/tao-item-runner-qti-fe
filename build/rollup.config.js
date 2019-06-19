@@ -81,8 +81,6 @@ export default inputs.map(input => {
             'ckeditor',
             'iframeNotifier',
 
-            'taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration',
-
             'qtiInfoControlContext',
             'qtiCustomInteractionContext',
 
