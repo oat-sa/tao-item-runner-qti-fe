@@ -20,7 +20,6 @@ import path from 'path';
 import glob from 'glob';
 import alias from 'rollup-plugin-alias';
 import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
-import cssResolve from './css-resolve';
 import externalAlias from './external-alias';
 import resolve from 'rollup-plugin-node-resolve';
 import json from 'rollup-plugin-json';
@@ -49,7 +48,13 @@ const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
 /**
  * Define all modules as external, so rollup won't bundle them together.
  */
-const localExternals = inputs.map(input => `taoQtiItem/${path.relative(srcDir, input).replace(/\.js$/, '')}`);
+const localExternals = inputs.map(
+    input =>
+        `taoQtiItem/${path
+            .relative(srcDir, input)
+            .replace(/\\/g, '/')
+            .replace(/\.js$/, '')}`
+);
 
 export default inputs.map(input => {
     const name = path.relative(srcDir, input).replace(/\.js$/, '');
@@ -83,27 +88,22 @@ export default inputs.map(input => {
             'ckeditor',
             'iframeNotifier',
 
-            // 'taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy', //move the whole directory
-            // 'taoQtiItem/portableElementRegistry/ciRegistry',
-            // 'taoQtiItem/portableElementRegistry/icRegistry',
-            // 'taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory',
-            // 'taoQtiItem/qtiRunner/core/Renderer', //move it
-            'taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration',
-
-            // 'taoQtiItem/qtiCreator/helper/qtiElements',
-
-            // 'taoItems/runner/api/itemRunner',
-            // 'taoItems/assets/manager',
-            // 'taoItems/assets/strategies',
-
             'qtiInfoControlContext',
             'qtiCustomInteractionContext',
 
             ...localExternals
         ],
         plugins: [
-            cssResolve(),
-            externalAlias(['core', 'util', 'ui', 'taoItems/runner', 'taoItems/assets', 'taoItems/scoring']),
+            externalAlias([
+                'core',
+                'util',
+                'ui',
+                'lib',
+                'taoItems/runner',
+                'taoItems/assets',
+                'taoItems/scoring',
+                'taoQtiItem/portableElementRegistry'
+            ]),
             alias({
                 resolve: ['.js', '.json', '.tpl'],
                 ...aliases
@@ -117,6 +117,7 @@ export default inputs.map(input => {
                     },
                     module: Handlebars
                 },
+                helpers: ['build/tpl.js'],
                 templateExtension: '.tpl'
             }),
             json({

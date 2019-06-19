@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Qti SimpleParser Test</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function() {
+                require(['qunitEnv'], function() {
+                    define('taoQtiItem/qtiXmlRenderer/renderers/Renderer', [
+                        'taoQtiItem/qtiRunner/core/Renderer'
+                    ], Renderer =>
+                        Renderer.build(
+                            {
+                                img: 'taoQtiItem/qtiXmlRenderer/renderers/Img',
+                                math: 'taoQtiItem/qtiXmlRenderer/renderers/math',
+                                _container: 'taoQtiItem/qtiXmlRenderer/renderers/container'
+                            },
+                            'xmlRenderer',
+                            {}
+                        ));
+                    define('taoQtiItem/qtiXmlRenderer/renderers/Img', [], {
+                        qtiClass: 'img',
+                        template: () => {}
+                    });
+                    define('taoQtiItem/qtiXmlRenderer/renderers/math', [], {
+                        qtiClass: 'math',
+                        template: () => {}
+                    });
+                    define('taoQtiItem/qtiXmlRenderer/renderers/container', [], {
+                        qtiClass: '_container',
+                        template: () => {}
+                    });
+                    require(['taoQtiItem/test/qtiItem/helper/simpleParser/test'], function() {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+    </body>
+</html>

@@ -27,8 +27,7 @@ module.exports = {
     rootPath,
     srcDir,
     testDir: path.resolve(rootPath, 'test'),
-    scssVendorDir: path.resolve(rootPath, 'scss'),
     outputDir: path.resolve(rootPath, 'dist'),
     testOutputDir: path.resolve(rootPath, 'test'),
-    aliases: { taoQtiItem: srcDir }
+    aliases: { taoQtiItem: srcDir, build: path.resolve(rootPath, 'build') }
 };
