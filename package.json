@@ -44,7 +44,7 @@
         "@oat-sa/tao-core-libs": "^0.1.0",
         "@oat-sa/tao-core-sdk": "^0.3.0",
         "@oat-sa/tao-core-ui": "^0.1.1",
-        "@oat-sa/tao-item-runner": "github:oat-sa/tao-item-runner-fe#feature/NEX-126/vendorize-item-runner-scoring",
+        "@oat-sa/tao-item-runner": "^0.2.0",
         "async": "^0.2.10",
         "autoprefixer": "^9.6.0",
         "dompurify": "^1.0.10",
