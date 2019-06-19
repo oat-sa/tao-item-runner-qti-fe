@@ -28,6 +28,7 @@ requirejs.config({
         'qunit-assert-close': '/node_modules/qunit-assert-close/qunit-assert-close',
         qunit: '/node_modules/qunit/qunit/qunit',
         qunitStyle: '/node_modules/qunit/qunit/qunit',
+        'taoQtiItem/test': '/test',
 
         taoQtiItem: '/dist',
         core: '/node_modules/@oat-sa/tao-core-sdk/dist/core',
