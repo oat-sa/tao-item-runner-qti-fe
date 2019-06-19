@@ -82,7 +82,6 @@ export default inputs.map(input => {
             'iframeNotifier',
 
             'taoQtiItem/qtiCreator/model/variables/OutcomeDeclaration',
-            'taoQtiItem/qtiCreator/helper/qtiElements',
 
             'qtiInfoControlContext',
             'qtiCustomInteractionContext',
