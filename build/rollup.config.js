@@ -131,7 +131,7 @@ export default inputs.map(input => {
             {
                 name: 'expressions_helper',
                 generateBundle(options, bundle) {
-                    if (options.name.indexOf('expressions/engine') !== -1) {
+                    if (options.name.match(/expressions[\/\\]engine/)) {
                         bundle['engine.js'].code = bundle['engine.js'].code.replace(
                             /expressionProcessors\.hasOwnProperty\('default'\)/,
                             false
