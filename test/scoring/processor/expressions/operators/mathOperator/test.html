@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>mathOperator Operator Processor Test</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function() {
+                // QUnit assert.close provided by plugin for this test only:
+                require(['qunitEnv', 'qunit-assert-close'], function() {
+                    require(['test/scoring/processor/expressions/operators/mathOperator/test'], function() {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+    </body>
+</html>

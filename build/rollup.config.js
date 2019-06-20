@@ -75,6 +75,7 @@ export default inputs.map(input => {
             'module',
             'context',
             'async',
+            'require',
 
             'raphael',
             'scale.raphael',
@@ -100,6 +101,7 @@ export default inputs.map(input => {
                 'lib',
                 'taoItems/runner',
                 'taoItems/assets',
+                'taoItems/scoring',
                 'taoQtiItem/portableElementRegistry'
             ]),
             alias({
@@ -120,7 +122,23 @@ export default inputs.map(input => {
             }),
             json({
                 preferConst: false
-            })
+            }),
+            /**
+             * The following hack is necessary because expressions.js wants to export an object
+             * containing a key named 'default', and expressions/engine.js needs to import the whole thing.
+             * By omitting a line from Rollup's generated bundle, we can preserve the full object.
+             */
+            {
+                name: 'expressions_helper',
+                generateBundle(options, bundle) {
+                    if (options.name.match(/expressions[\/\\]engine/)) {
+                        bundle['engine.js'].code = bundle['engine.js'].code.replace(
+                            /expressionProcessors\.hasOwnProperty\('default'\)/,
+                            false
+                        );
+                    }
+                }
+            }
         ]
     };
 });

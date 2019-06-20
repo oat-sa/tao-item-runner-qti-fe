@@ -21,11 +21,13 @@ requirejs.config({
     paths: {
         css: '/node_modules/require-css/css',
         json: '/node_modules/requirejs-plugins/src/json',
-        text: '/node_modules/text/text',
+        text: '/node_modules/requirejs-plugins/lib/text',
 
         /* TEST related */
         'qunit-parameterize': '/environment/qunit2-parameterize',
-        qunit: '/node_modules/qunit/qunit',
+        'qunit-assert-close': '/node_modules/qunit-assert-close/qunit-assert-close',
+        qunit: '/node_modules/qunit/qunit/qunit',
+        qunitStyle: '/node_modules/qunit/qunit/qunit',
         'taoQtiItem/test': '/test',
 
         taoQtiItem: '/dist',
@@ -35,6 +37,7 @@ requirejs.config({
         lib: '/node_modules/@oat-sa/tao-core-libs/dist',
         'taoItems/runner': '/node_modules/@oat-sa/tao-item-runner/dist/runner',
         'taoItems/assets': '/node_modules/@oat-sa/tao-item-runner/dist/assets',
+        'taoItems/scoring': '/node_modules/@oat-sa/tao-item-runner/dist/scoring',
         jquery: '/node_modules/jquery/jquery',
         lodash: '/node_modules/lodash/lodash',
         moment: '/node_modules/moment/min/moment-with-locales',
@@ -59,7 +62,10 @@ requirejs.config({
     },
     shim: {
         'qunit-parameterize': {
-            deps: ['qunit/qunit']
+            deps: ['qunit']
+        },
+        'qunit-assert-close': {
+            deps: ['qunit']
         },
         ckeditor: {
             exports: 'CKEDITOR'
@@ -68,7 +74,7 @@ requirejs.config({
     waitSeconds: 15
 });
 
-define('qunitLibs', ['qunit/qunit', 'css!qunit/qunit.css']);
+define('qunitLibs', ['qunit', 'css!qunitStyle']);
 define('qunitEnv', ['qunitLibs', 'qunit-parameterize'], function() {
     requirejs.config({ nodeIdCompat: true });
 });
