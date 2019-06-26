@@ -161,7 +161,7 @@ define([
             );
             assert.equal(
                 $container.find('.qti-mediaInteraction audio source').attr('type'),
-                'audio/mpeg; charset=utf-8',
+                'audio/mpeg',
                 'the interaction has proper file type'
             );
             assert.equal(
