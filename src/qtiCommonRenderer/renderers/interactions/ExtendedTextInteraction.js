@@ -521,7 +521,7 @@ var inputLimiter = function userInputLimier(interaction) {
 
                 // insert the cut-off text
                 if (isCke) {
-                    _getCKEditor(interaction).insertText(newValue);
+                    _getCKEditor(interaction).insertHtml(newValue);
                 } else {
                     containerHelper
                         .get(interaction)
