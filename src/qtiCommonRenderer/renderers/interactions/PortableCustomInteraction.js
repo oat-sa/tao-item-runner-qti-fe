@@ -89,7 +89,7 @@ var render = function render(interaction, options) {
 
                 pciRenderer = _getPciRenderer(interaction);
 
-                require(pciRenderer.getRequiredModules(), function() {
+                window.require(pciRenderer.getRequiredModules(), function() {
                     var pci = instanciator.getPci(interaction);
                     if (pci) {
                         pciRenderer.createInstance(interaction, {

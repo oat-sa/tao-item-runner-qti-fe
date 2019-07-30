@@ -38,7 +38,7 @@ export default {
             }
         }
         return new Promise(function(resolve, reject) {
-            require(userModules, function() {
+            window.require(userModules, function() {
                 _.forEach(arguments, function(dependency) {
                     if (dependency && _.isFunction(dependency.exec)) {
                         dependency.exec();
