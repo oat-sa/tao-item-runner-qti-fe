@@ -30,6 +30,9 @@ import Element from 'taoQtiItem/qtiItem/core/Element';
 import interactionHelper from 'taoQtiItem/qtiItem/helper/interactionHelper';
 import themeLoader from 'ui/themeLoader';
 import themesHelper from 'ui/themes';
+import moduleLoader from 'core/moduleLoader';
+
+debugger;
 
 var _isValidRenderer = function(renderer) {
     var valid = true;
@@ -572,17 +575,20 @@ var Renderer = function(options) {
             required = _.values(_locations);
         }
 
-        require(required, function() {
-            _.each(arguments, function(clazz) {
-                if (_isValidRenderer(clazz)) {
-                    _renderers[clazz.qtiClass] = clazz;
+        moduleLoader([], ()=> true)
+            .addList( required.map( module => ({ module, category: 'qti'}) ) )
+            .load()
+            .then( loaded => {
+                loaded.forEach( clazz => {
+                    if (_isValidRenderer(clazz)) {
+                        _renderers[clazz.qtiClass] = clazz;
+                    }
+
+                });
+                if (typeof callback === 'function') {
+                    callback.call(self, _renderers);
                 }
             });
-
-            if (typeof callback === 'function') {
-                callback.call(self, _renderers);
-            }
-        });
 
         return this;
     };

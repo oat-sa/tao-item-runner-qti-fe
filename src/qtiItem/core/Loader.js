@@ -22,6 +22,7 @@ import 'class';
 import qtiClasses from 'taoQtiItem/qtiItem/core/qtiClasses';
 import Element from 'taoQtiItem/qtiItem/core/Element';
 import xmlNsHandler from 'taoQtiItem/qtiItem/helper/xmlNsHandler';
+import moduleLoader from 'core/moduleLoader';
 
 var Loader = Class.extend({
     init: function(item, classesLocation) {
@@ -58,18 +59,20 @@ var Loader = Class.extend({
         for (i in requiredClasses) {
             requiredClass = requiredClasses[i];
             if (this.classesLocation[requiredClass]) {
-                required.push(this.classesLocation[requiredClass]);
+                required.push({
+                    module : this.classesLocation[requiredClass],
+                    category: 'qti'
+                });
             } else {
                 throw new Error('missing qti class location declaration : ' + requiredClass);
             }
         }
 
-        var _this = this;
-        require(required, function() {
-            _.each(arguments, function(QtiClass) {
-                _this.qti[QtiClass.prototype.qtiClass] = QtiClass;
+        moduleLoader([], () => true).addList(required).load().then(loadeded => {
+            loadeded.forEach( QtiClass => {
+                this.qti[QtiClass.prototype.qtiClass] = QtiClass;
             });
-            callback.call(_this, _this.qti);
+            callback.call(this, this.qti);
         });
     },
     getLoadedClasses: function() {
@@ -434,3 +437,4 @@ function loadPortableCustomElementProperties(portableElement, rawProperties) {
 }
 
 export default Loader;
+
