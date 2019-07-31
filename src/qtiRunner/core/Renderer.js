@@ -30,8 +30,15 @@ import interactionHelper from 'taoQtiItem/qtiItem/helper/interactionHelper';
 import themeLoader from 'ui/themeLoader';
 import themesHelper from 'ui/themes';
 import moduleLoader from 'core/moduleLoader';
+import Handlebars from 'handlebars';
 
-const hb = require('handlebars');
+//webpack trick : handlebar is usale only from cjs.
+//but anyway we should deprecate the practice to invoke
+//directly Handlebars at runtimej
+let hb = Handlebars;
+if(typeof hb.compile !== 'function'){
+    hb = require('handlebars');
+}
 
 var _isValidRenderer = function(renderer) {
     var valid = true;
