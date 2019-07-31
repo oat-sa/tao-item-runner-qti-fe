@@ -37,6 +37,9 @@ export default {
                 userModules = [];
             }
         }
+        if(!userModules.length){
+            return Promise.resolve();
+        }
         return new Promise(function(resolve, reject) {
             window.require(userModules, function() {
                 _.forEach(arguments, function(dependency) {
