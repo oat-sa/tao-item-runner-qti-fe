@@ -5,8 +5,7 @@
     "description": "TAO QTI Item Runner modules",
     "files": [
         "dist",
-        "src",
-        "css"
+        "src"
     ],
     "directories": {
         "test": "test"
