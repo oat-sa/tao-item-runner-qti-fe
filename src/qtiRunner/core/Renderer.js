@@ -25,14 +25,13 @@
  */
 import _ from 'lodash';
 import $ from 'jquery';
-import Handlebars from 'handlebars';
 import Element from 'taoQtiItem/qtiItem/core/Element';
 import interactionHelper from 'taoQtiItem/qtiItem/helper/interactionHelper';
 import themeLoader from 'ui/themeLoader';
 import themesHelper from 'ui/themes';
 import moduleLoader from 'core/moduleLoader';
 
-debugger;
+const hb = require('handlebars');
 
 var _isValidRenderer = function(renderer) {
     var valid = true;
@@ -268,7 +267,7 @@ var Renderer = function(options) {
         var messages = this.getOption('messages');
         if (messages && elementName && messages[elementName] && _.isString(messages[elementName][messageKey])) {
             //currently not translatable but potentially could be if the need raises
-            return Handlebars.compile(messages[elementName][messageKey]);
+            return hb.compile(messages[elementName][messageKey]);
         } else {
             return null;
         }
@@ -358,7 +357,7 @@ var Renderer = function(options) {
     };
 
     this.renderDirect = function(tpl, data) {
-        return Handlebars.compile(tpl)(data);
+        return hb.compile(tpl)(data);
     };
 
     this.getContainer = function(qtiElement, $scope, qtiSubclass) {
