@@ -20,9 +20,10 @@ import path from 'path';
 import glob from 'glob';
 import alias from 'rollup-plugin-alias';
 import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
-import externalAlias from './external-alias';
+import istanbul from 'rollup-plugin-istanbul';
 import resolve from 'rollup-plugin-node-resolve';
 import json from 'rollup-plugin-json';
+import wildcardExternal from '@oat-sa/rollup-plugin-wildcard-external';
 
 const { srcDir, outputDir, aliases } = require('./path');
 const Handlebars = require('handlebars');
@@ -94,15 +95,15 @@ export default inputs.map(input => {
             ...localExternals
         ],
         plugins: [
-            externalAlias([
-                'core',
-                'util',
-                'ui',
-                'lib',
-                'taoItems/runner',
-                'taoItems/assets',
-                'taoItems/scoring',
-                'taoQtiItem/portableElementRegistry'
+            wildcardExternal([
+                'core/**',
+                'util/**',
+                'ui/**',
+                'lib/**',
+                'taoItems/runner/**',
+                'taoItems/assets/**',
+                'taoItems/scoring/**',
+                'taoQtiItem/portableElementRegistry/**'
             ]),
             alias({
                 resolve: ['.js', '.json', '.tpl'],
@@ -123,6 +124,9 @@ export default inputs.map(input => {
             json({
                 preferConst: false
             }),
+            ...(process.env.COVERAGE ? [istanbul({
+                exclude: 'build/tpl.js'
+            })] : []),
             /**
              * The following hack is necessary because expressions.js wants to export an object
              * containing a key named 'default', and expressions/engine.js needs to import the whole thing.
