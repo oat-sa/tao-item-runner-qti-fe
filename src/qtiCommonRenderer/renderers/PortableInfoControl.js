@@ -106,7 +106,7 @@ var render = function(infoControl, options) {
                 });
 
                 //load the entrypoint
-                require(requireEntries, function() {
+                window.require(requireEntries, function() {
                     var pic = _getPic(infoControl);
                     var picAssetManager = {
                         resolve: function resolve(url) {
