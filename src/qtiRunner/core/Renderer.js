@@ -25,11 +25,20 @@
  */
 import _ from 'lodash';
 import $ from 'jquery';
-import Handlebars from 'handlebars';
 import Element from 'taoQtiItem/qtiItem/core/Element';
 import interactionHelper from 'taoQtiItem/qtiItem/helper/interactionHelper';
 import themeLoader from 'ui/themeLoader';
 import themesHelper from 'ui/themes';
+import moduleLoader from 'core/moduleLoader';
+import Handlebars from 'handlebars';
+
+//webpack trick : handlebar is usale only from cjs.
+//but anyway we should deprecate the practice to invoke
+//directly Handlebars at runtimej
+let hb = Handlebars;
+if(typeof hb.compile !== 'function'){
+    hb = require('handlebars');
+}
 
 var _isValidRenderer = function(renderer) {
     var valid = true;
@@ -265,7 +274,7 @@ var Renderer = function(options) {
         var messages = this.getOption('messages');
         if (messages && elementName && messages[elementName] && _.isString(messages[elementName][messageKey])) {
             //currently not translatable but potentially could be if the need raises
-            return Handlebars.compile(messages[elementName][messageKey]);
+            return hb.compile(messages[elementName][messageKey]);
         } else {
             return null;
         }
@@ -355,7 +364,7 @@ var Renderer = function(options) {
     };
 
     this.renderDirect = function(tpl, data) {
-        return Handlebars.compile(tpl)(data);
+        return hb.compile(tpl)(data);
     };
 
     this.getContainer = function(qtiElement, $scope, qtiSubclass) {
@@ -572,17 +581,20 @@ var Renderer = function(options) {
             required = _.values(_locations);
         }
 
-        require(required, function() {
-            _.each(arguments, function(clazz) {
-                if (_isValidRenderer(clazz)) {
-                    _renderers[clazz.qtiClass] = clazz;
+        moduleLoader([], ()=> true)
+            .addList( required.map( module => ({ module, category: 'qti'}) ) )
+            .load()
+            .then( loaded => {
+                loaded.forEach( clazz => {
+                    if (_isValidRenderer(clazz)) {
+                        _renderers[clazz.qtiClass] = clazz;
+                    }
+
+                });
+                if (typeof callback === 'function') {
+                    callback.call(self, _renderers);
                 }
             });
-
-            if (typeof callback === 'function') {
-                callback.call(self, _renderers);
-            }
-        });
 
         return this;
     };

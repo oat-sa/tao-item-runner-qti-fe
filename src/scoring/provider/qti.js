@@ -24,7 +24,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import require from 'require';
 import ruleEngineFactory from 'taoQtiItem/scoring/processor/responseRules/engine';
 import preProcessor from 'taoQtiItem/scoring/processor/expressions/preprocessor';
 import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
@@ -269,7 +268,7 @@ var loadCustomOperators = function loadCustomOperators(rules, done) {
     _.each(supportedRules, getCustomOperatorsClasses);
 
     if (classes.length) {
-        require(classes, done);
+        window.require(classes, done);
     } else {
         done();
     }
