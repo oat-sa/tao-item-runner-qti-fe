@@ -108,7 +108,7 @@ var qtiItemRuntimeProvider = {
                             reject,
                             timeout,
                             new Error(
-                                'It seems that there is an error during item loading. The error has been reported. Please continue with the test.'
+                                'It seems that there is an error during item loading. The error has been reported. The test will be paused.'
                             )
                         );
                     })
@@ -144,7 +144,7 @@ var qtiItemRuntimeProvider = {
                     .catch(function(err) {
                         done(); // in case of postRendering issue, we are also done
                         self.trigger(
-                            'warning',
+                            'itemrender.error',
                             'Error in post rendering : ' + err instanceof Error ? err.message : err
                         );
                     });
