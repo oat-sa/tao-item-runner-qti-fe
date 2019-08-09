@@ -135,7 +135,7 @@ var unsetChoice = function(interaction, $filledChoice, animate, triggerChange) {
 
     //decrease the  use for this choice
     usage--;
-    
+
     $choice.data('usage', usage).removeClass('deactivated');
 
     $filledChoice
@@ -160,9 +160,7 @@ var unsetChoice = function(interaction, $filledChoice, animate, triggerChange) {
         }
         
         //completely empty pair:
-        if (
-            !$choice.siblings('div').hasClass('filled') && (isNumberOfMaxAssociationsZero || interaction.responseMappingMode)
-        ) {
+        if (!$choice.siblings('div').hasClass('filled') && (isNumberOfMaxAssociationsZero || interaction.responseMappingMode)) {
             //shall we remove it?
             if (!$parent.hasClass('incomplete-pair')) {
                 if (animate) {
