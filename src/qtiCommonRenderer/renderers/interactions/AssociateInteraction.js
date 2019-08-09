@@ -131,6 +131,7 @@ var unsetChoice = function(interaction, $filledChoice, animate, triggerChange) {
     var $sibling = $container.find(
         '.choice-area [data-serial=' + $filledChoice.siblings('.target').data('serial') + ']'
     );
+    var isNumberOfMaxAssociationsZero = parseInt(interaction.attr('maxAssociations')) === 0;
 
     //decrease the  use for this choice
     usage--;
@@ -152,14 +153,14 @@ var unsetChoice = function(interaction, $filledChoice, animate, triggerChange) {
             instructionMgr.validateInstructions(interaction, { choice: $choice });
         }
 
-        //if we are to remove the sibling too, update its usage:
-        $sibling.data('usage', $sibling.data('usage') - 1).removeClass('deactivated');
-
+        // if we are removing the sibling too, update its usage
+        // but only if number of maximum assotiations is zero
+        if (isNumberOfMaxAssociationsZero) {
+            $sibling.data('usage', $sibling.data('usage') - 1).removeClass('deactivated');
+        }
+        
         //completely empty pair:
-        if (
-            !$choice.siblings('div').hasClass('filled') &&
-            (parseInt(interaction.attr('maxAssociations')) === 0 || interaction.responseMappingMode)
-        ) {
+        if (!$choice.siblings('div').hasClass('filled') && (isNumberOfMaxAssociationsZero || interaction.responseMappingMode)) {
             //shall we remove it?
             if (!$parent.hasClass('incomplete-pair')) {
                 if (animate) {
