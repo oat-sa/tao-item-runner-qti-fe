@@ -492,8 +492,9 @@ var render = function(interaction) {
                             onend: function(e) {
                                 var $target = $(e.target);
                                 $target.removeClass('dragged');
-                                _resetSelection();
-
+                                _.delay(function(){
+                                    _resetSelection();
+                                });
                                 interactUtils.restoreOriginalPosition($target);
                                 interactUtils.iFrameDragFixOff();
                             }
