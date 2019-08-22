@@ -492,6 +492,7 @@ var render = function(interaction) {
                             onend: function(e) {
                                 var $target = $(e.target);
                                 $target.removeClass('dragged');
+                                // The reason of placing delay here is that there was timing conflict between "draggable" and "drag-zone" elements.
                                 _.delay(function(){
                                     _resetSelection();
                                 });
