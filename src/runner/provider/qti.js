@@ -143,10 +143,9 @@ var qtiItemRuntimeProvider = {
                     })
                     .catch(function(err) {
                         done(); // in case of postRendering issue, we are also done
-                        self.trigger(
-                            'itemrender.error',
-                            'Error in post rendering : ' + err instanceof Error ? err.message : err
-                        );
+                        var error = new Error('Error in post rendering : ' + err instanceof Error ? err.message : err);
+                        error.unrecoverable = true;
+                        self.trigger('error', error);
                     });
             } catch (err) {
                 self.trigger('error', 'Error in post rendering : ' + err.message);
