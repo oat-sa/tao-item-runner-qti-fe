@@ -141,9 +141,9 @@ var qtiItemRuntimeProvider = {
 
                         return userModules.load().then(done);
                     })
-                    .catch(function(err) {
+                    .catch(function(renderingError) {
                         done(); // in case of postRendering issue, we are also done
-                        var error = new Error('Error in post rendering : ' + err instanceof Error ? err.message : err);
+                        const error = new Error('Error in post rendering : ' + renderingError instanceof Error ? renderingError.message : renderingError);
                         error.unrecoverable = true;
                         self.trigger('error', error);
                     });
