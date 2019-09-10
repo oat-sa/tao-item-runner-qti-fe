@@ -131,6 +131,7 @@ var unsetChoice = function(interaction, $filledChoice, animate, triggerChange) {
     var $sibling = $container.find(
         '.choice-area [data-serial=' + $filledChoice.siblings('.target').data('serial') + ']'
     );
+    var isNumberOfMaxAssociationsZero = parseInt(interaction.attr('maxAssociations')) === 0;
 
     //decrease the  use for this choice
     usage--;
@@ -152,14 +153,14 @@ var unsetChoice = function(interaction, $filledChoice, animate, triggerChange) {
             instructionMgr.validateInstructions(interaction, { choice: $choice });
         }
 
-        //if we are to remove the sibling too, update its usage:
-        $sibling.data('usage', $sibling.data('usage') - 1).removeClass('deactivated');
+        // if we are removing the sibling too, update its usage
+        // but only if number of maximum assotiations is zero
+        if (isNumberOfMaxAssociationsZero) {
+            $sibling.data('usage', $sibling.data('usage') - 1).removeClass('deactivated');
+        }
 
         //completely empty pair:
-        if (
-            !$choice.siblings('div').hasClass('filled') &&
-            (parseInt(interaction.attr('maxAssociations')) === 0 || interaction.responseMappingMode)
-        ) {
+        if (!$choice.siblings('div').hasClass('filled') && (isNumberOfMaxAssociationsZero || interaction.responseMappingMode)) {
             //shall we remove it?
             if (!$parent.hasClass('incomplete-pair')) {
                 if (animate) {
@@ -201,6 +202,99 @@ var renderEmptyPairs = function(interaction) {
 };
 
 /**
+ * Builds a scroll observer that will make sure the dragged element keeps an accurate positioning
+ * @param {jQuery} $scrollContainer
+ * @returns {scrollObserver}
+ */
+var scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
+    var currentDraggable = null;
+    var beforeY = 0;
+    var beforeX = 0;
+    var afterY = 0;
+    var afterX = 0;
+
+    // reset the scroll observer context
+    function resetScrollObserver() {
+        currentDraggable = null;
+        beforeY = 0;
+        beforeX = 0;
+        afterY = 0;
+        afterX = 0;
+    }
+
+    // keep the position of the dragged element accurate with the scroll position
+    function onScrollCb() {
+        var x, y;
+        if (currentDraggable) {
+            beforeY = afterY;
+            beforeX = afterX;
+
+            if (afterY === 0 && beforeY === 0)
+                beforeY = this.scrollTop;
+            if (afterX === 0 && beforeX === 0)
+                beforeX = this.scrollLeft;
+
+            afterY = this.scrollTop;
+            afterX = this.scrollLeft;
+
+            y = (parseInt(currentDraggable.getAttribute('data-y'), 10) || 0) + (afterY - beforeY);
+            x = (parseInt(currentDraggable.getAttribute('data-x'), 10) || 0) + (afterX - beforeX);
+
+            // translate the element
+            currentDraggable.style.webkitTransform = currentDraggable.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+
+            // update the position attributes
+            currentDraggable.setAttribute('data-x', x);
+            currentDraggable.setAttribute('data-y', y);
+        }
+    }
+
+    // find the scroll container within the parents if any
+    $scrollContainer.parents().each(function findScrollContainer() {
+        var $el = $(this);
+        var ovf = $el.css('overflow');
+        if (ovf !== 'hidden' && ovf !== 'visible') {
+            $scrollContainer = $el;
+            return false;
+        }
+    });
+
+    // make sure the drop zones will follow the scroll
+    interact.dynamicDrop(true);
+
+    /**
+     * @typedef {Object} scrollObserver
+     */
+    return {
+        /**
+         * Gets the scroll container
+         * @returns {jQuery}
+         */
+        getScrollContainer: function getScrollContainer() {
+            return $scrollContainer;
+        },
+
+        /**
+         * Initializes the scroll observer while dragging a choice
+         * @param {HTMLElement|jQuery} draggedElement
+         */
+        start: function start(draggedElement) {
+            resetScrollObserver();
+            currentDraggable = draggedElement instanceof $ ? draggedElement.get(0) : draggedElement;
+            $scrollContainer.on('scroll.scrollObserver', _.throttle(onScrollCb, 50));
+        },
+
+        /**
+         * Tears down the the scroll observer once the dragging is done
+         */
+        stop: function stop() {
+            $scrollContainer.off('.scrollObserver');
+            resetScrollObserver();
+        }
+    };
+};
+
+/**
  * Init rendering, called after template injected into the DOM
  * All options are listed in the QTI v2.1 information model:
  * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10291
@@ -216,6 +310,7 @@ var render = function(interaction) {
         var $resultArea = $container.find('.result-area');
 
         var $activeChoice = null;
+        var scrollObserver = null;
 
         var isDragAndDropEnabled;
         var dragOptions;
@@ -460,9 +555,12 @@ var render = function(interaction) {
         }
 
         if (isDragAndDropEnabled) {
+            scrollObserver = scrollObserverFactory($container);
             dragOptions = {
                 inertia: false,
-                autoScroll: true,
+                autoScroll: {
+                    container: scrollObserver.getScrollContainer().get(0)
+                },
                 restrict: {
                     restriction: '.qti-interaction',
                     endOnly: false,
@@ -484,6 +582,8 @@ var render = function(interaction) {
                                 scale = interactUtils.calculateScale(e.target);
                                 scaleX = scale[0];
                                 scaleY = scale[1];
+
+                                scrollObserver.start($activeChoice);
                             },
                             onmove: function(e) {
                                 interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
@@ -491,10 +591,14 @@ var render = function(interaction) {
                             onend: function(e) {
                                 var $target = $(e.target);
                                 $target.removeClass('dragged');
-                                _resetSelection();
-
+                                // The reason of placing delay here is that there was timing conflict between "draggable" and "drag-zone" elements.
+                                _.delay(function(){
+                                    _resetSelection();
+                                });
                                 interactUtils.restoreOriginalPosition($target);
                                 interactUtils.iFrameDragFixOff();
+
+                                scrollObserver.stop();
                             }
                         },
                         dragOptions
@@ -517,6 +621,8 @@ var render = function(interaction) {
                                 scale = interactUtils.calculateScale(e.target);
                                 scaleX = scale[0];
                                 scaleY = scale[1];
+
+                                scrollObserver.start($activeChoice);
                             },
                             onmove: function(e) {
                                 interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
@@ -533,6 +639,8 @@ var render = function(interaction) {
                                 _resetSelection();
 
                                 interactUtils.iFrameDragFixOff();
+
+                                scrollObserver.stop();
                             }
                         },
                         dragOptions
