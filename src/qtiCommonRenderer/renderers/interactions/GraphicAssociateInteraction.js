@@ -35,14 +35,14 @@ import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/in
  * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10321
  *
  * @param {object} interaction
+ * @returns {Promise}
  */
 var render = function render(interaction) {
     var self = this;
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve) {
         var $container = containerHelper.get(interaction);
         var background = interaction.object.attributes;
-        var $imageBox = $('.main-image-box', $container);
         interaction._vsets = [];
 
         $container.off('resized.qti-widget.resolve').one('resized.qti-widget.resolve', resolve);
@@ -105,9 +105,8 @@ var _renderChoice = function _renderChoice(interaction, choice) {
                 instructionMgr.validateInstructions(interaction, { choice: choice, target: this });
                 return;
             }
-
+            active = _getActiveElement(interaction);
             if (this.selectable) {
-                active = _getActiveElement(interaction);
                 if (active) {
                     //increment the matching counter
                     active.data('matching', active.data('matching') + 1);
@@ -125,7 +124,7 @@ var _renderChoice = function _renderChoice(interaction, choice) {
                         self.data('matching', self.data('matching') - 1);
 
                         //detach the response from the active
-                        active.data('assocs', _.remove(active.data('assocs') || [], choice.id()));
+                        active.data('assocs', _.pull(active.data('assocs') || [], choice.id()));
 
                         containerHelper.triggerResponseChangeEvent(interaction);
                         instructionMgr.validateInstructions(interaction, { choice: choice, target: self });
@@ -133,10 +132,11 @@ var _renderChoice = function _renderChoice(interaction, choice) {
                 }
                 _shapesUnSelectable(interaction);
             } else if (this.active) {
-                graphic.updateElementState(this, 'basic', __('Select another area to complete the association'));
-                this.active = false;
                 _shapesUnSelectable(interaction);
             } else if (_isMatchable(this)) {
+                if (active) {
+                    _shapesUnSelectable(interaction);
+                }
                 graphic.updateElementState(this, 'active', __('Select this area to start an association'));
                 this.active = true;
                 _shapesSelectable(interaction, this);
@@ -304,13 +304,21 @@ var _createPath = function _createPath(interaction, srcElement, destElement, onR
  */
 var _shapesSelectable = function _shapesSelectable(interaction, active) {
     var assocs = active.data('assocs') || [];
+    var choices = interaction.getChoices();
+    var activeChoice = choices[active.id];
 
     //update the shape state
-    _.forEach(interaction.getChoices(), function(choice) {
+    _.forEach(choices, function(choice) {
         var element;
+        var assocsElemet;
         if (!_.contains(assocs, choice.id())) {
             element = interaction.paper.getById(choice.serial);
-            if (!element.active && element.id !== active.id && _isMatchable(element, active)) {
+            assocsElemet = element.data('assocs') || [];
+            if (
+                !element.active &&
+                element.id !== active.id &&
+                _isMatchable(element, active) &&
+                !_.contains(assocsElemet, activeChoice.id())) {
                 element.selectable = true;
                 graphic.updateElementState(element, 'selectable');
             }
@@ -389,6 +397,7 @@ var _getRawResponse = function _getRawResponse(interaction) {
  */
 var setResponse = function(interaction, response) {
     var responseValues;
+    var map;
     if (response && interaction.paper) {
         try {
             responseValues = pciResponse.unserialize(response, interaction);
@@ -396,7 +405,7 @@ var setResponse = function(interaction, response) {
 
         if (_.isArray(responseValues)) {
             //create an object with choiceId => shapeElement
-            var map = _.transform(interaction.getChoices(), function(res, choice) {
+            map = _.transform(interaction.getChoices(), function(res, choice) {
                 res[choice.id()] = interaction.paper.getById(choice.serial);
             });
             _.forEach(responseValues, function(responseValue) {
@@ -466,7 +475,7 @@ var resetResponse = function resetResponse(interaction) {
  */
 var getResponse = function(interaction) {
     var raw = _getRawResponse(interaction);
-    var response = pciResponse.serialize(_getRawResponse(interaction), interaction);
+    var response = pciResponse.serialize(raw, interaction);
     return response;
 };
 
@@ -520,7 +529,6 @@ var setState = function setState(interaction, state) {
  * @returns {Object} the interaction current state
  */
 var getState = function getState(interaction) {
-    var $container;
     var state = {};
     var response = interaction.getResponse();
 
