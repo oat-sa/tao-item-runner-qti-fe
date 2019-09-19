@@ -310,15 +310,15 @@ var _shapesSelectable = function _shapesSelectable(interaction, active) {
     //update the shape state
     _.forEach(choices, function(choice) {
         var element;
-        var assocsElemet;
+        var assocsElement;
         if (!_.contains(assocs, choice.id())) {
             element = interaction.paper.getById(choice.serial);
-            assocsElemet = element.data('assocs') || [];
+            assocsElement = element.data('assocs') || [];
             if (
                 !element.active &&
                 element.id !== active.id &&
                 _isMatchable(element, active) &&
-                !_.contains(assocsElemet, activeChoice.id())) {
+                !_.contains(assocsElement, activeChoice.id())) {
                 element.selectable = true;
                 graphic.updateElementState(element, 'selectable');
             }
