@@ -108,7 +108,7 @@ var qtiItemRuntimeProvider = {
                             reject,
                             timeout,
                             new Error(
-                                'It seems that there is an error during item loading. The error has been reported. Please continue with the test.'
+                                'It seems that there is an error during item loading. The error has been reported. The test will be paused.'
                             )
                         );
                     })
@@ -141,12 +141,11 @@ var qtiItemRuntimeProvider = {
 
                         return userModules.load().then(done);
                     })
-                    .catch(function(err) {
+                    .catch(function(renderingError) {
                         done(); // in case of postRendering issue, we are also done
-                        self.trigger(
-                            'warning',
-                            'Error in post rendering : ' + err instanceof Error ? err.message : err
-                        );
+                        const error = new Error('Error in post rendering : ' + renderingError instanceof Error ? renderingError.message : renderingError);
+                        error.unrecoverable = true;
+                        self.trigger('error', error);
                     });
             } catch (err) {
                 self.trigger('error', 'Error in post rendering : ' + err.message);
