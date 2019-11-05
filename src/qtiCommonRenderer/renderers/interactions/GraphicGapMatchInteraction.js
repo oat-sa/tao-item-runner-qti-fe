@@ -424,11 +424,13 @@ var _renderGapList = function _renderGapList(interaction, $gapList) {
                             interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
                         },
                         onend: function(e) {
-                            var $target = $(e.target);
-                            _setInactiveGapState($target);
-                            $target.removeClass('dragged');
-                            interactUtils.restoreOriginalPosition($target);
-                            interactUtils.iFrameDragFixOff();
+                            _.defer( () => {
+                                var $target = $(e.target);
+                                _setInactiveGapState($target);
+                                $target.removeClass('dragged');
+                                interactUtils.restoreOriginalPosition($target);
+                                interactUtils.iFrameDragFixOff();
+                            });
                         }
                     })
                 )
