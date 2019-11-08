@@ -385,14 +385,14 @@ var resetResponse = function(interaction) {
 };
 
 var _setPairs = function(interaction, pairs) {
-    if (_.isArray(pairs[0]) && _.isArray(pairs[0])) {
+    if ( _.isArray(pairs) && _.isArray(pairs[0]) && _.isArray(pairs[1])) {
         _.each(pairs, function(pair) {
             if (pair && pair[0] && pair[1]) {
                 setChoice(interaction, getChoice(interaction, pair[0]), getGap(interaction, pair[1]).find('.gapmatch-content'));
             }
         });
     } else {
-        if (pairs[0] && pairs[1]) {
+        if (pairs && pairs[0] && pairs[1]) {
             setChoice(interaction, getChoice(interaction, pairs[0]), getGap(interaction, pairs[1]).find('.gapmatch-content'));
         }
     }
