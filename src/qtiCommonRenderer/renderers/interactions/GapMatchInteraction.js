@@ -385,7 +385,7 @@ var resetResponse = function(interaction) {
 };
 
 var _setPairs = function(interaction, pairs) {
-    if ( _.isArray(pairs) && _.isArray(pairs[0]) && _.isArray(pairs[1])) {
+    if ( _.isArray(pairs) && _.isArray(pairs[0])) {
         _.each(pairs, function(pair) {
             if (pair && pair[0] && pair[1]) {
                 setChoice(interaction, getChoice(interaction, pair[0]), getGap(interaction, pair[1]).find('.gapmatch-content'));
