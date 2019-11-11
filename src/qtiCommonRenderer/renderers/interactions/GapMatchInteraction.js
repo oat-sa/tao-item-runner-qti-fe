@@ -400,7 +400,6 @@ var _setPairs = function(interaction, pair) {
  * @param {object} interaction
  * @param {object} response
  */
-
 var setResponse = function(interaction, response) {
     resetResponse(interaction);
     let pairs = pciResponse.unserialize(response, interaction);
