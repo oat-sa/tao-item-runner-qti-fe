@@ -384,18 +384,8 @@ var resetResponse = function(interaction) {
     });
 };
 
-var _setPairs = function(interaction, pairs) {
-    if ( _.isArray(pairs) && _.isArray(pairs[0])) {
-        _.each(pairs, function(pair) {
-            if (pair && pair[0] && pair[1]) {
-                setChoice(interaction, getChoice(interaction, pair[0]), getGap(interaction, pair[1]).find('.gapmatch-content'));
-            }
-        });
-    } else {
-        if (pairs && pairs[0] && pairs[1]) {
-            setChoice(interaction, getChoice(interaction, pairs[0]), getGap(interaction, pairs[1]).find('.gapmatch-content'));
-        }
-    }
+var _setPairs = function(interaction, pair) {
+    setChoice(interaction, getChoice(interaction, pair[0]), getGap(interaction, pair[1]).find('.gapmatch-content'));
 };
 
 /**
@@ -410,9 +400,15 @@ var _setPairs = function(interaction, pairs) {
  * @param {object} interaction
  * @param {object} response
  */
+
 var setResponse = function(interaction, response) {
     resetResponse(interaction);
-    _setPairs(interaction, pciResponse.unserialize(response, interaction));
+    let pairs = pciResponse.unserialize(response, interaction);
+    if ( _.isArray(pairs) && _.isArray(pairs[0])) {
+        _.forEach(pairs, pair => _setPairs(interaction, pair));
+    } else {
+        _setPairs(interaction, pairs);
+    }
 };
 
 var _getRawResponse = function(interaction) {
