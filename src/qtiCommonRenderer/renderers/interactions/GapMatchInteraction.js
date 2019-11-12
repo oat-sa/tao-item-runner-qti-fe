@@ -385,7 +385,9 @@ var resetResponse = function(interaction) {
 };
 
 var _setPairs = function(interaction, pair) {
-    setChoice(interaction, getChoice(interaction, pair[0]), getGap(interaction, pair[1]).find('.gapmatch-content'));
+    if (pair && pair.length) {
+        setChoice(interaction, getChoice(interaction, pair[0]), getGap(interaction, pair[1]).find('.gapmatch-content'));
+    }
 };
 
 /**
