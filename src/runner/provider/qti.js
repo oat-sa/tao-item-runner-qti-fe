@@ -267,16 +267,7 @@ var qtiItemRuntimeProvider = {
                 done(renderingQueue);
             }, this.getLoadedClasses());
         });
-    },
-
-    getApipData: function() {
-        var apipData = null;
-        var src = this._item && this._item.getApipAccessibility();
-        if (_.isPlainObject(src)) {
-            apipData = src;
-        }
-        return apipData;
-    },
+    }
 };
 
 export default qtiItemRuntimeProvider;
