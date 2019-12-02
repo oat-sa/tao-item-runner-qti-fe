@@ -436,7 +436,7 @@ var setState = function setState(interaction, state) {
         //restore eliminated choices
         if (isEliminable(interaction) && _.isArray(state.eliminated) && state.eliminated.length) {
             _.forEach(state.eliminated, function(identifier) {
-                $container.find('.qti-simpleChoice[data-identifier=' + identifier + ']').addClass('eliminated');
+                $container.find('.qti-simpleChoice[data-identifier="' + identifier + '"]').addClass('eliminated');
             });
         }
     }

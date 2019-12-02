@@ -568,7 +568,7 @@ var setResponse = function(interaction, response) {
     } else {
         try {
             _.each(pciResponse.unserialize(response, interaction), function(identifier) {
-                $resultArea.append($choiceArea.find('[data-identifier=' + identifier + ']'));
+                $resultArea.append($choiceArea.find('[data-identifier="' + identifier + '"]'));
             });
         } catch (e) {
             throw new Error('wrong response format in argument : ' + e);
