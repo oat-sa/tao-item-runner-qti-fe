@@ -77,8 +77,8 @@ var setResponse = function(interaction, response) {
 
     if (typeof response.list !== 'undefined' && typeof response.list.directedPair !== 'undefined') {
         _(response.list.directedPair).forEach(function(directedPair) {
-            var x = $('th[data-identifier=' + directedPair[0] + ']', $container).index() - 1;
-            var y = $('th[data-identifier=' + directedPair[1] + ']', $container)
+            var x = $('th[data-identifier="' + directedPair[0] + '"]', $container).index() - 1;
+            var y = $('th[data-identifier="' + directedPair[1] + '"]', $container)
                 .parent()
                 .index();
 

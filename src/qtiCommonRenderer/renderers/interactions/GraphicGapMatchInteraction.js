@@ -578,7 +578,7 @@ var setResponse = function(interaction, response) {
                             responseChoice = isDirectedPairFlipped ? pair[0] : pair[1];
                             responseGap = isDirectedPairFlipped ? pair[1] : pair[0];
                             if (responseChoice === choice.id()) {
-                                $('[data-identifier=' + responseGap + ']', $container).addClass('active');
+                                $('[data-identifier="' + responseGap + '"]', $container).addClass('active');
                                 _selectShape(interaction, element, false);
                             }
                         }

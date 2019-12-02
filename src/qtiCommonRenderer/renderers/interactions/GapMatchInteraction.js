@@ -85,12 +85,12 @@ var unsetChoice = function(interaction, $choice) {
 
 var getChoice = function(interaction, identifier) {
     var $container = containerHelper.get(interaction);
-    return $('.choice-area [data-identifier=' + identifier + ']', $container);
+    return $('.choice-area [data-identifier="' + identifier + '"]', $container);
 };
 
 var getGap = function(interaction, identifier) {
     var $container = containerHelper.get(interaction);
-    return $('.qti-flow-container [data-identifier=' + identifier + ']', $container);
+    return $('.qti-flow-container [data-identifier="' + identifier + '"]', $container);
 };
 
 /**
