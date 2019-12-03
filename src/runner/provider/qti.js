@@ -270,11 +270,7 @@ var qtiItemRuntimeProvider = {
     },
 
     getApipData: function() {
-        var apipData = null;
-        var src = this._item && this._item.getApipAccessibility();
-        if (_.isPlainObject(src)) {
-            apipData = src;
-        }
+        var apipData = this._item && _.isFunction(this._item.getApipAccessibility) && this._item.getApipAccessibility() || null;
         return apipData;
     },
 };
