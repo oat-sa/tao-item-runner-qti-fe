@@ -45,14 +45,10 @@ export default {
                 if (!window.MathJax) {
                     window.MathJax = MathJax;
                 }
-                _.defer(function() {
-                    //defer execution fix some rendering issue in chrome
+                //@see http://docs.mathjax.org/en/latest/advanced/typeset.html
+                MathJax.Hub.Queue(['Typeset', MathJax.Hub, containerHelper.get(math).parent()[0]]);
 
-                    MathJax.Hub.Queue(['Typeset', MathJax.Hub, containerHelper.get(math).parent()[0]]);
-
-                    //@see http://docs.mathjax.org/en/latest/advanced/typeset.html
-                    MathJax.Hub.Queue(resolve);
-                });
+                MathJax.Hub.Queue(resolve);
             } else {
                 resolve();
             }
