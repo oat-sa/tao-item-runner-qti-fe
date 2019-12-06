@@ -40,15 +40,20 @@ export default {
     getContainer: containerHelper.get,
     render: function render(math) {
         return new Promise(function(resolve) {
+            var $item = containerHelper.get(math).closest('.qti-item');
             if (typeof MathJax !== 'undefined' && MathJax) {
                 //MathJax needs to be exported globally to integrate with tools like TTS, it's weird...
                 if (!window.MathJax) {
                     window.MathJax = MathJax;
                 }
-                //@see http://docs.mathjax.org/en/latest/advanced/typeset.html
-                MathJax.Hub.Queue(['Typeset', MathJax.Hub, containerHelper.get(math).parent()[0]]);
-
-                MathJax.Hub.Queue(resolve);
+                //defer execution fix some rendering issue in chrome
+                if ($item.length && !$item.data('mathInitialized')) {
+                    $item.data('mathInitialized', true);
+                    MathJax.Hub.Queue(['Typeset', MathJax.Hub, $item[0]]);
+                    MathJax.Hub.Queue(resolve);
+                } else {
+                    resolve();
+                }
             } else {
                 resolve();
             }
