@@ -1,6 +1,6 @@
 {
     "name": "@oat-sa/tao-item-runner-qti",
-    "version": "0.4.10",
+    "version": "0.4.12",
     "displayName": "TAO Item Runner QTI",
     "description": "TAO QTI Item Runner modules",
     "files": [
