@@ -276,7 +276,7 @@ var qtiItemRuntimeProvider = {
                 done(renderingQueue);
             }, this.getLoadedClasses());
         });
-    },
+    }
 };
 
 export default qtiItemRuntimeProvider;
