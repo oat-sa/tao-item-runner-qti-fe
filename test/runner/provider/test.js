@@ -44,6 +44,20 @@ define([
         );
     });
 
+    QUnit.test('extend default API with APIP data', function(assert) {
+
+        assert.ok(!!itemRunner, 'the item runner presented');
+
+        itemRunner.register('qti', qtiRuntimeProvider);
+        itemRunner.getApipData = itemRunner.providers.qti.getApipData.bind(itemRunner);
+
+        assert.ok(_.isFunction(itemRunner.getApipData), 'The item getApipData method presented');
+        delete itemRunner.providers;
+
+        let ad = itemRunner.getApipData();
+        assert.ok( _.isNull(ad) || _.isPlainObject(ad), 'item runner getApipData returns correct value');
+    });
+
     QUnit.module('Register the provider', {
         afterEach: function(assert) {
             itemRunner.providers = null;

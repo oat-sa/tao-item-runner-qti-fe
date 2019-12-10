@@ -269,6 +269,10 @@ var qtiItemRuntimeProvider = {
         });
     },
 
+    /**
+     * Get data related to QTI APIP accessibility
+     * @return {Object|null} accessibility data provided in test
+     */
     getApipData: function() {
         var apipData = this._item && _.isFunction(this._item.getApipAccessibility) && this._item.getApipAccessibility() || null;
         return apipData;
