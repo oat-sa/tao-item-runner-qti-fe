@@ -65,6 +65,15 @@ var qtiItemRuntimeProvider = {
 
                 done();
             }, this.getLoadedClasses());
+
+            /**
+             * Get data related to QTI APIP accessibility
+             * @return {Object|null} accessibility data provided in test
+             */
+            self.getApipData = function getApipData() {
+                var apipData = self._item && _.isFunction(self._item.getApipAccessibility) && self._item.getApipAccessibility() || null;
+                return apipData;
+            };
         });
     },
 
@@ -267,15 +276,6 @@ var qtiItemRuntimeProvider = {
                 done(renderingQueue);
             }, this.getLoadedClasses());
         });
-    },
-
-    /**
-     * Get data related to QTI APIP accessibility
-     * @return {Object|null} accessibility data provided in test
-     */
-    getApipData: function() {
-        var apipData = this._item && _.isFunction(this._item.getApipAccessibility) && this._item.getApipAccessibility() || null;
-        return apipData;
     },
 };
 
