@@ -44,20 +44,6 @@ define([
         );
     });
 
-    QUnit.test('extend default API with APIP data', function(assert) {
-
-        assert.ok(!!itemRunner, 'the item runner presented');
-
-        itemRunner.register('qti', qtiRuntimeProvider);
-        itemRunner.getApipData = itemRunner.providers.qti.getApipData.bind(itemRunner);
-
-        assert.ok(_.isFunction(itemRunner.getApipData), 'The item getApipData method presented');
-        delete itemRunner.providers;
-
-        let ad = itemRunner.getApipData();
-        assert.ok( _.isNull(ad) || _.isPlainObject(ad), 'item runner getApipData returns correct value');
-    });
-
     QUnit.module('Register the provider', {
         afterEach: function(assert) {
             itemRunner.providers = null;
@@ -112,6 +98,23 @@ define([
                 ready();
             })
             .init();
+    });
+
+    QUnit.test('extend default API with APIP data', function(assert) {
+        var ready = assert.async();
+        assert.expect(2);
+
+        itemRunner.register('qti', qtiRuntimeProvider);
+        itemRunner('qti', itemData)
+            .on('init', function() {
+                assert.ok(typeof this.getApipData === "function", 'The item getApipData method presented');
+                let ad = this.getApipData();
+                assert.ok( _.isNull(ad) || _.isPlainObject(ad), 'item runner getApipData returns correct value');
+
+                ready();
+            })
+            .init();
+
     });
 
     QUnit.module('Provider render', {
