@@ -26,8 +26,9 @@ define([
     'taoItems/runner/api/itemRunner',
     'taoQtiItem/runner/provider/qti',
     'taoQtiItem/portableElementRegistry/icRegistry',
+    'json!taoQtiItem/test/samples/json/apip-data.json',
     'json!taoQtiItem/test/samples/json/space-shuttle.json'
-], function($, _, itemRunner, qtiRuntimeProvider, icRegistry, itemData) {
+], function($, _, itemRunner, qtiRuntimeProvider, icRegistry, itemApipData, itemData) {
     'use strict';
 
     var runner;
@@ -108,13 +109,23 @@ define([
         itemRunner('qti', itemData)
             .on('init', function() {
                 assert.ok(typeof this.getApipData === "function", 'The item getApipData method presented');
-                let ad = this.getApipData();
-                assert.ok( _.isNull(ad) || _.isPlainObject(ad), 'item runner getApipData returns correct value');
-
+                assert.ok( _.isNull(this.getApipData()), 'item runner getApipData returns correct value for an absent data');
                 ready();
             })
             .init();
+    });
 
+    QUnit.test('reading APIP data from QTI item runner', function(assert) {
+        var ready = assert.async();
+        assert.expect(1);
+
+        itemRunner.register('qti', qtiRuntimeProvider);
+        itemRunner('qti', itemApipData)
+            .on('init', function() {
+                assert.ok( _.isPlainObject(this.getApipData()), 'item runner getApipData returns correct value');
+                ready();
+            })
+            .init();
     });
 
     QUnit.module('Provider render', {

@@ -1,0 +1,894 @@
+{
+      "identifier": "A00289548",
+      "serial": "item_5df0be6b661e2141526766",
+      "qtiClass": "assessmentItem",
+      "attributes": {
+        "identifier": "A00289548",
+        "title": "A00289548",
+        "label": "A00289548",
+        "xml:lang": "en-US",
+        "adaptive": false,
+        "timeDependent": false,
+        "toolName": "TAO",
+        "toolVersion": "3.4.0-sprint117",
+        "class": ""
+      },
+      "body": {
+        "serial": "container_containeritembody_5df0be6b661b7921373722",
+        "body": "\n    <div class=\"grid-row\">\n      <div class=\"col-12\">\n        <div class=\"stem\">\n          <p>\n            <span id=\"cde_i289548_20\">45 minutes\u201475 questions<\/span>\n          <\/p>\n          <p>\n            <span id=\"cde_i289548_21\">In the five passages that follow, certain words and phrases are underlined and highlighted.<\/span>\n            <span id=\"cde_i289548_22\">On the right-hand side of the screen, you will find alternatives for the underlined and highlighted text.<\/span>\n            <span id=\"cde_i289548_23\">In most cases, you are to choose the one that best expresses the idea, makes the statement appropriate for standard written English, or is worded most consistently with the style and tone of the passage as a whole.<\/span>\n            <span id=\"cde_i289548_24\">If you think the original version is best, choose \u201cNO CHANGE.\u201d<\/span>\n            <span id=\"cde_i289548_25\">In some cases, you will find on the right-hand side of the screen a question about the underlined and highlighted text.<\/span>\n            <span id=\"cde_i289548_26\">You are to choose the best answer to the question.<\/span>\n          <\/p>\n          <p><span id=\"cde_i289548_27\">You will also find questions about a section of the passage, or about the passage as a whole.<\/span><span id=\"cde_i289548_28\">These questions do not refer to an underlined and highlighted portion of the passage, but rather refer to a letter or letters, a number or numbers, or an asterisk within square brackets<\/span> [ ].<\/p>\n          <p>\n            <span id=\"cde_i289548_29\">For each question, choose the alternative you consider best and select the circle next to your answer.<\/span>\n            <span id=\"cde_i289548_30\">Read each passage through once, using the scroll bar to see the entire passage, before you begin to answer the questions that accompany the passage.<\/span>\n            <span id=\"cde_i289548_31\">For many of the questions, you must read several sentences beyond the question to determine the answer.<\/span>\n            <span id=\"cde_i289548_32\">Be sure that you have read far enough ahead each time you choose an alternative.<\/span>\n          <\/p>\n          <p>\u200b<\/p>\n          {{interaction_extendedtextinteraction_5df0be6b66b58073749912}}\n          <p>\u00a0<\/p>\n        <\/div>\n        {{interaction_extendedtextinteraction_5df0be6b66e08022231125}}\n      <\/div>\n    <\/div>\n  ",
+        "elements": {
+          "interaction_extendedtextinteraction_5df0be6b66b58073749912": {
+            "serial": "interaction_extendedtextinteraction_5df0be6b66b58073749912",
+            "qtiClass": "extendedTextInteraction",
+            "attributes": {
+              "responseIdentifier": "RESP",
+              "base": 10,
+              "expectedLength": 240,
+              "minStrings": 0,
+              "format": "plain",
+              "class": "height-tall behavior-highlight"
+            },
+            "debug": {
+              "relatedItem": "item_5df0be6b661e2141526766"
+            },
+            "choices": [],
+            "prompt": {
+              "serial": "container_containerstatic_5df0be6b66d65300253631",
+              "body": "",
+              "elements": [],
+              "debug": {
+                "relatedItem": "item_5df0be6b661e2141526766"
+              }
+            }
+          },
+          "interaction_extendedtextinteraction_5df0be6b66e08022231125": {
+            "serial": "interaction_extendedtextinteraction_5df0be6b66e08022231125",
+            "qtiClass": "extendedTextInteraction",
+            "attributes": {
+              "responseIdentifier": "RESP",
+              "base": 10,
+              "expectedLength": 240,
+              "minStrings": 0,
+              "format": "plain",
+              "class": "height-tall behavior-highlight"
+            },
+            "debug": {
+              "relatedItem": "item_5df0be6b661e2141526766"
+            },
+            "choices": [],
+            "prompt": {
+              "serial": "container_containerstatic_5df0be6b67201000810208",
+              "body": "",
+              "elements": [],
+              "debug": {
+                "relatedItem": "item_5df0be6b661e2141526766"
+              }
+            }
+          }
+        },
+        "debug": {
+          "relatedItem": "item_5df0be6b661e2141526766"
+        }
+      },
+      "debug": {
+        "relatedItem": "item_5df0be6b661e2141526766"
+      },
+      "namespaces": {
+        "": "http:\/\/www.imsglobal.org\/xsd\/imsqti_v2p1",
+        "xi": "http:\/\/www.w3.org\/2001\/XInclude",
+        "xsi": "http:\/\/www.w3.org\/2001\/XMLSchema-instance"
+      },
+      "schemaLocations": {
+        "http:\/\/www.imsglobal.org\/xsd\/imsqti_v2p1": "http:\/\/www.imsglobal.org\/xsd\/qti\/qtiv2p1\/imsqti_v2p1p2.xsd",
+        "http:\/\/www.w3.org\/2001\/XInclude": "http:\/\/www.imsglobal.org\/xsd\/w3\/2001\/XInclude.xsd",
+        "http:\/\/www.w3.org\/1998\/Math\/MathML": "http:\/\/www.w3.org\/Math\/XMLSchema\/mathml2\/mathml2.xsd",
+        "http:\/\/www.imsglobal.org\/xsd\/apip\/apipv1p0\/qtiitem\/imsqti_v2p1": "http:\/\/www.imsglobal.org\/profile\/apip\/apipv1p0\/apipv1p0_qtiitemv2p1_v1p0.xsd"
+      },
+      "stylesheets": [],
+      "outcomes": {
+        "outcomedeclaration_5df0be6b66614536126421": {
+          "identifier": "SCORE",
+          "serial": "outcomedeclaration_5df0be6b66614536126421",
+          "qtiClass": "outcomeDeclaration",
+          "attributes": {
+            "identifier": "SCORE",
+            "cardinality": "single",
+            "baseType": "float",
+            "interpretation": "scoreSystem:human responseIdentifier:RESP",
+            "normalMaximum": 0
+          },
+          "debug": {
+            "relatedItem": "item_5df0be6b661e2141526766"
+          },
+          "defaultValue": "0"
+        }
+      },
+      "responses": {
+        "responsedeclaration_5df0be6b664d3594302331": {
+          "identifier": "RESP",
+          "serial": "responsedeclaration_5df0be6b664d3594302331",
+          "qtiClass": "responseDeclaration",
+          "attributes": {
+            "identifier": "RESP",
+            "cardinality": "single",
+            "baseType": "string"
+          },
+          "debug": {
+            "relatedItem": "item_5df0be6b661e2141526766"
+          },
+          "defaultValue": []
+        }
+      },
+      "feedbacks": [],
+      "apipAccessibility": {
+        "companionMaterialsInfo": [],
+        "inclusionOrder": {
+          "textGraphicsDefaultOrder": {
+            "elementOrder": [
+              {
+                "@attributes": {
+                  "identifierRef": "ae001"
+                },
+                "order": "1"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae002"
+                },
+                "order": "2"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae003"
+                },
+                "order": "3"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae004"
+                },
+                "order": "4"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae005"
+                },
+                "order": "5"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae006"
+                },
+                "order": "6"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae007"
+                },
+                "order": "7"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae008"
+                },
+                "order": "8"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae009"
+                },
+                "order": "9"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae010"
+                },
+                "order": "10"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae011"
+                },
+                "order": "11"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae012"
+                },
+                "order": "12"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae013"
+                },
+                "order": "13"
+              }
+            ]
+          },
+          "textGraphicsOnDemandOrder": {
+            "elementOrder": [
+              {
+                "@attributes": {
+                  "identifierRef": "ae001"
+                },
+                "order": "1"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae002"
+                },
+                "order": "2"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae003"
+                },
+                "order": "3"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae004"
+                },
+                "order": "4"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae005"
+                },
+                "order": "5"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae006"
+                },
+                "order": "6"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae007"
+                },
+                "order": "7"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae008"
+                },
+                "order": "8"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae009"
+                },
+                "order": "9"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae010"
+                },
+                "order": "10"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae011"
+                },
+                "order": "11"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae012"
+                },
+                "order": "12"
+              },
+              {
+                "@attributes": {
+                  "identifierRef": "ae013"
+                },
+                "order": "13"
+              }
+            ]
+          }
+        },
+        "accessibilityInfo": {
+          "accessElement": [
+            {
+              "@attributes": {
+                "identifier": "ae001"
+              },
+              "contentLinkInfo": {
+                "@attributes": {
+                  "qtiLinkIdentifierRef": "cde_i289548_20"
+                },
+                "objectLink": []
+              },
+              "relatedElementInfo": {
+                "spoken": {
+                  "audioFileInfo": [
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534500_mp3",
+                        "mimeType": "audio\/mpeg"
+                      },
+                      "fileHref": "assets\/ae001_534500.mp3",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534500_ogg",
+                        "mimeType": "audio\/ogg"
+                      },
+                      "fileHref": "assets\/ae001_534500.ogg",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534500_xml",
+                        "mimeType": "application\/xml"
+                      },
+                      "fileHref": "assets\/ae001_534500.xml",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    }
+                  ],
+                  "spokenText": "45 minutes, 75 questions",
+                  "textToSpeechPronunciation": "45 minutes, 75 questions"
+                }
+              }
+            },
+            {
+              "@attributes": {
+                "identifier": "ae002"
+              },
+              "contentLinkInfo": {
+                "@attributes": {
+                  "qtiLinkIdentifierRef": "cde_i289548_21"
+                },
+                "objectLink": []
+              },
+              "relatedElementInfo": {
+                "spoken": {
+                  "audioFileInfo": [
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534501_mp3",
+                        "mimeType": "audio\/mpeg"
+                      },
+                      "fileHref": "assets\/ae002_534501.mp3",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534501_ogg",
+                        "mimeType": "audio\/ogg"
+                      },
+                      "fileHref": "assets\/ae002_534501.ogg",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534501_xml",
+                        "mimeType": "application\/xml"
+                      },
+                      "fileHref": "assets\/ae002_534501.xml",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    }
+                  ],
+                  "spokenText": "In the five passages that follow, certain words and phrases are underlined and highlighted.",
+                  "textToSpeechPronunciation": "In the five passages that follow, certain words and phrases are underlined and highlighted."
+                }
+              }
+            },
+            {
+              "@attributes": {
+                "identifier": "ae003"
+              },
+              "contentLinkInfo": {
+                "@attributes": {
+                  "qtiLinkIdentifierRef": "cde_i289548_22"
+                },
+                "objectLink": []
+              },
+              "relatedElementInfo": {
+                "spoken": {
+                  "audioFileInfo": [
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534502_mp3",
+                        "mimeType": "audio\/mpeg"
+                      },
+                      "fileHref": "assets\/ae003_534502.mp3",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534502_ogg",
+                        "mimeType": "audio\/ogg"
+                      },
+                      "fileHref": "assets\/ae003_534502.ogg",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534502_xml",
+                        "mimeType": "application\/xml"
+                      },
+                      "fileHref": "assets\/ae003_534502.xml",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    }
+                  ],
+                  "spokenText": "On the right-hand side of the screen, you will find alternatives for the underlined and highlighted text.",
+                  "textToSpeechPronunciation": "On the right-hand side of the screen, you will find alternatives for the underlined and highlighted text."
+                }
+              }
+            },
+            {
+              "@attributes": {
+                "identifier": "ae004"
+              },
+              "contentLinkInfo": {
+                "@attributes": {
+                  "qtiLinkIdentifierRef": "cde_i289548_23"
+                },
+                "objectLink": []
+              },
+              "relatedElementInfo": {
+                "spoken": {
+                  "audioFileInfo": [
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534503_mp3",
+                        "mimeType": "audio\/mpeg"
+                      },
+                      "fileHref": "assets\/ae004_534503.mp3",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534503_ogg",
+                        "mimeType": "audio\/ogg"
+                      },
+                      "fileHref": "assets\/ae004_534503.ogg",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534503_xml",
+                        "mimeType": "application\/xml"
+                      },
+                      "fileHref": "assets\/ae004_534503.xml",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    }
+                  ],
+                  "spokenText": "In most cases, you are to choose the one that best expresses the idea, makes the statement appropriate for standard written English, or is worded most consistently with the styel and tone of the passage as a whole.",
+                  "textToSpeechPronunciation": "In most cases, you are to choose the one that best expresses the idea, makes the statement appropriate for standard written English, or is worded most consistently with the styel and tone of the passage as a whole."
+                }
+              }
+            },
+            {
+              "@attributes": {
+                "identifier": "ae005"
+              },
+              "contentLinkInfo": {
+                "@attributes": {
+                  "qtiLinkIdentifierRef": "cde_i289548_24"
+                },
+                "objectLink": []
+              },
+              "relatedElementInfo": {
+                "spoken": {
+                  "audioFileInfo": [
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534504_mp3",
+                        "mimeType": "audio\/mpeg"
+                      },
+                      "fileHref": "assets\/ae005_534504.mp3",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534504_ogg",
+                        "mimeType": "audio\/ogg"
+                      },
+                      "fileHref": "assets\/ae005_534504.ogg",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534504_xml",
+                        "mimeType": "application\/xml"
+                      },
+                      "fileHref": "assets\/ae005_534504.xml",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    }
+                  ],
+                  "spokenText": "If you think the original version is best, choose no change.",
+                  "textToSpeechPronunciation": "If you think the original version is best, choose no change."
+                }
+              }
+            },
+            {
+              "@attributes": {
+                "identifier": "ae006"
+              },
+              "contentLinkInfo": {
+                "@attributes": {
+                  "qtiLinkIdentifierRef": "cde_i289548_25"
+                },
+                "objectLink": []
+              },
+              "relatedElementInfo": {
+                "spoken": {
+                  "audioFileInfo": [
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534505_mp3",
+                        "mimeType": "audio\/mpeg"
+                      },
+                      "fileHref": "assets\/ae006_534505.mp3",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534505_ogg",
+                        "mimeType": "audio\/ogg"
+                      },
+                      "fileHref": "assets\/ae006_534505.ogg",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534505_xml",
+                        "mimeType": "application\/xml"
+                      },
+                      "fileHref": "assets\/ae006_534505.xml",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    }
+                  ],
+                  "spokenText": "In some cases, you will find on the right-hand side of the screen a question about the underlined and highlighted text.",
+                  "textToSpeechPronunciation": "In some cases, you will find on the right-hand side of the screen a question about the underlined and highlighted text."
+                }
+              }
+            },
+            {
+              "@attributes": {
+                "identifier": "ae007"
+              },
+              "contentLinkInfo": {
+                "@attributes": {
+                  "qtiLinkIdentifierRef": "cde_i289548_26"
+                },
+                "objectLink": []
+              },
+              "relatedElementInfo": {
+                "spoken": {
+                  "audioFileInfo": [
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534506_mp3",
+                        "mimeType": "audio\/mpeg"
+                      },
+                      "fileHref": "assets\/ae007_534506.mp3",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534506_ogg",
+                        "mimeType": "audio\/ogg"
+                      },
+                      "fileHref": "assets\/ae007_534506.ogg",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534506_xml",
+                        "mimeType": "application\/xml"
+                      },
+                      "fileHref": "assets\/ae007_534506.xml",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    }
+                  ],
+                  "spokenText": "You are to choose the best answer to the question.",
+                  "textToSpeechPronunciation": "You are to choose the best answer to the question."
+                }
+              }
+            },
+            {
+              "@attributes": {
+                "identifier": "ae008"
+              },
+              "contentLinkInfo": {
+                "@attributes": {
+                  "qtiLinkIdentifierRef": "cde_i289548_27"
+                },
+                "objectLink": []
+              },
+              "relatedElementInfo": {
+                "spoken": {
+                  "audioFileInfo": [
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534507_mp3",
+                        "mimeType": "audio\/mpeg"
+                      },
+                      "fileHref": "assets\/ae008_534507.mp3",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534507_ogg",
+                        "mimeType": "audio\/ogg"
+                      },
+                      "fileHref": "assets\/ae008_534507.ogg",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534507_xml",
+                        "mimeType": "application\/xml"
+                      },
+                      "fileHref": "assets\/ae008_534507.xml",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    }
+                  ],
+                  "spokenText": "You will also find questions about a section of the passage, or about the passage as a whole.",
+                  "textToSpeechPronunciation": "You will also find questions about a section of the passage, or about the passage as a whole."
+                }
+              }
+            },
+            {
+              "@attributes": {
+                "identifier": "ae009"
+              },
+              "contentLinkInfo": {
+                "@attributes": {
+                  "qtiLinkIdentifierRef": "cde_i289548_28"
+                },
+                "objectLink": []
+              },
+              "relatedElementInfo": {
+                "spoken": {
+                  "audioFileInfo": [
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534508_mp3",
+                        "mimeType": "audio\/mpeg"
+                      },
+                      "fileHref": "assets\/ae009_534508.mp3",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534508_ogg",
+                        "mimeType": "audio\/ogg"
+                      },
+                      "fileHref": "assets\/ae009_534508.ogg",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534508_xml",
+                        "mimeType": "application\/xml"
+                      },
+                      "fileHref": "assets\/ae009_534508.xml",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    }
+                  ],
+                  "spokenText": "These questions do not refer to an underlined and highlighted portion of the passage, but rather refer to a letter or letters, a number or numbers, or an asterisk within square brackets.",
+                  "textToSpeechPronunciation": "These questions do not refer to an underlined and highlighted portion of the passage, but rather refer to a letter or letters, a number or numbers, or an asterisk within square brackets."
+                }
+              }
+            },
+            {
+              "@attributes": {
+                "identifier": "ae010"
+              },
+              "contentLinkInfo": {
+                "@attributes": {
+                  "qtiLinkIdentifierRef": "cde_i289548_29"
+                },
+                "objectLink": []
+              },
+              "relatedElementInfo": {
+                "spoken": {
+                  "audioFileInfo": [
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534509_mp3",
+                        "mimeType": "audio\/mpeg"
+                      },
+                      "fileHref": "assets\/ae010_534509.mp3",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534509_ogg",
+                        "mimeType": "audio\/ogg"
+                      },
+                      "fileHref": "assets\/ae010_534509.ogg",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534509_xml",
+                        "mimeType": "application\/xml"
+                      },
+                      "fileHref": "assets\/ae010_534509.xml",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    }
+                  ],
+                  "spokenText": "For each question, choose the alternative you consider best, and select the circle next to your answer.",
+                  "textToSpeechPronunciation": "For each question, choose the alternative you consider best, and select the circle next to your answer."
+                }
+              }
+            },
+            {
+              "@attributes": {
+                "identifier": "ae011"
+              },
+              "contentLinkInfo": {
+                "@attributes": {
+                  "qtiLinkIdentifierRef": "cde_i289548_30"
+                },
+                "objectLink": []
+              },
+              "relatedElementInfo": {
+                "spoken": {
+                  "audioFileInfo": [
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534510_mp3",
+                        "mimeType": "audio\/mpeg"
+                      },
+                      "fileHref": "assets\/ae011_534510.mp3",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534510_ogg",
+                        "mimeType": "audio\/ogg"
+                      },
+                      "fileHref": "assets\/ae011_534510.ogg",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534510_xml",
+                        "mimeType": "application\/xml"
+                      },
+                      "fileHref": "assets\/ae011_534510.xml",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    }
+                  ],
+                  "spokenText": "Reed each passage through once, using the scroll bar to see the entire passage, before you begin to answer the questions that accompany the passage.",
+                  "textToSpeechPronunciation": "Reed each passage through once, using the scroll bar to see the entire passage, before you begin to answer the questions that accompany the passage."
+                }
+              }
+            },
+            {
+              "@attributes": {
+                "identifier": "ae012"
+              },
+              "contentLinkInfo": {
+                "@attributes": {
+                  "qtiLinkIdentifierRef": "cde_i289548_31"
+                },
+                "objectLink": []
+              },
+              "relatedElementInfo": {
+                "spoken": {
+                  "audioFileInfo": [
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534511_mp3",
+                        "mimeType": "audio\/mpeg"
+                      },
+                      "fileHref": "assets\/ae012_534511.mp3",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534511_ogg",
+                        "mimeType": "audio\/ogg"
+                      },
+                      "fileHref": "assets\/ae012_534511.ogg",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534511_xml",
+                        "mimeType": "application\/xml"
+                      },
+                      "fileHref": "assets\/ae012_534511.xml",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    }
+                  ],
+                  "spokenText": "For many of the questions, you must read several sentences beyond the question to determine the answer.",
+                  "textToSpeechPronunciation": "For many of the questions, you must read several sentences beyond the question to determine the answer."
+                }
+              }
+            },
+            {
+              "@attributes": {
+                "identifier": "ae013"
+              },
+              "contentLinkInfo": {
+                "@attributes": {
+                  "qtiLinkIdentifierRef": "cde_i289548_32"
+                },
+                "objectLink": []
+              },
+              "relatedElementInfo": {
+                "spoken": {
+                  "audioFileInfo": [
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534512_mp3",
+                        "mimeType": "audio\/mpeg"
+                      },
+                      "fileHref": "assets\/ae013_534512.mp3",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534512_ogg",
+                        "mimeType": "audio\/ogg"
+                      },
+                      "fileHref": "assets\/ae013_534512.ogg",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    },
+                    {
+                      "@attributes": {
+                        "contentLinkIdentifier": "audioFileInfo534512_xml",
+                        "mimeType": "application\/xml"
+                      },
+                      "fileHref": "assets\/ae013_534512.xml",
+                      "voiceType": "Synthetic",
+                      "voiceSpeed": "Standard"
+                    }
+                  ],
+                  "spokenText": "Be sure that you have read far enough ahead, each time you choose an alternative.",
+                  "textToSpeechPronunciation": "Be sure that you have read far enough ahead, each time you choose an alternative."
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
