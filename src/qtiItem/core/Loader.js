@@ -25,7 +25,7 @@ import xmlNsHandler from 'taoQtiItem/qtiItem/helper/xmlNsHandler';
 import moduleLoader from 'core/moduleLoader';
 import loggerFactory from 'core/logger';
 
-var loager = loggerFactory('taoQtiItem/qtiItem/core/Loader');
+var logger = loggerFactory('taoQtiItem/qtiItem/core/Loader');
 
 var Loader = Class.extend({
     init: function(item, classesLocation) {
