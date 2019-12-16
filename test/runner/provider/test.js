@@ -101,7 +101,7 @@ define([
             .init();
     });
 
-    QUnit.test('extend default API with APIP data', function(assert) {
+    QUnit.test('Checking APIP without data', function(assert) {
         var ready = assert.async();
         assert.expect(2);
 
@@ -115,14 +115,14 @@ define([
             .init();
     });
 
-    QUnit.test('reading APIP data from QTI item runner', function(assert) {
+    QUnit.test('Checking APIP with data', function(assert) {
         var ready = assert.async();
         assert.expect(1);
 
         itemRunner.register('qti', qtiRuntimeProvider);
         itemRunner('qti', itemApipData)
             .on('init', function() {
-                assert.ok( _.isPlainObject(this.getApipData()), 'item runner getApipData returns correct value');
+                assert.deepEqual(this.getApipData(), itemApipData.apipAccessibility, 'item runner getApipData returns correct value');
                 ready();
             })
             .init();
