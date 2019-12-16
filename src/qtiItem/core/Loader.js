@@ -23,6 +23,9 @@ import qtiClasses from 'taoQtiItem/qtiItem/core/qtiClasses';
 import Element from 'taoQtiItem/qtiItem/core/Element';
 import xmlNsHandler from 'taoQtiItem/qtiItem/helper/xmlNsHandler';
 import moduleLoader from 'core/moduleLoader';
+import loggerFactory from 'core/logger';
+
+var loager = loggerFactory('taoQtiItem/qtiItem/core/Loader');
 
 var Loader = Class.extend({
     init: function(item, classesLocation) {
@@ -64,6 +67,7 @@ var Loader = Class.extend({
                     category: 'qti'
                 });
             } else {
+                loager.error('Data: '+ JSON.stringify(data) + '; RequiredClasses: ' + requiredClasses.join(', '));
                 throw new Error('missing qti class location declaration : ' + requiredClass);
             }
         }
