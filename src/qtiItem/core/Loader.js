@@ -67,7 +67,7 @@ var Loader = Class.extend({
                     category: 'qti'
                 });
             } else {
-                logger.error('Data: '+ JSON.stringify(data) + '; RequiredClasses: ' + JSON.stringify(requiredClasses));
+                logger.error('Data: '+ JSON.stringify(data) + '; RequiredClasses: ' + JSON.stringify(requiredClasses) + '; Callstack: ' + new Error().stack);
                 throw new Error('missing qti class location declaration : ' + requiredClass);
             }
         }
