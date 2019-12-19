@@ -71,7 +71,7 @@ var qtiItemRuntimeProvider = {
              * @return {Object} current item data
              */
             self.getData = function getData() {
-                return self._item.data();
+                return self._item;
             };
 
         });
