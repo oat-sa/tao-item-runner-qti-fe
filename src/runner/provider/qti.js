@@ -67,13 +67,13 @@ var qtiItemRuntimeProvider = {
             }, this.getLoadedClasses());
 
             /**
-             * Get data related to QTI APIP accessibility
-             * @return {Object|null} accessibility data provided in test
+             * Get item data to access item source date like APIP accessibility from plugins
+             * @return {Object} current item data
              */
-            self.getApipData = function getApipData() {
-                var apipData = self._item && _.isFunction(self._item.getApipAccessibility) && self._item.getApipAccessibility() || null;
-                return apipData;
+            self.getData = function getData() {
+                return self._item.data();
             };
+
         });
     },
 

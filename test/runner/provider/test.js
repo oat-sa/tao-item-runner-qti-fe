@@ -101,31 +101,19 @@ define([
             .init();
     });
 
-    QUnit.test('Checking APIP without data', function(assert) {
-        var ready = assert.async();
-        assert.expect(2);
-
-        itemRunner.register('qti', qtiRuntimeProvider);
-        itemRunner('qti', itemData)
-            .on('init', function() {
-                assert.ok(typeof this.getApipData === "function", 'The item getApipData method presented');
-                assert.ok( _.isNull(this.getApipData()), 'item runner getApipData returns correct value for an absent data');
-                ready();
-            })
-            .init();
-    });
-
-    QUnit.test('Checking APIP with data', function(assert) {
+    QUnit.test('Checking APIP data', function(assert) {
         var ready = assert.async();
         assert.expect(1);
 
         itemRunner.register('qti', qtiRuntimeProvider);
+
         itemRunner('qti', itemApipData)
             .on('init', function() {
-                assert.deepEqual(this.getApipData(), itemApipData.apipAccessibility, 'item runner getApipData returns correct value');
+                assert.deepEqual(this.getData().apipAccessibility, itemApipData.apipAccessibility, 'item runner getData returns correct APIP value');
                 ready();
             })
             .init();
+
     });
 
     QUnit.module('Provider render', {
