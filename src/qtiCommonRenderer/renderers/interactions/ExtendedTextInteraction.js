@@ -496,8 +496,8 @@ var inputLimiter = function userInputLimier(interaction) {
                     newValue = e.originalEvent.clipboardData
                         ? e.originalEvent.clipboardData.getData('text')
                         : e.originalEvent.dataTransfer.getData('text') ||
-                          e.originalEvent.dataTransfer.getData('text/plain') ||
-                          '';
+                        e.originalEvent.dataTransfer.getData('text/plain') ||
+                        '';
                 }
 
                 // prevent insertion of non-limited data
@@ -523,10 +523,21 @@ var inputLimiter = function userInputLimier(interaction) {
                 if (isCke) {
                     _getCKEditor(interaction).insertHtml(newValue);
                 } else {
-                    containerHelper
-                        .get(interaction)
-                        .find('textarea')
-                        .val(oldValue + newValue);
+                    let elements = containerHelper.get(interaction).find('textarea');
+                    let el = elements[0];
+                    let {
+                        selectionStart: start,
+                        selectionEnd: end,
+                        value: text
+                    } = el;
+                    elements.val(
+                        text.substring(0, start) +
+                        newValue +
+                        text.substring(end, text.length)
+                    );
+                    el.focus();
+                    el.selectionStart = start + newValue.length;
+                    el.selectionEnd = el.selectionStart;
                 }
 
                 _.defer(function() {
