@@ -1,3 +1,20 @@
+/**
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2014-1019 (original work) Open Assessment Technologies SA;
+ */
 define([
     'jquery',
     'lodash',
@@ -385,41 +402,31 @@ define([
     });
 
     QUnit.test('destroys', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(2);
 
-        var $container = $('#' + fixtureContainerId);
+        const $container = $(`#${fixtureContainerId}`);
         assert.equal($container.length, 1, 'the item container exists');
 
         qtiItemRunner('qti', gapMatchData)
             .on('render', function() {
-                var self = this;
+                const interaction = this._item.getInteractions()[0];
+                const $gapFiller = $('.qti-choice[data-identifier="gapimg_1"]', $container);
+                const $hotspot = $('.main-image-box rect', $container).eq(5);
 
                 //Call destroy manually
-                var interaction = this._item.getInteractions()[0];
                 interaction.renderer.destroy(interaction);
 
-                var $gapFiller = $('.qti-choice[data-identifier="gapimg_1"]', $container);
-                var $hotspot = $('.main-image-box rect', $container).eq(5);
-
-                interactUtils.tapOn(
-                    $gapFiller,
-                    function() {
-                        interactUtils.tapOn(
-                            $hotspot,
-                            function() {
-                                assert.deepEqual(
-                                    self.getState(),
-                                    { RESPONSE: { response: { list: { directedPair: [] } } } },
-                                    'Click does not trigger response once destroyed'
-                                );
-                                ready();
-                            },
-                            10
+                interactUtils.tapOn($gapFiller, () => {
+                    interactUtils.tapOn( $hotspot, () => {
+                        assert.deepEqual(
+                            this.getState(),
+                            { RESPONSE: { response: { list: { directedPair: [] } } } },
+                            'Click does not trigger response once destroyed'
                         );
-                    },
-                    10
-                );
+                        ready();
+                    }, 10);
+                }, 10);
             })
             .assets(strategies)
             .init()
