@@ -14,7 +14,7 @@
         {!-- If there's an expected length or a max length --}}
         {{#if attributes.expectedLength}}
             <div class="text-counter">
-                <span class="count-chars">0</span> {{__ "of"}} {{attributes.expectedLength}} {{__ "chars"}} {{__ "recommanded"}}.
+                <span class="count-chars">0</span> {{__ "of"}} {{attributes.expectedLength}} {{__ "chars"}}.
             </div>
         {{/if}}
         {{#if maxLength}}
@@ -37,7 +37,7 @@
         {{!-- If there's an expected length or a max length --}}
         {{#if attributes.expectedLength}}
             <div class="text-counter">
-                <span class="count-chars">0</span> {{__ "of"}} {{attributes.expectedLength}} {{__ "chars"}} {{__ "recommended"}}.
+                <span class="count-chars">0</span> {{__ "of"}} {{attributes.expectedLength}} {{__ "chars"}}.
             </div>
         {{/if}}
         {{#if maxLength}}
