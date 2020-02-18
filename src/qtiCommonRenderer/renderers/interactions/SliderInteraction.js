@@ -41,20 +41,20 @@ var _slideTo = function(options) {
  *
  * @param {object} interaction
  */
-var render = function(interaction) {
-    var attributes = interaction.getAttributes(),
+const render = function(interaction) {
+    const attributes = interaction.getAttributes(),
         $container = interaction.getContainer(),
-        $el = $('<div />').attr({ id: attributes.responseIdentifier + '-qti-slider', class: 'qti-slider' }), //slider element
+        $el = $('<div />').attr({ id: `${attributes.responseIdentifier}-qti-slider`, class: 'qti-slider' }), //slider element
         $sliderLabels = $('<div />').attr({ class: 'qti-slider-values' }),
         $sliderCurrentValue = $('<div />').attr({
-            id: attributes.responseIdentifier + '-qti-slider-cur-value',
+            id: `${attributes.responseIdentifier}-qti-slider-cur-value`,
             class: 'qti-slider-cur-value'
         }), //show the current selected value
-        $sliderValue = $('<input />').attr({ type: 'hidden', id: attributes.responseIdentifier + '-qti-slider-value' }); //the input that always holds the slider value
+        $sliderValue = $('<input />').attr({ type: 'hidden', id: `${attributes.responseIdentifier}-qti-slider-value`, class: 'qti-slider-value' }); //the input that always holds the slider value
 
     //getting the options
-    var orientation = 'horizontal',
-        reverse = typeof attributes.reverse !== 'undefined' && attributes.reverse ? true : false, //setting the slider whether to be reverse or not
+    let orientation = 'horizontal';
+    const reverse = typeof attributes.reverse !== 'undefined' && attributes.reverse ? true : false, //setting the slider whether to be reverse or not
         min = parseInt(attributes.lowerBound),
         max = parseInt(attributes.upperBound),
         step = typeof attributes.step !== 'undefined' && attributes.step ? parseInt(attributes.step) : 1, //default value as per QTI standard
@@ -62,12 +62,12 @@ var render = function(interaction) {
 
     //add the containers
     $sliderCurrentValue
-        .append('<span class="qti-slider-cur-value-text">' + __('Current value:') + ' </span>')
+        .append(`<span class="qti-slider-cur-value-text">${__('Current value:')}</span>`)
         .append('<span class="qti-slider-cur-value"></span>');
 
     $sliderLabels
-        .append('<span class="slider-min">' + (!reverse ? min : max) + '</span>')
-        .append('<span class="slider-max">' + (!reverse ? max : min) + '</span>');
+        .append(`<span class="slider-min">${!reverse ? min : max}</span>`)
+        .append(`<span class="slider-max">${!reverse ? max : min}</span>`);
 
     interaction
         .getContainer()
@@ -84,35 +84,35 @@ var render = function(interaction) {
         orientation = attributes.orientation;
     }
 
-    var sliderSize = 0;
+    let sliderSize = 0;
 
     if (orientation === 'horizontal') {
         $container.addClass('qti-slider-horizontal');
     } else {
-        var maxHeight = 300;
+        const maxHeight = 300;
         sliderSize = steps * 20;
         if (sliderSize > maxHeight) {
             sliderSize = maxHeight;
         }
         $container.addClass('qti-slider-vertical');
-        $el.height(sliderSize + 'px');
-        $sliderLabels.height(sliderSize + 'px');
+        $el.height(`${sliderSize}px`);
+        $sliderLabels.height(`${sliderSize}px`);
     }
 
     //set the middle value if the stepLabel attribute is enabled
     if (typeof attributes.stepLabel !== 'undefined' && attributes.stepLabel) {
-        var middleStep = parseInt(steps / 2),
+        const middleStep = parseInt(steps / 2),
             leftOffset = (100 / steps) * middleStep,
             middleValue = reverse ? max - middleStep * step : min + middleStep * step;
 
         if (orientation === 'horizontal') {
             $sliderLabels
                 .find('.slider-min')
-                .after('<span class="slider-middle" style="left:' + leftOffset + '%">' + middleValue + '</span>');
+                .after(`<span class="slider-middle" style="left:'${leftOffset}%">${middleValue}</span>`);
         } else {
             $sliderLabels
                 .find('.slider-min')
-                .after('<span class="slider-middle" style="top:' + leftOffset + '%">' + middleValue + '</span>');
+                .after(`<span class="slider-middle" style="top:${leftOffset}%">${middleValue}</span>`);
         }
     }
 
@@ -125,8 +125,8 @@ var render = function(interaction) {
         },
         step: step,
         orientation: orientation
-    }).on('slide', function(e) {
-        var val = parseInt($(this).val());
+    }).on('slide', function() {
+        let val = parseInt($(this).val());
         if (interaction.attr('reverse')) {
             val = max + min - val;
         }
@@ -145,13 +145,27 @@ var render = function(interaction) {
         sliderValue: $sliderValue,
         sliderCurrentValue: $sliderCurrentValue
     });
+
+    //bind event listener in case the attributes change dynamically on runtime
+    $(document).on('attributeChange.qti-widget.commonRenderer', function(e, data) {
+        if (data.element.getSerial() === interaction.getSerial()) {
+            if (data.key === 'responseIdentifier' && data.value) {
+                const attributesNew = interaction.getAttributes();
+                // data.value and attributesNew.responseIdentifier is the same
+                $container.find('.qti-slider').attr({ id: `${attributesNew.responseIdentifier}-qti-slider`});
+                $container.find('.qti-slider-cur-value').attr({ id: `${attributesNew.responseIdentifier}-qti-slider-cur-value`});
+                $container.find('.qti-slider-value').attr({ id: `${attributesNew.responseIdentifier}-qti-slider-value`});
+            }
+        }
+    });
 };
 
 var resetResponse = function(interaction) {
-    var attributes = interaction.getAttributes(),
-        $el = $('#' + attributes.responseIdentifier + '-qti-slider'),
-        $sliderValue = $('#' + attributes.responseIdentifier + '-qti-slider-value'),
-        $sliderCurrentValue = $('#' + attributes.responseIdentifier + '-qti-slider-cur-value'),
+    const attributes = interaction.getAttributes(),
+        $container = interaction.getContainer(),
+        $el = $container.find(`#${attributes.responseIdentifier}-qti-slider`),
+        $sliderValue = $container.find(`#${attributes.responseIdentifier}-qti-slider-value`),
+        $sliderCurrentValue = $container.find(`#${attributes.responseIdentifier}-qti-slider-cur-value`),
         min = parseInt(attributes.lowerBound),
         max = parseInt(attributes.upperBound),
         reverse = typeof attributes.reverse !== 'undefined' && attributes.reverse ? true : false,
@@ -179,13 +193,14 @@ var resetResponse = function(interaction) {
  * @param {object} response
  */
 var setResponse = function(interaction, response) {
-    var attributes = interaction.getAttributes(),
-        $sliderValue = $('#' + attributes.responseIdentifier + '-qti-slider-value'),
-        $sliderCurrentValue = $('#' + attributes.responseIdentifier + '-qti-slider-cur-value'),
-        $el = $('#' + attributes.responseIdentifier + '-qti-slider'),
+    const attributes = interaction.getAttributes(),
+        $container = interaction.getContainer(),
+        $sliderValue = $container.find(`#${attributes.responseIdentifier}-qti-slider-value`),
+        $sliderCurrentValue = $container.find(`#${attributes.responseIdentifier}-qti-slider-cur-value`),
+        $el = $container.find(`#${attributes.responseIdentifier}-qti-slider`),
         min = parseInt(attributes.lowerBound),
-        max = parseInt(attributes.upperBound),
-        value;
+        max = parseInt(attributes.upperBound);
+    let value;
 
     value = pciResponse.unserialize(response, interaction)[0];
 
@@ -199,11 +214,12 @@ var setResponse = function(interaction, response) {
 };
 
 var _getRawResponse = function(interaction) {
-    var value,
-        attributes = interaction.getAttributes(),
+    let value;
+    const attributes = interaction.getAttributes(),
         baseType = interaction.getResponseDeclaration().attr('baseType'),
         min = parseInt(attributes.lowerBound),
-        $sliderValue = $('#' + attributes.responseIdentifier + '-qti-slider-value');
+        $container = interaction.getContainer(),
+        $sliderValue = $container.find(`#${attributes.responseIdentifier}-qti-slider-value`);
 
     if (baseType === 'integer') {
         value = parseInt($sliderValue.val());
@@ -226,12 +242,12 @@ var _getRawResponse = function(interaction) {
  * @param {object} interaction
  * @returns {object}
  */
-var getResponse = function(interaction) {
+const getResponse = function(interaction) {
     return pciResponse.serialize([_getRawResponse(interaction)], interaction);
 };
 
-var destroy = function(interaction) {
-    var $container = interaction.getContainer();
+const destroy = function(interaction) {
+    const $container = interaction.getContainer();
 
     $container.empty();
 
@@ -245,7 +261,7 @@ var destroy = function(interaction) {
  * @param {Object} interaction - the interaction instance
  * @param {Object} state - the interaction state
  */
-var setState = function setState(interaction, state) {
+const setState = function setState(interaction, state) {
     if (_.isObject(state)) {
         if (state.response) {
             interaction.resetResponse();
@@ -260,10 +276,9 @@ var setState = function setState(interaction, state) {
  * @param {Object} interaction - the interaction instance
  * @returns {Object} the interaction current state
  */
-var getState = function getState(interaction) {
-    var $container;
-    var state = {};
-    var response = interaction.getResponse();
+const getState = function getState(interaction) {
+    const state = {};
+    const response = interaction.getResponse();
 
     if (response) {
         state.response = response;
