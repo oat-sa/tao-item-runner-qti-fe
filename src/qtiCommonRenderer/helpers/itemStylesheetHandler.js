@@ -25,7 +25,7 @@ import _ from 'lodash';
 //throttle events because of the loop
 var informLoaded = _.throttle(
     function() {
-        $(document).trigger('customcssloaded.styleeditor');
+        $(document).trigger('customcssloaded.styleeditor',[{}]);
     },
     10,
     { leading: false }
