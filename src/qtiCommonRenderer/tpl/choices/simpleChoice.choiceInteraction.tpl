@@ -1,6 +1,6 @@
 <li class="qti-choice qti-simpleChoice" data-identifier="{{attributes.identifier}}" data-serial="{{serial}}"{{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}>
     <div class="pseudo-label-box">
-        <label class="real-label">
+        <label class="real-label" aria-labelledby="choice-{{interaction.serial}}-{{attributes.identifier}}">
             {{#if unique}}
             <input type="radio" name="response-{{interaction.serial}}" value="{{attributes.identifier}}" tabindex="1">
             <span class="icon-radio"></span>
@@ -10,7 +10,7 @@
             {{/if}}
         </label>
         <div class="label-box">
-            <div class="label-content clear" contenteditable="false">
+            <div class="label-content clear" contenteditable="false" id="choice-{{interaction.serial}}-{{attributes.identifier}}">
                 {{{body}}}
                 <svg class="overlay-answer-eliminator">
                     <line x1="0" y1="100%" x2="100%" y2="0"/>
