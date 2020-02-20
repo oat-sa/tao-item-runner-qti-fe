@@ -5,9 +5,12 @@
   data-qti-class="choiceInteraction"
   {{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}
 >
-  {{#if prompt}}{{{prompt}}}{{/if}}
+  {{#if prompt}}{{{ prompt }}}{{/if}}
   <div class="instruction-container"></div>
-  <ol class="plain block-listing solid choice-area{{#if horizontal}} horizontal{{/if}} {{#if listStyle}}{{{listStyle}}}{{/if}}">
+  <ol
+    class="plain block-listing solid choice-area{{#if horizontal}} horizontal{{/if}} {{#if listStyle}}{{{listStyle}}}{{/if}}"
+    aria-labelledby="{{promptId}}"
+  >
       {{#choices}}{{{.}}}{{/choices}}
   </ol>
   <div class="notification-container"></div>
