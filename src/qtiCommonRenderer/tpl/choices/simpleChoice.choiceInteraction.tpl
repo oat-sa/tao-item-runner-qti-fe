@@ -1,11 +1,23 @@
 <li class="qti-choice qti-simpleChoice" data-identifier="{{attributes.identifier}}" data-serial="{{serial}}"{{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}>
     <div class="pseudo-label-box">
-        <label class="real-label" aria-labelledby="choice-{{interaction.serial}}-{{attributes.identifier}}">
+        <label class="real-label">
             {{#if unique}}
-            <input type="radio" name="response-{{interaction.serial}}" value="{{attributes.identifier}}" tabindex="1">
+            <input
+                type="radio"
+                name="response-{{interaction.serial}}"
+                value="{{attributes.identifier}}"
+                tabindex="1"
+                aria-labelledby="choice-{{interaction.serial}}-{{attributes.identifier}}"
+            >
             <span class="icon-radio"></span>
             {{else}}
-            <input type="checkbox" name="response-{{interaction.serial}}" value="{{attributes.identifier}}" tabindex="1">
+            <input
+                type="checkbox"
+                name="response-{{interaction.serial}}"
+                value="{{attributes.identifier}}"
+                tabindex="1"
+                aria-labelledby="choice-{{interaction.serial}}-{{attributes.identifier}}"
+            >
             <span class="icon-checkbox"></span>
             {{/if}}
         </label>
