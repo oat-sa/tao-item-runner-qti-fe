@@ -346,7 +346,7 @@ var inputLimiter = function userInputLimier(interaction) {
     var expectedLines = interaction.attr('expectedLines');
     var patternMask = interaction.attr('patternMask');
     var patternRegEx;
-    var $textarea, $charsCounter, $wordsCounter, maxWords, maxLength;
+    var $textarea, $charsCounter, $wordsCounter, maxWords, maxLength, $maxLengthCounter, $maxWordsCounter;
     var enabled = false;
 
     if (expectedLength || expectedLines || patternMask) {
@@ -355,6 +355,8 @@ var inputLimiter = function userInputLimier(interaction) {
         $textarea = $('.text-container', $container);
         $charsCounter = $('.count-chars', $container);
         $wordsCounter = $('.count-words', $container);
+        $maxLengthCounter = $('.count-max-length', $container);
+        $maxWordsCounter = $('.count-max-words', $container);
 
         if (patternMask !== '') {
             maxWords = patternMaskHelper.parsePattern(patternMask, 'words');
@@ -364,6 +366,8 @@ var inputLimiter = function userInputLimier(interaction) {
             if (!maxLength && !maxWords) {
                 patternRegEx = new RegExp(patternMask);
             }
+            $maxLengthCounter.val(maxLength);
+            $maxWordsCounter.val(maxWords);
         }
     }
 
