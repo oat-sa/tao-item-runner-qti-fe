@@ -366,8 +366,8 @@ var inputLimiter = function userInputLimier(interaction) {
             if (!maxLength && !maxWords) {
                 patternRegEx = new RegExp(patternMask);
             }
-            $maxLengthCounter.val(maxLength);
-            $maxWordsCounter.val(maxWords);
+            $maxLengthCounter.text(maxLength);
+            $maxWordsCounter.text(maxWords);
         }
     }
 
