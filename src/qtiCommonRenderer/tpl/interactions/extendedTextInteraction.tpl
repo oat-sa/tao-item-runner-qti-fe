@@ -8,7 +8,12 @@
             {{/each}}
         {{else}}
             {{#each maxStringLoop}}
-                <textarea class="text-container text-{{attributes.format}} solid{{#if attributes.class}} attributes.class{{/if}}" name="{{attributes.identifier}}_{{this}}" {{#if attributes.patternMask}}pattern="{{attributes.patternMask}}"{{/if}}></textarea>
+                <textarea
+                    class="text-container text-{{attributes.format}} solid{{#if attributes.class}} attributes.class{{/if}}"
+                    name="{{attributes.identifier}}_{{this}}"
+                    {{#if attributes.patternMask}}pattern="{{attributes.patternMask}}"{{/if}}
+                    aria-labelledby="{{promptId}}"
+                ></textarea>
             {{/each}}
         {{/equal}}
         {!-- If there's an expected length or a max length --}}
@@ -32,7 +37,11 @@
         {{#equal attributes.format xhtml}}
             <div class="text-container text-{{attributes.format}} solid{{#if attributes.class}} attributes.class{{/if}}" contenteditable></div>
         {{else}}
-            <textarea class="text-container text-{{attributes.format}} solid{{#if attributes.class}} attributes.class{{/if}}" {{#if attributes.patternMask}}pattern="{{attributes.patternMask}}"{{/if}}></textarea>
+            <textarea
+                class="text-container text-{{attributes.format}} solid{{#if attributes.class}} attributes.class{{/if}}"
+                {{#if attributes.patternMask}}pattern="{{attributes.patternMask}}"{{/if}}
+                aria-labelledby="{{promptId}}"
+            ></textarea>
         {{/equal}}
         {{!-- If there's an expected length or a max length --}}
         {{#if attributes.expectedLength}}
