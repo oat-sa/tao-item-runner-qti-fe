@@ -24,6 +24,7 @@ var BlockInteraction = Interaction.extend({
         var args = rendererConfig.getOptionsFromArguments(arguments),
             renderer = args.renderer || this.getRenderer(),
             defaultData = {
+                promptId: `prompt-${this.prompt.getSerial()}`,
                 prompt: this.prompt.render(renderer)
             };
 
