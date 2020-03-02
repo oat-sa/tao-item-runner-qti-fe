@@ -361,8 +361,8 @@ var inputLimiter = function userInputLimier(interaction) {
         if (patternMask !== '') {
             maxWords = patternMaskHelper.parsePattern(patternMask, 'words');
             maxLength = patternMaskHelper.parsePattern(patternMask, 'chars');
-            maxWords = _.isNaN(maxWords) ? undefined : maxWords;
-            maxLength = _.isNaN(maxLength) ? undefined : maxLength;
+            maxWords = _.isNaN(maxWords) ? 0 : maxWords;
+            maxLength = _.isNaN(maxLength) ? 0 : maxLength;
             if (!maxLength && !maxWords) {
                 patternRegEx = new RegExp(patternMask);
             }
@@ -866,8 +866,8 @@ var getCustomData = function(interaction, data) {
         maxLength = parseInt(patternMaskHelper.parsePattern(pattern, 'chars')),
         expectedLength = parseInt(interaction.attr('expectedLines'), 10);
     return _.merge(data || {}, {
-        maxWords: !isNaN(maxWords) ? maxWords : undefined,
-        maxLength: !isNaN(maxLength) ? maxLength : undefined,
+        maxWords: !isNaN(maxWords) ? maxWords : 0,
+        maxLength: !isNaN(maxLength) ? maxLength : 0,
         attributes: !isNaN(expectedLength) ? { expectedLength: expectedLength * 72 } : undefined
     });
 };
