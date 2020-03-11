@@ -36,7 +36,7 @@ import 'ui/waitForMedia';
 
 var _initialInstructions = __('Browse your computer and select the appropriate file.');
 
-var _readyInstructions = __('The selected file is ready to be sent.');
+var _readyInstructions = __('Your file has been uploaded.');
 
 /**
  * Validate type of selected file
