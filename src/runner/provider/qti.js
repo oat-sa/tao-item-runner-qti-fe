@@ -30,6 +30,7 @@ import ciRegistry from 'taoQtiItem/portableElementRegistry/ciRegistry';
 import icRegistry from 'taoQtiItem/portableElementRegistry/icRegistry';
 import sideLoadingProviderFactory from 'taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory';
 import QtiRenderer from 'taoQtiItem/qtiCommonRenderer/renderers/Renderer';
+import ReviewRenderer from 'taoQtiItem/reviewRenderer/renderers/Renderer';
 import picManager from 'taoQtiItem/runner/provider/manager/picManager';
 import userModules from 'taoQtiItem/runner/provider/manager/userModules';
 import modalFeedbackHelper from 'taoQtiItem/qtiItem/helper/modalFeedback';
@@ -48,10 +49,15 @@ var qtiItemRuntimeProvider = {
             {
                 assetManager: this.assetManager
             },
-            _.pick(this.options, ['themes', 'preload'])
+            _.pick(this.options, ['themes', 'preload', 'view'])
         );
 
-        this._renderer = new QtiRenderer(rendererOptions);
+        if(rendererOptions.view === 'scorer') {
+            this._renderer = new ReviewRenderer(rendererOptions);
+        } else  {
+            this._renderer = new QtiRenderer(rendererOptions);
+        }
+
         this._loader = new QtiLoader();
 
         this._loader.loadItemData(itemData, function(item) {
