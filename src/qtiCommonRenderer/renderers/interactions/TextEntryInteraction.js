@@ -134,7 +134,7 @@ var render = function render(interaction) {
 
             if ($input.val().length && regex.test($input.val())) {
                 $input.removeClass('invalid');
-            } else {
+            } else if ($input.val().length) {
                 $input.addClass('invalid');
                 showTooltip($input, 'error', __('This is not a valid answer'));
             }
