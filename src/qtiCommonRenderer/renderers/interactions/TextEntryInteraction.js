@@ -132,9 +132,9 @@ var render = function render(interaction) {
 
             hideTooltip($input);
 
-            if ($input.val().length && regex.test($input.val())) {
+            if (($input.val().length && regex.test($input.val())) || ($input.val().length && regex.test($input.val()))) {
                 $input.removeClass('invalid');
-            } else if ($input.val().length) {
+            } else {
                 $input.addClass('invalid');
                 showTooltip($input, 'error', __('This is not a valid answer'));
             }
