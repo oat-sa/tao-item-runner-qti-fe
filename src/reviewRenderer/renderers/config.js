@@ -94,6 +94,7 @@ var locations = {
     gapMatchInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/GapMatchInteraction',
     selectPointInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/SelectPointInteraction',
     graphicOrderInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/GraphicOrderInteraction',
+    graphicGapMatchInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/GraphicGapMatchInteraction',
     uploadInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/UploadInteraction',
     customInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/PortableCustomInteraction',
 
@@ -106,7 +107,6 @@ var locations = {
     'simpleAssociableChoice.associateInteraction':
         'taoQtiItem/qtiCommonRenderer/renderers/choices/SimpleAssociableChoice.AssociateInteraction',
     mediaInteraction: 'taoQtiItem/qtiCommonRenderer/renderers/interactions/MediaInteraction',
-    graphicGapMatchInteraction: 'taoQtiItem/qtiCommonRenderer/renderers/interactions/GraphicGapMatchInteraction',
     gapImg: 'taoQtiItem/qtiCommonRenderer/renderers/choices/GapImg',
     graphicAssociateInteraction: 'taoQtiItem/qtiCommonRenderer/renderers/interactions/GraphicAssociateInteraction',
     endAttemptInteraction: 'taoQtiItem/qtiCommonRenderer/renderers/interactions/EndAttemptInteraction',
