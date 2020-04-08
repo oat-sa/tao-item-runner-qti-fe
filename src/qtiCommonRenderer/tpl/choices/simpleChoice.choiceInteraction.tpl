@@ -22,7 +22,7 @@
             {{/if}}
         </label>
         <div class="label-box">
-            <div class="label-content clear" contenteditable="false" id="choice-{{interaction.serial}}-{{attributes.identifier}}">
+            <div style="width: 100%;" class="label-content clear" contenteditable="false" id="choice-{{interaction.serial}}-{{attributes.identifier}}">
                 {{{body}}}
                 <svg class="overlay-answer-eliminator">
                     <line x1="0" y1="100%" x2="100%" y2="0"/>
