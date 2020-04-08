@@ -132,7 +132,7 @@ var render = function render(interaction) {
 
             hideTooltip($input);
 
-            if ($input.val().length && regex.test($input.val())) {
+            if (regex.test($input.val())) {
                 $input.removeClass('invalid');
             } else {
                 $input.addClass('invalid');
