@@ -137,17 +137,17 @@ define([
                     'the container contains a text entry interaction .qti-textEntryInteraction'
                 );
 
+                $input.val('');
+                $input.focus();
+                assert.ok(getTooltip($input).not(':visible'), 'the tooltip error is not hidden after a correct response');
+
                 $input.val('PARIS');
                 $input.keyup();
                 ready();
             })
             .on('responsechange', function(state) {
                 var $input = $container.find('.qti-interaction.qti-textEntryInteraction');
-                assert.equal(
-                    getTooltipContent($input),
-                    undefined,
-                    'the error tooltip is hidden after a correct response'
-                );
+                assert.ok(getTooltip($input).not(':visible'), 'the tooltip error is not hidden after a correct response');
                 ready();
             })
             .init()
