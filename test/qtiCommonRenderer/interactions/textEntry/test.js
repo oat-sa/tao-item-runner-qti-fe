@@ -141,6 +141,10 @@ define([
                     'the container contains a text entry interaction .qti-textEntryInteraction'
                 );
 
+                $input.val('');
+                $input.focus();
+                assert.equal(getTooltipContent($input), __('This is not a valid answer'));
+
                 $input.val('PARIS');
                 $input.keyup();
                 ready();
@@ -149,7 +153,7 @@ define([
                 var $input = $container.find('.qti-interaction.qti-textEntryInteraction');
                 assert.equal(
                     getTooltipContent($input),
-                    undefined,
+                    __('This is not a valid answer'),
                     'the error tooltip is hidden after a correct response'
                 );
                 ready();
