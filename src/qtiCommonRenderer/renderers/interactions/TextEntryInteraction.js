@@ -128,11 +128,13 @@ var render = function render(interaction) {
             });
     } else if (attributes.patternMask) {
         updatePatternMaskTooltip = function updatePatternMaskTooltip() {
+            if (!$input.val().length) return;
+
             var regex = new RegExp(attributes.patternMask);
 
             hideTooltip($input);
 
-            if ($input.val().length && regex.test($input.val())) {
+            if (regex.test($input.val())) {
                 $input.removeClass('invalid');
             } else {
                 $input.addClass('invalid');
