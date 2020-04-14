@@ -139,7 +139,7 @@ define([
 
                 $input.val('');
                 $input.focus();
-                assert.ok(getTooltip($input).not(':visible'), 'the tooltip error is not hidden after a correct response');
+                assert.ok(getTooltip($input).not(':visible'), 'the error tooltip is hidden in a correct response');
 
                 $input.val('PARIS');
                 $input.keyup();
@@ -147,7 +147,7 @@ define([
             })
             .on('responsechange', function(state) {
                 var $input = $container.find('.qti-interaction.qti-textEntryInteraction');
-                assert.ok(getTooltip($input).not(':visible'), 'the tooltip error is not hidden after a correct response');
+                assert.ok(getTooltip($input).not(':visible'), 'the error tooltip is hidden in a correct response');
                 ready();
             })
             .init()
