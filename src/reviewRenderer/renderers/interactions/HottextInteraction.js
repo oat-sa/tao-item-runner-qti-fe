@@ -23,7 +23,7 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
-import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/hottextInteraction';
+import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/hottextInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';

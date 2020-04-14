@@ -23,7 +23,7 @@
  */
 import _ from 'lodash';
 import $ from 'jquery';
-import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/gapMatchInteraction';
+import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/gapMatchInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import interact from 'interact';
