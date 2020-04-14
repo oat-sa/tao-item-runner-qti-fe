@@ -101,10 +101,6 @@ define([
                     'the container contains a text entry interaction .qti-textEntryInteraction'
                 );
 
-                $input.val('');
-                $input.focus();
-                assert.equal(getTooltipContent($input), __('This is not a valid answer'));
-
                 $input.val('123');
                 $input.keyup();
                 ready();
@@ -140,10 +136,6 @@ define([
                     1,
                     'the container contains a text entry interaction .qti-textEntryInteraction'
                 );
-
-                $input.val('');
-                $input.focus();
-                assert.equal(getTooltipContent($input), __('This is not a valid answer'));
 
                 $input.val('PARIS');
                 $input.keyup();
