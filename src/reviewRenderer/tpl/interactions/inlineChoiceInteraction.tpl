@@ -1,4 +1,4 @@
-<select disabled="true" {{#if attributes.id}}id="{{attributes.id}}"{{/if}} class="qti-interaction qti-inlineInteraction qti-inlineChoiceInteraction{{#if attributes.class}} {{attributes.class}}{{/if}}"
+<select disabled {{#if attributes.id}}id="{{attributes.id}}"{{/if}} class="qti-interaction qti-inlineInteraction qti-inlineChoiceInteraction{{#if attributes.class}} {{attributes.class}}{{/if}}"
         data-serial="{{serial}}"
         data-qti-class="inlineChoiceInteraction"
         data-has-search="false"

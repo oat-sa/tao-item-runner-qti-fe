@@ -5,7 +5,7 @@
         <div class="progressbar"></div>
         <span class="btn-info small col-4"></span>
         <span class="file-name placeholder col-8 truncate"></span>
-        <input disabled="disabled" type="file" {{#if accept}}accept="{{accept}}"{{/if}}/>
+        <input disabled type="file" {{#if accept}}accept="{{accept}}"{{/if}}/>
     </div>
     <div class="file-upload-preview lft visible-file-upload-preview runtime-visible-file-upload-preview">
         <p class="nopreview">{{__ 'No preview available'}}</p>

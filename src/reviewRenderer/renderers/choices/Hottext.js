@@ -18,8 +18,7 @@
  */
 
 /**
- * @author Sam Sipasseuth <sam@taotesting.com>
- * @author Bertrand Chevrier <bertrand@taotesting.com>
+ * @author Ansul Sharma <ansultaotesting.com>
  */
 import tpl from 'taoQtiItem/reviewRenderer/tpl/choices/hottext';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';

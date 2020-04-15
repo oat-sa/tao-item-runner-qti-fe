@@ -18,7 +18,7 @@
  */
 
 /**
- * @author Sam Sipasseuth <sam@taotesting.com>
+ * @author Ansul Sharma <ansultaotesting.com>
  */
 import tpl from 'taoQtiItem/reviewRenderer/tpl/choices/simpleChoice.choiceInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';

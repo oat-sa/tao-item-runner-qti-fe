@@ -16,7 +16,7 @@
         {{#each ../matchSet1}}
         <td>
           <label>
-            <input disabled="disabled" type="checkbox" >
+            <input disabled type="checkbox" >
             <span class="icon-checkbox cross"></span>
           </label>
         </td>

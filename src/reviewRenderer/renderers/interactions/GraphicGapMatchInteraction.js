@@ -18,34 +18,22 @@
  */
 
 /**
- * @author Bertrand Chevrier <bertrand@taotesting.com>
+ * @author Ansul Sharma <ansultaotesting.com>
  */
 import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
-import module from 'module';
 import 'core/mouseEvent';
-import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/graphicGapMatchInteraction';
-import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/Graphic';
+import graphicGapMatchInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/GraphicGapMatchInteraction';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
+import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/Graphic';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
-import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
-import interact from 'interact';
-import interactUtils from 'ui/interactUtils';
 
 /**
  * Global variable to count number of choice usages:
  * @type {object}
  */
 var _choiceUsages = {};
-
-/**
- * This options enables to support old items created with the wrong
- * direction in the directedpairs.
- *
- * @deprecated
- */
-var isDirectedPairFlipped = module.config().flipDirectedPair;
 
 /**
  * Sets a choice and marks as disabled if at max
@@ -195,30 +183,6 @@ var render = function render(interaction) {
 };
 
 /**
- * Get the responses from the interaction
- * @private
- * @param {Object} interaction
- * @returns {Array} of matches
- */
-var _getRawResponse = function _getRawResponse(interaction) {
-    var pairs = [];
-    _.forEach(interaction.getChoices(), function(choice) {
-        var element = interaction.paper.getById(choice.serial);
-        if (element && _.isArray(element.data('matching'))) {
-            _.forEach(element.data('matching'), function(gapImg) {
-                //backward support of previous order
-                if (isDirectedPairFlipped) {
-                    pairs.push([choice.id(), gapImg]);
-                } else {
-                    pairs.push([gapImg, choice.id()]);
-                }
-            });
-        }
-    });
-    return _.sortBy(pairs, [0, 1]);
-};
-
-/**
  * Set the response to the rendered interaction.
  *
  * The response format follows the IMS PCI recommendation :
@@ -251,8 +215,8 @@ var setResponse = function(interaction, response) {
                         var responseGap;
                         if (pair.length === 2) {
                             //backward support of previous order
-                            responseChoice = isDirectedPairFlipped ? pair[0] : pair[1];
-                            responseGap = isDirectedPairFlipped ? pair[1] : pair[0];
+                            responseChoice = graphicGapMatchInteraction.isDirectedPairFlipped ? pair[0] : pair[1];
+                            responseGap = graphicGapMatchInteraction.isDirectedPairFlipped ? pair[1] : pair[0];
                             if (responseChoice === choice.id()) {
                                 $('[data-identifier="' + responseGap + '"]', $container).addClass('active');
                                 _selectShape(interaction, element, false);
@@ -266,114 +230,7 @@ var setResponse = function(interaction, response) {
 };
 
 /**
- * Reset the current responses of the rendered interaction.
- *
- * The response format follows the IMS PCI recommendation :
- * http://www.imsglobal.org/assessment/pciv1p0cf/imsPCIv1p0cf.html#_Toc353965343
- *
- * Available base types are defined in the QTI v2.1 information model:
- * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10321
- *
- * Special value: the empty object value {} resets the interaction responses
- *
- * @param {object} interaction
- */
-var resetResponse = function resetResponse(interaction) {
-    _.forEach(interaction.gapFillers, function(gapFiller) {
-        interactUtils.tapOn(gapFiller.items[2][0]); // this refers to the gapFiller image
-    });
-};
-
-/**
- * Return the response of the rendered interaction
- *
- * The response format follows the IMS PCI recommendation :
- * http://www.imsglobal.org/assessment/pciv1p0cf/imsPCIv1p0cf.html#_Toc353965343
- *
- * Available base types are defined in the QTI v2.1 information model:
- * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10321
- *
- * @param {object} interaction
- * @returns {object}
- */
-var getResponse = function(interaction) {
-    var raw = _getRawResponse(interaction);
-    return pciResponse.serialize(raw, interaction);
-};
-
-/**
- * Clean interaction destroy
- * @param {Object} interaction
- */
-var destroy = function destroy(interaction) {
-    var $container;
-    if (interaction.paper) {
-        $container = containerHelper.get(interaction);
-
-        $(window).off('resize.qti-widget.' + interaction.serial);
-        $container.off('resize.qti-widget.' + interaction.serial);
-
-        interaction.paper.clear();
-        instructionMgr.removeInstructions(interaction);
-
-        $('.main-image-box', $container)
-            .empty()
-            .removeAttr('style');
-        $('.image-editor', $container).removeAttr('style');
-        $('ul', $container).empty();
-
-        interact($container.find('ul.source li').selector).unset(); // gapfillers
-        interact($container.find('.main-image-box rect').selector).unset(); // choices/hotspot
-    }
-    //remove all references to a cache container
-    containerHelper.reset(interaction);
-};
-
-/**
- * Set the interaction state. It could be done anytime with any state.
- *
- * @param {Object} interaction - the interaction instance
- * @param {Object} state - the interaction state
- */
-var setState = function setState(interaction, state) {
-    if (_.isObject(state)) {
-        if (state.response) {
-            interaction.resetResponse();
-            interaction.setResponse(state.response);
-        }
-    }
-};
-
-/**
- * Get the interaction state.
- *
- * @param {Object} interaction - the interaction instance
- * @returns {Object} the interaction current state
- */
-var getState = function getState(interaction) {
-    var state = {};
-    var response = interaction.getResponse();
-
-    if (response) {
-        state.response = response;
-    }
-    return state;
-};
-
-/**
  * Expose the common renderer for the hotspot interaction
  * @exports qtiCommonRenderer/renderers/interactions/HotspotInteraction
  */
-export default {
-    qtiClass: 'graphicGapMatchInteraction',
-    template: tpl,
-    render: render,
-    getContainer: containerHelper.get,
-    setResponse: setResponse,
-    getResponse: getResponse,
-    resetResponse: resetResponse,
-    destroy: destroy,
-    setState: setState,
-    getState: getState,
-    isDirectedPairFlipped: isDirectedPairFlipped
-};
+export default Object.assign({}, graphicGapMatchInteraction, {render: render, setResponse: setResponse});

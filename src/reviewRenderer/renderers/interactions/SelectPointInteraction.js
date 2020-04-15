@@ -18,31 +18,13 @@
  */
 
 /**
- * The Common Render for the Select Point Interaction
- *
- * @author Bertrand Chevrier <bertrand@taotesting.com>
+ * @author Ansul Sharma <ansultaotesting.com>
  */
-import $ from 'jquery';
-import _ from 'lodash';
-import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/selectPointInteraction';
-import graphic from 'taoQtiItem/reviewRenderer/helpers/Graphic';
+import selectPointInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/SelectPointInteraction';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
+import graphic from 'taoQtiItem/reviewRenderer/helpers/Graphic';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
-import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
-
-/**
- * Get the responses from the interaction
- * @param {Object} interaction
- * @returns {Array} of points
- */
-var getRawResponse = function getRawResponse(interaction) {
-    if (interaction && interaction.paper && _.isArray(interaction.paper.points)) {
-        return _.map(interaction.paper.points, function(point) {
-            return [point.x, point.y];
-        });
-    }
-    return [];
-};
+import _ from "lodash";
 
 /**
  * Add a new point to the interaction
@@ -50,38 +32,31 @@ var getRawResponse = function getRawResponse(interaction) {
  * @param {Object} point - the x/y point
  */
 var addPoint = function addPoint(interaction, point) {
-    var maxChoices = interaction.attr('maxChoices');
-
     var pointChange = function pointChange() {
         containerHelper.triggerResponseChangeEvent(interaction);
-        instructionMgr.validateInstructions(interaction);
     };
 
-    if (maxChoices > 0 && getRawResponse(interaction).length >= maxChoices) {
-        instructionMgr.validateInstructions(interaction);
-    } else {
-        if (!_.isArray(interaction.paper.points)) {
-            interaction.paper.points = [];
-        }
-
-        graphic.createTarget(interaction.paper, {
-            point: point,
-            create: function create(target) {
-                if (interaction.isTouch && target && target.getBBox) {
-                    graphic.createTouchCircle(interaction.paper, target.getBBox());
-                }
-
-                interaction.paper.points.push(point);
-
-                pointChange();
-            },
-            remove: function remove() {
-                _.remove(interaction.paper.points, point);
-
-                pointChange();
-            }
-        });
+    if (!_.isArray(interaction.paper.points)) {
+        interaction.paper.points = [];
     }
+
+    graphic.createTarget(interaction.paper, {
+        point: point,
+        create: function create(target) {
+            if (interaction.isTouch && target && target.getBBox) {
+                graphic.createTouchCircle(interaction.paper, target.getBBox());
+            }
+
+            interaction.paper.points.push(point);
+
+            pointChange();
+        },
+        remove: function remove() {
+            _.remove(interaction.paper.points, point);
+
+            pointChange();
+        }
+    });
 };
 
 /**
@@ -107,20 +82,6 @@ var render = function render(interaction) {
             img: self.resolveUrl(background.data),
             imgId: 'bg-image-' + interaction.serial,
             container: $container
-        });
-
-
-        //set up the constraints instructions
-        instructionMgr.minMaxChoiceInstructions(interaction, {
-            min: interaction.attr('minChoices'),
-            max: interaction.attr('maxChoices'),
-            choiceCount: false,
-            getResponse: getRawResponse,
-            onError: function(data) {
-                if (data) {
-                    graphic.highlightError(data.target, 'success');
-                }
-            }
         });
     });
 };
@@ -164,116 +125,7 @@ var setResponse = function(interaction, response) {
 };
 
 /**
- * Reset the current responses of the rendered interaction.
- *
- * The response format follows the IMS PCI recommendation :
- * http://www.imsglobal.org/assessment/pciv1p0cf/imsPCIv1p0cf.html#_Toc353965343
- *
- * Available base types are defined in the QTI v2.1 information model:
- * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10321
- *
- * Special value: the empty object value {} resets the interaction responses
- *
- * @param {Object} interaction
- */
-var resetResponse = function resetResponse(interaction) {
-    if (interaction && interaction.paper) {
-        interaction.paper.points = [];
-
-        interaction.paper.forEach(function(element) {
-            var point = element.data('point');
-            if (typeof point === 'object') {
-                graphic.trigger(element, 'click');
-            }
-        });
-    }
-};
-
-/**
-     i* Return the response of the rendered interaction
-     *
-     * The response format follows the IMS PCI recommendation :
-     * http://www.imsglobal.org/assessment/pciv1p0cf/imsPCIv1p0cf.html#_Toc353965343
-     *
-     * Available base types are defined in the QTI v2.1 information model:
-     * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10321
-     *
-     * @param {Object} interaction
-     * @returns {Object} the response
-     */
-var getResponse = function(interaction) {
-    return pciResponse.serialize(getRawResponse(interaction), interaction);
-};
-
-/**
- * Clean interaction destroy
- * @param {Object} interaction
- */
-var destroy = function destroy(interaction) {
-    var $container;
-    if (interaction.paper) {
-        $container = containerHelper.get(interaction);
-
-        $(window).off('resize.qti-widget.' + interaction.serial);
-        $container.off('resize.qti-widget.' + interaction.serial);
-
-        interaction.paper.clear();
-        instructionMgr.removeInstructions(interaction);
-
-        $('.main-image-box', $container)
-            .empty()
-            .removeAttr('style');
-        $('.image-editor', $container).removeAttr('style');
-    }
-
-    //remove all references to a cache container
-    containerHelper.reset(interaction);
-};
-
-/**
- * Set the interaction state. It could be done anytime with any state.
- *
- * @param {Object} interaction - the interaction instance
- * @param {Object} state - the interaction state
- */
-var setState = function setState(interaction, state) {
-    if (_.isObject(state)) {
-        if (state.response) {
-            interaction.resetResponse();
-            interaction.setResponse(state.response);
-        }
-    }
-};
-
-/**
- * Get the interaction state.
- *
- * @param {Object} interaction - the interaction instance
- * @returns {Object} the interaction current state
- */
-var getState = function getState(interaction) {
-    var state = {};
-    var response = interaction.getResponse();
-
-    if (response) {
-        state.response = response;
-    }
-    return state;
-};
-
-/**
  * Expose the common renderer for the interaction
  * @exports qtiCommonRenderer/renderers/interactions/SelectPointInteraction
  */
-export default {
-    qtiClass: 'selectPointInteraction',
-    template: tpl,
-    render: render,
-    getContainer: containerHelper.get,
-    setResponse: setResponse,
-    getResponse: getResponse,
-    resetResponse: resetResponse,
-    destroy: destroy,
-    setState: setState,
-    getState: getState
-};
+export default Object.assign({}, selectPointInteraction, {render: render, setResponse: setResponse});

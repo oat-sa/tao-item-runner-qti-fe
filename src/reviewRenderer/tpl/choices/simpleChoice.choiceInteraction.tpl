@@ -3,7 +3,7 @@
         <label class="real-label">
             {{#if unique}}
             <input
-                disabled="disabled"
+                disabled
                 type="radio"
                 name="response-{{interaction.serial}}"
                 value="{{attributes.identifier}}"
@@ -13,7 +13,7 @@
             <span class="icon-radio"></span>
             {{else}}
             <input
-                disabled="disabled"
+                disabled
                 type="checkbox"
                 name="response-{{interaction.serial}}"
                 value="{{attributes.identifier}}"
