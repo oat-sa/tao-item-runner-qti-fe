@@ -20,56 +20,11 @@
 /**
  * @author Ansul Sharma <ansultaotesting.com>
  */
-import _ from 'lodash';
-import __ from 'i18n';
-import hotspotInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/hotspotInteraction';
-import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/Graphic';
-import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
-
-/**
- * Render a choice inside the paper.
- * Please note that the choice renderer isn't implemented separately because it relies on the Raphael paper instead of the DOM.
- * @param {Object} interaction
- * @param {Object} choice - the hotspot choice to add to the interaction
- */
-var _renderChoice = function _renderChoice(interaction, choice) {
-    var rElement = graphic
-        .createElement(interaction.paper, choice.attr('shape'), choice.attr('coords'), {
-            id: choice.serial,
-            title: __('Select this area')
-        });
-};
-
-/**
- * Init rendering, called after template injected into the DOM
- * All options are listed in the QTI v2.1 information model:
- * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10321
- *
- * @param {object} interaction
- */
-var render = function render(interaction) {
-    var self = this;
-
-    return new Promise(function(resolve, reject) {
-        var $container = containerHelper.get(interaction);
-        var background = interaction.object.attributes;
-
-        $container.off('resized.qti-widget.resolve').one('resized.qti-widget.resolve', resolve);
-
-        interaction.paper = graphic.responsivePaper('graphic-paper-' + interaction.serial, interaction.serial, {
-            width: background.width,
-            height: background.height,
-            img: self.resolveUrl(background.data),
-            container: $container
-        });
-
-        //call render choice for each interaction's choices
-        _.forEach(interaction.getChoices(), _.partial(_renderChoice, interaction));
-    });
-};
+import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/hotspotInteraction';
+import hotspotInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/HotspotInteraction';
 
 /**
  * Expose the common renderer for the hotspot interaction
  * @exports qtiCommonRenderer/renderers/interactions/HotspotInteraction
  */
-export default Object.assign({}, hotspotInteraction, {render: render});
+export default Object.assign({}, hotspotInteraction, {template: tpl});

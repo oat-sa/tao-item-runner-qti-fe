@@ -20,10 +20,11 @@
 /**
  * @author Ansul Sharma <ansultaotesting.com>
  */
-import graphicAssociateInteraction from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/GraphicAssociateInteraction';
+import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/graphicAssociateInteraction';
+import graphicAssociateInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/GraphicAssociateInteraction';
 
 /**
  * Expose the common renderer for the hotspot interaction
  * @exports qtiCommonRenderer/renderers/interactions/GraphicAssociateInteraction
  */
-export default Object.assign({}, graphicAssociateInteraction, {});
+export default Object.assign({}, graphicAssociateInteraction, {template: tpl});

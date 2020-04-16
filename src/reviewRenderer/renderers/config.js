@@ -84,7 +84,6 @@ var locations = {
     sliderInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/SliderInteraction',
     inlineChoiceInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/InlineChoiceInteraction',
     'simpleChoice.choiceInteraction': 'taoQtiItem/reviewRenderer/renderers/choices/SimpleChoice.ChoiceInteraction',
-    'simpleChoice.orderInteraction': 'taoQtiItem/reviewRenderer/renderers/choices/SimpleChoice.OrderInteraction',
     hottext: 'taoQtiItem/reviewRenderer/renderers/choices/Hottext',
     inlineChoice: 'taoQtiItem/qtiCommonRenderer/renderers/choices/InlineChoice',
     hottextInteraction: 'taoQtiItem/qtiCommonRenderer/renderers/interactions/HottextInteraction',
@@ -94,6 +93,7 @@ var locations = {
     gapMatchInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/GapMatchInteraction',
     selectPointInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/SelectPointInteraction',
     graphicOrderInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/GraphicOrderInteraction',
+    graphicAssociateInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/GraphicAssociateInteraction',
     graphicGapMatchInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/GraphicGapMatchInteraction',
     uploadInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/UploadInteraction',
     customInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/PortableCustomInteraction',
@@ -102,13 +102,13 @@ var locations = {
 
     gap: 'taoQtiItem/qtiCommonRenderer/renderers/choices/Gap',
     gapText: 'taoQtiItem/qtiCommonRenderer/renderers/choices/GapText',
+    'simpleChoice.orderInteraction': 'taoQtiItem/qtiCommonRenderer/renderers/choices/SimpleChoice.OrderInteraction',
     'simpleAssociableChoice.matchInteraction':
         'taoQtiItem/qtiCommonRenderer/renderers/choices/SimpleAssociableChoice.MatchInteraction',
     'simpleAssociableChoice.associateInteraction':
         'taoQtiItem/qtiCommonRenderer/renderers/choices/SimpleAssociableChoice.AssociateInteraction',
     mediaInteraction: 'taoQtiItem/qtiCommonRenderer/renderers/interactions/MediaInteraction',
     gapImg: 'taoQtiItem/qtiCommonRenderer/renderers/choices/GapImg',
-    graphicAssociateInteraction: 'taoQtiItem/qtiCommonRenderer/renderers/interactions/GraphicAssociateInteraction',
     endAttemptInteraction: 'taoQtiItem/qtiCommonRenderer/renderers/interactions/EndAttemptInteraction',
 };
 
