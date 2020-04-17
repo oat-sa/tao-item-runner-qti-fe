@@ -111,7 +111,7 @@ var render = function render(interaction) {
                 messageType = 'info';
             }
 
-            showTooltip($input, messageType, message);
+            if (count) showTooltip($input, messageType, message);
         };
 
         $input
@@ -130,15 +130,15 @@ var render = function render(interaction) {
         updatePatternMaskTooltip = function updatePatternMaskTooltip() {
             var regex = new RegExp(attributes.patternMask);
 
-            if (!$input.val().length) return;
-
             hideTooltip($input);
 
-            if (regex.test($input.val())) {
-                $input.removeClass('invalid');
-            } else {
-                $input.addClass('invalid');
-                showTooltip($input, 'error', __('This is not a valid answer'));
+            if ($input.val()) {
+                if (regex.test($input.val())) {
+                    $input.removeClass('invalid');
+                } else {
+                    $input.addClass('invalid');
+                    showTooltip($input, 'error', __('This is not a valid answer'));
+                }
             }
         };
 
