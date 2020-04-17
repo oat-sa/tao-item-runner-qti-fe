@@ -20,7 +20,7 @@
 /**
  * @author Ansul Sharma <ansultaotesting.com>
  */
-import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/GraphicOrderInteraction';
+import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/graphicOrderInteraction';
 import graphicOrderInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/GraphicOrderInteraction';
 
 /**
