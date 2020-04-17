@@ -111,7 +111,9 @@ var render = function render(interaction) {
                 messageType = 'info';
             }
 
-            if (count) showTooltip($input, messageType, message);
+            if (count) {
+                showTooltip($input, messageType, message);
+            }
         };
 
         $input
