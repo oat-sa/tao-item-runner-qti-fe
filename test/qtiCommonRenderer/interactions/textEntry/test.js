@@ -55,7 +55,12 @@ define([
 
                 $input.val('');
                 $input.focus();
-                assert.ok(!getTooltip($input), 'tooltip is hidden when no length');
+                assert.equal(
+                    getTooltipContent($input),
+                    __('%d characters allowed', 5),
+                    'the instruction message is correct'
+                );
+                assert.ok(getTooltip($input).is(':visible'), 'info tooltip is visible');
 
                 $input.val('123');
                 $input.keyup();
