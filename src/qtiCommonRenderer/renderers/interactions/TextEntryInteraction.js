@@ -111,8 +111,9 @@ var render = function render(interaction) {
                 messageType = 'info';
             }
 
-            if (count) {
-                showTooltip($input, messageType, message);
+            showTooltip($input, messageType, message);
+            if (count && messageType === 'warning') {
+                hideTooltip($input);
             }
         };
 
