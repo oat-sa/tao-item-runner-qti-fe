@@ -20,7 +20,7 @@
 /**
  * @author Ansul Sharma <ansultaotesting.com>
  */
-import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/SelectPointInteraction';
+import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/selectPointInteraction';
 import selectPointInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/SelectPointInteraction';
 
 /**
