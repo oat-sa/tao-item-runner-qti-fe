@@ -128,9 +128,9 @@ var render = function render(interaction) {
             });
     } else if (attributes.patternMask) {
         updatePatternMaskTooltip = function updatePatternMaskTooltip() {
-            if (!$input.val().length) return;
-
             var regex = new RegExp(attributes.patternMask);
+
+            if (!$input.val().length) return;
 
             hideTooltip($input);
 
