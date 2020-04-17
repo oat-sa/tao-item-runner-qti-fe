@@ -16,10 +16,12 @@
  * Copyright (c) 2014 (original work) Open Assessment Technologies SA;
  */
 
-/**
- * Define the Qti Item review Renderer
- */
-import Renderer from 'taoQtiItem/qtiRunner/core/Renderer';
-import config from 'taoQtiItem/reviewRenderer/renderers/config';
+import ReviewRenderer from 'taoQtiItem/reviewRenderer/renderers/Renderer';
 
-export default Renderer.build(config.locations, config.name, config.options);
+export default {
+    name: 'reviewRenderer',
+    init: function() {},
+    getRenderer: function() {
+        return ReviewRenderer;
+    }
+};

@@ -17,9 +17,14 @@
  */
 
 /**
- * Define the Qti Item review Renderer
+ * Define the Qti Item Common Renderer
  */
-import Renderer from 'taoQtiItem/qtiRunner/core/Renderer';
-import config from 'taoQtiItem/reviewRenderer/renderers/config';
+import QtiRenderer from 'taoQtiItem/qtiCommonRenderer/renderers/Renderer';
 
-export default Renderer.build(config.locations, config.name, config.options);
+export default {
+    name: 'commonRenderer',
+    init: function() {},
+    getRenderer: function() {
+        return QtiRenderer;
+    }
+};

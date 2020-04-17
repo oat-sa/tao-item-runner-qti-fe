@@ -29,11 +29,11 @@ import Element from 'taoQtiItem/qtiItem/core/Element';
 import ciRegistry from 'taoQtiItem/portableElementRegistry/ciRegistry';
 import icRegistry from 'taoQtiItem/portableElementRegistry/icRegistry';
 import sideLoadingProviderFactory from 'taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory';
-import QtiRenderer from 'taoQtiItem/qtiCommonRenderer/renderers/Renderer';
-import ReviewRenderer from 'taoQtiItem/reviewRenderer/renderers/Renderer';
+import rendererManager from 'taoQtiItem/runner/rendererManager';
 import picManager from 'taoQtiItem/runner/provider/manager/picManager';
 import userModules from 'taoQtiItem/runner/provider/manager/userModules';
 import modalFeedbackHelper from 'taoQtiItem/qtiItem/helper/modalFeedback';
+import getRendererNameFromView from 'taoQtiItem/runner/utils/imsViewToRendererMaper';
 import 'taoItems/assets/manager';
 
 var timeout = (context.timeout > 0 ? context.timeout + 1 : 30) * 1000;
@@ -52,11 +52,9 @@ var qtiItemRuntimeProvider = {
             _.pick(this.options, ['themes', 'preload', 'view'])
         );
 
-        if(rendererOptions.view === 'scorer') {
-            this._renderer = new ReviewRenderer(rendererOptions);
-        } else  {
-            this._renderer = new QtiRenderer(rendererOptions);
-        }
+        const Renderer = rendererManager(getRendererNameFromView(rendererOptions.view)).getRenderer();
+
+        this._renderer = new Renderer(rendererOptions);
 
         this._loader = new QtiLoader();
 
