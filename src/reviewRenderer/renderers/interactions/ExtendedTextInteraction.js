@@ -24,9 +24,9 @@ import template from 'taoQtiItem/reviewRenderer/tpl/interactions/extendedTextInt
 import extendedTextInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/ExtendedTextInteraction';
 
 /**
- * Disables the ckEditor and renders the interaction as usual
+ * * Disables the ckEditor and renders the interaction as usual
  *
- * @param interaction
+ * @param {Object} interaction
  * @returns {*}
  */
 const render = interaction => {

@@ -20,7 +20,7 @@
 /**
  * @author Ansul Sharma <ansultaotesting.com>
  */
-import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/customInteraction';
+import template from 'taoQtiItem/reviewRenderer/tpl/interactions/customInteraction';
 import portableCustomInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/PortableCustomInteraction';
 
-export default Object.assign({}, portableCustomInteraction, {template: tpl});
+export default Object.assign({}, portableCustomInteraction, {template});
