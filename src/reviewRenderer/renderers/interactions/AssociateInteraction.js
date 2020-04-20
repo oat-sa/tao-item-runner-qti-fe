@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2019 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -22,16 +22,10 @@
  */
 import associateInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/AssociateInteraction';
 
-var render = function(interaction) {
-    return new Promise(function(resolve) {
-        associateInteraction.renderEmptyPairs(interaction);
-
-        resolve();
-    });
-};
+const render = interaction => Promise.resolve(associateInteraction.renderEmptyPairs(interaction));
 
 /**
  * Expose the common renderer for the associate interaction
  * @exports qtiCommonRenderer/renderers/interactions/AssociateInteraction
  */
-export default Object.assign({}, associateInteraction, {render: render});
+export default Object.assign({}, associateInteraction, {render});

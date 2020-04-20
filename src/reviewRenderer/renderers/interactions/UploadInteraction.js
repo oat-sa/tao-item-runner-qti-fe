@@ -13,14 +13,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
 /**
  * @author Ansul Sharma <ansultaotesting.com>
  */
-import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/uploadInteraction';
+import template from 'taoQtiItem/reviewRenderer/tpl/interactions/uploadInteraction';
 import uploadInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/UploadInteraction';
 
-export default Object.assign({}, uploadInteraction, {template: tpl});
+export default Object.assign({}, uploadInteraction, {template});

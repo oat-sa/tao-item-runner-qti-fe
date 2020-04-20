@@ -13,18 +13,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2017 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
 /**
  * @author Ansul Sharma <ansultaotesting.com>
  */
-import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/selectPointInteraction';
+import template from 'taoQtiItem/reviewRenderer/tpl/interactions/selectPointInteraction';
 import selectPointInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/SelectPointInteraction';
 
 /**
  * Expose the common renderer for the interaction
  * @exports qtiCommonRenderer/renderers/interactions/SelectPointInteraction
  */
-export default Object.assign({}, selectPointInteraction, {template: tpl});
+export default Object.assign({}, selectPointInteraction, {template});

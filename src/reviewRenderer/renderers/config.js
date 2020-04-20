@@ -24,15 +24,15 @@ import assetStrategies from 'taoItems/assets/strategies';
 import module from 'module';
 import portableAssetStrategy from 'taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy';
 
-var itemThemes = themes.get('items');
-var moduleConfig = module.config();
+const itemThemes = themes.get('items');
+const moduleConfig = module.config();
 
 //Create asset manager stack
-var assetManager = assetManagerFactory(
+const assetManager = assetManagerFactory(
     [
         {
             name: 'theme',
-            handle: function handleTheme(url) {
+            handle: url => {
                 if (
                     itemThemes &&
                     url.path &&
@@ -53,7 +53,7 @@ var assetManager = assetManagerFactory(
 ); //baseUrl is not predefined in the config, but should be set upon renderer instantiating
 
 //renderers locations
-var locations = {
+const locations = {
     assessmentItem: 'taoQtiItem/qtiCommonRenderer/renderers/Item',
     _container: 'taoQtiItem/qtiCommonRenderer/renderers/Container',
     _simpleFeedbackRule: false,
@@ -114,9 +114,9 @@ var locations = {
 
 export default {
     name: 'reviewRenderer',
-    locations: locations,
+    locations,
     options: {
-        assetManager: assetManager,
+        assetManager,
         themes: itemThemes,
         enableDragAndDrop: {
             associate: !!moduleConfig.associateDragAndDrop,

@@ -13,22 +13,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
 /**
  * @author Ansul Sharma <ansultaotesting.com>
  */
-import tpl from 'taoQtiItem/reviewRenderer/tpl/choices/simpleChoice.choiceInteraction';
+import template from 'taoQtiItem/reviewRenderer/tpl/choices/simpleChoice.choiceInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 
 export default {
     qtiClass: 'simpleChoice.choiceInteraction',
     getContainer: containerHelper.get,
-    getData: function(choice, data) {
-        data.unique = parseInt(data.interaction.attributes.maxChoices) === 1;
-        return data;
-    },
-    template: tpl
+    getData: (choice, data) => Object.assign(data, { unique: parseInt(data.interaction.attributes.maxChoices) === 1 }),
+    template
 };

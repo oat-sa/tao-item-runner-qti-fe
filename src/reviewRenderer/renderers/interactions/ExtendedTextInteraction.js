@@ -13,14 +13,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
 /**
  * @author Ansul Sharma <ansultaotesting.com>
  */
-import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/extendedTextInteraction';
+import template from 'taoQtiItem/reviewRenderer/tpl/interactions/extendedTextInteraction';
 import extendedTextInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/ExtendedTextInteraction';
 
 /**
@@ -29,7 +29,7 @@ import extendedTextInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/inte
  * @param interaction
  * @returns {*}
  */
-var render = function render(interaction) {
+const render = interaction => {
     extendedTextInteraction.disable(interaction);
 
     return extendedTextInteraction.render(interaction);
@@ -41,4 +41,4 @@ var render = function render(interaction) {
  * @exports qtiCommonRenderer/renderers/interactions/ExtendedTextInteraction
  */
 
-export default Object.assign({}, extendedTextInteraction, {template: tpl, render: render});
+export default Object.assign({}, extendedTextInteraction, {template, render});

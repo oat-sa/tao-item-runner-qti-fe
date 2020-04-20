@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2019 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -25,8 +25,8 @@ import 'core/mouseEvent';
 import orderInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/OrderInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 
-var _freezeSize = function($container) {
-    var $orderArea = $container.find('.order-interaction-area');
+const _freezeSize = function($container) {
+    const $orderArea = $container.find('.order-interaction-area');
     $orderArea.height($orderArea.height());
 };
 
@@ -37,13 +37,11 @@ var _freezeSize = function($container) {
  *
  * @param {Object} interaction - the interaction instance
  */
-var render = function(interaction) {
-    var $container = containerHelper.get(interaction);
+const render = function(interaction) {
+    const $container = containerHelper.get(interaction);
 
     //bind event listener in case the attributes change dynamically on runtime
-    $(document).on('attributeChange.qti-widget.commonRenderer', function(e) {
-        e.preventDefault();
-    });
+    $(document).on('attributeChange.qti-widget.commonRenderer', (e) => e.preventDefault());
 
     _freezeSize($container);
 };
@@ -52,4 +50,4 @@ var render = function(interaction) {
  * Expose the common renderer for the order interaction
  * @exports qtiCommonRenderer/renderers/interactions/OrderInteraction
  */
-export default Object.assign({}, orderInteraction, {render: render});
+export default Object.assign({}, orderInteraction, {render});

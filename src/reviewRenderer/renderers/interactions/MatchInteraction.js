@@ -13,27 +13,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
 /**
  * @author Ansul Sharma <ansultaotesting.com>
  */
-import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/matchInteraction';
+import template from 'taoQtiItem/reviewRenderer/tpl/interactions/matchInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import matchInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/MatchInteraction';
 
-var render = function(interaction) {
-    var $container = containerHelper.get(interaction);
+const render = interaction => {
+    const $container = containerHelper.get(interaction);
 
-    $container.on('click.commonRenderer', 'input[type=checkbox]', function(e) {
-        e.preventDefault();
-    });
+    $container.on('click.commonRenderer', 'input[type=checkbox]', e => e.preventDefault());
 };
 
 /**
  * Expose the common renderer for the match interaction
  * @exports reviewRenderer/renderers/interactions/MatchInteraction
  */
-export default Object.assign({}, matchInteraction, {template: tpl, render: render});
+export default Object.assign({}, matchInteraction, {template, render});
