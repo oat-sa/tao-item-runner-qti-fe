@@ -28,12 +28,19 @@ define([
         }
     }
 
+    function hasTooltip($input) {
+        return getTooltipText($input) || false;
+    }
+
     function getTooltip($input) {
-        var instance = $input.data('$tooltip');
+        var instance = getTooltipText($input)
         if (instance && instance.popperInstance.popper) {
             return $(instance.popperInstance.popper);
         }
-        return instance
+    }
+
+    function getTooltipText($input) {
+        return $input.data('$tooltip');
     }
 
     QUnit.test('Lenght constraint', function(assert) {
@@ -140,7 +147,7 @@ define([
 
                 $input.val('');
                 $input.focus();
-                assert.ok(!getTooltip($input), 'the error tooltip is hidden in a correct response');
+                assert.ok(!hasTooltip($input), 'the error tooltip is hidden in a correct response');
 
                 $input.val('PARIS');
                 $input.keyup();
@@ -148,7 +155,7 @@ define([
             })
             .on('responsechange', function(state) {
                 var $input = $container.find('.qti-interaction.qti-textEntryInteraction');
-                assert.ok(!getTooltip($input), 'the error tooltip is hidden in a correct response');
+                assert.ok(!hasTooltip($input), 'the error tooltip is hidden in a correct response');
                 ready();
             })
             .init()
