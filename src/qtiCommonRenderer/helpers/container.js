@@ -13,15 +13,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-2020 (original work) Open Assessment Technologies SA ;
  */
 import _ from 'lodash';
 import $ from 'jquery';
 import Element from 'taoQtiItem/qtiItem/core/Element';
 
 //containers are cached, so do not forget to remove them.
-var _containers = {};
-var _$containerContext = $();
+let _containers = {};
+let _$containerContext = $();
 
 /**
  * Build the selector for your element (from the element serial)
@@ -29,14 +29,14 @@ var _$containerContext = $();
  * @param {QtiElement} element
  * @returns {String} the selector
  */
-var _getSelector = function(element) {
-    var serial = element.getSerial(),
-        selector = '[data-serial=' + serial + ']';
+const _getSelector = function(element) {
+    const serial = element.getSerial();
+    let selector = `[data-serial=${  serial  }]`;
 
     if (Element.isA(element, 'choice')) {
-        selector = '.qti-choice' + selector;
+        selector = `.qti-choice${  selector}`;
     } else if (Element.isA(element, 'interaction')) {
-        selector = '.qti-interaction' + selector;
+        selector = `.qti-interaction${  selector}`;
     }
 
     return selector;
@@ -46,13 +46,21 @@ var _getSelector = function(element) {
  * Helps you to retrieve the DOM element (as a jquery element)
  * @exports taoQtiItem/qtiCommonRenderer/helpers/containerHelper
  */
-var containerHelper = {
+const containerHelper = {
     /**
      * Set a global scope to look for element container
      * @param {jQueryElement} [$scope] - if you want to retrieve the element in a particular scope or context
      */
-    setContext: function($scope) {
+    setContext($scope) {
         _$containerContext = $scope;
+    },
+
+    /**
+     * Returns current scope
+     * @returns {jQueryElement}
+     */
+    getContext() {
+        return  _$containerContext;
     },
 
     /**
@@ -61,8 +69,9 @@ var containerHelper = {
      * @param {jQueryElement} [$scope] - if you want to retrieve the element in a particular scope or context
      * @returns {jQueryElement} the container
      */
-    get: function(element, $scope) {
-        var serial = element.getSerial();
+    get(element, $scope) {
+        const serial = element.getSerial();
+
         if ($scope instanceof $ && $scope.length) {
             //find in the given context
             return $scope.find(_getSelector(element));
@@ -81,7 +90,7 @@ var containerHelper = {
      * getContainer use a cache to store elements. This methods helps you to purge it.
      * @param {Element} element - find the container of this element
      */
-    reset: function(element) {
+    reset(element) {
         if (element instanceof Element && _containers[element.getSerial()]) {
             _containers = _.omit(_containers, element.getSerial());
         }
@@ -90,7 +99,7 @@ var containerHelper = {
     /**
      * Clear the containers cache
      */
-    clear: function clear() {
+    clear() {
         _containers = {};
         _$containerContext = $();
     },
@@ -101,7 +110,7 @@ var containerHelper = {
      * @param {QtiElement} element - find the container of this element
      * @param {Array} [data] - data to give to the event
      */
-    trigger: function(eventType, element, data) {
+    trigger(eventType, element, data) {
         if (eventType) {
             if (data && !_.isArray(data)) {
                 data = [data];
@@ -115,7 +124,7 @@ var containerHelper = {
      * @param {QtiElement} interaction - the interaction that had a response changed
      * @param {Object} [extraData] - additionnal data to give to the event
      */
-    triggerResponseChangeEvent: function(interaction, extraData) {
+    triggerResponseChangeEvent(interaction, extraData) {
         this.trigger('responseChange', interaction, [
             {
                 interaction: interaction,
@@ -129,10 +138,10 @@ var containerHelper = {
      * Make all links to opens in another tab/window
      * @param {jQueryElement} $container
      */
-    targetBlank: function($container) {
+    targetBlank($container) {
         $container.on('click', 'a', function(e) {
             e.preventDefault();
-            var href = $(this).attr('href');
+            const href = $(this).attr('href');
             if (href && href.match(/^http/i)) {
                 window.open(href, '_blank');
             }
