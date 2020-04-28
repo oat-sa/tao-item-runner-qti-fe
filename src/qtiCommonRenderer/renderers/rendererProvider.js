@@ -22,6 +22,9 @@
  */
 import QtiRenderer from 'taoQtiItem/qtiCommonRenderer/renderers/Renderer';
 
+/**
+ * This is a provider wrapper for qtiCommonRenderer
+ */
 export default {
     name: 'commonRenderer',
     init: () => {},

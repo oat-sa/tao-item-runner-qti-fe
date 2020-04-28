@@ -21,9 +21,17 @@ import providerRegistry from 'core/providerRegistry';
 import qtiRenderer from 'taoQtiItem/qtiCommonRenderer/renderers/rendererProvider';
 import reviewRenderer from 'taoQtiItem/reviewRenderer/renderers/rendererProvider';
 
-export default function rendererManager(rendererName) {
+/**
+ * This renderer manager registers two different renderers at the moment:
+ * - qtiCommonRenderer: Standard renderer used for test taker view
+ * - reviewRenderer: This renderer is meant to render items in review mode (which is ready-only with some enhancement)
+ *
+ * @param {string} rendererName
+ * @returns {*|{init(): *, getRenderer(): *}|init}
+ */
+export default function renderStrategies(rendererName) {
     const name = rendererName || 'commonRenderer';
-    const renderer = rendererManager.getProvider(name);
+    const renderer = renderStrategies.getProvider(name);
 
     return {
         init() {
@@ -36,7 +44,7 @@ export default function rendererManager(rendererName) {
     };
 }
 
-providerRegistry(rendererManager);
+providerRegistry(renderStrategies);
 
-rendererManager.registerProvider(qtiRenderer.name, qtiRenderer);
-rendererManager.registerProvider(reviewRenderer.name, reviewRenderer);
+renderStrategies.registerProvider(qtiRenderer.name, qtiRenderer);
+renderStrategies.registerProvider(reviewRenderer.name, reviewRenderer);

@@ -29,7 +29,7 @@ import Element from 'taoQtiItem/qtiItem/core/Element';
 import ciRegistry from 'taoQtiItem/portableElementRegistry/ciRegistry';
 import icRegistry from 'taoQtiItem/portableElementRegistry/icRegistry';
 import sideLoadingProviderFactory from 'taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory';
-import rendererManager from 'taoQtiItem/runner/rendererManager';
+import renderStrategies from 'taoQtiItem/runner/renderStrategies';
 import picManager from 'taoQtiItem/runner/provider/manager/picManager';
 import userModules from 'taoQtiItem/runner/provider/manager/userModules';
 import modalFeedbackHelper from 'taoQtiItem/qtiItem/helper/modalFeedback';
@@ -52,7 +52,7 @@ var qtiItemRuntimeProvider = {
             _.pick(this.options, ['themes', 'preload', 'view'])
         );
 
-        const Renderer = rendererManager(getRendererNameFromView(rendererOptions.view)).getRenderer();
+        const Renderer = renderStrategies(getRendererNameFromView(rendererOptions.view)).getRenderer();
 
         this._renderer = new Renderer(rendererOptions);
 

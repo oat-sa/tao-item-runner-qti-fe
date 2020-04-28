@@ -19,6 +19,9 @@
 
 import ReviewRenderer from 'taoQtiItem/reviewRenderer/renderers/Renderer';
 
+/**
+ * This is a provider wrapper for reviewRenderer
+ */
 export default {
     name: 'reviewRenderer',
     init: () => {},
