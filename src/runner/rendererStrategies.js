@@ -29,9 +29,9 @@ import reviewRenderer from 'taoQtiItem/reviewRenderer/renderers/rendererProvider
  * @param {string} rendererName
  * @returns {*|{init(): *, getRenderer(): *}|init}
  */
-export default function renderStrategies(rendererName) {
+export default function rendererStrategies(rendererName) {
     const name = rendererName || 'commonRenderer';
-    const renderer = renderStrategies.getProvider(name);
+    const renderer = rendererStrategies.getProvider(name);
 
     return {
         init() {
@@ -44,7 +44,7 @@ export default function renderStrategies(rendererName) {
     };
 }
 
-providerRegistry(renderStrategies);
+providerRegistry(rendererStrategies);
 
-renderStrategies.registerProvider(qtiRenderer.name, qtiRenderer);
-renderStrategies.registerProvider(reviewRenderer.name, reviewRenderer);
+rendererStrategies.registerProvider(qtiRenderer.name, qtiRenderer);
+rendererStrategies.registerProvider(reviewRenderer.name, reviewRenderer);
