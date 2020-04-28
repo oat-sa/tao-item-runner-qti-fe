@@ -17,6 +17,16 @@
  *
  */
 
+
+/**
+ * Returns the appropriate renderer based on the IMS view property.
+ *
+ * Read more about IMS view here:
+ * https://www.imsglobal.org/question/qtiv2p2p2/QTIv2p2p2-ASI-InformationModelv1p0/imsqtiv2p2p2_asi_v1p0_InfoModelv1p0.html#FigEnumeratedListClass_DataModel_View
+ *
+ * @param {string} imsView
+ * @returns {string}
+ */
 const getRendererNameFromView = function(imsView) {
     return imsView === 'scorer' ? 'reviewRenderer' : 'commonRenderer';
 };
