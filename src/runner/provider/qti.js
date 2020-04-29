@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -29,10 +29,11 @@ import Element from 'taoQtiItem/qtiItem/core/Element';
 import ciRegistry from 'taoQtiItem/portableElementRegistry/ciRegistry';
 import icRegistry from 'taoQtiItem/portableElementRegistry/icRegistry';
 import sideLoadingProviderFactory from 'taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory';
-import QtiRenderer from 'taoQtiItem/qtiCommonRenderer/renderers/Renderer';
+import rendererStrategies from 'taoQtiItem/runner/rendererStrategies';
 import picManager from 'taoQtiItem/runner/provider/manager/picManager';
 import userModules from 'taoQtiItem/runner/provider/manager/userModules';
 import modalFeedbackHelper from 'taoQtiItem/qtiItem/helper/modalFeedback';
+import getRendererNameFromView from 'taoQtiItem/runner/utils/imsViewToRendererMaper';
 import 'taoItems/assets/manager';
 
 var timeout = (context.timeout > 0 ? context.timeout + 1 : 30) * 1000;
@@ -48,10 +49,13 @@ var qtiItemRuntimeProvider = {
             {
                 assetManager: this.assetManager
             },
-            _.pick(this.options, ['themes', 'preload'])
+            _.pick(this.options, ['themes', 'preload', 'view'])
         );
 
-        this._renderer = new QtiRenderer(rendererOptions);
+        const Renderer = rendererStrategies(getRendererNameFromView(rendererOptions.view)).getRenderer();
+
+        this._renderer = new Renderer(rendererOptions);
+
         this._loader = new QtiLoader();
 
         this._loader.loadItemData(itemData, function(item) {
