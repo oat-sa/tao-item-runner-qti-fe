@@ -38,11 +38,6 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
             'taoItems/runner': '/node_modules/@oat-sa/tao-item-runner/dist/runner',
             'taoItems/assets': '/node_modules/@oat-sa/tao-item-runner/dist/assets',
             'taoItems/scoring': '/node_modules/@oat-sa/tao-item-runner/dist/scoring',
-
-            /* LIBS */
-            'lib/simulator': '/node_modules/@oat-sa/tao-core-libs/lib/simulator',
-            ckeditor: '/node_modules/@oat-sa/tao-core-libs/lib/ckeditor/ckeditor'
-        /* LIBS END */
         }, libPathDefinition),
         shim: {
             'qunit-parameterize': {
