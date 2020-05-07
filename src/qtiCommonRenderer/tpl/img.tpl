@@ -8,5 +8,9 @@
     {{#if attributes.height}}height="{{attributes.height}}" {{/if}}
     {{#if attributes.width}}width="{{attributes.width}}" {{/if}}
     {{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}
-    style="{{#if attributes.height}}height: {{attributes.height}}px; {{/if}}{{#if attributes.width}}width: {{attributes.width}}px; {{/if}}"
+    {{#if attributes.height}}
+        style="height: {{attributes.height}}px; width: {{attributes.width}}px;"
+        {{else}}
+        style="width: {{attributes.width}};"
+    {{/if}}
     />
