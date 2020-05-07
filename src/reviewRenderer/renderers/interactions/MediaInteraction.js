@@ -132,7 +132,7 @@ var render = function render(interaction) {
 };
 
 /**
- * Expose the common renderer for the match interaction
- * @exports reviewRenderer/renderers/interactions/MatchInteraction
+ * Expose the common renderer for the media interaction
+ * @exports reviewRenderer/renderers/interactions/mediaInteraction
  */
 export default Object.assign({}, mediaInteraction, {render});
