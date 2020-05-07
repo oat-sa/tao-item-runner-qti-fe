@@ -98,6 +98,7 @@ const locations = {
     graphicGapMatchInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/GraphicGapMatchInteraction',
     uploadInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/UploadInteraction',
     customInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/PortableCustomInteraction',
+    mediaInteraction: 'taoQtiItem/reviewRenderer/renderers/interactions/MediaInteraction',
 
     // Interactions/Choices inherited from qtiCommonRenderer
 
@@ -108,7 +109,6 @@ const locations = {
         'taoQtiItem/qtiCommonRenderer/renderers/choices/SimpleAssociableChoice.MatchInteraction',
     'simpleAssociableChoice.associateInteraction':
         'taoQtiItem/qtiCommonRenderer/renderers/choices/SimpleAssociableChoice.AssociateInteraction',
-    mediaInteraction: 'taoQtiItem/qtiCommonRenderer/renderers/interactions/MediaInteraction',
     gapImg: 'taoQtiItem/qtiCommonRenderer/renderers/choices/GapImg',
     endAttemptInteraction: 'taoQtiItem/qtiCommonRenderer/renderers/interactions/EndAttemptInteraction',
 };
