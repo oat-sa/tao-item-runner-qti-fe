@@ -26,7 +26,7 @@ import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import mediaInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/MediaInteraction';
 import mediaplayer from 'ui/mediaplayer';
 
-var defaults = {
+const defaults = {
     type: 'video/mp4',
     video: {
         height: 270
@@ -41,20 +41,20 @@ var defaults = {
  * @param {object} interaction
  * @returns {Promise<any>}
  */
-var render = function render(interaction) {
+const render = function render(interaction) {
     return new Promise((resolve) => {
-        var $container = containerHelper.get(interaction);
-        var media = interaction.object;
-        var $item = $container.parents('.qti-item');
-        var url = media.attr('data') || '';
+        const $container = containerHelper.get(interaction);
+        const media = interaction.object;
+        const $item = $container.parents('.qti-item');
+        const url = media.attr('data') || '';
 
         /**
          * Resize video player elements to fit container size
          * @param {Object} mediaElement - player instance
          * @param {jQueryElement} $container   - container element to adapt
          */
-        var resize = _.debounce(function resize() {
-            var width, height;
+        const resize = _.debounce(() => {
+            let width, height;
             if (interaction.mediaElement) {
                 height = $container.find('.media-container').height();
                 width = $container.find('.media-container').width();
@@ -77,7 +77,7 @@ var render = function render(interaction) {
                     loop: false,
                     renderTo: $('.media-container', $container)
                 })
-                    .on('render', function() {
+                    .on('render', () => {
                         resize();
 
                         $(window)
@@ -91,7 +91,7 @@ var render = function render(interaction) {
                          */
                         $container.trigger('playerrendered');
                     })
-                    .on('ready', function() {
+                    .on('ready', () => {
                         /**
                          * @event playerready
                          */
@@ -102,11 +102,11 @@ var render = function render(interaction) {
                     })
                     .on(
                         'update',
-                        _.throttle(function() {
+                        _.throttle(() => {
                             containerHelper.triggerResponseChangeEvent(interaction);
                         }, 1000)
                     )
-                    .on('ended', function() {
+                    .on('ended', () => {
                         containerHelper.triggerResponseChangeEvent(interaction);
                     });
             }
@@ -122,7 +122,7 @@ var render = function render(interaction) {
         }
 
         //initialize the component
-        $container.on('responseSet', function() {
+        $container.on('responseSet', () => {
             initMediaPlayer();
         });
 
