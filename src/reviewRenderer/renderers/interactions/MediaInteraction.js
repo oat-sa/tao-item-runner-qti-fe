@@ -51,13 +51,11 @@ const render = function render(interaction) {
         /**
          * Resize video player elements to fit container size
          * @param {Object} mediaElement - player instance
-         * @param {jQueryElement} $container   - container element to adapt
          */
         const resize = _.debounce(() => {
-            let width, height;
             if (interaction.mediaElement) {
-                height = $container.find('.media-container').height();
-                width = $container.find('.media-container').width();
+                const height = $container.find('.media-container').height();
+                const width = $container.find('.media-container').width();
 
                 interaction.mediaElement.resize(width, height);
             }
