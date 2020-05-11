@@ -492,7 +492,9 @@ var inputLimiter = function userInputLimier(interaction) {
                 var oldValue = _getTextareaValue(interaction);
                 var isCke = _getFormat(interaction) === 'xhtml';
 
-                if (isCke) {
+                if (typeof($(e.target).attr('data-clipboard')) === 'string') {
+                    newValue = $(e.target).attr('data-clipboard');
+                } else if (isCke) {
                     // cke has its own object structure
                     newValue = e.data.dataValue;
                 } else {
