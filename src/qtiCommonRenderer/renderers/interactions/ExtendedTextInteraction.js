@@ -430,7 +430,7 @@ var inputLimiter = function userInputLimier(interaction) {
                 if (patternRegEx) {
                     if (isCke) {
                         // cke has its own object structure
-                        newValue = e.getData();
+                        newValue = this.getData();
                     } else {
                         // covers input
                         newValue = e.currentTarget.value;
@@ -537,6 +537,7 @@ var inputLimiter = function userInputLimier(interaction) {
             if (_getFormat(interaction) === 'xhtml') {
                 cke = _getCKEditor(interaction);
                 cke.on('key', keyLimitHandler);
+                cke.on('change', patternHandler);
                 cke.on('paste', nonKeyLimitHandler);
                 // @todo: drop requires cke 4.5
                 // cke.on('drop', nonKeyLimitHandler);
