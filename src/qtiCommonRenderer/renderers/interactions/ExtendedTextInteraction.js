@@ -42,9 +42,9 @@ import tooltip from 'ui/tooltip';
  * @returns {Promise} rendering is async
  */
 var render = function render(interaction) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         var $el, expectedLength, minStrings, patternMask, placeholderType, editor;
-        var isThemeLoaded, _styleUpdater, themeLoaded, _getNumStrings;
+        var _styleUpdater, themeLoaded, _getNumStrings;
         var $container = containerHelper.get(interaction);
 
         var multiple = _isMultiple(interaction);
@@ -68,8 +68,7 @@ var render = function render(interaction) {
                 $el.attr('placeholder', placeholderText);
             }
             if (_getFormat(interaction) === 'xhtml') {
-                isThemeLoaded = false;
-                _styleUpdater = function() {
+                _styleUpdater = function () {
                     var qtiItemStyle, $editorBody, qtiItem;
 
                     if (editor.document) {
@@ -88,8 +87,7 @@ var render = function render(interaction) {
                         });
                     }
                 };
-                themeLoaded = function() {
-                    isThemeLoaded = true;
+                themeLoaded = function () {
                     _styleUpdater();
                 };
 
@@ -98,7 +96,7 @@ var render = function render(interaction) {
                     reject('Unable to instantiate ckEditor');
                 }
 
-                editor.on('instanceReady', function() {
+                editor.on('instanceReady', function () {
                     _styleUpdater();
 
                     //TAO-6409, disable navigation from cke toolbar
@@ -112,20 +110,20 @@ var render = function render(interaction) {
                 if (editor.status === 'ready' || editor.status === 'loaded') {
                     _.defer(resolve);
                 }
-                editor.on('configLoaded', function() {
+                editor.on('configLoaded', function () {
                     editor.config = ckConfigurator.getConfig(editor, toolbarType, ckOptions);
 
                     if (limiter.enabled) {
                         limiter.listenTextInput();
                     }
                 });
-                editor.on('change', function() {
+                editor.on('change', function () {
                     containerHelper.triggerResponseChangeEvent(interaction, {});
                 });
 
                 $(document).on('themechange.themeloader', themeLoaded);
             } else {
-                $el.on('keyup.commonRenderer change.commonRenderer', function() {
+                $el.on('keyup.commonRenderer change.commonRenderer', function () {
                     containerHelper.triggerResponseChangeEvent(interaction, {});
                 });
 
@@ -146,9 +144,9 @@ var render = function render(interaction) {
             //setting the checking for minimum number of answers
             if (minStrings) {
                 //get the number of filled inputs
-                _getNumStrings = function($element) {
+                _getNumStrings = function ($element) {
                     var num = 0;
-                    $element.each(function() {
+                    $element.each(function () {
                         if ($(this).val() !== '') {
                             num++;
                         }
@@ -159,8 +157,8 @@ var render = function render(interaction) {
 
                 minStrings = parseInt(minStrings, 10);
                 if (minStrings > 0) {
-                    $el.on('blur.commonRenderer', function() {
-                        setTimeout(function() {
+                    $el.on('blur.commonRenderer', function () {
+                        setTimeout(function () {
                             //checking if the user was clicked outside of the input fields
 
                             //TODO remove notifications in favor of instructions
@@ -182,7 +180,7 @@ var render = function render(interaction) {
                 expectedLength = parseInt(expectedLength, 10);
 
                 if (expectedLength > 0) {
-                    $el.each(function() {
+                    $el.each(function () {
                         $(this).css('width', expectedLength + 'em');
                     });
                 }
@@ -190,7 +188,7 @@ var render = function render(interaction) {
 
             //set the fields pattern mask
             if (patternMask) {
-                $el.each(function() {
+                $el.each(function () {
                     _setPattern($(this), patternMask);
                 });
             }
@@ -206,7 +204,7 @@ var render = function render(interaction) {
                 placeholderType = 'first';
 
                 if (placeholderType === 'multiple') {
-                    $el.each(function() {
+                    $el.each(function () {
                         $(this).attr('placeholder', placeholderText);
                     });
                 } else if (placeholderType === 'first') {
@@ -222,14 +220,11 @@ var render = function render(interaction) {
  * Reset the textarea / ckEditor
  * @param {Object} interaction - the extended text interaction model
  */
-var resetResponse = function(interaction) {
+var resetResponse = function (interaction) {
     if (_getFormat(interaction) === 'xhtml') {
         _getCKEditor(interaction).setData('');
     } else {
-        containerHelper
-            .get(interaction)
-            .find('input, textarea')
-            .val('');
+        containerHelper.get(interaction).find('input, textarea').val('');
     }
 };
 
@@ -245,8 +240,8 @@ var resetResponse = function(interaction) {
  * @param {Object} interaction - the extended text interaction model
  * @param {object} response
  */
-var setResponse = function(interaction, response) {
-    var _setMultipleVal = function(identifier, value) {
+var setResponse = function (interaction, response) {
+    var _setMultipleVal = function (identifier, value) {
         interaction
             .getContainer()
             .find('#' + identifier)
@@ -279,7 +274,7 @@ var setResponse = function(interaction, response) {
  * @param {Object} interaction - the extended text interaction model
  * @returns {object}
  */
-var getResponse = function(interaction) {
+var getResponse = function (interaction) {
     var $container = containerHelper.get(interaction);
     var attributes = interaction.getAttributes();
     var responseDeclaration = interaction.getResponseDeclaration();
@@ -291,11 +286,13 @@ var getResponse = function(interaction) {
             responseDeclaration.attr('cardinality') === 'ordered')
     );
     var ret = multiple ? { list: {} } : { base: {} };
+    var values;
+    var value = '';
 
     if (multiple) {
-        var values = [];
+        values = [];
 
-        $container.find('input').each(function(i) {
+        $container.find('input').each(function (i) {
             var $el = $(this);
 
             if (attributes.placeholderText && $el.val() === attributes.placeholderText) {
@@ -315,8 +312,6 @@ var getResponse = function(interaction) {
 
         ret.list[baseType] = values;
     } else {
-        var value = '';
-
         if (attributes.placeholderText && _getTextareaValue(interaction) === attributes.placeholderText) {
             value = '';
         } else {
@@ -340,7 +335,7 @@ var getResponse = function(interaction) {
  * @param {Object} interaction - the extended text interaction
  * @returns {Object} the limiter
  */
-var inputLimiter = function userInputLimier(interaction) {
+function inputLimiter(interaction) {
     var $container = containerHelper.get(interaction);
     var expectedLength = interaction.attr('expectedLength');
     var expectedLines = interaction.attr('expectedLines');
@@ -443,7 +438,7 @@ var inputLimiter = function userInputLimier(interaction) {
                     if (!newValue) {
                         return false;
                     }
-                    _.debounce(function() {
+                    _.debounce(function () {
                         if (!patternRegEx.test(newValue)) {
                             $container.addClass('invalid');
                             $container.show();
@@ -478,7 +473,7 @@ var inputLimiter = function userInputLimier(interaction) {
                     }
                     return false;
                 }
-                _.defer(function() {
+                _.defer(function () {
                     self.updateCounter();
                 });
             };
@@ -492,7 +487,7 @@ var inputLimiter = function userInputLimier(interaction) {
                 var oldValue = _getTextareaValue(interaction);
                 var isCke = _getFormat(interaction) === 'xhtml';
 
-                if (typeof($(e.target).attr('data-clipboard')) === 'string') {
+                if (typeof $(e.target).attr('data-clipboard') === 'string') {
                     newValue = $(e.target).attr('data-clipboard');
                 } else if (isCke) {
                     // cke has its own object structure
@@ -502,8 +497,8 @@ var inputLimiter = function userInputLimier(interaction) {
                     newValue = e.originalEvent.clipboardData
                         ? e.originalEvent.clipboardData.getData('text')
                         : e.originalEvent.dataTransfer.getData('text') ||
-                        e.originalEvent.dataTransfer.getData('text/plain') ||
-                        '';
+                          e.originalEvent.dataTransfer.getData('text/plain') ||
+                          '';
                 }
 
                 // prevent insertion of non-limited data
@@ -531,22 +526,14 @@ var inputLimiter = function userInputLimier(interaction) {
                 } else {
                     let elements = containerHelper.get(interaction).find('textarea');
                     let el = elements[0];
-                    let {
-                        selectionStart: start,
-                        selectionEnd: end,
-                        value: text
-                    } = el;
-                    elements.val(
-                        text.substring(0, start) +
-                        newValue +
-                        text.substring(end, text.length)
-                    );
+                    let { selectionStart: start, selectionEnd: end, value: text } = el;
+                    elements.val(text.substring(0, start) + newValue + text.substring(end, text.length));
                     el.focus();
                     el.selectionStart = start + newValue.length;
                     el.selectionEnd = el.selectionStart;
                 }
 
-                _.defer(function() {
+                _.defer(function () {
                     self.updateCounter();
                 });
             };
@@ -576,10 +563,7 @@ var inputLimiter = function userInputLimier(interaction) {
                 return 0;
             }
             // leading and trailing white space don't qualify as words
-            return value
-                .trim()
-                .replace(/\s+/gi, ' ')
-                .split(' ').length;
+            return value.trim().replace(/\s+/gi, ' ').split(' ').length;
         },
 
         /**
@@ -601,7 +585,7 @@ var inputLimiter = function userInputLimier(interaction) {
     };
 
     return limiter;
-};
+}
 
 /**
  * return the value of the textarea or ckeditor data
@@ -609,34 +593,31 @@ var inputLimiter = function userInputLimier(interaction) {
  * @param  {Boolean} raw Tells if the returned data does not have to be filtered (i.e. XHTML tags not removed)
  * @return {String}             the value
  */
-var _getTextareaValue = function(interaction, raw) {
+function _getTextareaValue(interaction, raw) {
     if (_getFormat(interaction) === 'xhtml') {
         return _ckEditorData(interaction, raw);
     } else {
-        return containerHelper
-            .get(interaction)
-            .find('textarea')
-            .val();
+        return containerHelper.get(interaction).find('textarea').val();
     }
-};
+}
 
 /**
  * Setting the pattern mask for the input, for browsers which doesn't support this feature
  * @param {jQuery} $element
  * @param {string} pattern
  */
-var _setPattern = function _setPattern($element, pattern) {
+function _setPattern($element, pattern) {
     var patt = new RegExp(pattern);
 
     //test when some data is entering in the input field
     //@todo plug the validator + tooltip
-    $element.on('keyup.commonRenderer', function() {
+    $element.on('keyup.commonRenderer', function () {
         $element.removeClass('field-error');
         if (!patt.test($element.val())) {
             $element.addClass('field-error');
         }
     });
-};
+}
 
 /**
  * Whether or not multiple strings are expected from the candidate to
@@ -645,14 +626,14 @@ var _setPattern = function _setPattern($element, pattern) {
  * @param {Object} interaction - the extended text interaction model
  * @returns {Boolean} true if a multiple
  */
-var _isMultiple = function _isMultiple(interaction) {
+function _isMultiple(interaction) {
     var attributes = interaction.getAttributes();
     var response = interaction.getResponseDeclaration();
     return !!(
         attributes.maxStrings &&
         (response.attr('cardinality') === 'multiple' || response.attr('cardinality') === 'ordered')
     );
-};
+}
 
 /**
  * Instantiate CkEditor for the interaction
@@ -661,14 +642,14 @@ var _isMultiple = function _isMultiple(interaction) {
  * @param {Object} [options = {}] - the CKEditor configuration options
  * @returns {Object} the ckEditor instance (or you'll be in trouble
  */
-var _setUpCKEditor = function _setUpCKEditor(interaction, options) {
+function _setUpCKEditor(interaction, options) {
     var $container = containerHelper.get(interaction);
     var editor = ckEditor.replace($container.find('.text-container')[0], options || {});
     if (editor) {
         $container.data('editor', editor.name);
         return editor;
     }
-};
+}
 
 /**
  * Destroy CKEditor
@@ -676,7 +657,7 @@ var _setUpCKEditor = function _setUpCKEditor(interaction, options) {
  * @param {Object} interaction - the extended text interaction model
  * @param {Object} [options = {}] - the CKEditor configuration options
  */
-var _destroyCkEditor = function _destroyCkEditor(interaction) {
+function _destroyCkEditor(interaction) {
     var $container = containerHelper.get(interaction);
     var name = $container.data('editor');
     var editor;
@@ -687,19 +668,19 @@ var _destroyCkEditor = function _destroyCkEditor(interaction) {
         editor.destroy();
         $container.removeData('editor');
     }
-};
+}
 
 /**
  * Gets the CKEditor instance
  * @param {Object} interaction - the extended text interaction model
  * @returns {Object}  CKEditor instance
  */
-var _getCKEditor = function _getCKEditor(interaction) {
+function _getCKEditor(interaction) {
     var $container = containerHelper.get(interaction);
     var name = $container.data('editor');
 
     return ckEditor.instances[name];
-};
+}
 
 /**
  * get the text content of the ckEditor ( not the entire html )
@@ -707,7 +688,7 @@ var _getCKEditor = function _getCKEditor(interaction) {
  * @param  {Boolean} raw Tells if the returned data does not have to be filtered (i.e. XHTML tags not removed)
  * @returns {string}             text content of the ckEditor
  */
-var _ckEditorData = function _ckEditorData(interaction, raw) {
+function _ckEditorData(interaction, raw) {
     var editor = _getCKEditor(interaction);
     var data = (editor && editor.getData()) || '';
 
@@ -716,33 +697,33 @@ var _ckEditorData = function _ckEditorData(interaction, raw) {
     }
 
     return data;
-};
+}
 
 /**
  * Remove HTML tags from a string
  * @param {String} str
  * @returns {String}
  */
-var _stripTags = function _stripTags(str) {
+function _stripTags(str) {
     var tempNode = document.createElement('div');
     tempNode.innerHTML = str;
     return tempNode.textContent;
-};
+}
 
 /**
  * Get the interaction format
  * @param {Object} interaction - the extended text interaction model
  * @returns {String} format in 'plain', 'xhtml', 'preformatted'
  */
-var _getFormat = function _getFormat(interaction) {
+function _getFormat(interaction) {
     var format = interaction.attr('format');
     if (_.contains(['plain', 'xhtml', 'preformatted'], format)) {
         return format;
     }
     return 'plain';
-};
+}
 
-var enable = function(interaction) {
+function enable(interaction) {
     var $container = containerHelper.get(interaction);
     var editor;
 
@@ -758,9 +739,9 @@ var enable = function(interaction) {
             }
         }
     }
-};
+}
 
-var disable = function(interaction) {
+function disable(interaction) {
     var $container = containerHelper.get(interaction);
     var editor;
 
@@ -776,17 +757,17 @@ var disable = function(interaction) {
             }
         }
     }
-};
+}
 
-var clearText = function(interaction) {
+function clearText(interaction) {
     setText(interaction, '');
-};
+}
 
-var setText = function(interaction, text) {
+function setText(interaction, text) {
     var limiter = inputLimiter(interaction);
     if (_getFormat(interaction) === 'xhtml') {
         try {
-            _getCKEditor(interaction).setData(text, function() {
+            _getCKEditor(interaction).setData(text, function () {
                 if (limiter.enabled) {
                     limiter.updateCounter();
                 }
@@ -795,21 +776,18 @@ var setText = function(interaction, text) {
             console.error('setText error', e);
         }
     } else {
-        containerHelper
-            .get(interaction)
-            .find('textarea')
-            .val(text);
+        containerHelper.get(interaction).find('textarea').val(text);
         if (limiter.enabled) {
             limiter.updateCounter();
         }
     }
-};
+}
 
 /**
  * Clean interaction destroy
  * @param {Object} interaction
  */
-var destroy = function destroy(interaction) {
+function destroy(interaction) {
     var $container = containerHelper.get(interaction);
     var $el = $container.find('input, textarea');
 
@@ -826,7 +804,7 @@ var destroy = function destroy(interaction) {
 
     //remove all references to a cache container
     containerHelper.reset(interaction);
-};
+}
 
 /**
  * Set the interaction state. It could be done anytime with any state.
@@ -834,7 +812,7 @@ var destroy = function destroy(interaction) {
  * @param {Object} interaction - the interaction instance
  * @param {Object} state - the interaction state
  */
-var setState = function setState(interaction, state) {
+function setState(interaction, state) {
     if (_.isObject(state)) {
         if (state.response) {
             try {
@@ -845,7 +823,7 @@ var setState = function setState(interaction, state) {
             }
         }
     }
-};
+}
 
 /**
  * Get the interaction state.
@@ -853,7 +831,7 @@ var setState = function setState(interaction, state) {
  * @param {Object} interaction - the interaction instance
  * @returns {Object} the interaction current state
  */
-var getState = function getState(interaction) {
+function getState(interaction) {
     var state = {};
     var response = interaction.getResponse();
 
@@ -861,9 +839,9 @@ var getState = function getState(interaction) {
         state.response = response;
     }
     return state;
-};
+}
 
-var getCustomData = function(interaction, data) {
+function getCustomData(interaction, data) {
     var pattern = interaction.attr('patternMask'),
         maxWords = parseInt(patternMaskHelper.parsePattern(pattern, 'words')),
         maxLength = parseInt(patternMaskHelper.parsePattern(pattern, 'chars')),
@@ -873,7 +851,7 @@ var getCustomData = function(interaction, data) {
         maxLength: !isNaN(maxLength) ? maxLength : 0,
         attributes: !isNaN(expectedLength) ? { expectedLength: expectedLength * 72 } : undefined
     });
-};
+}
 
 /**
  * Expose the common renderer for the extended text interaction
