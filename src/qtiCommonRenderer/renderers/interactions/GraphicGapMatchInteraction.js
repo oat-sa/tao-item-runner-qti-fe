@@ -602,11 +602,24 @@ var setResponse = function(interaction, response) {
  *
  * @param {object} interaction
  */
+
+function msieversion() {
+    var ua = window.navigator.userAgent;
+    var msie = ua.indexOf('MSIE ');
+
+    if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+        return true;
+    }
+    return false;
+}
+
 var resetResponse = function resetResponse(interaction) {
     _shapesUnSelectable(interaction);
 
     _.forEach(interaction.gapFillers, function(gapFiller) {
-        interactUtils.tapOn(gapFiller.items[2][0]); // this refers to the gapFiller image
+        if (!msieversion()) {
+            interactUtils.tapOn(gapFiller.items[2][0]); // this refers to the gapFiller image
+        }
     });
 };
 
