@@ -54,7 +54,6 @@ var render = function render(interaction) {
 
         var toolbarType = 'extendedText';
         var ckOptions = {
-            extraPlugins: 'onchange',
             language: 'en',
             defaultLanguage: 'en',
             resize_enabled: true,
