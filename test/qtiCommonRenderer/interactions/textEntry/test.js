@@ -28,11 +28,19 @@ define([
         }
     }
 
+    function hasTooltip($input) {
+        return getTooltipText($input) || false;
+    }
+
     function getTooltip($input) {
-        var instance = $input.data('$tooltip');
+        var instance = getTooltipText($input)
         if (instance && instance.popperInstance.popper) {
             return $(instance.popperInstance.popper);
         }
+    }
+
+    function getTooltipText($input) {
+        return $input.data('$tooltip');
     }
 
     QUnit.test('Lenght constraint', function(assert) {
@@ -101,10 +109,6 @@ define([
                     'the container contains a text entry interaction .qti-textEntryInteraction'
                 );
 
-                $input.val('');
-                $input.focus();
-                assert.equal(getTooltipContent($input), __('This is not a valid answer'));
-
                 $input.val('123');
                 $input.keyup();
                 ready();
@@ -143,7 +147,7 @@ define([
 
                 $input.val('');
                 $input.focus();
-                assert.equal(getTooltipContent($input), __('This is not a valid answer'));
+                assert.ok(!hasTooltip($input), 'the error tooltip is hidden in a correct response');
 
                 $input.val('PARIS');
                 $input.keyup();
@@ -151,11 +155,7 @@ define([
             })
             .on('responsechange', function(state) {
                 var $input = $container.find('.qti-interaction.qti-textEntryInteraction');
-                assert.equal(
-                    getTooltipContent($input),
-                    __('This is not a valid answer'),
-                    'the error tooltip is hidden after a correct response'
-                );
+                assert.ok(!hasTooltip($input), 'the error tooltip is hidden in a correct response');
                 ready();
             })
             .init()

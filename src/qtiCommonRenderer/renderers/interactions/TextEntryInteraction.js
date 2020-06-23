@@ -112,6 +112,9 @@ var render = function render(interaction) {
             }
 
             showTooltip($input, messageType, message);
+            if (count && messageType === 'warning') {
+                hideTooltip($input);
+            }
         };
 
         $input
@@ -132,11 +135,13 @@ var render = function render(interaction) {
 
             hideTooltip($input);
 
-            if ($input.val().length && regex.test($input.val())) {
-                $input.removeClass('invalid');
-            } else {
-                $input.addClass('invalid');
-                showTooltip($input, 'error', __('This is not a valid answer'));
+            if ($input.val()) {
+                if (regex.test($input.val())) {
+                    $input.removeClass('invalid');
+                } else {
+                    $input.addClass('invalid');
+                    showTooltip($input, 'error', __('This is not a valid answer'));
+                }
             }
         };
 

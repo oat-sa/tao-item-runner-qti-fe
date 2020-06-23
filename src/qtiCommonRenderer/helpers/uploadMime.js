@@ -56,7 +56,11 @@ var uploadMime = {
                 mime: 'application/vnd.ms-powerpoint',
                 label: __('Microsoft Powerpoint'),
                 equivalent: ['application/vnd.openxmlformats-officedocument.presentationml.presentation']
-            }
+            },
+            { mime: 'application/vnd.oasis.opendocument.text', label: __('OpenDocument text document') },
+            { mime: 'application/vnd.oasis.opendocument.spreadsheet', label: __('OpenDocument spreadsheet document') },
+            { mime: 'text/x-c', label: __('C++ file (.cpp)') },
+            { mime: 'text/pascal', label: __('Pascal file (.pas)') }
         ];
     },
 
