@@ -123,11 +123,15 @@ export default inputs.map(input => {
             {
                 name: 'expressions_helper',
                 generateBundle(options, bundle) {
-                    if (options.name.match(/expressions[\/\\]engine/)) {
+                    console.log(options.name);
+                    if (options.name.match(/expressions[/]engine/)) {
+                        console.log('  MATCH!!!!!');
                         bundle['engine.js'].code = bundle['engine.js'].code.replace(
-                            /expressionProcessors\.hasOwnProperty\('default'\)/,
+                            /Object\.prototype\.hasOwnProperty\.call\(expressionProcessors,.?'default'\)/,
                             false
                         );
+
+    //expressionProcessors = expressionProcessors; // && Object.prototype.hasOwnProperty.call(expressionProcessors, 'default') ? expressionProcessors['default'] : expressionProcessors;
                     }
                 }
             }
