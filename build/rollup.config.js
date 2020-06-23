@@ -18,11 +18,11 @@
 
 import path from 'path';
 import glob from 'glob';
-import alias from 'rollup-plugin-alias';
+import alias from '@rollup/plugin-alias';
 import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
 import istanbul from 'rollup-plugin-istanbul';
-import resolve from 'rollup-plugin-node-resolve';
-import json from 'rollup-plugin-json';
+import resolve from '@rollup/plugin-node-resolve';
+import json from '@rollup/plugin-json';
 import wildcardExternal from '@oat-sa/rollup-plugin-wildcard-external';
 
 const { srcDir, outputDir, aliases } = require('./path');
@@ -34,8 +34,7 @@ const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
  * Define all modules as external, so rollup won't bundle them together.
  */
 const localExternals = inputs.map(
-    input =>
-        `taoQtiItem/${path
+    input => `taoQtiItem/${path
             .relative(srcDir, input)
             .replace(/\\/g, '/')
             .replace(/\.js$/, '')}`
@@ -89,11 +88,15 @@ export default inputs.map(input => {
                 'taoItems/scoring/**',
                 'taoQtiItem/portableElementRegistry/**'
             ]),
-            alias({
-                resolve: ['.js', '.json', '.tpl'],
-                ...aliases
+            resolve({
+                extensions: ['.js', '.json', '.tpl']
             }),
-            resolve(),
+            alias({
+                entries : Object.assign({
+                    resolve: ['.js', '.json', '.tpl'],
+                }, aliases)
+            }),
+
             handlebarsPlugin({
                 handlebars: {
                     id: 'handlebars',
@@ -106,6 +109,7 @@ export default inputs.map(input => {
                 templateExtension: '.tpl'
             }),
             json({
+                namedExport: false,
                 preferConst: false
             }),
             ...(process.env.COVERAGE ? [istanbul({
