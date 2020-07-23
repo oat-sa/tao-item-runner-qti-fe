@@ -54,8 +54,6 @@ var render = function render(interaction) {
 
         var toolbarType = 'extendedText';
         var ckOptions = {
-            language: 'en',
-            defaultLanguage: 'en',
             resize_enabled: true,
             secure: location.protocol === 'https:',
             forceCustomDomain: true
