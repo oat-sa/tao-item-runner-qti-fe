@@ -7,7 +7,6 @@
                 name="response-{{interaction.serial}}"
                 value="{{attributes.identifier}}"
                 tabindex="1"
-                aria-labelledby="choice-{{interaction.serial}}-{{attributes.identifier}}"
             >
             <span class="icon-radio"></span>
             {{else}}
@@ -16,13 +15,12 @@
                 name="response-{{interaction.serial}}"
                 value="{{attributes.identifier}}"
                 tabindex="1"
-                aria-labelledby="choice-{{interaction.serial}}-{{attributes.identifier}}"
             >
             <span class="icon-checkbox"></span>
             {{/if}}
         </label>
         <div class="label-box">
-            <div aria-hidden="true" class="label-content clear" contenteditable="false" id="choice-{{interaction.serial}}-{{attributes.identifier}}">
+            <div class="label-content clear" contenteditable="false" id="choice-{{interaction.serial}}-{{attributes.identifier}}">
                 {{{body}}}
                 <svg class="overlay-answer-eliminator">
                     <line x1="0" y1="100%" x2="100%" y2="0"/>
