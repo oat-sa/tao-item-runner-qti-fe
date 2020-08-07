@@ -7,7 +7,6 @@
                 name="response-{{interaction.serial}}"
                 value="{{attributes.identifier}}"
                 tabindex="1"
-                aria-labelledby="choice-{{interaction.serial}}-{{attributes.identifier}}"
             >
             <span class="icon-radio"></span>
             {{else}}
@@ -16,7 +15,6 @@
                 name="response-{{interaction.serial}}"
                 value="{{attributes.identifier}}"
                 tabindex="1"
-                aria-labelledby="choice-{{interaction.serial}}-{{attributes.identifier}}"
             >
             <span class="icon-checkbox"></span>
             {{/if}}
