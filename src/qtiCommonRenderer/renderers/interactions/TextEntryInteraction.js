@@ -72,6 +72,7 @@ var showTooltip = function showTooltip($input, theme, message) {
  */
 var render = function render(interaction) {
     var attributes = interaction.getAttributes(),
+        baseType = interaction.getResponseDeclaration().attributes.baseType,
         $input = interaction.getContainer(),
         expectedLength,
         updateMaxCharsTooltip,
@@ -79,13 +80,13 @@ var render = function render(interaction) {
         patternMask = interaction.attr('patternMask'),
         maxChars = parseInt(patternMaskHelper.parsePattern(patternMask, 'chars'), 10);
 
-    attributes.baseType = 'integer';
+    // baseType = 'float';
 
     // Setting up baseType
-    if (attributes.baseType) {
-        if (attributes.baseType === 'integer') {
+    if (baseType) {
+        if (baseType === 'integer') {
             $input.attr('inputmode', 'numeric');
-        } else if (attributes.baseType === 'float') {
+        } else if (baseType === 'float') {
             $input.attr('inputmode', 'decimal');
         }
     }
