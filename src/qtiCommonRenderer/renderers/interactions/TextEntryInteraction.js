@@ -80,8 +80,6 @@ var render = function render(interaction) {
         patternMask = interaction.attr('patternMask'),
         maxChars = parseInt(patternMaskHelper.parsePattern(patternMask, 'chars'), 10);
 
-    // baseType = 'float';
-
     // Setting up baseType
     if (baseType) {
         if (baseType === 'integer') {
