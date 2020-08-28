@@ -72,12 +72,20 @@ var showTooltip = function showTooltip($input, theme, message) {
  */
 var render = function render(interaction) {
     var attributes = interaction.getAttributes(),
+        baseType = interaction.getResponseDeclaration().attributes.baseType,
         $input = interaction.getContainer(),
         expectedLength,
         updateMaxCharsTooltip,
         updatePatternMaskTooltip,
         patternMask = interaction.attr('patternMask'),
         maxChars = parseInt(patternMaskHelper.parsePattern(patternMask, 'chars'), 10);
+
+    // Setting up baseType
+        if (baseType === 'integer') {
+            $input.attr('inputmode', 'numeric');
+        } else if (baseType === 'float') {
+            $input.attr('inputmode', 'decimal');
+        }
 
     //setting up the width of the input field
     if (attributes.expectedLength) {
