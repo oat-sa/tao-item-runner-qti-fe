@@ -29,7 +29,7 @@ define([
     'taoQtiItem/qtiItem/core/interactions/MatchInteraction',
     'taoQtiItem/qtiItem/core/interactions/GraphicGapMatchInteraction',
     'taoQtiItem/qtiItem/core/variables/ResponseDeclaration',
-    'taoQtiItem/qtiItem/helper/responseTemplate',
+    'taoQtiItem/qtiItem/helper/responseRules',
 ], function (...args) {
     const [
         QtiItemLoader,
@@ -45,7 +45,7 @@ define([
         MatchInteractionQtiClass,
         GraphicGapMatchInteractionQtiClass,
         ResponseDeclarationQtiClass,
-        responseTemplateHelper,
+        responseRulesHelper,
     ] = args;
 
     QUnit.module('QTI item loader');
@@ -986,7 +986,7 @@ define([
             responseProcessing: {
                 qtiClass: 'responseProcessing',
                 responseRules: [
-                    responseTemplateHelper.responseTemplates.MATCH_CORRECT('testresponse', 'testoutcome'),
+                    responseRulesHelper.responseRules.MATCH_CORRECT('testresponse', 'testoutcome'),
                 ],
                 serial: 'loadItemDataResponseProcessing',
             },
@@ -1091,8 +1091,8 @@ define([
             responseProcessing: {
                 qtiClass: 'responseProcessing',
                 responseRules: [
-                    responseTemplateHelper.responseTemplates.MATCH_CORRECT('testresponse', 'testoutcome'),
-                    responseTemplateHelper.responseTemplates.MATCH_CORRECT('testresponse1', 'testoutcome1'),
+                    responseRulesHelper.responseRules.MATCH_CORRECT('testresponse', 'testoutcome'),
+                    responseRulesHelper.responseRules.MATCH_CORRECT('testresponse1', 'testoutcome1'),
                 ],
                 serial: 'loadItemDataCustomResponseProcessingResponseProcessing',
             },
@@ -1100,7 +1100,7 @@ define([
                 loadItemDataResponse: {
                     identifier: 'testresponse',
                     qtiClass: 'responseDeclaration',
-                    serial: 'lloadItemDataCustomResponseProcessingResponse',
+                    serial: 'loadItemDataCustomResponseProcessingResponse',
                 }
             }
         };
