@@ -142,8 +142,32 @@ var Loader = Class.extend({
                 }
 
                 //important : build responses after all modal feedbacks and outcomes has been loaded, because the simple feedback rules need to reference them
+                let responseRules = data.responseProcessing && data.responseProcessing.responseRules
+                    ? [...data.responseProcessing.responseRules]
+                    : [];
                 for (let i in data.responses) {
-                    const response = this.buildResponse(data.responses[i]);
+                    const responseIdentifier = data.responses[i].identifier;
+                    const responseRuleItemIndex = responseRules.findIndex(({ responseIf: {
+                        expression: {
+                            expressions: [expression = {}] = [],
+                        } = {}
+                    } = {} }) => expression.attributes
+                        && expression.attributes.identifier === responseIdentifier
+                        || (
+                            expression.expressions
+                            && expression.expressions[0]
+                            && expression.expressions[0].attributes
+                            && expression.expressions[0].attributes.identifier === responseIdentifier
+                        )
+                    );
+                    const [responseRule] = responseRuleItemIndex !== -1
+                        ? responseRules.splice(responseRuleItemIndex, 1)
+                        : [];
+
+                    const response = this.buildResponse(
+                        data.responses[i],
+                        responseRule
+                    );
 
                     if (response) {
                         this.item.addResponseDeclaration(response);
@@ -159,7 +183,14 @@ var Loader = Class.extend({
                 }
 
                 if (data.responseProcessing) {
-                    this.item.setResponseProcessing(this.buildResponseProcessing(data.responseProcessing));
+                    const customResponseProcessing = responseRules.length > 0
+                        || (
+                            this.item.responses
+                            && Object.keys(this.item.responses)
+                                .some((responseKey) => !this.item.responses[responseKey].template)
+                        );
+
+                    this.item.setResponseProcessing(this.buildResponseProcessing(data.responseProcessing, customResponseProcessing));
                 }
                 this.item.setNamespaces(data.namespaces);
                 this.item.setSchemaLocations(data.schemaLocations);
@@ -221,10 +252,14 @@ var Loader = Class.extend({
             }
         });
     },
-    buildResponse(data) {
+    buildResponse(data, responseRule) {
         const response = this.buildElement(data);
 
-        response.template = data.howMatch || null;
+        response.template = responseHelper.getTemplateUriFromName(
+            responseHelper.getTemplateNameFromResponseRules(data.identifier, responseRule)
+        )
+            || null;
+
         response.defaultValue = data.defaultValue || null;
         response.correctResponse = data.correctResponses || null;
 
@@ -269,16 +304,14 @@ var Loader = Class.extend({
 
         return outcome;
     },
-    buildResponseProcessing(data) {
+    buildResponseProcessing(data, customResponseProcessing) {
         const rp = this.buildElement(data);
 
-        if (data && data.processingType) {
-            if (data.processingType === 'custom') {
-                rp.xml = data.data;
-                rp.processingType = 'custom';
-            } else {
-                rp.processingType = 'templateDriven';
-            }
+        if (customResponseProcessing) {
+            rp.xml = data.data;
+            rp.processingType = 'custom';
+        } else {
+            rp.processingType = 'templateDriven';
         }
 
         return rp;

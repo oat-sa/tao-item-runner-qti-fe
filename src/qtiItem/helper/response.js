@@ -17,40 +17,66 @@
  *
  */
 import _ from 'lodash';
+import { responseRules as responseRulesHelper } from 'taoQtiItem/qtiItem/helper/responseRules';
 
-var _templateNames = {
+const _templateNames = {
     MATCH_CORRECT: 'http://www.imsglobal.org/question/qti_v2p1/rptemplates/match_correct',
     MAP_RESPONSE: 'http://www.imsglobal.org/question/qti_v2p1/rptemplates/map_response',
     MAP_RESPONSE_POINT: 'http://www.imsglobal.org/question/qti_v2p1/rptemplates/map_response_point',
     NONE: 'no_response_processing'
 };
 
+
 export default {
-    isUsingTemplate: function isUsingTemplate(response, tpl) {
+    isUsingTemplate(response, tpl) {
         if (_.isString(tpl)) {
             if (tpl === response.template || _templateNames[tpl] === response.template) {
                 return true;
             }
         }
+
         return false;
     },
-    isValidTemplateName: function isValidTemplateName(tplName) {
+    isValidTemplateName(tplName) {
         return !!this.getTemplateUriFromName(tplName);
     },
-    getTemplateUriFromName: function getTemplateUriFromName(tplName) {
-        if (_templateNames[tplName]) {
-            return _templateNames[tplName];
-        }
-        return '';
+    getTemplateUriFromName(tplName) {
+        return _templateNames[tplName] || '';
     },
-    getTemplateNameFromUri: function getTemplateNameFromUri(tplUri) {
-        var tplName = '';
-        _.forIn(_templateNames, function(uri, name) {
+    getTemplateNameFromUri(tplUri) {
+        let tplName = '';
+
+        _.forIn(_templateNames, (uri, name) => {
             if (uri === tplUri) {
                 tplName = name;
                 return false;
             }
         });
+
         return tplName;
+    },
+    getTemplateNameFromResponseRules(responseIdentifier, responseRules) {
+        if (!responseRules) {
+            return 'NONE';
+        }
+
+        const {
+            responseIf: {
+                responseRules: [outcomeRules = {}] = [],
+            } = {}
+        } = responseRules;
+        const {
+            attributes: {
+                identifier: outcomeIdentifier,
+            } = {},
+        } = outcomeRules;
+
+        if (!outcomeRules) {
+            return '';
+        }
+
+        return Object.keys(responseRulesHelper).find(
+            (key) => _.isEqual(responseRules, responseRulesHelper[key](responseIdentifier, outcomeIdentifier))
+        );
     }
 };
