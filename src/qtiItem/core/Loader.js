@@ -258,6 +258,7 @@ var Loader = Class.extend({
         response.template = responseHelper.getTemplateUriFromName(
             responseHelper.getTemplateNameFromResponseRules(data.identifier, responseRule)
         )
+            || data.howMatch
             || null;
 
         response.defaultValue = data.defaultValue || null;
