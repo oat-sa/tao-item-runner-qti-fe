@@ -146,8 +146,9 @@ define([
     });
 
     QUnit.test('getTemplateNameFromResponseRules', function (assert) {
-        assert.ok(
-            typeof responseHelper.getTemplateNameFromResponseRules({}, {}) === 'undefined',
+        assert.equal(
+            responseHelper.getTemplateNameFromResponseRules({}, {}),
+            '',
             'return undefined if can not recognize template'
         );
 
