@@ -86,6 +86,8 @@ var render = function render(interaction) {
             $input.attr('inputmode', 'numeric');
         } else if (baseType === 'float') {
             $input.attr('inputmode', 'decimal');
+        } else {
+            $input.attr('inputmode', 'text');
         }
     }
 
