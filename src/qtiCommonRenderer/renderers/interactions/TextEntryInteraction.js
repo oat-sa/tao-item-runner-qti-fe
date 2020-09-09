@@ -72,7 +72,7 @@ var showTooltip = function showTooltip($input, theme, message) {
  */
 var render = function render(interaction) {
     var attributes = interaction.getAttributes(),
-        baseType = interaction.getResponseDeclaration().attributes.baseType,
+        baseType = interaction.getResponseDeclaration().attr('baseType'),
         $input = interaction.getContainer(),
         expectedLength,
         updateMaxCharsTooltip,
