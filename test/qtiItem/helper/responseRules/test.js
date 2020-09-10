@@ -163,6 +163,23 @@ define([
                 ],
             },
         },
+        itemScore: {
+            qtiClass: 'setOutcomeValue',
+            attributes: {
+                identifier: 'SCORE',
+            },
+            expression: {
+                qtiClass: 'sum',
+                expressions: [
+                    {
+                        qtiClass: 'variable',
+                        attributes: {
+                            identifier: `SCORE_${responseIdentifier}`,
+                        },
+                    },
+                ],
+            },
+        }
     };
 
     QUnit.test('MATCH_CORRECT', function (assert) {
@@ -192,6 +209,16 @@ define([
             actual,
             responseRules.MAP_RESPONSE_POINT,
             'build MAP_RESPONSE_POINT response rule'
+        );
+    });
+
+    QUnit.test('itemScore', function (assert) {
+        const actual = responseRulesHelper.itemScore([responseIdentifier]);
+
+        assert.deepEqual(
+            actual,
+            responseRules.itemScore,
+            'build item score response rule'
         );
     });
 });

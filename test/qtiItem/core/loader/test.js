@@ -1115,4 +1115,94 @@ define([
             ready();
         });
     });
+
+    QUnit.test('loadItemData::perInteractionRP=true', function (assert) {
+        const ready = assert.async();
+        const loader = new QtiItemLoader();
+        const data = {
+            body: {
+                body: 'testBody',
+                elements: {},
+            },
+            qtiClass: 'assessmentItem',
+            serial: 'loadItemDataCustomResponseProcessing',
+            responseProcessing: {
+                qtiClass: 'responseProcessing',
+                responseRules: [
+                    responseRulesHelper.responseRules.MATCH_CORRECT('testresponse', 'testoutcome'),
+                    responseRulesHelper.itemScore(['testresponse']),
+                ],
+                serial: 'loadItemDataCustomResponseProcessingResponseProcessing',
+            },
+            responses: {
+                loadItemDataResponse: {
+                    attributes: {
+                        identifier: 'testresponse',
+                    },
+                    identifier: 'testresponse',
+                    qtiClass: 'responseDeclaration',
+                    serial: 'loadItemDataCustomResponseProcessingResponse',
+                }
+            },
+            outcomeDeclaration: {
+                qtiClass: 'outcomeDeclaration',
+            },
+        };
+
+        loader.loadItemData(data, (item) => {
+            assert.equal(
+                item.responseProcessing.processingType,
+                'templateDriven',
+                'loadItemData recognize response processing type'
+            );
+
+            const outcomeSerial = Object.keys(item.outcomes)[0];
+
+            assert.equal(
+                item.outcomes[outcomeSerial].attributes.identifier,
+                `SCORE_testresponse`,
+                'loadItemData create missing outcomes'
+            );
+
+            ready();
+        }, true);
+    });
+
+    QUnit.test('loadItemData::perInteractionRP=false', function (assert) {
+        const ready = assert.async();
+        const loader = new QtiItemLoader();
+        const data = {
+            body: {
+                body: 'testBody',
+                elements: {},
+            },
+            qtiClass: 'assessmentItem',
+            serial: 'loadItemDataCustomResponseProcessing',
+            responseProcessing: {
+                qtiClass: 'responseProcessing',
+                responseRules: [
+                    responseRulesHelper.responseRules.MATCH_CORRECT('testresponse', 'testoutcome'),
+                    responseRulesHelper.itemScore(['testresponse']),
+                ],
+                serial: 'loadItemDataCustomResponseProcessingResponseProcessing',
+            },
+            responses: {
+                loadItemDataResponse: {
+                    identifier: 'testresponse',
+                    qtiClass: 'responseDeclaration',
+                    serial: 'loadItemDataCustomResponseProcessingResponse',
+                }
+            }
+        };
+
+        loader.loadItemData(data, (item) => {
+            assert.equal(
+                item.responseProcessing.processingType,
+                'custom',
+                'loadItemData recognize response processing type'
+            );
+
+            ready();
+        }, false);
+    });
 });
