@@ -81,14 +81,15 @@ var render = function render(interaction) {
         maxChars = parseInt(patternMaskHelper.parsePattern(patternMask, 'chars'), 10);
 
     // Setting up baseType
-    if (baseType) {
-        if (baseType === 'integer') {
+    switch (baseType) {
+        case 'integer':
             $input.attr('inputmode', 'numeric');
-        } else if (baseType === 'float') {
+            break;
+        case 'float':
             $input.attr('inputmode', 'decimal');
-        } else {
+            break;
+        default:
             $input.attr('inputmode', 'text');
-        }
     }
 
     //setting up the width of the input field
