@@ -157,3 +157,23 @@ export const responseRules = {
         },
     }),
 };
+
+export const itemScore = (responseIdentifiers) => {
+    const outcomeExpressions = responseIdentifiers.map((outcomeIdentifier) => ({
+        qtiClass: 'variable',
+        attributes: {
+            identifier: `SCORE_${outcomeIdentifier}`,
+        },
+    }));
+
+    return {
+        qtiClass: 'setOutcomeValue',
+        attributes: {
+            identifier: 'SCORE',
+        },
+        expression: {
+            qtiClass: 'sum',
+            expressions: outcomeExpressions,
+        },
+    };
+};
