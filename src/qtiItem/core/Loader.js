@@ -24,6 +24,7 @@ import Element from 'taoQtiItem/qtiItem/core/Element';
 import xmlNsHandler from 'taoQtiItem/qtiItem/helper/xmlNsHandler';
 import moduleLoader from 'core/moduleLoader';
 import responseHelper from 'taoQtiItem/qtiItem/helper/response';
+import { itemScore as itemScoreHelper } from 'taoQtiItem/qtiItem/helper/responseRules';
 
 /**
  * If a property is given as a serialized JSON object, parse it directly to a JS object
@@ -106,7 +107,7 @@ var Loader = Class.extend({
     getLoadedClasses() {
         return _.keys(this.qti);
     },
-    loadItemData(data, callback) {
+    loadItemData(data, callback, perInteractionRP) {
         this.loadRequiredClasses(data, (Qti) => {
             if (typeof data === 'object' && data.qtiClass === 'assessmentItem') {
                 //unload an item from it's serial (in case of a reload)
@@ -152,7 +153,7 @@ var Loader = Class.extend({
                             expressions: [expression = {}] = [],
                         } = {}
                     } = {} }) => expression.attributes
-                        && expression.attributes.identifier === responseIdentifier
+                    && expression.attributes.identifier === responseIdentifier
                         || (
                             expression.expressions
                             && expression.expressions[0]
@@ -182,13 +183,57 @@ var Loader = Class.extend({
                     }
                 }
 
+                const responseIdentifiers = Object.keys(this.item.responses || {})
+                    .map((responseKey) => this.item.responses[responseKey].attributes.identifier);
+
                 if (data.responseProcessing) {
-                    const customResponseProcessing = responseRules.length > 0
+                    const customResponseProcessing =
+                        (
+                            responseRules.length > 0
+                            && !(
+                                perInteractionRP
+                                && responseRules.length === 1
+                                && _.isEqual(
+                                    responseRules[0],
+                                    itemScoreHelper(
+                                        responseIdentifiers
+                                    )
+                                )
+                            )
+                        )
                         || (
                             this.item.responses
                             && Object.keys(this.item.responses)
                                 .some((responseKey) => !this.item.responses[responseKey].template)
                         );
+
+                    // To migrate old test items to use per interaction response processing
+                    // missing aoutcome declarations should be added
+                    if (!customResponseProcessing && perInteractionRP) {
+                        const outcomes = Object
+                            .keys(this.item.outcomes || {})
+                            .map((outcomesSerial) => this.item.outcomes[outcomesSerial]);
+
+                        _.each(responseIdentifiers, (responseIdentifier) => {
+                            if (!outcomes.find(
+                                ({ attributes: { identifier } }) => identifier === `SCORE_${responseIdentifier}`
+                            )) {
+                                const outcome = this.loadElementData(
+                                    new Qti.outcomeDeclaration(),
+                                    {
+                                        attributes: {
+                                            baseType: 'float',
+                                            cardinality: 'single',
+                                            identifier: `SCORE_${responseIdentifier}`,
+                                        },
+                                        qtiClass: 'outcomeDeclaration',
+                                    }
+                                );
+
+                                this.item.addOutcomeDeclaration(outcome);
+                            }
+                        });
+                    }
 
                     this.item.setResponseProcessing(this.buildResponseProcessing(data.responseProcessing, customResponseProcessing));
                 }
