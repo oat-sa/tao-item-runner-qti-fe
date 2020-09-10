@@ -5,8 +5,22 @@ define([
     'taoQtiItem/runner/qtiItemRunner',
     'json!taoQtiItem/test/samples/json/text-entry-noconstraint.json',
     'json!taoQtiItem/test/samples/json/text-entry-length.json',
-    'json!taoQtiItem/test/samples/json/text-entry-pattern.json'
-], function($, _, __, qtiItemRunner, textEntryData, textEntryLengthConstrainedData, textEntryPatternConstrainedData) {
+    'json!taoQtiItem/test/samples/json/text-entry-pattern.json',
+    'json!taoQtiItem/test/samples/json/text-entry-inputmode-text.json',
+    'json!taoQtiItem/test/samples/json/text-entry-inputmode-integer.json',
+    'json!taoQtiItem/test/samples/json/text-entry-inputmode-float.json'
+], function(
+    $,
+    _,
+    __,
+    qtiItemRunner,
+    textEntryData,
+    textEntryLengthConstrainedData,
+    textEntryPatternConstrainedData,
+    textEntryInputmodeTextData,
+    textEntryInputmodeIntegerData,
+    textEntryInputmodeFloatData
+) {
     'use strict';
 
     var runner;
@@ -175,31 +189,37 @@ define([
     QUnit.cases
         .init([
             {
-                baseType: 'text',
+                title: 'TextEntryInteraction contains inputmode = text',
+                item: textEntryInputmodeTextData,
+                expected: 'text'
             },
             {
-                baseType: 'integer',
+                title: 'TextEntryInteraction contains inputmode = numerical',
+                item: textEntryInputmodeIntegerData,
+                expected: 'numerical'
             },
             {
-                baseType: 'float'
+                title: 'TextEntryInteraction contains inputmode = decimal',
+                item: textEntryInputmodeFloatData,
+                expected: 'decimal'
             }
         ])
         .test('Pattern constraint - inputmode', function(data, assert) {
-            var ready = assert.async();
+            const ready = assert.async();
+            const item = _.cloneDeep(data.item);
 
-            var $container = $('#pattern-constraint-inputmode');
-            textEntryPatternConstrainedData.responses.responseDeclaration.attributes.baseType = data.baseType;
+            const $container = $('#pattern-constraint-inputmode');
 
             assert.equal($container.length, 1, 'the item container exists');
             assert.equal($container.children().length, 0, 'the container has no children');
-            renderMatchInteraction($container, textEntryPatternConstrainedData)
+            renderMatchInteraction($container, item)
                 .then(() => {
                     const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
 
                     assert.equal(
                         $input.attr('inputmode'),
-                        'text',
-                        'TextEntryInteraction contains inputmode = text'
+                        data.expected,
+                        data.title
                     );
                 })
                 .catch(err => {
