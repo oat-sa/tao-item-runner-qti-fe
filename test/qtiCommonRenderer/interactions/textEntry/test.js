@@ -33,7 +33,7 @@ define([
     }
 
     function getTooltip($input) {
-        var instance = getTooltipText($input)
+        var instance = getTooltipText($input);
         if (instance && instance.popperInstance.popper) {
             return $(instance.popperInstance.popper);
         }
@@ -41,6 +41,16 @@ define([
 
     function getTooltipText($input) {
         return $input.data('$tooltip');
+    }
+
+    function renderMatchInteraction($container, state = {}) {
+        return new Promise((resolve, reject) => qtiItemRunner('qti', state)
+            .on('render', function onRenderItem() {
+                resolve(this);
+            })
+            .on('error', reject)
+            .init()
+            .render($container, { state }));
     }
 
     QUnit.test('Lenght constraint', function(assert) {
@@ -162,28 +172,44 @@ define([
             .render($container);
     });
 
-    QUnit.test('Pattern constraint - inputmode', function(assert) {
-        var ready = assert.async();
+    QUnit.cases
+        .init([
+            {
+                baseType: 'text',
+            },
+            {
+                baseType: 'integer',
+            },
+            {
+                baseType: 'float'
+            }
+        ])
+        .test('Pattern constraint - inputmode', function(data, assert) {
+            var ready = assert.async();
 
-        var $container = $('#pattern-constraint-inputmode');
+            var $container = $('#pattern-constraint-inputmode');
+            textEntryPatternConstrainedData.responses.responseDeclaration.attributes.baseType = data.baseType;
 
-        assert.equal($container.length, 1, 'the item container exists');
-        assert.equal($container.children().length, 0, 'the container has no children');
-        runner = qtiItemRunner('qti', textEntryPatternConstrainedData)
-            .on('render', function() {
-                var $input = $container.find('.qti-interaction.qti-textEntryInteraction');
+            assert.equal($container.length, 1, 'the item container exists');
+            assert.equal($container.children().length, 0, 'the container has no children');
+            renderMatchInteraction($container, textEntryPatternConstrainedData)
+                .then(() => {
+                    const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
 
-                assert.equal(
-                    $input.attr('inputmode'),
-                    'text',
-                    'TextEntryInteraction contains inputmode = text'
-                );
-
-                ready();
-            })
-            .init()
-            .render($container);
-    });
+                    assert.equal(
+                        $input.attr('inputmode'),
+                        'text',
+                        'TextEntryInteraction contains inputmode = text'
+                    );
+                })
+                .catch(err => {
+                    assert.pushResult({
+                        result: false,
+                        message: err
+                    });
+                })
+                .then(ready);
+        });
 
     QUnit.test('set/get response', function(assert) {
         var ready = assert.async();
