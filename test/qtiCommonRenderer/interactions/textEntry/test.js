@@ -162,6 +162,29 @@ define([
             .render($container);
     });
 
+    QUnit.test('Pattern constraint - inputmode', function(assert) {
+        var ready = assert.async();
+
+        var $container = $('#pattern-constraint-inputmode');
+
+        assert.equal($container.length, 1, 'the item container exists');
+        assert.equal($container.children().length, 0, 'the container has no children');
+        runner = qtiItemRunner('qti', textEntryPatternConstrainedData)
+            .on('render', function() {
+                var $input = $container.find('.qti-interaction.qti-textEntryInteraction');
+
+                assert.equal(
+                    $input.attr('inputmode'),
+                    'text',
+                    'TextEntryInteraction contains inputmode = text'
+                );
+
+                ready();
+            })
+            .init()
+            .render($container);
+    });
+
     QUnit.test('set/get response', function(assert) {
         var ready = assert.async();
 
