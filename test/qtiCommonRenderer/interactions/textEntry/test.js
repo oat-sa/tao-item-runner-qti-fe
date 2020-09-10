@@ -196,7 +196,7 @@ define([
             {
                 title: 'TextEntryInteraction contains inputmode = numerical',
                 item: textEntryInputmodeIntegerData,
-                expected: 'numerical'
+                expected: 'numeric'
             },
             {
                 title: 'TextEntryInteraction contains inputmode = decimal',
@@ -215,6 +215,8 @@ define([
             renderMatchInteraction($container, item)
                 .then(() => {
                     const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
+
+                    console.log($input.attr('inputmode'), $input);
 
                     assert.equal(
                         $input.attr('inputmode'),
