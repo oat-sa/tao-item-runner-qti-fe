@@ -155,6 +155,7 @@ var _pseudoLabel = function _pseudoLabel(interaction, $container) {
 
         instructionMgr.validateInstructions(interaction, { choice: $choiceBox });
         containerHelper.triggerResponseChangeEvent(interaction);
+        $(input).focus();
     });
 };
 
