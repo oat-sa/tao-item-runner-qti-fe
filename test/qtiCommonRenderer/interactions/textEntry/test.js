@@ -221,7 +221,7 @@ define([
                         data.expected,
                         data.title
                     );
-                    
+
                     itemRunner.clear();
                 })
                 .catch(err => {
