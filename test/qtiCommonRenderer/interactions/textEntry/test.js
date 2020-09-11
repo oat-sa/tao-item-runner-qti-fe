@@ -213,16 +213,16 @@ define([
             assert.equal($container.length, 1, 'the item container exists');
             assert.equal($container.children().length, 0, 'the container has no children');
             renderMatchInteraction($container, item)
-                .then(() => {
+                .then(itemRunner => {
                     const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
-
-                    console.log($input.attr('inputmode'), $input);
 
                     assert.equal(
                         $input.attr('inputmode'),
                         data.expected,
                         data.title
                     );
+                    
+                    itemRunner.clear();
                 })
                 .catch(err => {
                     assert.pushResult({
