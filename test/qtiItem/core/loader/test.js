@@ -55,111 +55,86 @@ define([
         assert.equal(typeof new QtiItemLoader(), 'object', 'The plugin factory produces an instance');
     });
 
-    const pluginApi = [
+    QUnit.cases.init([
         {
-            name: 'init',
             title: 'init',
         },
         {
-            name: 'setClassesLocation',
             title: 'setClassesLocation',
         },
         {
-            name: 'getRequiredClasses',
             title: 'getRequiredClasses',
         },
         {
-            name: 'loadRequiredClasses',
             title: 'loadRequiredClasses',
         },
         {
-            name: 'getLoadedClasses',
             title: 'getLoadedClasses',
         },
         {
-            name: 'loadItemData',
             title: 'loadItemData',
         },
         {
-            name: 'loadAndBuildElement',
             title: 'loadAndBuildElement',
         },
         {
-            name: 'loadElement',
             title: 'loadElement',
         },
         {
-            name: 'loadElements',
             title: 'loadElements',
         },
         {
-            name: 'buildResponse',
             title: 'buildResponse',
         },
         {
-            name: 'buildSimpleFeedbackRule',
             title: 'buildSimpleFeedbackRule',
         },
         {
-            name: 'buildOutcome',
             title: 'buildOutcome',
         },
         {
-            name: 'buildResponseProcessing',
             title: 'buildResponseProcessing',
         },
         {
-            name: 'loadContainer',
             title: 'loadContainer',
         },
         {
-            name: 'buildElement',
             title: 'buildElement',
         },
         {
-            name: 'loadElementData',
             title: 'loadElementData',
         },
         {
-            name: 'loadInteractionData',
             title: 'loadInteractionData',
         },
         {
-            name: 'buildInteractionChoices',
             title: 'buildInteractionChoices',
         },
         {
-            name: 'loadChoiceData',
             title: 'loadChoiceData',
         },
         {
-            name: 'loadObjectData',
             title: 'loadObjectData',
         },
         {
-            name: 'loadMathData',
             title: 'loadMathData',
         },
         {
-            name: 'loadTooltipData',
             title: 'loadTooltipData',
         },
         {
-            name: 'loadPciData',
             title: 'loadPciData',
         },
         {
-            name: 'loadPicData',
             title: 'loadPicData',
         },
-    ];
-    QUnit.cases.init(pluginApi).test('loader API ', function (data, assert) {
+    ]).test('loader API ', function (data, assert) {
         const loader = new QtiItemLoader();
 
         assert.equal(
-            typeof loader[data.name],
+            typeof loader[data.title],
             'function',
-            `The pluginFactory instances expose a "${data.name}" function`
+            `The pluginFactory instances expose a "${data.title}" function`
         );
     });
 
