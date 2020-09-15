@@ -24,7 +24,7 @@ import Element from 'taoQtiItem/qtiItem/core/Element';
 import xmlNsHandler from 'taoQtiItem/qtiItem/helper/xmlNsHandler';
 import moduleLoader from 'core/moduleLoader';
 import responseHelper from 'taoQtiItem/qtiItem/helper/response';
-import { itemScore as itemScoreHelper } from 'taoQtiItem/qtiItem/helper/responseRules';
+import itemScoreHelper from 'taoQtiItem/qtiItem/helper/itemScore';
 
 /**
  * If a property is given as a serialized JSON object, parse it directly to a JS object
@@ -214,7 +214,7 @@ var Loader = Class.extend({
                             .keys(this.item.outcomes || {})
                             .map((outcomesSerial) => this.item.outcomes[outcomesSerial]);
 
-                        _.each(responseIdentifiers, (responseIdentifier) => {
+                        _.forEach(responseIdentifiers, responseIdentifier => {
                             if (!outcomes.find(
                                 ({ attributes: { identifier } }) => identifier === `SCORE_${responseIdentifier}`
                             )) {

@@ -16,7 +16,7 @@
  * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-export const responseRules = {
+export default {
     MATCH_CORRECT: (responseIdentifier, outcomeIdentifier) => ({
         qtiClass: 'responseCondition',
         responseIf: {
@@ -156,24 +156,4 @@ export const responseRules = {
             ],
         },
     }),
-};
-
-export const itemScore = (responseIdentifiers) => {
-    const outcomeExpressions = responseIdentifiers.map((outcomeIdentifier) => ({
-        qtiClass: 'variable',
-        attributes: {
-            identifier: `SCORE_${outcomeIdentifier}`,
-        },
-    }));
-
-    return {
-        qtiClass: 'setOutcomeValue',
-        attributes: {
-            identifier: 'SCORE',
-        },
-        expression: {
-            qtiClass: 'sum',
-            expressions: outcomeExpressions,
-        },
-    };
 };
