@@ -5,8 +5,22 @@ define([
     'taoQtiItem/runner/qtiItemRunner',
     'json!taoQtiItem/test/samples/json/text-entry-noconstraint.json',
     'json!taoQtiItem/test/samples/json/text-entry-length.json',
-    'json!taoQtiItem/test/samples/json/text-entry-pattern.json'
-], function($, _, __, qtiItemRunner, textEntryData, textEntryLengthConstrainedData, textEntryPatternConstrainedData) {
+    'json!taoQtiItem/test/samples/json/text-entry-pattern.json',
+    'json!taoQtiItem/test/samples/json/text-entry-inputmode-text.json',
+    'json!taoQtiItem/test/samples/json/text-entry-inputmode-integer.json',
+    'json!taoQtiItem/test/samples/json/text-entry-inputmode-float.json'
+], function(
+    $,
+    _,
+    __,
+    qtiItemRunner,
+    textEntryData,
+    textEntryLengthConstrainedData,
+    textEntryPatternConstrainedData,
+    textEntryInputmodeTextData,
+    textEntryInputmodeIntegerData,
+    textEntryInputmodeFloatData
+) {
     'use strict';
 
     var runner;
@@ -33,7 +47,7 @@ define([
     }
 
     function getTooltip($input) {
-        var instance = getTooltipText($input)
+        var instance = getTooltipText($input);
         if (instance && instance.popperInstance.popper) {
             return $(instance.popperInstance.popper);
         }
@@ -41,6 +55,16 @@ define([
 
     function getTooltipText($input) {
         return $input.data('$tooltip');
+    }
+
+    function renderMatchInteraction($container, state = {}) {
+        return new Promise((resolve, reject) => qtiItemRunner('qti', state)
+            .on('render', function onRenderItem() {
+                resolve(this);
+            })
+            .on('error', reject)
+            .init()
+            .render($container, { state }));
     }
 
     QUnit.test('Lenght constraint', function(assert) {
@@ -161,6 +185,53 @@ define([
             .init()
             .render($container);
     });
+
+    QUnit.cases
+        .init([
+            {
+                title: 'TextEntryInteraction contains inputmode = text',
+                item: textEntryInputmodeTextData,
+                expected: 'text'
+            },
+            {
+                title: 'TextEntryInteraction contains inputmode = numerical',
+                item: textEntryInputmodeIntegerData,
+                expected: 'numeric'
+            },
+            {
+                title: 'TextEntryInteraction contains inputmode = decimal',
+                item: textEntryInputmodeFloatData,
+                expected: 'decimal'
+            }
+        ])
+        .test('Pattern constraint - inputmode', function(data, assert) {
+            const ready = assert.async();
+            const item = _.cloneDeep(data.item);
+
+            const $container = $('#pattern-constraint-inputmode');
+
+            assert.equal($container.length, 1, 'the item container exists');
+            assert.equal($container.children().length, 0, 'the container has no children');
+            renderMatchInteraction($container, item)
+                .then(itemRunner => {
+                    const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
+
+                    assert.equal(
+                        $input.attr('inputmode'),
+                        data.expected,
+                        data.title
+                    );
+
+                    itemRunner.clear();
+                })
+                .catch(err => {
+                    assert.pushResult({
+                        result: false,
+                        message: err
+                    });
+                })
+                .then(ready);
+        });
 
     QUnit.test('set/get response', function(assert) {
         var ready = assert.async();

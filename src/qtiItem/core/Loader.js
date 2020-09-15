@@ -32,7 +32,7 @@ import itemScoreHelper from 'taoQtiItem/qtiItem/helper/itemScore';
 const loadPortableCustomElementProperties = (portableElement, rawProperties) => {
     var properties = {};
 
-    _.forOwn(rawProperties, function (value, key) {
+    _.forOwn(rawProperties, (value, key) => {
         try {
             properties[key] = JSON.parse(value);
         } catch (e) {
@@ -108,7 +108,7 @@ var Loader = Class.extend({
         return _.keys(this.qti);
     },
     loadItemData(data, callback, perInteractionRP) {
-        this.loadRequiredClasses(data, (Qti) => {
+        this.loadRequiredClasses(data, Qti => {
             if (typeof data === 'object' && data.qtiClass === 'assessmentItem') {
                 //unload an item from it's serial (in case of a reload)
                 if (data.serial) {
