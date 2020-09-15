@@ -17,7 +17,8 @@
  */
 define([
     'taoQtiItem/qtiItem/helper/responseRules',
-], function (responseRulesHelper) {
+    'taoQtiItem/qtiItem/helper/itemScore',
+], function (responseRulesHelper, itemScoreHelper) {
     'use strict';
 
     const responseIdentifier = 'testResponseIdentifier';
@@ -183,7 +184,7 @@ define([
     };
 
     QUnit.test('MATCH_CORRECT', function (assert) {
-        const actual = responseRulesHelper.responseRules.MATCH_CORRECT(responseIdentifier, outcomeIdentifier);
+        const actual = responseRulesHelper.MATCH_CORRECT(responseIdentifier, outcomeIdentifier);
 
         assert.deepEqual(
             actual,
@@ -193,7 +194,7 @@ define([
     });
 
     QUnit.test('MAP_RESPONSE', function (assert) {
-        const actual = responseRulesHelper.responseRules.MAP_RESPONSE(responseIdentifier, outcomeIdentifier);
+        const actual = responseRulesHelper.MAP_RESPONSE(responseIdentifier, outcomeIdentifier);
 
         assert.deepEqual(
             actual,
@@ -203,7 +204,7 @@ define([
     });
 
     QUnit.test('MAP_RESPONSE_POINT', function (assert) {
-        const actual = responseRulesHelper.responseRules.MAP_RESPONSE_POINT(responseIdentifier, outcomeIdentifier);
+        const actual = responseRulesHelper.MAP_RESPONSE_POINT(responseIdentifier, outcomeIdentifier);
 
         assert.deepEqual(
             actual,
@@ -213,7 +214,7 @@ define([
     });
 
     QUnit.test('itemScore', function (assert) {
-        const actual = responseRulesHelper.itemScore([responseIdentifier]);
+        const actual = itemScoreHelper([responseIdentifier]);
 
         assert.deepEqual(
             actual,

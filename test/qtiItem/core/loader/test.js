@@ -30,6 +30,7 @@ define([
     'taoQtiItem/qtiItem/core/interactions/GraphicGapMatchInteraction',
     'taoQtiItem/qtiItem/core/variables/ResponseDeclaration',
     'taoQtiItem/qtiItem/helper/responseRules',
+    'taoQtiItem/qtiItem/helper/itemScore',
 ], function (...args) {
     const [
         QtiItemLoader,
@@ -46,6 +47,7 @@ define([
         GraphicGapMatchInteractionQtiClass,
         ResponseDeclarationQtiClass,
         responseRulesHelper,
+        itemScoreHelper,
     ] = args;
 
     QUnit.module('QTI item loader');
@@ -986,7 +988,7 @@ define([
             responseProcessing: {
                 qtiClass: 'responseProcessing',
                 responseRules: [
-                    responseRulesHelper.responseRules.MATCH_CORRECT('testresponse', 'testoutcome'),
+                    responseRulesHelper.MATCH_CORRECT('testresponse', 'testoutcome'),
                 ],
                 serial: 'loadItemDataResponseProcessing',
             },
@@ -1091,8 +1093,8 @@ define([
             responseProcessing: {
                 qtiClass: 'responseProcessing',
                 responseRules: [
-                    responseRulesHelper.responseRules.MATCH_CORRECT('testresponse', 'testoutcome'),
-                    responseRulesHelper.responseRules.MATCH_CORRECT('testresponse1', 'testoutcome1'),
+                    responseRulesHelper.MATCH_CORRECT('testresponse', 'testoutcome'),
+                    responseRulesHelper.MATCH_CORRECT('testresponse1', 'testoutcome1'),
                 ],
                 serial: 'loadItemDataCustomResponseProcessingResponseProcessing',
             },
@@ -1129,8 +1131,8 @@ define([
             responseProcessing: {
                 qtiClass: 'responseProcessing',
                 responseRules: [
-                    responseRulesHelper.responseRules.MATCH_CORRECT('testresponse', 'testoutcome'),
-                    responseRulesHelper.itemScore(['testresponse']),
+                    responseRulesHelper.MATCH_CORRECT('testresponse', 'testoutcome'),
+                    itemScoreHelper(['testresponse']),
                 ],
                 serial: 'loadItemDataCustomResponseProcessingResponseProcessing',
             },
@@ -1181,8 +1183,8 @@ define([
             responseProcessing: {
                 qtiClass: 'responseProcessing',
                 responseRules: [
-                    responseRulesHelper.responseRules.MATCH_CORRECT('testresponse', 'testoutcome'),
-                    responseRulesHelper.itemScore(['testresponse']),
+                    responseRulesHelper.MATCH_CORRECT('testresponse', 'testoutcome'),
+                    itemScoreHelper(['testresponse']),
                 ],
                 serial: 'loadItemDataCustomResponseProcessingResponseProcessing',
             },
