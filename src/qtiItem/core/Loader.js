@@ -183,7 +183,7 @@ var Loader = Class.extend({
                                 } = data.outcomes[fbData.feedbackOutcome] || {};
                                 response.feedbackRules[serial] = this.buildSimpleFeedbackRule(fbData, response);
 
-                                // feedback response rule from response rules array
+                                // remove feedback response rule from response rules array
                                 const feedbackResponseRuleIndex = responseRules.findIndex(({
                                     responseIf: {
                                         responseRules: [setOutcomeResponseRule = {}] = [],
