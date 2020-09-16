@@ -1093,6 +1093,75 @@ define([
         });
     });
 
+    QUnit.test('loadItemData::feedbackRules', function (assert) {
+        const ready = assert.async();
+        const loader = new QtiItemLoader();
+        const data = {
+            body: {
+                body: 'testBody',
+                elements: {},
+            },
+            qtiClass: 'assessmentItem',
+            serial: 'loadItemDataFeedbackRuleItem',
+            outcomes: {
+                testOutcome: {
+                    attributes: {
+                        identifier: 'testoutcome',
+                    },
+                    qtiClass: 'outcomeDeclaration',
+                    serial: 'feedbackRuleOutcome',
+                },
+            },
+            responseProcessing: {
+                qtiClass: 'responseProcessing',
+                responseRules: [
+                    {
+                        responseIf: {
+                            responseRules: [
+                                {
+                                    attributes: {
+                                        identifier: 'testoutcome',
+                                    },
+                                    qtiClass: 'setOutcomeValue'
+                                }
+                            ],
+                        },
+                    },
+                ],
+                serial: 'loadItemDataFeedbackRuleResponseProcessing',
+            },
+            responses: {
+                loadItemDataResponse: {
+                    identifier: 'testresponse',
+                    qtiClass: 'responseDeclaration',
+                    serial: 'loadItemDataFeedbackRuleResponse',
+                    feedbackRules: {
+                        simpleFeedbackRule: {
+                            comparedOutcome: 'comparedoutcome',
+                            comparedValue: 0,
+                            condition: 'correct',
+                            feedbackElse: '',
+                            feedbackOutcome: 'testOutcome',
+                            feedbackThen: 'feedbackthen',
+                            qtiClass: '_simpleFeedbackRule',
+                            serial: 'feedbackrule',
+                        }
+                    },
+                }
+            }
+        };
+
+        loader.loadItemData(data, (item) => {
+            assert.equal(
+                item.responseProcessing.processingType,
+                'templateDriven',
+                'loadItemData recognize response processing type of item with feedbackrules'
+            );
+
+            ready();
+        });
+    });
+
     QUnit.test('loadItemData::perInteractionRP=true', function (assert) {
         const ready = assert.async();
         const loader = new QtiItemLoader();
