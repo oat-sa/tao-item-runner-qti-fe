@@ -152,7 +152,7 @@ var Loader = Class.extend({
                             expressions: [expression = {}] = [],
                         } = {}
                     } = {} }) => expression.attributes
-                        && expression.attributes.identifier === responseIdentifier
+                    && expression.attributes.identifier === responseIdentifier
                         || (
                             expression.expressions
                             && expression.expressions[0]
@@ -176,7 +176,29 @@ var Loader = Class.extend({
 
                         if (feedbackRules) {
                             _.forIn(feedbackRules, (fbData, serial) => {
+                                const {
+                                    attributes: {
+                                        identifier: feedbackOutcomeIdentifier,
+                                    } = {}
+                                } = data.outcomes[fbData.feedbackOutcome] || {};
                                 response.feedbackRules[serial] = this.buildSimpleFeedbackRule(fbData, response);
+
+                                // feedback response rule from response rules array
+                                const feedbackResponseRuleIndex = responseRules.findIndex(({
+                                    responseIf: {
+                                        responseRules: [setOutcomeResponseRule = {}] = [],
+                                    } = {}
+                                }) => {
+                                    const { attributes = {}, qtiClass } = setOutcomeResponseRule;
+                                    const outcomeIdentifier = attributes.identifier;
+
+                                    return feedbackOutcomeIdentifier === outcomeIdentifier
+                                        && qtiClass === 'setOutcomeValue';
+                                });
+
+                                if (feedbackResponseRuleIndex !== -1) {
+                                    responseRules.splice(feedbackResponseRuleIndex, 1);
+                                }
                             });
                         }
                     }
