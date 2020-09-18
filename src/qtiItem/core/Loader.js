@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-2020 (original work) Open Assessment Technologies SA ;
  *
  */
 //@todo : move this to the ../helper directory
@@ -23,23 +23,51 @@ import qtiClasses from 'taoQtiItem/qtiItem/core/qtiClasses';
 import Element from 'taoQtiItem/qtiItem/core/Element';
 import xmlNsHandler from 'taoQtiItem/qtiItem/helper/xmlNsHandler';
 import moduleLoader from 'core/moduleLoader';
+import responseHelper from 'taoQtiItem/qtiItem/helper/response';
+
+/**
+ * If a property is given as a serialized JSON object, parse it directly to a JS object
+ */
+const loadPortableCustomElementProperties = (portableElement, rawProperties) => {
+    var properties = {};
+
+    _.forOwn(rawProperties, (value, key) => {
+        try {
+            properties[key] = JSON.parse(value);
+        } catch (e) {
+            properties[key] = value;
+        }
+    });
+    portableElement.properties = properties;
+};
+
+const loadPortableCustomElementData = (portableElement, data) => {
+    portableElement.typeIdentifier = data.typeIdentifier;
+    portableElement.markup = data.markup;
+    portableElement.entryPoint = data.entryPoint;
+    portableElement.libraries = data.libraries;
+    portableElement.setNamespace('', data.xmlns);
+
+    loadPortableCustomElementProperties(portableElement, data.properties);
+};
 
 var Loader = Class.extend({
-    init: function(item, classesLocation) {
+    init(item, classesLocation) {
         this.qti = {}; //loaded qti classes are store here
         this.classesLocation = {};
-
         this.item = item || null; //starts either from scratch or with an existing item object
+
         this.setClassesLocation(classesLocation || qtiClasses); //load default location for qti classes model
     },
-    setClassesLocation: function(qtiClasses) {
-        _.extend(this.classesLocation, qtiClasses);
+    setClassesLocation(qtiClassesList) {
+        _.extend(this.classesLocation, qtiClassesList);
+
         return this;
     },
-    getRequiredClasses: function(data) {
-        var ret = [],
-            i;
-        for (i in data) {
+    getRequiredClasses(data) {
+        let ret = [];
+
+        for (let i in data) {
             if (i === 'qtiClass' && data[i] !== '_container' && i !== 'rootElement') {
                 //although a _container is a concrete class in TAO, it is not defined in QTI standard
                 ret.push(data[i]);
@@ -48,113 +76,169 @@ var Loader = Class.extend({
                 ret = _.union(ret, this.getRequiredClasses(data[i]));
             }
         }
+
         return ret;
     },
-    loadRequiredClasses: function(data, callback, reload) {
-        var i;
-        var requiredClass,
-            requiredClasses = this.getRequiredClasses(data, reload),
-            required = [];
+    loadRequiredClasses(data, callback, reload) {
+        let requiredClass;
+        const requiredClasses = this.getRequiredClasses(data, reload);
+        const required = [];
 
-        for (i in requiredClasses) {
+        for (let i in requiredClasses) {
             requiredClass = requiredClasses[i];
             if (this.classesLocation[requiredClass]) {
                 required.push({
-                    module : this.classesLocation[requiredClass],
+                    module: this.classesLocation[requiredClass],
                     category: 'qti'
                 });
             } else {
-                throw new Error('missing qti class location declaration : ' + requiredClass);
+                throw new Error(`missing qti class location declaration : ${requiredClass}`);
             }
         }
 
         moduleLoader([], () => true).addList(required).load().then(loadeded => {
-            loadeded.forEach( QtiClass => {
+            loadeded.forEach(QtiClass => {
                 this.qti[QtiClass.prototype.qtiClass] = QtiClass;
             });
             callback.call(this, this.qti);
         });
     },
-    getLoadedClasses: function() {
+    getLoadedClasses() {
         return _.keys(this.qti);
     },
-    loadItemData: function(data, callback) {
-        var _this = this;
-        _this.loadRequiredClasses(data, function(Qti) {
-            var i;
+    loadItemData(data, callback) {
+        this.loadRequiredClasses(data, Qti => {
             if (typeof data === 'object' && data.qtiClass === 'assessmentItem') {
                 //unload an item from it's serial (in case of a reload)
                 if (data.serial) {
                     Element.unsetElement(data.serial);
                 }
 
-                _this.item = new Qti.assessmentItem(data.serial, data.attributes || {});
-                _this.loadContainer(_this.item.getBody(), data.body);
+                this.item = new Qti.assessmentItem(data.serial, data.attributes || {});
+                this.loadContainer(this.item.getBody(), data.body);
 
-                for (i in data.outcomes) {
-                    var outcome = _this.buildOutcome(data.outcomes[i]);
+                for (let i in data.outcomes) {
+                    const outcome = this.buildOutcome(data.outcomes[i]);
+
                     if (outcome) {
-                        _this.item.addOutcomeDeclaration(outcome);
+                        this.item.addOutcomeDeclaration(outcome);
                     }
                 }
-                for (i in data.feedbacks) {
-                    var feedback = _this.buildElement(data.feedbacks[i]);
+
+                for (let i in data.feedbacks) {
+                    const feedback = this.buildElement(data.feedbacks[i]);
+
                     if (feedback) {
-                        _this.item.addModalFeedback(feedback);
+                        this.item.addModalFeedback(feedback);
                     }
                 }
-                for (i in data.stylesheets) {
-                    var stylesheet = _this.buildElement(data.stylesheets[i]);
+
+                for (let i in data.stylesheets) {
+                    const stylesheet = this.buildElement(data.stylesheets[i]);
+
                     if (stylesheet) {
-                        _this.item.addStylesheet(stylesheet);
+                        this.item.addStylesheet(stylesheet);
                     }
                 }
 
                 //important : build responses after all modal feedbacks and outcomes has been loaded, because the simple feedback rules need to reference them
-                for (i in data.responses) {
-                    var response = _this.buildResponse(data.responses[i]);
-                    if (response) {
-                        _this.item.addResponseDeclaration(response);
+                let responseRules = data.responseProcessing && data.responseProcessing.responseRules
+                    ? [...data.responseProcessing.responseRules]
+                    : [];
+                for (let i in data.responses) {
+                    const responseIdentifier = data.responses[i].identifier;
+                    const responseRuleItemIndex = responseRules.findIndex(({ responseIf: {
+                        expression: {
+                            expressions: [expression = {}] = [],
+                        } = {}
+                    } = {} }) => expression.attributes
+                    && expression.attributes.identifier === responseIdentifier
+                        || (
+                            expression.expressions
+                            && expression.expressions[0]
+                            && expression.expressions[0].attributes
+                            && expression.expressions[0].attributes.identifier === responseIdentifier
+                        )
+                    );
+                    const [responseRule] = responseRuleItemIndex !== -1
+                        ? responseRules.splice(responseRuleItemIndex, 1)
+                        : [];
 
-                        var feedbackRules = data.responses[i].feedbackRules;
+                    const response = this.buildResponse(
+                        data.responses[i],
+                        responseRule
+                    );
+
+                    if (response) {
+                        this.item.addResponseDeclaration(response);
+
+                        const feedbackRules = data.responses[i].feedbackRules;
+
                         if (feedbackRules) {
-                            _.forIn(feedbackRules, function(fbData, serial) {
-                                response.feedbackRules[serial] = _this.buildSimpleFeedbackRule(fbData, response);
+                            _.forIn(feedbackRules, (fbData, serial) => {
+                                const {
+                                    attributes: {
+                                        identifier: feedbackOutcomeIdentifier,
+                                    } = {}
+                                } = data.outcomes[fbData.feedbackOutcome] || {};
+                                response.feedbackRules[serial] = this.buildSimpleFeedbackRule(fbData, response);
+
+                                // remove feedback response rule from response rules array
+                                const feedbackResponseRuleIndex = responseRules.findIndex(({
+                                    responseIf: {
+                                        responseRules: [setOutcomeResponseRule = {}] = [],
+                                    } = {}
+                                }) => {
+                                    const { attributes = {}, qtiClass } = setOutcomeResponseRule;
+                                    const outcomeIdentifier = attributes.identifier;
+
+                                    return feedbackOutcomeIdentifier === outcomeIdentifier
+                                        && qtiClass === 'setOutcomeValue';
+                                });
+
+                                if (feedbackResponseRuleIndex !== -1) {
+                                    responseRules.splice(feedbackResponseRuleIndex, 1);
+                                }
                             });
                         }
                     }
                 }
 
                 if (data.responseProcessing) {
-                    _this.item.setResponseProcessing(_this.buildResponseProcessing(data.responseProcessing));
+                    const customResponseProcessing = responseRules.length > 0
+                        || (
+                            this.item.responses
+                            && Object.keys(this.item.responses)
+                                .some((responseKey) => !this.item.responses[responseKey].template)
+                        );
+
+                    this.item.setResponseProcessing(this.buildResponseProcessing(data.responseProcessing, customResponseProcessing));
                 }
-                _this.item.setNamespaces(data.namespaces);
-                _this.item.setSchemaLocations(data.schemaLocations);
-                _this.item.setApipAccessibility(data.apipAccessibility);
+                this.item.setNamespaces(data.namespaces);
+                this.item.setSchemaLocations(data.schemaLocations);
+                this.item.setApipAccessibility(data.apipAccessibility);
             }
 
             if (typeof callback === 'function') {
-                callback.call(_this, _this.item);
-            }
-        });
-    },
-    loadAndBuildElement: function(data, callback) {
-        var _this = this;
-
-        _this.loadRequiredClasses(data, function(Qti) {
-            var element = _this.buildElement(data);
-
-            if (typeof callback === 'function') {
-                callback.call(_this, element);
+                callback.call(this, this.item);
             }
         });
     },
-    loadElement: function(element, data, callback) {
-        var _this = this;
-        this.loadRequiredClasses(data, function() {
-            _this.loadElementData(element, data);
+    loadAndBuildElement(data, callback) {
+        this.loadRequiredClasses(data, () => {
+            const element = this.buildElement(data);
+
             if (typeof callback === 'function') {
-                callback.call(_this, element);
+                callback.call(this, element);
+            }
+        });
+    },
+    loadElement(element, data, callback) {
+        this.loadRequiredClasses(data, () => {
+            this.loadElementData(element, data);
+
+            if (typeof callback === 'function') {
+                callback.call(this, element);
             }
         });
     },
@@ -166,35 +250,39 @@ var Loader = Class.extend({
      * @param {function} callback
      * @returns {undefined}
      */
-    loadElements: function(data, callback) {
-        var _this = this;
+    loadElements(data, callback) {
+        if (!this.item) {
+            throw new Error('QtiLoader : cannot load elements in empty item');
+        }
 
-        if (_this.item) {
-            this.loadRequiredClasses(data, function() {
-                var allElements = _this.item.getComposingElements();
+        this.loadRequiredClasses(data, () => {
+            const allElements = this.item.getComposingElements();
 
-                for (var i in data) {
-                    var elementData = data[i];
-                    if (elementData && elementData.qtiClass && elementData.serial) {
-                        //find and update element
-                        if (allElements[elementData.serial]) {
-                            _this.loadElementData(allElements[elementData.serial], elementData);
-                        }
+            for (let i in data) {
+                const elementData = data[i];
+
+                if (elementData && elementData.qtiClass && elementData.serial) {
+                    //find and update element
+                    if (allElements[elementData.serial]) {
+                        this.loadElementData(allElements[elementData.serial], elementData);
                     }
                 }
+            }
 
-                if (typeof callback === 'function') {
-                    callback.call(_this, _this.item);
-                }
-            });
-        } else {
-            throw 'QtiLoader : cannot load elements in empty item';
-        }
+            if (typeof callback === 'function') {
+                callback.call(this, this.item);
+            }
+        });
     },
-    buildResponse: function(data) {
-        var response = this.buildElement(data);
+    buildResponse(data, responseRule) {
+        const response = this.buildElement(data);
 
-        response.template = data.howMatch || null;
+        response.template = responseHelper.getTemplateUriFromName(
+            responseHelper.getTemplateNameFromResponseRules(data.identifier, responseRule)
+        )
+            || data.howMatch
+            || null;
+
         response.defaultValue = data.defaultValue || null;
         response.correctResponse = data.correctResponses || null;
 
@@ -210,8 +298,8 @@ var Loader = Class.extend({
 
         return response;
     },
-    buildSimpleFeedbackRule: function(data, response) {
-        var feedbackRule = this.buildElement(data);
+    buildSimpleFeedbackRule(data, response) {
+        const feedbackRule = this.buildElement(data);
 
         feedbackRule.setCondition(response, data.condition, data.comparedValue || null);
 
@@ -221,74 +309,76 @@ var Loader = Class.extend({
         feedbackRule.feedbackElse = this.item.modalFeedbacks[data.feedbackElse] || null;
 
         //associate the compared outcome to the feedbacks if applicable
-        var response = feedbackRule.comparedOutcome;
+        const comparedOutcome = feedbackRule.comparedOutcome;
+
         if (feedbackRule.feedbackThen) {
-            feedbackRule.feedbackThen.data('relatedResponse', response);
+            feedbackRule.feedbackThen.data('relatedResponse', comparedOutcome);
         }
+
         if (feedbackRule.feedbackElse) {
-            feedbackRule.feedbackElse.data('relatedResponse', response);
+            feedbackRule.feedbackElse.data('relatedResponse', comparedOutcome);
         }
 
         return feedbackRule;
     },
-    buildOutcome: function(data) {
-        var outcome = this.buildElement(data);
+    buildOutcome(data) {
+        const outcome = this.buildElement(data);
         outcome.defaultValue = data.defaultValue || null;
+
         return outcome;
     },
-    buildResponseProcessing: function(data) {
-        var rp = this.buildElement(data);
-        if (data && data.processingType) {
-            if (data.processingType === 'custom') {
-                rp.xml = data.data;
-                rp.processingType = 'custom';
-            } else {
-                rp.processingType = 'templateDriven';
-            }
-        }
-        return rp;
-    },
-    loadContainer: function(bodyObject, bodyData) {
-        if (!Element.isA(bodyObject, '_container')) {
-            throw 'bodyObject must be a QTI Container';
+    buildResponseProcessing(data, customResponseProcessing) {
+        const rp = this.buildElement(data);
+
+        if (customResponseProcessing) {
+            rp.xml = data.data;
+            rp.processingType = 'custom';
+        } else {
+            rp.processingType = 'templateDriven';
         }
 
-        if (
-            bodyData &&
-            typeof bodyData.body === 'string' &&
-            (typeof bodyData.elements === 'array' || typeof bodyData.elements === 'object')
-        ) {
-            for (var serial in bodyData.elements) {
-                var eltData = bodyData.elements[serial];
-                //check if class is loaded:
-                var element = this.buildElement(eltData);
-                if (element) {
-                    bodyObject.setElement(element, bodyData.body);
-                }
-            }
-            bodyObject.body(xmlNsHandler.stripNs(bodyData.body));
-        } else {
-            throw 'wrong bodydata format';
-        }
+        return rp;
     },
-    buildElement: function(elementData) {
-        var elt = null;
-        if (elementData && elementData.qtiClass && elementData.serial) {
-            var className = elementData.qtiClass;
-            if (this.qti[className]) {
-                elt = new this.qti[className](elementData.serial);
-                this.loadElementData(elt, elementData);
-            } else {
-                throw 'the qti element class does not exist: ' + className;
-            }
-        } else {
-            throw 'wrong elementData format';
+    loadContainer(bodyObject, bodyData) {
+        if (!Element.isA(bodyObject, '_container')) {
+            throw new Error('bodyObject must be a QTI Container');
         }
+
+        if (!(bodyData && typeof bodyData.body === 'string' && typeof bodyData.elements === 'object')) {
+            throw new Error('wrong bodydata format');
+        }
+
+        for (let serial in bodyData.elements) {
+            const eltData = bodyData.elements[serial];
+            const element = this.buildElement(eltData);
+
+            //check if class is loaded:
+            if (element) {
+                bodyObject.setElement(element, bodyData.body);
+            }
+        }
+
+        bodyObject.body(xmlNsHandler.stripNs(bodyData.body));
+    },
+    buildElement(elementData) {
+        if (!(elementData && elementData.qtiClass && elementData.serial)) {
+            throw new Error('wrong elementData format');
+        }
+
+        const className = elementData.qtiClass;
+
+        if (!this.qti[className]) {
+            throw new Error(`the qti element class does not exist: ${className}`);
+        }
+
+        const elt = new this.qti[className](elementData.serial);
+        this.loadElementData(elt, elementData);
+
         return elt;
     },
-    loadElementData: function(element, data) {
+    loadElementData(element, data) {
         //merge attributes when loading element data
-        var attributes = _.defaults(data.attributes || {}, element.attributes || {});
+        const attributes = _.defaults(data.attributes || {}, element.attributes || {});
         element.setAttributes(attributes);
 
         if (element.body && data.body) {
@@ -317,7 +407,7 @@ var Loader = Class.extend({
 
         return element;
     },
-    loadInteractionData: function(interaction, data) {
+    loadInteractionData(interaction, data) {
         if (Element.isA(interaction, 'blockInteraction')) {
             if (data.prompt) {
                 this.loadContainer(interaction.prompt.getBody(), data.prompt);
@@ -330,25 +420,29 @@ var Loader = Class.extend({
             this.loadPciData(interaction, data);
         }
     },
-    buildInteractionChoices: function(interaction, data) {
-        //note: Qti.ContainerInteraction (Qti.GapMatchInteraction and Qti.HottextInteraction) has already been parsed by builtElement(interacionData);
+    buildInteractionChoices(interaction, data) {
+        // note: Qti.ContainerInteraction (Qti.GapMatchInteraction and Qti.HottextInteraction) has already been parsed by builtElement(interacionData);
         if (data.choices) {
             if (Element.isA(interaction, 'matchInteraction')) {
-                for (var set = 0; set < 2; set++) {
+                for (let set = 0; set < 2; set++) {
                     if (!data.choices[set]) {
-                        throw 'missing match set #' + set;
+                        throw new Error(`missing match set #${set}`);
                     }
-                    var matchSet = data.choices[set];
-                    for (var serial in matchSet) {
-                        var choice = this.buildElement(matchSet[serial]);
+
+                    const matchSet = data.choices[set];
+
+                    for (let serial in matchSet) {
+                        const choice = this.buildElement(matchSet[serial]);
+
                         if (choice) {
                             interaction.addChoice(choice, set);
                         }
                     }
                 }
             } else {
-                for (var serial in data.choices) {
-                    var choice = this.buildElement(data.choices[serial]);
+                for (let serial in data.choices) {
+                    const choice = this.buildElement(data.choices[serial]);
+
                     if (choice) {
                         interaction.addChoice(choice);
                     }
@@ -357,8 +451,9 @@ var Loader = Class.extend({
 
             if (Element.isA(interaction, 'graphicGapMatchInteraction')) {
                 if (data.gapImgs) {
-                    for (var serial in data.gapImgs) {
-                        var gapImg = this.buildElement(data.gapImgs[serial]);
+                    for (let serial in data.gapImgs) {
+                        const gapImg = this.buildElement(data.gapImgs[serial]);
+
                         if (gapImg) {
                             interaction.addGapImg(gapImg);
                         }
@@ -367,7 +462,7 @@ var Loader = Class.extend({
             }
         }
     },
-    loadChoiceData: function(choice, data) {
+    loadChoiceData(choice, data) {
         if (Element.isA(choice, 'textVariableChoice')) {
             choice.val(data.text);
         } else if (Element.isA(choice, 'gapImg')) {
@@ -381,8 +476,9 @@ var Loader = Class.extend({
             //has already been taken care of in buildElement()
         }
     },
-    loadObjectData: function(object, data) {
+    loadObjectData(object, data) {
         object.setAttributes(data.attributes);
+
         //@todo: manage object like a container
         if (data._alt) {
             if (data._alt.qtiClass === 'object') {
@@ -392,49 +488,23 @@ var Loader = Class.extend({
             }
         }
     },
-    loadMathData: function(math, data) {
+    loadMathData(math, data) {
         math.ns = data.ns || {};
         math.setMathML(data.mathML || '');
-        _.forIn(data.annotations || {}, function(value, encoding) {
+        _.forIn(data.annotations || {}, (value, encoding) => {
             math.setAnnotation(encoding, value);
         });
     },
-    loadTooltipData: function(tooltip, data) {
+    loadTooltipData(tooltip, data) {
         tooltip.content(data.content);
     },
-    loadPciData: function(pci, data) {
+    loadPciData(pci, data) {
         loadPortableCustomElementData(pci, data);
     },
-    loadPicData: function(pic, data) {
+    loadPicData(pic, data) {
         loadPortableCustomElementData(pic, data);
     }
 });
-
-function loadPortableCustomElementData(portableElement, data) {
-    portableElement.typeIdentifier = data.typeIdentifier;
-    portableElement.markup = data.markup;
-    portableElement.entryPoint = data.entryPoint;
-    portableElement.libraries = data.libraries;
-    portableElement.setNamespace('', data.xmlns);
-
-    loadPortableCustomElementProperties(portableElement, data.properties);
-}
-
-/**
- * If a property is given as a serialized JSON object, parse it directly to a JS object
- */
-function loadPortableCustomElementProperties(portableElement, rawProperties) {
-    var properties = {};
-
-    _.forOwn(rawProperties, function(value, key) {
-        try {
-            properties[key] = JSON.parse(value);
-        } catch (e) {
-            properties[key] = value;
-        }
-    });
-    portableElement.properties = properties;
-}
 
 export default Loader;
 
