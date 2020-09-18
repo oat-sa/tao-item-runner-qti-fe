@@ -1202,14 +1202,6 @@ define([
                 'loadItemData recognize response processing type'
             );
 
-            const outcomeSerial = Object.keys(item.outcomes)[0];
-
-            assert.equal(
-                item.outcomes[outcomeSerial].attributes.identifier,
-                `SCORE_testresponse`,
-                'loadItemData create missing outcomes'
-            );
-
             ready();
         }, true);
     });
