@@ -229,34 +229,6 @@ var Loader = Class.extend({
                                 .some((responseKey) => !this.item.responses[responseKey].template)
                         );
 
-                    // To migrate old test items to use per interaction response processing
-                    // missing aoutcome declarations should be added
-                    if (!customResponseProcessing && perInteractionRP) {
-                        const outcomes = Object
-                            .keys(this.item.outcomes || {})
-                            .map((outcomesSerial) => this.item.outcomes[outcomesSerial]);
-
-                        _.forEach(responseIdentifiers, responseIdentifier => {
-                            if (!outcomes.find(
-                                ({ attributes: { identifier } }) => identifier === `SCORE_${responseIdentifier}`
-                            )) {
-                                const outcome = this.loadElementData(
-                                    new Qti.outcomeDeclaration(),
-                                    {
-                                        attributes: {
-                                            baseType: 'float',
-                                            cardinality: 'single',
-                                            identifier: `SCORE_${responseIdentifier}`,
-                                        },
-                                        qtiClass: 'outcomeDeclaration',
-                                    }
-                                );
-
-                                this.item.addOutcomeDeclaration(outcome);
-                            }
-                        });
-                    }
-
                     this.item.setResponseProcessing(this.buildResponseProcessing(data.responseProcessing, customResponseProcessing));
                 }
                 this.item.setNamespaces(data.namespaces);
