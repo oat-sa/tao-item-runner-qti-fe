@@ -98,8 +98,6 @@ var render = function render(interaction) {
                     renderTo: $('.media-container', $container)
                 })
                     .on('render', function() {
-                        resize();
-
                         $(window)
                             .off('resize.mediaInteraction')
                             .on('resize.mediaInteraction', resize);
