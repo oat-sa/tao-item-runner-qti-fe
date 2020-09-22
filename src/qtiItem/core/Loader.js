@@ -107,7 +107,7 @@ var Loader = Class.extend({
     getLoadedClasses() {
         return _.keys(this.qti);
     },
-    loadItemData(data, callback, perInteractionRP) {
+    loadItemData(data, callback) {
         this.loadRequiredClasses(data, Qti => {
             if (typeof data === 'object' && data.qtiClass === 'assessmentItem') {
                 //unload an item from it's serial (in case of a reload)
@@ -213,8 +213,7 @@ var Loader = Class.extend({
                         (
                             responseRules.length > 0
                             && !(
-                                perInteractionRP
-                                && responseRules.length === 1
+                                responseRules.length === 1
                                 && _.isEqual(
                                     responseRules[0],
                                     itemScoreHelper(
