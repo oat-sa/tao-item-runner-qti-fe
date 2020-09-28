@@ -16,7 +16,7 @@
  * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-export const responseRules = {
+export default {
     MATCH_CORRECT: (responseIdentifier, outcomeIdentifier) => ({
         qtiClass: 'responseCondition',
         responseIf: {

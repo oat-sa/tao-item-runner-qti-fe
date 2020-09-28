@@ -17,7 +17,7 @@
  *
  */
 import _ from 'lodash';
-import { responseRules as responseRulesHelper } from 'taoQtiItem/qtiItem/helper/responseRules';
+import responseRulesHelper from 'taoQtiItem/qtiItem/helper/responseRules';
 
 const _templateNames = {
     MATCH_CORRECT: 'http://www.imsglobal.org/question/qti_v2p1/rptemplates/match_correct',

@@ -24,6 +24,7 @@ import Element from 'taoQtiItem/qtiItem/core/Element';
 import xmlNsHandler from 'taoQtiItem/qtiItem/helper/xmlNsHandler';
 import moduleLoader from 'core/moduleLoader';
 import responseHelper from 'taoQtiItem/qtiItem/helper/response';
+import itemScoreHelper from 'taoQtiItem/qtiItem/helper/itemScore';
 
 /**
  * If a property is given as a serialized JSON object, parse it directly to a JS object
@@ -204,8 +205,23 @@ var Loader = Class.extend({
                     }
                 }
 
+                const responseIdentifiers = Object.keys(this.item.responses || {})
+                    .map((responseKey) => this.item.responses[responseKey].attributes.identifier);
+
                 if (data.responseProcessing) {
-                    const customResponseProcessing = responseRules.length > 0
+                    const customResponseProcessing =
+                        (
+                            responseRules.length > 0
+                            && !(
+                                responseRules.length === 1
+                                && _.isEqual(
+                                    responseRules[0],
+                                    itemScoreHelper(
+                                        responseIdentifiers
+                                    )
+                                )
+                            )
+                        )
                         || (
                             this.item.responses
                             && Object.keys(this.item.responses)
