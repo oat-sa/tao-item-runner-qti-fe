@@ -99,7 +99,7 @@ var render = function render(interaction) {
                 })
                     .on('render', function() {
                         $(window)
-                            .off('resize.mediaInteraction');
+         $(window).off('resize.mediaInteraction');
 
                         /**
                          * @event playerrendered
