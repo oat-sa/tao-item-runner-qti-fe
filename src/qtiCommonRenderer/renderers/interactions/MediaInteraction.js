@@ -66,21 +66,6 @@ var render = function render(interaction) {
             return maxPlays === 0 || maxPlays > current;
         };
 
-        /**
-         * Resize video player elements to fit container size
-         * @param {Object} mediaElement - player instance
-         * @param {jQueryElement} $container   - container element to adapt
-         */
-        var resize = _.debounce(function resize() {
-            var width, height;
-            if (interaction.mediaElement) {
-                height = $container.find('.media-container').height();
-                width = $container.find('.media-container').width();
-
-                interaction.mediaElement.resize(width, height);
-            }
-        }, 200);
-
         //intialize the player if not yet done
         var initMediaPlayer = function initMediaPlayer() {
             if (!interaction.mediaElement) {
@@ -98,9 +83,6 @@ var render = function render(interaction) {
                     renderTo: $('.media-container', $container)
                 })
                     .on('render', function() {
-                        $(window)
-         $(window).off('resize.mediaInteraction');
-
                         /**
                          * @event playerrendered
                          */
