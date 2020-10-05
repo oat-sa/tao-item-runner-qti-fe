@@ -3,26 +3,26 @@ define([
     'lodash',
     'taoQtiItem/runner/qtiItemRunner',
     'json!taoQtiItem/test/samples/json/space-shuttle.json'
-], function ($, _, qtiItemRunner, itemData) {
+], function($, _, qtiItemRunner, itemData) {
     'use strict';
 
     var runner;
     var containerId = 'item-container';
 
     QUnit.module('Init', {
-        afterEach: function (assert) {
+        afterEach: function(assert) {
             if (runner) {
                 runner.clear();
             }
         }
     });
 
-    QUnit.test('Item data loading', function (assert) {
+    QUnit.test('Item data loading', function(assert) {
         var ready = assert.async();
         assert.expect(2);
 
         runner = qtiItemRunner('qti', itemData)
-            .on('init', function () {
+            .on('init', function() {
                 assert.ok(typeof this._item === 'object', 'The item data is loaded and mapped to an object');
                 assert.ok(typeof this._item.bdy === 'object', 'The item contains a body object');
 
@@ -32,14 +32,14 @@ define([
     });
 
     QUnit.module('Render', {
-        afterEach: function (assert) {
+        afterEach: function(assert) {
             if (runner) {
                 runner.clear();
             }
         }
     });
 
-    QUnit.test('Item rendering', function (assert) {
+    QUnit.test('Item rendering', function(assert) {
         var ready = assert.async();
         assert.expect(3);
 
@@ -49,7 +49,7 @@ define([
         assert.equal(container.children.length, 0, 'the container has no children');
 
         runner = qtiItemRunner('qti', itemData)
-            .on('render', function () {
+            .on('render', function() {
                 assert.equal(container.children.length, 1, 'the container has children');
 
                 ready();
@@ -60,7 +60,7 @@ define([
 
     QUnit.module('Clear');
 
-    QUnit.test('Clear Item', function (assert) {
+    QUnit.test('Clear Item', function(assert) {
         var ready = assert.async();
         assert.expect(4);
 
@@ -70,12 +70,12 @@ define([
         assert.equal(container.children.length, 0, 'the container has no children');
 
         runner = qtiItemRunner('qti', itemData)
-            .on('render', function () {
+            .on('render', function() {
                 assert.equal(container.children.length, 1, 'the container has children');
 
                 this.clear();
             })
-            .on('clear', function () {
+            .on('clear', function() {
                 assert.equal(container.children.length, 0, 'the container children are removed');
 
                 ready();
@@ -85,14 +85,14 @@ define([
     });
 
     QUnit.module('State', {
-        afterEach: function (assert) {
+        afterEach: function(assert) {
             if (runner) {
                 runner.clear();
             }
         }
     });
 
-    QUnit.test('get state after changes', function (assert) {
+    QUnit.test('get state after changes', function(assert) {
         var ready = assert.async();
         assert.expect(12);
 
@@ -101,10 +101,10 @@ define([
         assert.ok(container instanceof HTMLElement, 'the item container exists');
 
         runner = qtiItemRunner('qti', itemData)
-            .on('error', function (e) {
+            .on('error', function(e) {
                 console.error(e);
             })
-            .on('render', function () {
+            .on('render', function() {
                 //Default state
                 var state = this.getState();
 
@@ -114,6 +114,8 @@ define([
 
                 //Change something
                 $('[data-identifier="Discovery"]', $(container)).click();
+
+                //Debugger;
 
                 state = this.getState();
 
@@ -138,7 +140,7 @@ define([
             .render(container);
     });
 
-    QUnit.test('set state', function (assert) {
+    QUnit.test('set state', function(assert) {
         var ready = assert.async();
         assert.expect(3);
 
@@ -147,7 +149,7 @@ define([
         assert.ok(container instanceof HTMLElement, 'the item container exists');
 
         runner = qtiItemRunner('qti', itemData)
-            .on('render', function () {
+            .on('render', function() {
                 assert.ok(
                     !$('[data-identifier="Atlantis"] input', $(container)).prop('checked'),
                     'The choice is not checked'
@@ -166,7 +168,7 @@ define([
             .render(container);
     });
 
-    QUnit.test('set multiple  states', function (assert) {
+    QUnit.test('set multiple  states', function(assert) {
         var ready = assert.async();
         assert.expect(8);
 
@@ -175,7 +177,7 @@ define([
         assert.ok(container instanceof HTMLElement, 'the item container exists');
 
         runner = qtiItemRunner('qti', itemData)
-            .on('render', function () {
+            .on('render', function() {
                 assert.ok(
                     !$('[data-identifier="Atlantis"] input', $(container)).prop('checked'),
                     'The choice is not checked'
@@ -221,7 +223,7 @@ define([
             .render(container);
     });
 
-    QUnit.test('listen state changes', function (assert) {
+    QUnit.test('listen state changes', function(assert) {
         var ready = assert.async();
         assert.expect(10);
 
@@ -230,7 +232,7 @@ define([
         assert.ok(container instanceof HTMLElement, 'the item container exists');
 
         runner = qtiItemRunner('qti', itemData)
-            .on('statechange', function (state) {
+            .on('statechange', function(state) {
                 assert.ok(
                     $('[data-identifier="Atlantis"] input', $(container)).prop('checked'),
                     'The choice is checked'
@@ -243,7 +245,7 @@ define([
 
                 ready();
             })
-            .on('render', function () {
+            .on('render', function() {
                 var state = this.getState();
 
                 assert.ok(typeof state === 'object', 'the state is an object');
@@ -262,14 +264,14 @@ define([
     });
 
     QUnit.module('Get responses', {
-        afterEach: function (assert) {
+        afterEach: function(assert) {
             if (runner) {
                 runner.clear();
             }
         }
     });
 
-    QUnit.test('no responses set', function (assert) {
+    QUnit.test('no responses set', function(assert) {
         var ready = assert.async();
         assert.expect(4);
 
@@ -278,7 +280,7 @@ define([
         assert.ok(container instanceof HTMLElement, 'the item container exists');
 
         runner = qtiItemRunner('qti', itemData)
-            .on('render', function () {
+            .on('render', function() {
                 var responses = this.getResponses();
 
                 assert.ok(typeof responses === 'object', 'the response is an object');
@@ -294,7 +296,7 @@ define([
             .render(container);
     });
 
-    QUnit.test('get responses after changes', function (assert) {
+    QUnit.test('get responses after changes', function(assert) {
         var ready = assert.async();
         assert.expect(7);
 
@@ -303,7 +305,7 @@ define([
         assert.ok(container instanceof HTMLElement, 'the item container exists');
 
         runner = qtiItemRunner('qti', itemData)
-            .on('render', function () {
+            .on('render', function() {
                 var responses = this.getResponses();
 
                 assert.ok(typeof responses === 'object', 'the response is an object');
