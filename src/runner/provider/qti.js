@@ -42,7 +42,7 @@ var timeout = (context.timeout > 0 ? context.timeout + 1 : 30) * 1000;
  * @exports taoQtiItem/runner/provider/qti
  */
 var qtiItemRuntimeProvider = {
-    init: function(itemData, done) {
+    init: function (itemData, done) {
         var self = this;
 
         var rendererOptions = _.merge(
@@ -58,13 +58,13 @@ var qtiItemRuntimeProvider = {
 
         this._loader = new QtiLoader();
 
-        this._loader.loadItemData(itemData, function(item) {
+        this._loader.loadItemData(itemData, function (item) {
             if (!item) {
                 return self.trigger('error', 'Unable to load item from the given data.');
             }
 
             self._item = item;
-            self._renderer.load(function() {
+            self._renderer.load(function () {
                 self._item.setRenderer(this);
 
                 done();
@@ -72,7 +72,7 @@ var qtiItemRuntimeProvider = {
         });
     },
 
-    render: function(elt, done, options) {
+    render: function (elt, done, options) {
         var self = this;
 
         options = _.defaults(options || {}, { state: {} });
@@ -107,7 +107,7 @@ var qtiItemRuntimeProvider = {
                 // postRendering waits for everything to be resolved or one reject
                 Promise.race([
                     Promise.all(this._item.postRender(options)),
-                    new Promise(function(resolve, reject) {
+                    new Promise(function (resolve, reject) {
                         _.delay(
                             reject,
                             timeout,
@@ -117,19 +117,19 @@ var qtiItemRuntimeProvider = {
                         );
                     })
                 ])
-                    .then(function() {
+                    .then(function () {
                         $(elt)
                             .off('responseChange')
-                            .on('responseChange', function() {
+                            .on('responseChange', function () {
                                 self.trigger('statechange', self.getState());
                                 self.trigger('responsechange', self.getResponses());
                             })
                             .off('endattempt')
-                            .on('endattempt', function(e, responseIdentifier) {
+                            .on('endattempt', function (e, responseIdentifier) {
                                 self.trigger('endattempt', responseIdentifier || e.originalEvent.detail);
                             })
                             .off('themechange')
-                            .on('themechange', function(e, themeName) {
+                            .on('themechange', function (e, themeName) {
                                 var themeLoader = self._renderer.getThemeLoader();
                                 themeName = themeName || e.originalEvent.detail;
                                 if (themeLoader) {
@@ -145,9 +145,13 @@ var qtiItemRuntimeProvider = {
 
                         return userModules.load().then(done);
                     })
-                    .catch(function(renderingError) {
+                    .catch(function (renderingError) {
                         done(); // in case of postRendering issue, we are also done
-                        const error = new Error('Error in post rendering : ' + renderingError instanceof Error ? renderingError.message : renderingError);
+                        const error = new Error(
+                            'Error in post rendering : ' + renderingError instanceof Error
+                                ? renderingError.message
+                                : renderingError
+                        );
                         error.unrecoverable = true;
                         self.trigger('error', error);
                     });
@@ -160,24 +164,19 @@ var qtiItemRuntimeProvider = {
     /**
      * Clean up stuffs
      */
-    clear: function(elt, done) {
+    clear: function (elt, done) {
         var self = this;
 
         if (self._item) {
             Promise.all(
-                this._item.getInteractions().map(function(interaction) {
+                this._item.getInteractions().map(function (interaction) {
                     return interaction.clear();
                 })
             )
-                .then(function() {
+                .then(function () {
                     self._item.clear();
 
-                    $(elt)
-                        .off('responseChange')
-                        .off('endattempt')
-                        .off('themechange')
-                        .off('feedback')
-                        .empty();
+                    $(elt).off('responseChange').off('endattempt').off('themechange').off('feedback').empty();
 
                     if (self._renderer) {
                         self._renderer.unload();
@@ -186,7 +185,7 @@ var qtiItemRuntimeProvider = {
                     self._item = null;
                 })
                 .then(done)
-                .catch(function(err) {
+                .catch(function (err) {
                     self.trigger('error', 'Something went wrong while destroying an interaction: ' + err.message);
                 });
         } else {
@@ -202,12 +201,12 @@ var qtiItemRuntimeProvider = {
         var state = {};
         if (this._item) {
             //get the state from interactions
-            _.forEach(this._item.getInteractions(), function(interaction) {
+            _.forEach(this._item.getInteractions(), function (interaction) {
                 state[interaction.attr('responseIdentifier')] = interaction.getState();
             });
 
             //get the state from infoControls
-            _.forEach(this._item.getElements(), function(element) {
+            _.forEach(this._item.getElements(), function (element) {
                 if (Element.isA(element, 'infoControl') && element.attr('id')) {
                     state.pic = state.pic || {};
                     state.pic[element.attr('id')] = element.getState();
@@ -224,7 +223,7 @@ var qtiItemRuntimeProvider = {
     setState: function setState(state) {
         if (this._item && state) {
             //set interaction state
-            _.forEach(this._item.getInteractions(), function(interaction) {
+            _.forEach(this._item.getInteractions(), function (interaction) {
                 var id = interaction.attr('responseIdentifier');
                 if (id && state[id]) {
                     interaction.setState(state[id]);
@@ -233,7 +232,7 @@ var qtiItemRuntimeProvider = {
 
             //set info control state
             if (state.pic) {
-                _.forEach(this._item.getElements(), function(element) {
+                _.forEach(this._item.getElements(), function (element) {
                     if (Element.isA(element, 'infoControl') && state.pic[element.attr('id')]) {
                         element.setState(state.pic[element.attr('id')]);
                     }
@@ -242,12 +241,12 @@ var qtiItemRuntimeProvider = {
         }
     },
 
-    getResponses: function() {
+    getResponses: function () {
         var responses = {};
         if (this._item) {
             _.reduce(
                 this._item.getInteractions(),
-                function(res, interaction) {
+                function (res, interaction) {
                     responses[interaction.attr('responseIdentifier')] = interaction.getResponse();
                     return responses;
                 },
@@ -257,15 +256,15 @@ var qtiItemRuntimeProvider = {
         return responses;
     },
 
-    renderFeedbacks: function(feedbacks, itemSession, done) {
+    renderFeedbacks: function (feedbacks, itemSession, done) {
         var self = this;
 
         var _renderer = self._item.getRenderer();
         var _loader = new QtiLoader(self._item);
 
         // loading feedbacks from response into the current item
-        _loader.loadElements(feedbacks, function(item) {
-            _renderer.load(function() {
+        _loader.loadElements(feedbacks, function (item) {
+            _renderer.load(function () {
                 var renderingQueue = modalFeedbackHelper.getFeedbacks(item, itemSession);
 
                 done(renderingQueue);

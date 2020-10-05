@@ -866,9 +866,9 @@ export default {
     destroy: destroy,
     getState: getState,
     setState: setState,
-
     enable: enable,
     disable: disable,
     clearText: clearText,
-    setText: setText
+    setText: setText,
+    inputLimiter: inputLimiter
 };
