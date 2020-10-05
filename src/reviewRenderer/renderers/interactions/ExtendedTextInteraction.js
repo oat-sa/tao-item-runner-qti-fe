@@ -21,9 +21,8 @@
  * @author Ansul Sharma <ansultaotesting.com>
  */
 import template from 'taoQtiItem/reviewRenderer/tpl/interactions/extendedTextInteraction';
-import extendedTextInteraction, {
-    inputLimiter
-} from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/ExtendedTextInteraction';
+import patternMaskHelper from 'taoQtiItem/qtiCommonRenderer/helpers/patternMask';
+import extendedTextInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/ExtendedTextInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 
 /**
@@ -33,19 +32,18 @@ import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
  * @returns {*}
  */
 const render = interaction => {
-    return new Promise(function (resolve, reject) {
-        var $el, expectedLength, minStrings, patternMask, placeholderType;
-        var _getNumStrings;
-        var $container = containerHelper.get(interaction);
-        var multiple = _isMultiple(interaction);
-        var placeholderText = interaction.attr('placeholderText');
+    return new Promise(resolve => {
+        let $el, expectedLength, minStrings, patternMask, placeholderType;
+        const $container = containerHelper.get(interaction);
+        const multiple = _isMultiple(interaction);
+        const placeholderText = interaction.attr('placeholderText');
 
         if (!multiple) {
             $el = $container.find('div.text-container');
             if (placeholderText) {
                 $el.attr('placeholder', placeholderText);
             }
-            $el.on('keyup.commonRenderer change.commonRenderer', function () {
+            $el.on('keyup.commonRenderer change.commonRenderer', () => {
                 containerHelper.triggerResponseChangeEvent(interaction, {});
             });
 
@@ -58,27 +56,12 @@ const render = interaction => {
             expectedLength = interaction.attr('expectedLength');
             patternMask = interaction.attr('patternMask');
 
-            //setting the checking for minimum number of answers
-            if (minStrings) {
-                //get the number of filled inputs
-                _getNumStrings = function ($element) {
-                    var num = 0;
-                    $element.each(function () {
-                        if ($(this).innerText !== '') {
-                            num++;
-                        }
-                    });
-
-                    return num;
-                };
-            }
-
             //set the fields width
             if (expectedLength) {
                 expectedLength = parseInt(expectedLength, 10);
 
                 if (expectedLength > 0) {
-                    $el.each(function () {
+                    $el.each(() => {
                         $(this).css('width', expectedLength + 'em');
                     });
                 }
@@ -95,7 +78,7 @@ const render = interaction => {
                 placeholderType = 'first';
 
                 if (placeholderType === 'multiple') {
-                    $el.each(function () {
+                    $el.each(() => {
                         $(this).attr('placeholder', placeholderText);
                     });
                 } else if (placeholderType === 'first') {
@@ -112,13 +95,13 @@ const render = interaction => {
  * @param {Object} interaction - the extended text interaction model
  * @returns {String} format in 'plain', 'xhtml', 'preformatted'
  */
-function _getFormat(interaction) {
-    var format = interaction.attr('format');
+const _getFormat = interaction => {
+    const format = interaction.attr('format');
     if (_.contains(['plain', 'xhtml', 'preformatted'], format)) {
         return format;
     }
     return 'plain';
-}
+};
 
 /**
  * return the value of the textarea or ckeditor data
@@ -126,13 +109,13 @@ function _getFormat(interaction) {
  * @param  {Boolean} raw Tells if the returned data does not have to be filtered (i.e. XHTML tags not removed)
  * @return {String}             the value
  */
-function _getTextareaValue(interaction) {
+const _getTextContainerValue = interaction => {
     if (_getFormat(interaction) === 'xhtml') {
         return containerHelper.get(interaction).find('div.text-container')[0].innerHTML;
     } else {
         return containerHelper.get(interaction).find('div.text-container')[0].innerText;
     }
-}
+};
 
 /**
  * Whether or not multiple strings are expected from the candidate to
@@ -141,14 +124,93 @@ function _getTextareaValue(interaction) {
  * @param {Object} interaction - the extended text interaction model
  * @returns {Boolean} true if a multiple
  */
-function _isMultiple(interaction) {
-    var attributes = interaction.getAttributes();
-    var response = interaction.getResponseDeclaration();
+const _isMultiple = interaction => {
+    const attributes = interaction.getAttributes();
+    const response = interaction.getResponseDeclaration();
     return !!(
         attributes.maxStrings &&
         (response.attr('cardinality') === 'multiple' || response.attr('cardinality') === 'ordered')
     );
-}
+};
+
+/**
+ * Creates an input limiter object
+ * @param {Object} interaction - the extended text interaction
+ * @returns {Object} the limiter
+ */
+const inputLimiter = interaction => {
+    const $container = containerHelper.get(interaction);
+    const expectedLength = interaction.attr('expectedLength');
+    const expectedLines = interaction.attr('expectedLines');
+    const patternMask = interaction.attr('patternMask');
+    let patternRegEx;
+    let $textarea, $charsCounter, $wordsCounter, maxWords, maxLength, $maxLengthCounter, $maxWordsCounter;
+    let enabled = false;
+
+    if (expectedLength || expectedLines || patternMask) {
+        enabled = true;
+
+        $textarea = $('.text-container', $container);
+        $charsCounter = $('.count-chars', $container);
+        $wordsCounter = $('.count-words', $container);
+        $maxLengthCounter = $('.count-max-length', $container);
+        $maxWordsCounter = $('.count-max-words', $container);
+
+        if (patternMask !== '') {
+            maxWords = patternMaskHelper.parsePattern(patternMask, 'words');
+            maxLength = patternMaskHelper.parsePattern(patternMask, 'chars');
+            maxWords = _.isNaN(maxWords) ? 0 : maxWords;
+            maxLength = _.isNaN(maxLength) ? 0 : maxLength;
+            if (!maxLength && !maxWords) {
+                patternRegEx = new RegExp(patternMask);
+            }
+            $maxLengthCounter.text(maxLength);
+            $maxWordsCounter.text(maxWords);
+        }
+    }
+
+    /**
+     * The limiter instance
+     */
+    const limiter = {
+        /**
+         * Is the limiter enabled regarding the interaction configuration
+         */
+        enabled: enabled,
+
+        /**
+         * Get the number of words that are actually written in the response field
+         * @return {Number} number of words
+         */
+        getWordsCount: () => {
+            const value = _getTextContainerValue(interaction) || '';
+            if (_.isEmpty(value)) {
+                return 0;
+            }
+            // leading and trailing white space don't qualify as words
+            return value.trim().replace(/\s+/gi, ' ').split(' ').length;
+        },
+
+        /**
+         * Get the number of characters that are actually written in the response field
+         * @return {Number} number of characters
+         */
+        getCharsCount: () => {
+            const value = _getTextContainerValue(interaction) || '';
+            return value.length;
+        },
+
+        /**
+         * Update the counter element
+         */
+        updateCounter: function udpateCounter() {
+            $charsCounter.text(this.getCharsCount());
+            $wordsCounter.text(this.getWordsCount());
+        }
+    };
+
+    return limiter;
+};
 
 /**
  * Reset the textarea / ckEditor
@@ -159,7 +221,7 @@ const resetResponse = interaction => {
 };
 
 const setText = (interaction, text) => {
-    var limiter = inputLimiter(interaction);
+    const limiter = inputLimiter(interaction);
 
     containerHelper.get(interaction).find('div.text-container')[0].innerHTML = text;
 
@@ -181,21 +243,21 @@ const setText = (interaction, text) => {
  * @returns {object}
  */
 const getResponse = interaction => {
-    var $container = containerHelper.get(interaction);
-    var attributes = interaction.getAttributes();
-    var responseDeclaration = interaction.getResponseDeclaration();
-    var baseType = responseDeclaration.attr('baseType');
-    var numericBase = attributes.base || 10;
-    var multiple = _isMultiple(interaction);
-    var ret = multiple ? { list: {} } : { base: {} };
-    var values;
-    var value = '';
+    const $container = containerHelper.get(interaction);
+    const attributes = interaction.getAttributes();
+    const responseDeclaration = interaction.getResponseDeclaration();
+    const baseType = responseDeclaration.attr('baseType');
+    const numericBase = attributes.base || 10;
+    const multiple = _isMultiple(interaction);
+    let ret = multiple ? { list: {} } : { base: {} };
+    let values;
+    let value = '';
 
     if (multiple) {
         values = [];
 
-        $container.find('div.text-container').each(function (i) {
-            var $el = $(this);
+        $container.find('div.text-container').each(i => {
+            const $el = $(this);
 
             if (attributes.placeholderText && $el.innerText === attributes.placeholderText) {
                 values[i] = '';
@@ -214,15 +276,15 @@ const getResponse = interaction => {
 
         ret.list[baseType] = values;
     } else {
-        if (attributes.placeholderText && _getTextareaValue(interaction) === attributes.placeholderText) {
+        if (attributes.placeholderText && _getTextContainerValue(interaction) === attributes.placeholderText) {
             value = '';
         } else {
             if (baseType === 'integer') {
-                value = parseInt(_getTextareaValue(interaction), numericBase);
+                value = parseInt(_getTextContainerValue(interaction), numericBase);
             } else if (baseType === 'float') {
-                value = parseFloat(_getTextareaValue(interaction));
+                value = parseFloat(_getTextContainerValue(interaction));
             } else if (baseType === 'string') {
-                value = _getTextareaValue(interaction, true);
+                value = _getTextContainerValue(interaction, true);
             }
         }
 
@@ -245,7 +307,7 @@ const getResponse = interaction => {
  * @param {object} response
  */
 const setResponse = (interaction, response) => {
-    const _setMultipleVal = function (identifier, value) {
+    const _setMultipleVal = (identifier, value) => {
         interaction.getContainer().find('#' + identifier)[0].innerHTML = value;
     };
 
@@ -254,8 +316,8 @@ const setResponse = (interaction, response) => {
     if (response.base && response.base[baseType] !== undefined) {
         setText(interaction, response.base[baseType]);
     } else if (response.list && response.list[baseType]) {
-        for (var i in response.list[baseType]) {
-            var serial = response.list.serial === undefined ? '' : response.list.serial[i];
+        for (let i in response.list[baseType]) {
+            const serial = response.list.serial === undefined ? '' : response.list.serial[i];
             _setMultipleVal(serial + '_' + i, response.list[baseType][i]);
         }
     } else {
@@ -274,5 +336,6 @@ export default Object.assign({}, extendedTextInteraction, {
     getResponse,
     setResponse,
     resetResponse,
-    setText
+    setText,
+    inputLimiter
 });
