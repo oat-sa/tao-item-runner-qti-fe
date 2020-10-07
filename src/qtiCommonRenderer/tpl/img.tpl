@@ -8,11 +8,6 @@
     {{#if attributes.height}}height="{{attributes.height}}" {{/if}}
     {{#if attributes.width}}width="{{attributes.width}}" {{/if}}
     {{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}
-    {{#if attributes.height}}
-        style="height: {{attributes.height}}px; width: {{attributes.width}}px;"
-        {{else}}
-        style="width: {{attributes.width}};"
-    {{/if}}
     {{#if attributes.[aria-describedby]}} aria-describedby="{{attributes.[aria-describedby]}}"{{/if}}
     {{#if attributes.[aria-hidden]}} aria-hidden="{{attributes.[aria-hidden]}}"{{/if}}
     {{#if attributes.[aria-label]}} aria-label="{{attributes.[aria-label]}}"{{/if}}
