@@ -40,8 +40,16 @@ var uploadMime = {
             { mime: 'video/mp4', label: __('MP4 video') },
             { mime: 'video/quicktime', label: __('Quicktime video') },
             { mime: 'video/x-ms-wmv', label: __('Windows Media video') },
-            { mime: 'video/x-flv', label: __('Flash video') },
-            { mime: 'text/csv', label: __('CSV file') },
+            {
+                mime: 'video/x-flv',
+                label: __('Flash video'),
+                equivalent: ['.flv']
+            },
+            {
+                mime: 'text/csv',
+                label: __('CSV file'),
+                equivalent: ['.csv']
+            },
             {
                 mime: 'application/msword',
                 label: __('Microsoft Word'),
@@ -57,10 +65,26 @@ var uploadMime = {
                 label: __('Microsoft Powerpoint'),
                 equivalent: ['application/vnd.openxmlformats-officedocument.presentationml.presentation']
             },
-            { mime: 'application/vnd.oasis.opendocument.text', label: __('OpenDocument text document') },
-            { mime: 'application/vnd.oasis.opendocument.spreadsheet', label: __('OpenDocument spreadsheet document') },
-            { mime: 'text/x-c', label: __('C++ file (.cpp)') },
-            { mime: 'text/pascal', label: __('Pascal file (.pas)') }
+            {
+                mime: 'application/vnd.oasis.opendocument.text',
+                label: __('OpenDocument text document'),
+                equivalent: ['.odf']
+            },
+            {
+                mime: 'application/vnd.oasis.opendocument.spreadsheet',
+                label: __('OpenDocument spreadsheet document'),
+                equivalent: ['.ods']
+            },
+            {
+                mime: 'text/x-c',
+                label: __('C++ file (.cpp)'),
+                equivalent: ['.cpp']
+            },
+            {
+                mime: 'text/pascal',
+                label: __('Pascal file (.pas)'),
+                equivalent: ['.pas']
+            }
         ];
     },
 
