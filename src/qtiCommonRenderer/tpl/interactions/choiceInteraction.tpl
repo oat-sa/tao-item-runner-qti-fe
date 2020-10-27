@@ -7,6 +7,7 @@
 >
   {{#if prompt}}{{{ prompt }}}{{/if}}
   <div class="instruction-container"></div>
+  <div class="header-dummy">Header</div>
   <ol
     class="plain block-listing solid choice-area{{#if horizontal}} horizontal{{/if}} {{#if listStyle}}{{{listStyle}}}{{/if}}"
     aria-labelledby="{{promptId}}"
