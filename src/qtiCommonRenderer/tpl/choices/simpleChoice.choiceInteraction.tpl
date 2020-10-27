@@ -1,30 +1,36 @@
 <li class="qti-choice qti-simpleChoice" data-identifier="{{attributes.identifier}}" data-serial="{{serial}}"{{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}>
     <label class="real-label">
-        {{#if unique}}
-        <input
-            type="radio"
-            name="response-{{interaction.serial}}"
-            value="{{attributes.identifier}}"
-            tabindex="1"
-        >
-        <span class="icon-radio"></span>
-        {{else}}
-        <input
-            type="checkbox"
-            name="response-{{interaction.serial}}"
-            value="{{attributes.identifier}}"
-            tabindex="1"
-        >
-        <span class="icon-checkbox"></span>
-        {{/if}}
+        <div class="cell">
+            {{#if unique}}
+            <input
+                type="radio"
+                name="response-{{interaction.serial}}"
+                value="{{attributes.identifier}}"
+                tabindex="1"
+            >
+            <span class="icon-radio"></span>
+            {{else}}
+            <input
+                type="checkbox"
+                name="response-{{interaction.serial}}"
+                value="{{attributes.identifier}}"
+                tabindex="1"
+            >
+            <span class="icon-checkbox"></span>
+            {{/if}}
+        </div>
     </label>
 
     <div class="list-symbol-container">
-        <div class="list-symbol"></div>
+        <div class="cell">
+            <div class="list-symbol"></div>
+        </div>
     </div>
 
     <label data-eliminable="container" data-label="{{__ "Eliminate"}}" class="choice-eliminate">
-        <span data-eliminable="trigger" class="icon-checkbox"></span>
+        <div class="cell">
+            <span data-eliminable="trigger" class="icon-checkbox"></span>
+        </div>
     </label>
 
     <div class="label-content" contenteditable="false" id="choice-{{interaction.serial}}-{{attributes.identifier}}">

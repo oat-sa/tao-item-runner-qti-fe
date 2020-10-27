@@ -123,7 +123,7 @@ var _pseudoLabel = function _pseudoLabel(interaction, $container) {
         var $choiceBox = $(this);
         var state;
         var eliminator = e.target.dataset && e.target.dataset.eliminable;
-        var input = this.querySelector('.real-label > input');
+        var input = this.querySelector('.real-label input');
 
         // if the click has been triggered by a keyboard check, prevent this listener to cancel this check
         if (e.originalEvent && $(e.originalEvent.target).is('input')) {
@@ -168,7 +168,7 @@ var _pseudoLabel = function _pseudoLabel(interaction, $container) {
 var _getRawResponse = function _getRawResponse(interaction) {
     var values = [];
     var $container = containerHelper.get(interaction);
-    $('.real-label > input[name=response-' + interaction.getSerial() + ']:checked', $container).each(function() {
+    $('.real-label input[name=response-' + interaction.getSerial() + ']:checked', $container).each(function() {
         values.push($(this).val());
     });
     return values;
@@ -187,10 +187,10 @@ var _setInstructions = function _setInstructions(interaction) {
         minInstructionSet = false;
 
     var highlightInvalidInput = function highlightInvalidInput($choice) {
-        var $input = $choice.find('.real-label > input'),
+        var $input = $choice.find('.real-label input'),
             $li = $choice.css('color', '#BA122B'),
             $icon = $choice
-                .find('.real-label > span')
+                .find('.real-label span')
                 .css('color', '#BA122B')
                 .addClass('cross error');
         var timeout = interaction.data('__instructionTimeout');
@@ -304,7 +304,7 @@ var render = function render(interaction) {
 var resetResponse = function resetResponse(interaction) {
     var $container = containerHelper.get(interaction);
 
-    $('.real-label > input', $container).prop('checked', false);
+    $('.real-label input', $container).prop('checked', false);
 };
 
 /**
@@ -325,7 +325,7 @@ var setResponse = function setResponse(interaction, response) {
 
     try {
         _.forEach(pciResponse.unserialize(response, interaction), function(identifier) {
-            var $input = $container.find('.real-label > input[value="' + identifier + '"]').prop('checked', true);
+            var $input = $container.find('.real-label input[value="' + identifier + '"]').prop('checked', true);
             $input.closest('.qti-choice').toggleClass('user-selected', true);
         });
         instructionMgr.validateInstructions(interaction);
