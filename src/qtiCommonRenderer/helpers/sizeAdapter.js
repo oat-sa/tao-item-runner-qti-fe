@@ -50,7 +50,7 @@ export default {
             document.addEventListener(
                 'load',
                 function(e) {
-                    if (e.target.rel === 'stylesheet') {
+                    if (e.target.rel === 'stylesheet' || e.target.type === 'text/css' || e.target.tagName === "STYLE") {
                         adaptSize.height($elements);
                     }
                 },
