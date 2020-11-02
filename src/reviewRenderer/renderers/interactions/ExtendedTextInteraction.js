@@ -308,7 +308,7 @@ const getResponse = interaction => {
  */
 const setResponse = (interaction, response) => {
     const _setMultipleVal = (identifier, value) => {
-        interaction.getContainer().find('#' + identifier)[0].innerHTML = value;
+        interaction.getContainer().find(`#${identifier}`)[0].innerHTML = value;
     };
 
     const baseType = interaction.getResponseDeclaration().attr('baseType');
@@ -317,12 +317,12 @@ const setResponse = (interaction, response) => {
         response = { base: { string: '' } };
     }
 
-    if (response.base && response.base[baseType] !== undefined) {
+    if (response.base && typeof response.base[baseType] !== 'undefined') {
         setText(interaction, response.base[baseType]);
     } else if (response.list && response.list[baseType]) {
         for (let i in response.list[baseType]) {
-            const serial = response.list.serial === undefined ? '' : response.list.serial[i];
-            _setMultipleVal(serial + '_' + i, response.list[baseType][i]);
+            const serial = typeof response.list.serial === 'undefined' ? '' : response.list.serial[i];
+            _setMultipleVal(`${serial}_${i}`, response.list[baseType][i]);
         }
     } else {
         throw new Error('wrong response format in argument.');
