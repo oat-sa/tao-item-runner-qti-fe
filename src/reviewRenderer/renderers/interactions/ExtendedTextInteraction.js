@@ -313,6 +313,10 @@ const setResponse = (interaction, response) => {
 
     const baseType = interaction.getResponseDeclaration().attr('baseType');
 
+    if (response.base === null && Object.keys(response).length === 1) {
+        response = { base: { string: '' } };
+    }
+
     if (response.base && response.base[baseType] !== undefined) {
         setText(interaction, response.base[baseType]);
     } else if (response.list && response.list[baseType]) {
