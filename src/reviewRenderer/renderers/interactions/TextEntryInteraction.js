@@ -18,7 +18,7 @@
  */
 
 import _ from 'lodash';
-import tpl from 'taoQtiItem/reviewRenderer/tpl/interactions/textEntryInteraction';
+import template from 'taoQtiItem/reviewRenderer/tpl/interactions/textEntryInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import locale from 'util/locale';
@@ -149,13 +149,13 @@ const getState = function getState(interaction) {
 
 export default {
     qtiClass: 'textEntryInteraction',
-    template: tpl,
-    render: render,
+    template,
+    render,
     getContainer: containerHelper.get,
-    setResponse: setResponse,
-    getResponse: getResponse,
-    resetResponse: resetResponse,
-    destroy: destroy,
-    setState: setState,
-    getState: getState
+    setResponse,
+    getResponse,
+    resetResponse,
+    getState,
+    setState,
+    destroy
 };
