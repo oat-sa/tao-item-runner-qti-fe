@@ -30,20 +30,23 @@ import locale from 'util/locale';
  *
  * @param {object} interaction
  */
-const render = function render(interaction) {
-    let attributes = interaction.getAttributes(),
-        $input = interaction.getContainer(),
-        expectedLength;
+const render = (interaction) => {
+    const attributes = interaction.getAttributes();
+
     //setting up the width of the input field
     if (attributes.expectedLength) {
+        const $input = interaction.getContainer();
+
         //adding 2 chars to include reasonable padding size
-        expectedLength = parseInt(attributes.expectedLength) + 2;
-        $input.css('width', expectedLength + 'ch');
-        $input.css('min-width', expectedLength + 'ch');
+        const expectedLength = parseInt(attributes.expectedLength) + 2;
+        $input.css({
+            width: expectedLength + 'ch',
+            minWidth: expectedLength + 'ch'
+        });
     }
 };
 
-const resetResponse = function resetResponse(interaction) {
+const resetResponse = interaction => {
     interaction.getContainer().text('');
 };
 
@@ -61,7 +64,7 @@ const resetResponse = function resetResponse(interaction) {
  * @param {object} interaction
  * @param {object} response
  */
-const setResponse = function setResponse(interaction, response) {
+const setResponse = (interaction, response) => {
     let responseValue;
 
     try {
@@ -85,7 +88,7 @@ const setResponse = function setResponse(interaction, response) {
  * @param {object} interaction
  * @returns {object}
  */
-const getResponse = function getResponse(interaction) {
+const getResponse = interaction => {
     const ret = { base: {} },
         $input = interaction.getContainer(),
         attributes = interaction.getAttributes(),
@@ -111,7 +114,7 @@ const getResponse = function getResponse(interaction) {
     return ret;
 };
 
-const destroy = function destroy(interaction) {
+const destroy = interaction => {
     //remove all references to a cache container
     containerHelper.reset(interaction);
 };
@@ -122,7 +125,7 @@ const destroy = function destroy(interaction) {
  * @param {Object} interaction - the interaction instance
  * @param {Object} state - the interaction state
  */
-const setState = function setState(interaction, state) {
+const setState = (interaction, state) => {
     if (_.isObject(state)) {
         if (state.response) {
             interaction.resetResponse();
@@ -137,7 +140,7 @@ const setState = function setState(interaction, state) {
  * @param {Object} interaction - the interaction instance
  * @returns {Object} the interaction current state
  */
-const getState = function getState(interaction) {
+const getState = interaction => {
     const state = {};
     const response = interaction.getResponse();
 
