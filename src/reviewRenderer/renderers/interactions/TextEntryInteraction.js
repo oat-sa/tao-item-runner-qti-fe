@@ -140,13 +140,11 @@ const setState = (interaction, state) => {
  * @returns {Object} the interaction current state
  */
 const getState = interaction => {
-    const state = {};
     const response = interaction.getResponse();
-
     if (response) {
-        state.response = response;
+        return { response };
     }
-    return state;
+    return {};
 };
 
 export default {
