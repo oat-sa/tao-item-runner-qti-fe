@@ -38,7 +38,7 @@ const render = (interaction) => {
         const $input = interaction.getContainer();
 
         //adding 2 chars to include reasonable padding size
-        const expectedLength = parseInt(attributes.expectedLength) + 2;
+        const expectedLength = parseInt(attributes.expectedLength, 10) + 2;
         $input.css({
             width: expectedLength + 'ch',
             minWidth: expectedLength + 'ch'
@@ -69,7 +69,9 @@ const setResponse = (interaction, response) => {
 
     try {
         responseValue = pciResponse.unserialize(response, interaction);
-    } catch (e) {}
+    } catch (e) {
+        console.error(e.message);
+    }
 
     if (responseValue && responseValue.length) {
         interaction.getContainer().text(responseValue[0]);
@@ -89,8 +91,7 @@ const setResponse = (interaction, response) => {
  * @returns {object}
  */
 const getResponse = interaction => {
-    const ret = { base: {} },
-        $input = interaction.getContainer(),
+    const $input = interaction.getContainer(),
         attributes = interaction.getAttributes(),
         baseType = interaction.getResponseDeclaration().attr('baseType'),
         numericBase = attributes.base || 10;
@@ -99,19 +100,19 @@ const getResponse = interaction => {
     if ($input.hasClass('invalid') || (attributes.placeholderText && $input.text() === attributes.placeholderText)) {
         //invalid response or response equals to the placeholder text are considered empty
         value = '';
-    } else {
-        if (baseType === 'integer') {
-            value = locale.parseInt($input.text(), numericBase);
-        } else if (baseType === 'float') {
-            value = locale.parseFloat($input.text());
-        } else if (baseType === 'string') {
-            value = $input.text();
-        }
+    } else if (baseType === 'integer') {
+        value = locale.parseInt($input.text(), numericBase);
+    } else if (baseType === 'float') {
+        value = locale.parseFloat($input.text());
+    } else if (baseType === 'string') {
+        value = $input.text();
     }
 
-    ret.base[baseType] = isNaN(value) && typeof value === 'number' ? '' : value;
-
-    return ret;
+    return ({
+        base: {
+            [baseType]: isNaN(value) && typeof value === 'number' ? '' : value
+        }
+    });
 };
 
 const destroy = interaction => {
@@ -126,11 +127,9 @@ const destroy = interaction => {
  * @param {Object} state - the interaction state
  */
 const setState = (interaction, state) => {
-    if (_.isObject(state)) {
-        if (state.response) {
-            interaction.resetResponse();
-            interaction.setResponse(state.response);
-        }
+    if (_.isObject(state) && state.response) {
+        interaction.resetResponse();
+        interaction.setResponse(state.response);
     }
 };
 
