@@ -17,8 +17,8 @@
  *
  */
 
-import _ from 'lodash';
 import template from 'taoQtiItem/reviewRenderer/tpl/interactions/textEntryInteraction';
+import textEntryInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/TextEntryInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import locale from 'util/locale';
@@ -121,41 +121,15 @@ const destroy = interaction => {
 };
 
 /**
- * Set the interaction state. It could be done anytime with any state.
- *
- * @param {Object} interaction - the interaction instance
- * @param {Object} state - the interaction state
+ * Expose the common renderer for the text entry interaction
+ * @exports qtiCommonRenderer/renderers/interactions/TextEntryInteraction
  */
-const setState = (interaction, state) => {
-    if (_.isObject(state) && state.response) {
-        interaction.resetResponse();
-        interaction.setResponse(state.response);
-    }
-};
 
-/**
- * Get the interaction state.
- *
- * @param {Object} interaction - the interaction instance
- * @returns {Object} the interaction current state
- */
-const getState = interaction => {
-    const response = interaction.getResponse();
-    if (response) {
-        return { response };
-    }
-    return {};
-};
-
-export default {
-    qtiClass: 'textEntryInteraction',
+export default Object.assign({}, textEntryInteraction, {
     template,
     render,
-    getContainer: containerHelper.get,
-    setResponse,
     getResponse,
+    setResponse,
     resetResponse,
-    getState,
-    setState,
     destroy
-};
+});
