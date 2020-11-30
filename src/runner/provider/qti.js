@@ -33,7 +33,6 @@ import rendererStrategies from 'taoQtiItem/runner/rendererStrategies';
 import picManager from 'taoQtiItem/runner/provider/manager/picManager';
 import userModules from 'taoQtiItem/runner/provider/manager/userModules';
 import modalFeedbackHelper from 'taoQtiItem/qtiItem/helper/modalFeedback';
-import getRendererNameFromView from 'taoQtiItem/runner/utils/imsViewToRendererMaper';
 import 'taoItems/assets/manager';
 
 var timeout = (context.timeout > 0 ? context.timeout + 1 : 30) * 1000;
@@ -52,7 +51,7 @@ var qtiItemRuntimeProvider = {
             _.pick(this.options, ['themes', 'preload', 'view'])
         );
 
-        const Renderer = rendererStrategies(getRendererNameFromView(rendererOptions.view)).getRenderer();
+        const Renderer = rendererStrategies(rendererOptions.view).getRenderer();
 
         this._renderer = new Renderer(rendererOptions);
 
