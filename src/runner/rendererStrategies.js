@@ -54,7 +54,7 @@ const alias = {
  * @param {String} name
  * @returns {String}
  */
-function getProviderName (name) {
+function getProviderName(name) {
     const providers = rendererStrategies.getAvailableProviders();
 
     if (providers.includes(name)) {
@@ -81,8 +81,8 @@ function getProviderName (name) {
  * @returns {*|{init(): *, getRenderer(): *}|init}
  */
 export default function rendererStrategies(rendererName) {
-    const name = getProviderName(rendererName);
-    const provider = rendererStrategies.getProvider(name);
+    const providerName = getProviderName(rendererName);
+    const provider = rendererStrategies.getProvider(providerName);
     const renderer = {
         /**
          * Initializes the renderer.
