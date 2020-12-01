@@ -55,12 +55,9 @@ const alias = {
  * @returns {String}
  */
 function getProviderName (name) {
-    const providers = rendererStrategies.getAvailableProviders().reduce((acc, providerName) => {
-        acc[providerName] = providerName;
-        return acc;
-    }, {});
+    const providers = rendererStrategies.getAvailableProviders();
 
-    if (providers[name]) {
+    if (providers.includes(name)) {
         return name;
     }
 
