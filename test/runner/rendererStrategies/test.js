@@ -22,7 +22,7 @@ define([
 
     QUnit.module('rendererStrategies API');
 
-    QUnit.test('module', function (assert) {
+    QUnit.test('module', assert => {
         assert.notEqual(typeof rendererStrategies, 'undefined', 'The module exports something');
         assert.equal(typeof rendererStrategies, 'function', 'The module exports a function');
     });
@@ -32,7 +32,7 @@ define([
         { title: 'getProvider' },
         { title: 'getAvailableProviders' },
         { title: 'clearProviders' }
-    ]).test('registry API ', function (data, assert) {
+    ]).test('registry API ', (data, assert) => {
         assert.equal(typeof rendererStrategies[data.title], 'function', `The registry exposes the method ${data.title}`);
     });
 
@@ -41,8 +41,8 @@ define([
     QUnit.cases.init([
         { title: 'commonRenderer' },
         { title: 'reviewRenderer' }
-    ]).test('provider registered ', function (data, assert) {
-        var provider = rendererStrategies.getProvider(data.title);
+    ]).test('provider registered ', (data, assert) => {
+        const provider = rendererStrategies.getProvider(data.title);
         assert.notEqual(typeof provider, 'undefined', `The provider ${data.title} is registered`);
         assert.equal(typeof provider.init, 'function', `The provider ${data.title} has a init() method`);
         assert.equal(typeof provider.getRenderer, 'function', `The provider ${data.title} has a getRenderer() method`);
@@ -103,9 +103,9 @@ define([
         name: 'tutor',
         expected: 'reviewRenderer',
         warn: false
-    }]).test('renderer created ', function (data, assert) {
-        var logger = loggerFactory('taoQtiItem/runner/rendererStrategies').reset();
-        var renderer = rendererStrategies(data.name);
+    }]).test('renderer created ', (data, assert) => {
+        const logger = loggerFactory('taoQtiItem/runner/rendererStrategies').reset();
+        const renderer = rendererStrategies(data.name);
         assert.notEqual(typeof renderer, 'undefined', `The renderer ${data.title} is created`);
         assert.equal(typeof renderer.init, 'function', `The renderer ${data.title} has a init() method`);
         assert.equal(typeof renderer.getName, 'function', `The renderer ${data.title} has a getName() method`);
