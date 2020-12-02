@@ -208,9 +208,18 @@ function _getRawResponse(interaction) {
 function setResponse(interaction, response) {
     if (response) {
         try {
-            //try to unserialize the pci response
+            const maxPlays = parseInt(interaction.attr('maxPlays'), 10) || 0;
             const responseValues = pciResponse.unserialize(response, interaction);
-            getContainer(interaction).data('timesPlayed', responseValues[0]);
+            const timesPlayed = responseValues[0];
+            getContainer(interaction).data('timesPlayed', timesPlayed);
+
+            if (interaction.mediaElement) {
+                if (maxPlays !== 0 && maxPlays <= parseInt(timesPlayed, 10)) {
+                    interaction.mediaElement.disable();
+                } else {
+                    interaction.mediaElement.enable();
+                }
+            }
         } catch (e) {
             // something went wrong
         }
