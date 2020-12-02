@@ -216,7 +216,7 @@ function setResponse(interaction, response) {
             if (interaction.mediaElement) {
                 if (maxPlays !== 0 && maxPlays <= parseInt(timesPlayed, 10)) {
                     interaction.mediaElement.disable();
-                } else {
+                } else if (interaction.mediaElement.is('disabled')) {
                     interaction.mediaElement.enable();
                 }
             }
