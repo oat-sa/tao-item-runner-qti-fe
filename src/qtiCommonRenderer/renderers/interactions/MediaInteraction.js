@@ -24,13 +24,16 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
-import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/mediaInteraction';
+import template from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/mediaInteraction';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import mediaplayer from 'ui/mediaplayer';
 
+const qtiClass = 'mediaInteraction';
+const getContainer = containerHelper.get;
+
 //some default values
-var defaults = {
+const defaults = {
     type: 'video/mp4',
     video: {
         width: 480,
@@ -47,45 +50,40 @@ var defaults = {
  * All options are listed in the QTI v2.1 information model:
  * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10391
  *
- * @param {object} interaction
+ * @param {Object} interaction
  * @fires playerrendered when the player is at least rendered
  * @fires playerready when the player is sucessfully loaded and configured
  */
-var render = function render(interaction) {
-    var self = this;
-    return new Promise(function(resolve) {
-        var $container = containerHelper.get(interaction);
-        var media = interaction.object;
-        var $item = $container.parents('.qti-item');
-        var maxPlays = parseInt(interaction.attr('maxPlays'), 10) || 0;
-        var url = media.attr('data') || '';
+function render(interaction) {
+    return new Promise(resolve => {
+        const $container = getContainer(interaction);
+        const media = interaction.object;
+        const $item = $container.parents('.qti-item');
+        const maxPlays = parseInt(interaction.attr('maxPlays'), 10) || 0;
+        const url = media.attr('data') || '';
 
         //check if the media can be played (using timesPlayed and maxPlays)
-        var canBePlayed = function canBePlayed() {
-            var current = parseInt($container.data('timesPlayed'), 10);
-            return maxPlays === 0 || maxPlays > current;
-        };
+        const canBePlayed = () => maxPlays === 0 || maxPlays > parseInt($container.data('timesPlayed'), 10);
 
         /**
          * Resize video player elements to fit container size
          * @param {Object} mediaElement - player instance
          * @param {jQueryElement} $container   - container element to adapt
          */
-        var resize = _.debounce(function resize() {
-            var width, height;
+        const resize = _.debounce(() => {
             if (interaction.mediaElement) {
-                height = $container.find('.media-container').height();
-                width = $container.find('.media-container').width();
+                const height = $container.find('.media-container').height();
+                const width = $container.find('.media-container').width();
 
                 interaction.mediaElement.resize(width, height);
             }
         }, 200);
 
         //intialize the player if not yet done
-        var initMediaPlayer = function initMediaPlayer() {
+        const initMediaPlayer = () => {
             if (!interaction.mediaElement) {
                 interaction.mediaElement = mediaplayer({
-                    url: url && self.resolveUrl(url),
+                    url: url && this.resolveUrl(url),
                     type: media.attr('type') || defaults.type,
                     canPause: $container.hasClass('pause'),
                     maxPlays: maxPlays,
@@ -97,7 +95,7 @@ var render = function render(interaction) {
                     loop: !!interaction.attr('loop'),
                     renderTo: $('.media-container', $container)
                 })
-                    .on('render', function() {
+                    .on('render', () => {
                         resize();
 
                         $(window)
@@ -111,7 +109,7 @@ var render = function render(interaction) {
                          */
                         $container.trigger('playerrendered');
                     })
-                    .on('ready', function() {
+                    .on('ready', function () {
                         /**
                          * @event playerready
                          */
@@ -124,13 +122,8 @@ var render = function render(interaction) {
                         // declare the item ready when player is ready to play.
                         resolve();
                     })
-                    .on(
-                        'update',
-                        _.throttle(function() {
-                            containerHelper.triggerResponseChangeEvent(interaction);
-                        }, 1000)
-                    )
-                    .on('ended', function() {
+                    .on('update', _.throttle(() => containerHelper.triggerResponseChangeEvent(interaction), 1000))
+                    .on('ended', function () {
                         $container.data('timesPlayed', $container.data('timesPlayed') + 1);
                         containerHelper.triggerResponseChangeEvent(interaction);
 
@@ -156,21 +149,21 @@ var render = function render(interaction) {
         }
 
         //initialize the component
-        $container.on('responseSet', function() {
+        $container.on('responseSet', function () {
             initMediaPlayer();
         });
 
         //gives a small chance to the responseSet event before initializing the player
         initMediaPlayer();
     });
-};
+}
 
 /**
  * Destroy the current interaction
  * @param {Object} interaction
  */
-var destroy = function(interaction) {
-    var $container = containerHelper.get(interaction);
+function destroy(interaction) {
+    const $container = getContainer(interaction);
 
     if (interaction.mediaElement) {
         interaction.mediaElement.destroy();
@@ -186,7 +179,7 @@ var destroy = function(interaction) {
 
     //remove all references to a cache container
     containerHelper.reset(interaction);
-};
+}
 
 /**
  * Get the responses from the interaction
@@ -194,9 +187,9 @@ var destroy = function(interaction) {
  * @param {Object} interaction
  * @returns {Array} of points
  */
-var _getRawResponse = function _getRawResponse(interaction) {
-    return [containerHelper.get(interaction).data('timesPlayed') || 0];
-};
+function _getRawResponse(interaction) {
+    return [getContainer(interaction).data('timesPlayed') || 0];
+}
 
 /**
  * Set the response to the rendered interaction.
@@ -209,21 +202,20 @@ var _getRawResponse = function _getRawResponse(interaction) {
  *
  * Special value: the empty object value {} resets the interaction responses
  *
- * @param {object} interaction
- * @param {object} response
+ * @param {Object} interaction
+ * @param {Object} response
  */
-var setResponse = function(interaction, response) {
-    var responseValues;
+function setResponse(interaction, response) {
     if (response) {
         try {
             //try to unserialize the pci response
-            responseValues = pciResponse.unserialize(response, interaction);
-            containerHelper.get(interaction).data('timesPlayed', responseValues[0]);
+            const responseValues = pciResponse.unserialize(response, interaction);
+            getContainer(interaction).data('timesPlayed', responseValues[0]);
         } catch (e) {
             // something went wrong
         }
     }
-};
+}
 
 /**
  * Reset the current responses of the rendered interaction.
@@ -236,12 +228,11 @@ var setResponse = function(interaction, response) {
  *
  * Special value: the empty object value {} resets the interaction responses
  *
- * @param {object} interaction
- * @param {object} response
+ * @param {Object} interaction
  */
-var resetResponse = function resetResponse(interaction) {
-    containerHelper.get(interaction).data('timesPlayed', 0);
-};
+function resetResponse(interaction) {
+    getContainer(interaction).data('timesPlayed', 0);
+}
 
 /**
  * Return the response of the rendered interaction
@@ -252,12 +243,12 @@ var resetResponse = function resetResponse(interaction) {
  * Available base types are defined in the QTI v2.1 information model:
  * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10321
  *
- * @param {object} interaction
- * @returns {object}
+ * @param {Object} interaction
+ * @returns {Object}
  */
-var getResponse = function(interaction) {
+function getResponse(interaction) {
     return pciResponse.serialize(_getRawResponse(interaction), interaction);
-};
+}
 
 /**
  * Set the interaction state. It could be done anytime with any state.
@@ -265,16 +256,16 @@ var getResponse = function(interaction) {
  * @param {Object} interaction - the interaction instance
  * @param {Object} state - the interaction state
  */
-var setState = function setState(interaction, state) {
+function setState(interaction, state) {
     /**
      * Restore the media player state
      * @private
-     * @param {Object} [state]
-     * @param {Boolean} [state.muted] - is the player muted
-     * @param {Number} [state.volume] - the current volume
-     * @param {Number} [state.position] - the position to seek to
+     * @param {Object} [playerState]
+     * @param {Boolean} [playerState.muted] - is the player muted
+     * @param {Number} [playerState.volume] - the current volume
+     * @param {Number} [playerState.position] - the position to seek to
      */
-    var restorePlayerState = function restorePlayerState(playerState) {
+    const restorePlayerState = playerState => {
         if (playerState && interaction.mediaElement) {
             //Volume
             if (_.isNumber(playerState.volume)) {
@@ -307,14 +298,14 @@ var setState = function setState(interaction, state) {
             if (interaction.mediaElement.is('ready')) {
                 restorePlayerState(state.player);
             } else {
-                interaction.mediaElement.on('ready.state', function() {
+                interaction.mediaElement.on('ready.state', () => {
                     interaction.mediaElement.off('ready.state');
                     restorePlayerState(state.player);
                 });
             }
         }
     }
-};
+}
 
 /**
  * Get the interaction state.
@@ -322,9 +313,9 @@ var setState = function setState(interaction, state) {
  * @param {Object} interaction - the interaction instance
  * @returns {Object} the interaction current state
  */
-var getState = function getState(interaction) {
-    var state = {};
-    var response = interaction.getResponse();
+function getState(interaction) {
+    const state = {};
+    const response = interaction.getResponse();
 
     if (response) {
         state.response = response;
@@ -339,21 +330,21 @@ var getState = function getState(interaction) {
         };
     }
     return state;
-};
+}
 
 /**
  * Expose the common renderer for the interaction
  * @exports qtiCommonRenderer/renderers/interactions/MediaInteraction
  */
 export default {
-    qtiClass: 'mediaInteraction',
-    template: tpl,
-    render: render,
-    getContainer: containerHelper.get,
-    setResponse: setResponse,
-    getResponse: getResponse,
-    resetResponse: resetResponse,
-    destroy: destroy,
-    setState: setState,
-    getState: getState
+    qtiClass,
+    template,
+    render,
+    getContainer,
+    setResponse,
+    getResponse,
+    resetResponse,
+    destroy,
+    setState,
+    getState
 };
