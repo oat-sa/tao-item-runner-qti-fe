@@ -63,7 +63,7 @@ var render = function render(interaction, options) {
     var self = this;
 
     options = options || {};
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         var id = interaction.attr('responseIdentifier');
         var typeIdentifier = interaction.typeIdentifier;
         var assetManager = self.getAssetManager();
@@ -77,7 +77,7 @@ var render = function render(interaction, options) {
 
         ciRegistry
             .loadRuntimes({ include: [typeIdentifier] })
-            .then(function() {
+            .then(function () {
                 var pciRenderer;
                 var runtime = ciRegistry.getRuntime(typeIdentifier);
 
@@ -89,26 +89,30 @@ var render = function render(interaction, options) {
 
                 pciRenderer = _getPciRenderer(interaction);
 
-                window.require(pciRenderer.getRequiredModules(), function() {
-                    var pci = instanciator.getPci(interaction);
-                    if (pci) {
-                        pciRenderer.createInstance(interaction, {
-                            response: response,
-                            state: state,
-                            assetManager: assetManager
-                        });
-                        //forward internal PCI event responseChange
-                        if (_.isFunction(pci.on)) {
-                            interaction.onPci('responseChange', function() {
-                                containerHelper.triggerResponseChangeEvent(interaction);
+                window.require(
+                    pciRenderer.getRequiredModules(),
+                    function () {
+                        var pci = instanciator.getPci(interaction);
+                        if (pci) {
+                            pciRenderer.createInstance(interaction, {
+                                response: response,
+                                state: state,
+                                assetManager: assetManager
                             });
+                            //forward internal PCI event responseChange
+                            if (_.isFunction(pci.on)) {
+                                interaction.onPci('responseChange', function () {
+                                    containerHelper.triggerResponseChangeEvent(interaction);
+                                });
+                            }
+                            return resolve();
                         }
-                        return resolve();
-                    }
-                    return reject('Unable to initialize pci "' + id + '"');
-                }, reject);
+                        return reject('Unable to initialize pci "' + id + '"');
+                    },
+                    reject
+                );
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 reject('Error loading runtime "' + id + '": ' + error);
             });
     });
@@ -179,18 +183,20 @@ var getState = function getState(interaction) {
     return _getPciRenderer(interaction).getState(interaction);
 };
 
+var getData = function getData(customInteraction, data) {
+    //remove ns + fix media file path
+    var markup = data.markup;
+    markup = util.removeMarkupNamespaces(markup);
+    markup = PortableElement.fixMarkupMediaSources(markup, this);
+    data.markup = markup;
+
+    return data;
+};
+
 export default {
     qtiClass: 'customInteraction',
     template: tpl,
-    getData: function(customInteraction, data) {
-        //remove ns + fix media file path
-        var markup = data.markup;
-        markup = util.removeMarkupNamespaces(markup);
-        markup = PortableElement.fixMarkupMediaSources(markup, this);
-        data.markup = markup;
-
-        return data;
-    },
+    getData: getData,
     render: render,
     getContainer: containerHelper.get,
     setResponse: setResponse,
