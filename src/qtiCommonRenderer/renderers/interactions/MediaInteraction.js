@@ -149,9 +149,7 @@ function render(interaction) {
         }
 
         //initialize the component
-        $container.on('responseSet', function () {
-            initMediaPlayer();
-        });
+        $container.on('responseSet', initMediaPlayer);
 
         //gives a small chance to the responseSet event before initializing the player
         initMediaPlayer();
