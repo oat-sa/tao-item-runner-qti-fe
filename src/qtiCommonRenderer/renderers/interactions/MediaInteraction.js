@@ -208,11 +208,11 @@ function setResponse(interaction, response) {
         try {
             const maxPlays = parseInt(interaction.attr('maxPlays'), 10) || 0;
             const responseValues = pciResponse.unserialize(response, interaction);
-            const timesPlayed = responseValues[0];
+            const timesPlayed = parseInt(responseValues[0], 10);
             getContainer(interaction).data('timesPlayed', timesPlayed);
 
             if (interaction.mediaElement) {
-                if (maxPlays !== 0 && maxPlays <= parseInt(timesPlayed, 10)) {
+                if (maxPlays !== 0 && maxPlays <= timesPlayed) {
                     interaction.mediaElement.disable();
                 } else if (interaction.mediaElement.is('disabled')) {
                     interaction.mediaElement.enable();
