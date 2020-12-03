@@ -81,40 +81,53 @@ define([
             .render($container);
     });
 
-    QUnit.test('enables to load a response', function (assert) {
-        var ready = assert.async();
+    QUnit.cases.init([{
+        title: 'filled response',
+        response: { base: { string: 'test' } },
+        expected: { base: { string: 'test' } },
+        value: 'test'
+    }, {
+        title: 'empty response',
+        response: { base: { string: '' } },
+        expected: { base: { string: '' } },
+        value: ''
+    }, {
+        title: 'null response',
+        response: { base: null },
+        expected: { base: { string: '' } },
+        value: ''
+    }]).test('enables to load a response', (data, assert) => {
+        const ready = assert.async();
+        const $container = $(`#${fixtureContainerId}2`);
+        const buildState = response => ({ RESPONSE: { response } });
         assert.expect(5);
-
-        var $container = $('#' + fixtureContainerId + '2');
-        var response = { base: { string: 'test' } };
 
         assert.equal($container.length, 1, 'the item container exists');
         assert.equal($container.children().length, 0, 'the container has no children');
 
         runner = qtiItemRunner('qti', itemDataPlain, { view: 'scorer' })
-            .on('error', function (e) {
+            .on('error', e => {
                 assert.ok(false, e);
                 ready();
             })
-            .on('render', function () {
+            .on('render', () => {
+                runner.setState(buildState(data.response));
+
                 assert.equal(
                     $container.find('.qti-interaction.qti-extendedTextInteraction').length,
                     1,
                     'the container contains a text interaction .qti-extendedTextInteraction'
                 );
 
-                var interaction = this._item.getInteractions()[0];
-                interaction.renderer.setResponse(interaction, response);
-
                 assert.deepEqual(
-                    this.getState(),
-                    { RESPONSE: { response: response } },
+                    runner.getState(),
+                    buildState(data.expected),
                     'the response state is equal to the loaded response'
                 );
 
                 assert.equal(
                     $container.find('div.text-container')[0].innerHTML,
-                    response.base.string,
+                    data.value,
                     'the textarea displays the loaded response'
                 );
 
@@ -297,28 +310,38 @@ define([
             .render($container);
     });
 
-    QUnit.test('enables to load a response', function (assert) {
-        var ready = assert.async();
+    QUnit.cases.init([{
+        title: 'filled response',
+        response: { base: { string: '<strong>test</strong>' } },
+        expected: { base: { string: '<strong>test</strong>' } },
+        value: '<strong>test</strong>'
+    }, {
+        title: 'empty response',
+        response: { base: { string: '' } },
+        expected: { base: { string: '' } },
+        value: ''
+    }, {
+        title: 'null response',
+        response: { base: null },
+        expected: { base: { string: '' } },
+        value: ''
+    }]).test('enables to load a response', (data, assert) => {
+        const ready = assert.async();
+        const $container = $(`#${fixtureContainerId}7`);
+        const buildState = response => ({ RESPONSE: { response } });
         assert.expect(5);
-
-        var $container = $('#' + fixtureContainerId + '7');
-
-        //Var $container = $('#outside-container');
-        var response = { base: { string: '<strong>test</strong>' } };
 
         assert.equal($container.length, 1, 'the item container exists');
         assert.equal($container.children().length, 0, 'the container has no children');
 
         runner = qtiItemRunner('qti', itemDataXhtml, { view: 'scorer' })
-            .on('error', function (e) {
+            .on('error', e => {
                 assert.ok(false, e);
                 ready();
             })
-            .on('render', function () {
-                var self = this;
-
+            .on('render', () => {
                 //Set the state
-                runner.setState({ RESPONSE: { response: response } });
+                runner.setState(buildState(data.response));
 
                 assert.equal(
                     $container.find('.qti-extendedTextInteraction').length,
@@ -326,22 +349,20 @@ define([
                     'the container contains a text interaction .qti-extendedTextInteraction'
                 );
                 assert.deepEqual(
-                    self.getState(),
-                    { RESPONSE: { response: response } },
+                    runner.getState(),
+                    buildState(data.expected),
                     'the response state is equal to the loaded response'
                 );
 
                 //Ck set the text with a little delay
-                _.delay(function () {
+                _.delay(() => {
                     assert.equal(
                         $container.find('div.text-container')[0].innerHTML,
-                        response.base.string,
+                        data.value,
                         'the state text is inserted'
                     );
 
-                    _.delay(function () {
-                        ready();
-                    }, 10);
+                    _.delay(ready, 10);
                 }, 10);
             })
             .init()

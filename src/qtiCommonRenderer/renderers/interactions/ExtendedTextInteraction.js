@@ -237,22 +237,23 @@ var resetResponse = function (interaction) {
  * @param {Object} interaction - the extended text interaction model
  * @param {object} response
  */
-var setResponse = function (interaction, response) {
-    var _setMultipleVal = function (identifier, value) {
-        interaction
-            .getContainer()
-            .find('#' + identifier)
-            .val(value);
+const setResponse = (interaction, response) => {
+    const _setMultipleVal = (identifier, value) => {
+        interaction.getContainer().find(`#${identifier}`).val(value);
     };
 
-    var baseType = interaction.getResponseDeclaration().attr('baseType');
+    const baseType = interaction.getResponseDeclaration().attr('baseType');
 
-    if (response.base && response.base[baseType] !== undefined) {
+    if (response.base === null && Object.keys(response).length === 1) {
+        response = { base: { string: '' } };
+    }
+
+    if (response.base && typeof response.base[baseType] !== 'undefined') {
         setText(interaction, response.base[baseType]);
     } else if (response.list && response.list[baseType]) {
-        for (var i in response.list[baseType]) {
-            var serial = response.list.serial === undefined ? '' : response.list.serial[i];
-            _setMultipleVal(serial + '_' + i, response.list[baseType][i]);
+        for (let i in response.list[baseType]) {
+            const serial = typeof response.list.serial === 'undefined' ? '' : response.list.serial[i];
+            _setMultipleVal(`${serial}_${i}`, response.list[baseType][i]);
         }
     } else {
         throw new Error('wrong response format in argument.');
