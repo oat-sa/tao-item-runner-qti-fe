@@ -26,7 +26,7 @@ import util from 'taoQtiItem/qtiItem/helper/util';
 import PortableElement from 'taoQtiItem/qtiCommonRenderer/helpers/PortableElement';
 import { isInteractionDisabled } from 'taoQtiItem/reviewRenderer/helpers/pci';
 
-var getData = function getData(customInteraction, data) {
+const getData = (customInteraction, data) => {
     let markup = data.markup;
 
     //remove ns + fix media file path
@@ -35,7 +35,6 @@ var getData = function getData(customInteraction, data) {
     data.markup = markup;
 
     data.isInteractionDisabled = isInteractionDisabled(data.typeIdentifier);
-    console.log(data);
 
     return data;
 };
