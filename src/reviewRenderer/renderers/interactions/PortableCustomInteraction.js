@@ -28,15 +28,13 @@ import { isInteractionDisabled } from 'taoQtiItem/reviewRenderer/helpers/pci';
 
 const getData = (customInteraction, data) => {
     let markup = data.markup;
+    const isInteractionDisabled = isInteractionDisabled(data.typeIdentifier);
 
     //remove ns + fix media file path
     markup = util.removeMarkupNamespaces(markup);
     markup = PortableElement.fixMarkupMediaSources(markup, this);
-    data.markup = markup;
 
-    data.isInteractionDisabled = isInteractionDisabled(data.typeIdentifier);
-
-    return data;
+    return Object.assign({}, data, { markup, isInteractionDisabled });
 };
 
 export default Object.assign({}, portableCustomInteraction, { template, getData });
