@@ -24,11 +24,11 @@ import template from 'taoQtiItem/reviewRenderer/tpl/interactions/customInteracti
 import portableCustomInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/PortableCustomInteraction';
 import util from 'taoQtiItem/qtiItem/helper/util';
 import PortableElement from 'taoQtiItem/qtiCommonRenderer/helpers/PortableElement';
-import { isInteractionDisabledForPci } from 'taoQtiItem/reviewRenderer/helpers/pci';
+import { isInteractionDisabled } from 'taoQtiItem/reviewRenderer/helpers/pci';
 
 const getData = (customInteraction, data) => {
     let markup = data.markup;
-    const isInteractionDisabled = isInteractionDisabledForPci(data.typeIdentifier);
+    const isInteractionDisabled = isInteractionDisabled(data.typeIdentifier);
 
     //remove ns + fix media file path
     markup = util.removeMarkupNamespaces(markup);

@@ -66,6 +66,3 @@ typings/
 
 dist
 .idea/
-
-## OS
-.DS_Store
