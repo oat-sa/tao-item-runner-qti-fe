@@ -9,6 +9,6 @@ const interactablePcis = ['textReaderInteraction'];
  * @param {String} pciType
  * @returns {Boolean}
  */
-export const isInteractionDisabled = pciType => {
+export const isInteractionDisabledForPci = pciType => {
     return interactablePcis.indexOf(pciType) === -1;
 };
