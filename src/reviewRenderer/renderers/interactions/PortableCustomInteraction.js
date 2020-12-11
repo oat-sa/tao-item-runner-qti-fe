@@ -22,5 +22,19 @@
  */
 import template from 'taoQtiItem/reviewRenderer/tpl/interactions/customInteraction';
 import portableCustomInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/PortableCustomInteraction';
+import util from 'taoQtiItem/qtiItem/helper/util';
+import PortableElement from 'taoQtiItem/qtiCommonRenderer/helpers/PortableElement';
+import { isInteractionDisabled } from 'taoQtiItem/reviewRenderer/helpers/pci';
 
-export default Object.assign({}, portableCustomInteraction, {template});
+const getData = (customInteraction, data) => {
+    let markup = data.markup;
+    const isInteractionDisabled = isInteractionDisabled(data.typeIdentifier);
+
+    //remove ns + fix media file path
+    markup = util.removeMarkupNamespaces(markup);
+    markup = PortableElement.fixMarkupMediaSources(markup, this);
+
+    return Object.assign({}, data, { markup, isInteractionDisabled });
+};
+
+export default Object.assign({}, portableCustomInteraction, { template, getData });
