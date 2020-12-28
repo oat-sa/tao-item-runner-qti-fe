@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2020 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -32,6 +32,12 @@ import ckEditor from 'ckeditor';
 import ckConfigurator from 'taoQtiItem/qtiCommonRenderer/helpers/ckConfigurator';
 import patternMaskHelper from 'taoQtiItem/qtiCommonRenderer/helpers/patternMask';
 import tooltip from 'ui/tooltip';
+import loggerFactory from 'core/logger';
+
+/**
+ * Create a logger
+ */
+const logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/ExtendedTextInteraction.js');
 
 /**
  * Init rendering, called after template injected into the DOM
@@ -41,19 +47,19 @@ import tooltip from 'ui/tooltip';
  * @param {Object} interaction - the extended text interaction model
  * @returns {Promise} rendering is async
  */
-var render = function render(interaction) {
+const render = function render(interaction) {
     return new Promise(function (resolve, reject) {
-        var $el, expectedLength, minStrings, patternMask, placeholderType, editor;
-        var _styleUpdater, themeLoaded, _getNumStrings;
-        var $container = containerHelper.get(interaction);
+        let $el, expectedLength, minStrings, patternMask, placeholderType, editor;
+        let _styleUpdater, themeLoaded, _getNumStrings;
+        let $container = containerHelper.get(interaction);
 
-        var multiple = _isMultiple(interaction);
-        var limiter = inputLimiter(interaction);
+        const multiple = _isMultiple(interaction);
+        const limiter = inputLimiter(interaction);
 
-        var placeholderText = interaction.attr('placeholderText');
+        const placeholderText = interaction.attr('placeholderText');
 
-        var toolbarType = 'extendedText';
-        var ckOptions = {
+        const toolbarType = 'extendedText';
+        const ckOptions = {
             resize_enabled: true,
             secure: location.protocol === 'https:',
             forceCustomDomain: true
@@ -66,7 +72,7 @@ var render = function render(interaction) {
             }
             if (_getFormat(interaction) === 'xhtml') {
                 _styleUpdater = function () {
-                    var qtiItemStyle, $editorBody, qtiItem;
+                    let qtiItemStyle, $editorBody, qtiItem;
 
                     if (editor.document) {
                         qtiItem = $('.qti-item').get(0);
@@ -142,7 +148,7 @@ var render = function render(interaction) {
             if (minStrings) {
                 //get the number of filled inputs
                 _getNumStrings = function ($element) {
-                    var num = 0;
+                    let num = 0;
                     $element.each(function () {
                         if ($(this).val() !== '') {
                             num++;
@@ -163,7 +169,7 @@ var render = function render(interaction) {
                             if (!$el.is(':focus') && _getNumStrings($el) < minStrings) {
                                 instructionMgr.appendNotification(
                                     interaction,
-                                    __('The minimum number of answers is ') + ' : ' + minStrings,
+                                    `${__('The minimum number of answers is ')} : ${minStrings}`,
                                     'warning'
                                 );
                             }
@@ -178,7 +184,7 @@ var render = function render(interaction) {
 
                 if (expectedLength > 0) {
                     $el.each(function () {
-                        $(this).css('width', expectedLength + 'em');
+                        $(this).css('width', `${expectedLength}em`);
                     });
                 }
             }
@@ -217,7 +223,7 @@ var render = function render(interaction) {
  * Reset the textarea / ckEditor
  * @param {Object} interaction - the extended text interaction model
  */
-var resetResponse = function (interaction) {
+const resetResponse = function (interaction) {
     if (_getFormat(interaction) === 'xhtml') {
         _getCKEditor(interaction).setData('');
     } else {
@@ -271,26 +277,26 @@ var setResponse = function (interaction, response) {
  * @param {Object} interaction - the extended text interaction model
  * @returns {object}
  */
-var getResponse = function (interaction) {
-    var $container = containerHelper.get(interaction);
-    var attributes = interaction.getAttributes();
-    var responseDeclaration = interaction.getResponseDeclaration();
-    var baseType = responseDeclaration.attr('baseType');
-    var numericBase = attributes.base || 10;
-    var multiple = !!(
+const getResponse = function (interaction) {
+    const $container = containerHelper.get(interaction);
+    const attributes = interaction.getAttributes();
+    const responseDeclaration = interaction.getResponseDeclaration();
+    const baseType = responseDeclaration.attr('baseType');
+    const numericBase = attributes.base || 10;
+    const multiple = !!(
         attributes.maxStrings &&
         (responseDeclaration.attr('cardinality') === 'multiple' ||
             responseDeclaration.attr('cardinality') === 'ordered')
     );
-    var ret = multiple ? { list: {} } : { base: {} };
-    var values;
-    var value = '';
+    const ret = multiple ? { list: {} } : { base: {} };
+    let values;
+    let value = '';
 
     if (multiple) {
         values = [];
 
         $container.find('input').each(function (i) {
-            var $el = $(this);
+            const $el = $(this);
 
             if (attributes.placeholderText && $el.val() === attributes.placeholderText) {
                 values[i] = '';
@@ -333,13 +339,13 @@ var getResponse = function (interaction) {
  * @returns {Object} the limiter
  */
 function inputLimiter(interaction) {
-    var $container = containerHelper.get(interaction);
-    var expectedLength = interaction.attr('expectedLength');
-    var expectedLines = interaction.attr('expectedLines');
-    var patternMask = interaction.attr('patternMask');
-    var patternRegEx;
-    var $textarea, $charsCounter, $wordsCounter, maxWords, maxLength, $maxLengthCounter, $maxWordsCounter;
-    var enabled = false;
+    const $container = containerHelper.get(interaction);
+    const expectedLength = interaction.attr('expectedLength');
+    const expectedLines = interaction.attr('expectedLines');
+    const patternMask = interaction.attr('patternMask');
+    let patternRegEx;
+    let $textarea, $charsCounter, $wordsCounter, maxWords, maxLength, $maxLengthCounter, $maxWordsCounter;
+    let enabled = false;
 
     if (expectedLength || expectedLines || patternMask) {
         enabled = true;
@@ -366,7 +372,7 @@ function inputLimiter(interaction) {
     /**
      * The limiter instance
      */
-    var limiter = {
+    const limiter = {
         /**
          * Is the limiter enabled regarding the interaction configuration
          */
@@ -376,9 +382,7 @@ function inputLimiter(interaction) {
          * Listen for text input into the interaction and limit it if necessary
          */
         listenTextInput: function listenTextInput() {
-            var self = this;
-
-            var ignoreKeyCodes = [
+            const ignoreKeyCodes = [
                 8, // backspace
                 16, // shift
                 17, // control
@@ -409,20 +413,20 @@ function inputLimiter(interaction) {
                 1114202, // Ctrl + z
                 1114200 // Ctrl + x
             ];
-            var triggerKeyCodes = [
+            const triggerKeyCodes = [
                 32, // space
                 13, // enter
                 2228237 // shift + enter in ckEditor
             ];
-            var cke;
+            let cke;
 
-            var invalidToolip = tooltip.error($container, __('This is not a valid answer'), {
+            const invalidToolip = tooltip.error($container, __('This is not a valid answer'), {
                 position: 'bottom',
                 trigger: 'manual'
             });
-            var patternHandler = function patternHandler(e) {
-                var isCke = _getFormat(interaction) === 'xhtml';
-                var newValue;
+            const patternHandler = function patternHandler(e) {
+                const isCke = _getFormat(interaction) === 'xhtml';
+                let newValue;
                 if (patternRegEx) {
                     if (isCke) {
                         // cke has its own object structure
@@ -452,15 +456,15 @@ function inputLimiter(interaction) {
             /**
              * This part works on keyboard input
              *
-             * @param e
+             * @param {Event} e
              * @returns {boolean}
              */
-            var keyLimitHandler = function keyLimitHandler(e) {
-                var keyCode = e && e.data ? e.data.keyCode : e.which;
+            const keyLimitHandler = e => {
+                const keyCode = e && e.data ? e.data.keyCode : e.which;
                 if (
                     !_.contains(ignoreKeyCodes, keyCode) &&
-                    ((maxWords && self.getWordsCount() >= maxWords && _.contains(triggerKeyCodes, keyCode)) ||
-                        (maxLength && self.getCharsCount() >= maxLength))
+                    ((maxWords && this.getWordsCount() >= maxWords && _.contains(triggerKeyCodes, keyCode)) ||
+                        (maxLength && this.getCharsCount() >= maxLength))
                 ) {
                     if (e.cancel) {
                         e.cancel();
@@ -470,19 +474,17 @@ function inputLimiter(interaction) {
                     }
                     return false;
                 }
-                _.defer(function () {
-                    self.updateCounter();
-                });
+                _.defer(() => this.updateCounter());
             };
 
             /**
              * This part works on drop or paste
-             * @param e
+             * @param {Event} e
+             * @returns {boolean}
              */
-            var nonKeyLimitHandler = function nonKeyLimitHandler(e) {
-                var newValue;
-                var oldValue = _getTextareaValue(interaction);
-                var isCke = _getFormat(interaction) === 'xhtml';
+            const nonKeyLimitHandler = e => {
+                let newValue;
+                const isCke = _getFormat(interaction) === 'xhtml';
 
                 if (typeof $(e.target).attr('data-clipboard') === 'string') {
                     newValue = $(e.target).attr('data-clipboard');
@@ -512,9 +514,9 @@ function inputLimiter(interaction) {
 
                 // limit by word or character count if required
                 if (!_.isNull(maxWords)) {
-                    newValue = strLimiter.limitByWordCount(newValue, maxWords - self.getWordsCount());
+                    newValue = strLimiter.limitByWordCount(newValue, maxWords - this.getWordsCount());
                 } else if (!_.isNull(maxLength)) {
-                    newValue = strLimiter.limitByCharCount(newValue, maxLength - self.getCharsCount());
+                    newValue = strLimiter.limitByCharCount(newValue, maxLength - this.getCharsCount());
                 }
 
                 // insert the cut-off text
@@ -530,9 +532,7 @@ function inputLimiter(interaction) {
                     el.selectionEnd = el.selectionStart;
                 }
 
-                _.defer(function () {
-                    self.updateCounter();
-                });
+                _.defer(() => this.updateCounter());
             };
 
             if (_getFormat(interaction) === 'xhtml') {
@@ -552,10 +552,10 @@ function inputLimiter(interaction) {
 
         /**
          * Get the number of words that are actually written in the response field
-         * @return {Number} number of words
+         * @returns {Number} number of words
          */
         getWordsCount: function getWordsCount() {
-            var value = _getTextareaValue(interaction) || '';
+            const value = _getTextareaValue(interaction) || '';
             if (_.isEmpty(value)) {
                 return 0;
             }
@@ -565,12 +565,12 @@ function inputLimiter(interaction) {
 
         /**
          * Get the number of characters that are actually written in the response field
-         * @return {Number} number of characters
+         * @returns {Number} number of characters
          */
         getCharsCount: function getCharsCount() {
-            var value = _getTextareaValue(interaction) || '';
-            // remove NO-BREAK SPACE in the end when new line added and all new line symbols 
-            return value.replace(/[\r\n]{1}\xA0[\r\n]{1}$/,"").replace( /[\r\n]+/gm, "" ).length;
+            const value = _getTextareaValue(interaction) || '';
+            // remove NO-BREAK SPACE in the end when new line added and all new line symbols
+            return value.replace(/[\r\n]{1}\xA0[\r\n]{1}$/, '').replace(/[\r\n]+/gm, '').length;
         },
 
         /**
@@ -589,7 +589,7 @@ function inputLimiter(interaction) {
  * return the value of the textarea or ckeditor data
  * @param  {Object} interaction
  * @param  {Boolean} raw Tells if the returned data does not have to be filtered (i.e. XHTML tags not removed)
- * @return {String}             the value
+ * @returns {String} the value
  */
 function _getTextareaValue(interaction, raw) {
     if (_getFormat(interaction) === 'xhtml') {
@@ -605,7 +605,7 @@ function _getTextareaValue(interaction, raw) {
  * @param {string} pattern
  */
 function _setPattern($element, pattern) {
-    var patt = new RegExp(pattern);
+    const patt = new RegExp(pattern);
 
     //test when some data is entering in the input field
     //@todo plug the validator + tooltip
@@ -625,8 +625,8 @@ function _setPattern($element, pattern) {
  * @returns {Boolean} true if a multiple
  */
 function _isMultiple(interaction) {
-    var attributes = interaction.getAttributes();
-    var response = interaction.getResponseDeclaration();
+    const attributes = interaction.getAttributes();
+    const response = interaction.getResponseDeclaration();
     return !!(
         attributes.maxStrings &&
         (response.attr('cardinality') === 'multiple' || response.attr('cardinality') === 'ordered')
@@ -637,12 +637,12 @@ function _isMultiple(interaction) {
  * Instantiate CkEditor for the interaction
  *
  * @param {Object} interaction - the extended text interaction model
- * @param {Object} [options = {}] - the CKEditor configuration options
+ * @param {Object} [options= {}] - the CKEditor configuration options
  * @returns {Object} the ckEditor instance (or you'll be in trouble
  */
 function _setUpCKEditor(interaction, options) {
-    var $container = containerHelper.get(interaction);
-    var editor = ckEditor.replace($container.find('.text-container')[0], options || {});
+    const $container = containerHelper.get(interaction);
+    const editor = ckEditor.replace($container.find('.text-container')[0], options || {});
     if (editor) {
         $container.data('editor', editor.name);
         return editor;
@@ -653,12 +653,11 @@ function _setUpCKEditor(interaction, options) {
  * Destroy CKEditor
  *
  * @param {Object} interaction - the extended text interaction model
- * @param {Object} [options = {}] - the CKEditor configuration options
  */
 function _destroyCkEditor(interaction) {
-    var $container = containerHelper.get(interaction);
-    var name = $container.data('editor');
-    var editor;
+    const $container = containerHelper.get(interaction);
+    const name = $container.data('editor');
+    let editor;
     if (name) {
         editor = ckEditor.instances[name];
     }
@@ -674,8 +673,8 @@ function _destroyCkEditor(interaction) {
  * @returns {Object}  CKEditor instance
  */
 function _getCKEditor(interaction) {
-    var $container = containerHelper.get(interaction);
-    var name = $container.data('editor');
+    const $container = containerHelper.get(interaction);
+    const name = $container.data('editor');
 
     return ckEditor.instances[name];
 }
@@ -687,8 +686,8 @@ function _getCKEditor(interaction) {
  * @returns {string}             text content of the ckEditor
  */
 function _ckEditorData(interaction, raw) {
-    var editor = _getCKEditor(interaction);
-    var data = (editor && editor.getData()) || '';
+    const editor = _getCKEditor(interaction);
+    let data = (editor && editor.getData()) || '';
 
     if (!raw) {
         data = _stripTags(data);
@@ -703,7 +702,7 @@ function _ckEditorData(interaction, raw) {
  * @returns {String}
  */
 function _stripTags(str) {
-    var tempNode = document.createElement('div');
+    const tempNode = document.createElement('div');
     tempNode.innerHTML = str;
     return tempNode.textContent;
 }
@@ -714,7 +713,7 @@ function _stripTags(str) {
  * @returns {String} format in 'plain', 'xhtml', 'preformatted'
  */
 function _getFormat(interaction) {
-    var format = interaction.attr('format');
+    const format = interaction.attr('format');
     if (_.contains(['plain', 'xhtml', 'preformatted'], format)) {
         return format;
     }
@@ -722,8 +721,8 @@ function _getFormat(interaction) {
 }
 
 function enable(interaction) {
-    var $container = containerHelper.get(interaction);
-    var editor;
+    const $container = containerHelper.get(interaction);
+    let editor;
 
     $container.find('input, textarea').removeAttr('disabled');
 
@@ -740,8 +739,8 @@ function enable(interaction) {
 }
 
 function disable(interaction) {
-    var $container = containerHelper.get(interaction);
-    var editor;
+    const $container = containerHelper.get(interaction);
+    let editor;
 
     $container.find('input, textarea').attr('disabled', 'disabled');
 
@@ -762,7 +761,7 @@ function clearText(interaction) {
 }
 
 function setText(interaction, text) {
-    var limiter = inputLimiter(interaction);
+    const limiter = inputLimiter(interaction);
     if (_getFormat(interaction) === 'xhtml') {
         try {
             _getCKEditor(interaction).setData(text, function () {
@@ -771,7 +770,7 @@ function setText(interaction, text) {
                 }
             });
         } catch (e) {
-            console.error('setText error', e);
+            logger.warn(`setText error ${e}!`);
         }
     } else {
         containerHelper.get(interaction).find('textarea').val(text);
@@ -786,8 +785,8 @@ function setText(interaction, text) {
  * @param {Object} interaction
  */
 function destroy(interaction) {
-    var $container = containerHelper.get(interaction);
-    var $el = $container.find('input, textarea');
+    const $container = containerHelper.get(interaction);
+    const $el = $container.find('input, textarea');
 
     if (_getFormat(interaction) === 'xhtml') {
         _destroyCkEditor(interaction);
@@ -830,8 +829,8 @@ function setState(interaction, state) {
  * @returns {Object} the interaction current state
  */
 function getState(interaction) {
-    var state = {};
-    var response = interaction.getResponse();
+    const state = {};
+    const response = interaction.getResponse();
 
     if (response) {
         state.response = response;
@@ -840,7 +839,7 @@ function getState(interaction) {
 }
 
 function getCustomData(interaction, data) {
-    var pattern = interaction.attr('patternMask'),
+    const pattern = interaction.attr('patternMask'),
         maxWords = parseInt(patternMaskHelper.parsePattern(pattern, 'words')),
         maxLength = parseInt(patternMaskHelper.parsePattern(pattern, 'chars')),
         expectedLength = parseInt(interaction.attr('expectedLines'), 10);
