@@ -569,7 +569,8 @@ function inputLimiter(interaction) {
          */
         getCharsCount: function getCharsCount() {
             var value = _getTextareaValue(interaction) || '';
-            return value.length;
+            // remove NO-BREAK SPACE in the end when new line added and all new line symbols 
+            return value.replace(/[\r\n]{1}\xA0[\r\n]{1}$/,"").replace( /[\r\n]+/gm, "" ).length;
         },
 
         /**
