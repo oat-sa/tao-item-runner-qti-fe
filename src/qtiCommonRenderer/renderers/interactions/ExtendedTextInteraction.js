@@ -385,6 +385,7 @@ function inputLimiter(interaction) {
         listenTextInput: function listenTextInput() {
             const ignoreKeyCodes = [
                 8, // backspace
+                13, // enter
                 16, // shift
                 17, // control
                 46, // delete
@@ -408,6 +409,7 @@ function inputLimiter(interaction) {
                 2228263, // Shift + arrow right
                 4456487, // Alt   + arrow right
                 2228264, // Shift + arrow down
+                2228237, // Shift + enter
 
                 1114120, // Ctrl + backspace
                 1114177, // Ctrl + a
@@ -570,8 +572,8 @@ function inputLimiter(interaction) {
          */
         getCharsCount: function getCharsCount() {
             const value = _getTextareaValue(interaction) || '';
-            // remove NO-BREAK SPACE in the end when new line added and all new line symbols
-            return value.replace(/[\r\n]{1}\xA0[\r\n]{1}$/, '').replace(/[\r\n]+/gm, '').length;
+            // remove NO-BREAK SPACE in empty lines added and all new line symbols
+            return value.replace(/[\r\n]{1}\xA0[\r\n]{1}/gm, '\r').replace(/[\r\n]+/gm, '').length;
         },
 
         /**
