@@ -30,19 +30,11 @@ import locale from 'util/locale';
  *
  * @param {object} interaction
  */
-const render = (interaction) => {
+const render = interaction => {
     const attributes = interaction.getAttributes();
 
-    //setting up the width of the input field
     if (attributes.expectedLength) {
         const $input = interaction.getContainer();
-
-        //adding 2 chars to include reasonable padding size
-        const expectedLength = parseInt(attributes.expectedLength, 10) + 2;
-        $input.css({
-            width: expectedLength + 'ch',
-            minWidth: expectedLength + 'ch'
-        });
     }
 };
 
@@ -108,11 +100,11 @@ const getResponse = interaction => {
         value = $input.text();
     }
 
-    return ({
+    return {
         base: {
             [baseType]: isNaN(value) && typeof value === 'number' ? '' : value
         }
-    });
+    };
 };
 
 const destroy = interaction => {
