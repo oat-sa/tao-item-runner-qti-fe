@@ -45,6 +45,7 @@ const defaults = {
  * @param {Object} interaction
  * @fires playerrendered when the player is at least rendered
  * @fires playerready when the player is sucessfully loaded and configured
+ * @returns {Promise}
  */
 function render(interaction) {
     return new Promise(resolve => {
