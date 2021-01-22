@@ -34,15 +34,7 @@ const getContainer = containerHelper.get;
 
 //some default values
 const defaults = {
-    type: 'video/mp4',
-    video: {
-        width: 480,
-        height: 270
-    },
-    audio: {
-        width: 400,
-        height: 30
-    }
+    type: 'video/mp4'
 };
 
 /**
@@ -53,6 +45,7 @@ const defaults = {
  * @param {Object} interaction
  * @fires playerrendered when the player is at least rendered
  * @fires playerready when the player is sucessfully loaded and configured
+ * @returns {Promise}
  */
 function render(interaction) {
     return new Promise(resolve => {
@@ -96,14 +89,16 @@ function render(interaction) {
                     renderTo: $('.media-container', $container)
                 })
                     .on('render', () => {
-                        resize();
+                        // to support old sizes in px
+                        if (media.attr('width') && !/%/.test(media.attr('width'))) {
+                            resize();
 
-                        $(window)
-                            .off('resize.mediaInteraction')
-                            .on('resize.mediaInteraction', resize);
+                            $(window)
+                                .off('resize.mediaInteraction')
+                                .on('resize.mediaInteraction', resize);
 
-                        $item.off('resize.gridEdit').on('resize.gridEdit', resize);
-
+                            $item.off('resize.gridEdit').on('resize.gridEdit', resize);
+                        }
                         /**
                          * @event playerrendered
                          */
@@ -134,14 +129,6 @@ function render(interaction) {
             }
         };
 
-        if (_.size(media.attributes) === 0) {
-            //TODO move to afterCreate
-            media.attr('type', defaults.type);
-            media.attr('width', $container.innerWidth());
-
-            media.attr('height', defaults.video.height);
-            media.attr('data', '');
-        }
 
         //set up the number of times played
         if (!$container.data('timesPlayed')) {
