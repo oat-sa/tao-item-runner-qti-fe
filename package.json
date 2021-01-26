@@ -1,6 +1,6 @@
 {
     "name": "@oat-sa/tao-item-runner-qti",
-    "version": "0.17.1",
+    "version": "0.17.2",
     "displayName": "TAO Item Runner QTI",
     "description": "TAO QTI Item Runner modules",
     "files": [
@@ -74,7 +74,7 @@
         "promise-limit": "^2.7.0",
         "qunit": "^2.9.2",
         "qunit-assert-close": "^2.1.2",
-        "raphael": "2.1.4",
+        "raphael": "^2.2.2",
         "require-css": "^0.1.10",
         "requirejs-plugins": "^1.0.2",
         "rollup": "^1.15.1",
