@@ -126,7 +126,7 @@ define([
                 );
 
                 assert.equal(
-                    $container.find('pre.text-container')[0].innerHTML,
+                    $container.find('.text-container')[0].innerHTML,
                     data.value,
                     'the textarea displays the loaded response'
                 );
@@ -164,7 +164,7 @@ define([
                     'the container contains a text interaction .qti-extendedTextInteraction'
                 );
 
-                $container.find('pre.text-container')[0].innerText = 'test';
+                $container.find('.text-container')[0].innerText = 'test';
 
                 _.delay(function () {
                     assert.deepEqual(
@@ -211,7 +211,7 @@ define([
                     'the container contains a text interaction .qti-extendedTextInteraction'
                 );
 
-                $container.find('pre.text-container')[0].innerText = 'test';
+                $container.find('.text-container')[0].innerText = 'test';
 
                 _.delay(function () {
                     assert.deepEqual(
@@ -357,7 +357,7 @@ define([
                 //Ck set the text with a little delay
                 _.delay(() => {
                     assert.equal(
-                        $container.find('pre.text-container')[0].innerHTML,
+                        $container.find('.text-container')[0].innerHTML,
                         data.value,
                         'the state text is inserted'
                     );
@@ -395,7 +395,7 @@ define([
                     'the container contains a text interaction .qti-extendedTextInteraction'
                 );
 
-                $container.find('pre.text-container')[0].innerHTML = response;
+                $container.find('.text-container')[0].innerHTML = response;
 
                 assert.deepEqual(
                     self.getState(),
@@ -411,7 +411,7 @@ define([
                         { RESPONSE: { response: { base: { string: '' } } } },
                         'The response is cleared'
                     );
-                    assert.equal($container.find('pre.text-container')[0].innerHTML, '', 'the editor is cleared');
+                    assert.equal($container.find('.text-container')[0].innerHTML, '', 'the editor is cleared');
 
                     _.delay(ready, 10);
                 }, 10);
