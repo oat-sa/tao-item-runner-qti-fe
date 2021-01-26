@@ -4,22 +4,22 @@
     {{#if multiple}}
         {{#equal attributes.format "xhtml"}}
             {{#each maxStringLoop}}
-                <div class="text-container text-{{attributes.format}} solid{{#if attributes.class}} attributes.class{{/if}}" name="{{attributes.identifier}}_{{this}}" contenteditable></div>
+                <div class="text-container text-{{attributes.format}} solid{{#if attributes.class}} attributes.class{{/if}}" name="{{attributes.identifier}}_{{this}}"></div>
             {{/each}}
         {{else}}
             {{#each maxStringLoop}}
-                <div class="text-container text-{{attributes.format}} solid{{#if attributes.class}} attributes.class{{/if}}"
+                <pre class="text-container text-{{attributes.format}} solid{{#if attributes.class}} attributes.class{{/if}}"
                     name="{{attributes.identifier}}_{{this}}" {{#if attributes.patternMask}}pattern="{{attributes.patternMask}}"
-                    {{/if}} aria-labelledby="{{promptId}}"></div>
+                    {{/if}} aria-labelledby="{{promptId}}"></pre>
             {{/each}}
         {{/equal}}
     {{else}}
-        {{#equal attributes.format xhtml}}
-        <div class="text-container text-{{attributes.format}} solid{{#if attributes.class}} attributes.class{{/if}}" contenteditable></div>
+        {{#equal attributes.format "xhtml"}}
+        <div class="text-container text-{{attributes.format}} solid{{#if attributes.class}} attributes.class{{/if}}"></div>
         {{else}}
-            <div class="text-container text-{{attributes.format}} solid{{#if attributes.class}} attributes.class{{/if}}"
+            <pre class="text-container text-{{attributes.format}} solid{{#if attributes.class}} attributes.class{{/if}}"
                     name="{{attributes.identifier}}_{{this}}" {{#if attributes.patternMask}}pattern="{{attributes.patternMask}}"
-                    {{/if}} aria-labelledby="{{promptId}}"></div>
+                    {{/if}} aria-labelledby="{{promptId}}"></pre>
         {{/equal}}
     {{/if}}
     <div class="text-counter">

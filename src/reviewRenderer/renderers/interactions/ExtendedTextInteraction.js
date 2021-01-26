@@ -39,7 +39,7 @@ const render = interaction => {
         const placeholderText = interaction.attr('placeholderText');
 
         if (!multiple) {
-            $el = $container.find('div.text-container');
+            $el = $container.find('.text-container');
             if (placeholderText) {
                 $el.attr('placeholder', placeholderText);
             }
@@ -51,7 +51,7 @@ const render = interaction => {
 
             //multiple inputs
         } else {
-            $el = $container.find('div.text-container');
+            $el = $container.find('.text-container');
             minStrings = interaction.attr('minStrings');
             expectedLength = interaction.attr('expectedLength');
             patternMask = interaction.attr('patternMask');
@@ -111,9 +111,9 @@ const _getFormat = interaction => {
  */
 const _getTextContainerValue = interaction => {
     if (_getFormat(interaction) === 'xhtml') {
-        return containerHelper.get(interaction).find('div.text-container')[0].innerHTML;
+        return containerHelper.get(interaction).find('.text-container')[0].innerHTML;
     } else {
-        return containerHelper.get(interaction).find('div.text-container')[0].innerText;
+        return containerHelper.get(interaction).find('.text-container')[0].innerText;
     }
 };
 
@@ -217,13 +217,13 @@ const inputLimiter = interaction => {
  * @param {Object} interaction - the extended text interaction model
  */
 const resetResponse = interaction => {
-    containerHelper.get(interaction).find('div.text-container')[0].innerText = '';
+    containerHelper.get(interaction).find('.text-container')[0].innerText = '';
 };
 
 const setText = (interaction, text) => {
     const limiter = inputLimiter(interaction);
 
-    containerHelper.get(interaction).find('div.text-container')[0].innerHTML = text;
+    containerHelper.get(interaction).find('.text-container')[0].innerHTML = text;
 
     if (limiter.enabled) {
         limiter.updateCounter();
@@ -256,7 +256,7 @@ const getResponse = interaction => {
     if (multiple) {
         values = [];
 
-        $container.find('div.text-container').each(i => {
+        $container.find('.text-container').each(i => {
             const $el = $(this);
 
             if (attributes.placeholderText && $el.innerText === attributes.placeholderText) {
