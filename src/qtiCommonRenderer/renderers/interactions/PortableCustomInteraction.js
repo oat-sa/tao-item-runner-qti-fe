@@ -98,16 +98,18 @@ var render = function render(interaction, options) {
                                 response: response,
                                 state: state,
                                 assetManager: assetManager
+                            }).then(instance => {
+                                //forward internal PCI event responseChange
+                                if (_.isFunction(instance.on)) {
+                                    interaction.onPci('responseChange', function () {
+                                        containerHelper.triggerResponseChangeEvent(interaction);
+                                    });
+                                }
+                                resolve();
                             });
-                            //forward internal PCI event responseChange
-                            if (_.isFunction(pci.on)) {
-                                interaction.onPci('responseChange', function () {
-                                    containerHelper.triggerResponseChangeEvent(interaction);
-                                });
-                            }
-                            return resolve();
+                        } else {
+                            reject('Unable to initialize pci "' + id + '"');
                         }
-                        return reject('Unable to initialize pci "' + id + '"');
                     },
                     reject
                 );
