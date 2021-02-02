@@ -62,6 +62,7 @@ export default function commonPciRenderer(runtime) {
                 properties,
                 pciAssetManager
             );
+            return Promise.resolve(pci);
         },
         /**
          *
