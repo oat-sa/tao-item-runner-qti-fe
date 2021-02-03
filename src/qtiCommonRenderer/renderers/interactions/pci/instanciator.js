@@ -47,8 +47,8 @@ export default {
 
     /**
      * Associate a PCI instance to the interaction object
-     * @param {*} interaction 
-     * @param {*} instance 
+     * @param {Object} interaction - the js object representing the interaction
+     * @param {Object} instance - PCI instance
      */
     setPci(interaction, instance) {
         interaction.data('pci', instance);
