@@ -41,7 +41,7 @@ define([
         
         const pci = instanciator.getPci(this.interaction);
         
-        assert.strictEqual(pci.typeIdentifier, typeIdentifier);
+        assert.strictEqual(pci.typeIdentifier, typeIdentifier, 'returns with newly created pci instance');
     });
 
     QUnit.test('instanciator returns with same pci instance on second time', function(assert) {
@@ -51,7 +51,7 @@ define([
         const pci1 = instanciator.getPci(this.interaction);
         const pci2 = instanciator.getPci(this.interaction);
         
-        assert.strictEqual(pci1, pci2);
+        assert.strictEqual(pci1, pci2, 'returns with saved pci on second time, without create new one');
     });
 
     QUnit.test('instanciator returns with set pci instance', function(assert) {
@@ -61,6 +61,6 @@ define([
 
         instanciator.setPci(this.interaction, pciInstance);
 
-        assert.strictEqual(instanciator.getPci(this.interaction), pciInstance);
+        assert.strictEqual(instanciator.getPci(this.interaction), pciInstance, 'return with previously set pci');
     });
 });
