@@ -5,18 +5,18 @@
         <title>Instanciator test</title>
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
-            require(['/environment/config.js'], function() {
-                require(['qunitEnv'], function() {
-                    define('qtiCustomInteractionContext', [], function() {
+            require(['/environment/config.js'], function () {
+                require(['qunitEnv'], function () {
+                    define('qtiCustomInteractionContext', [], function () {
                         return {
-                            createPciInstance: function(pciTypeIdentifier) {
+                            createPciInstance: function (pciTypeIdentifier) {
                                 return {
                                     typeIdentifier: pciTypeIdentifier
                                 };
                             }
                         };
                     });
-                    require(['taoQtiItem/test/qtiCommonRenderer/interactions/pci/instanciator/test'], function() {
+                    require(['taoQtiItem/test/qtiCommonRenderer/interactions/pci/instanciator/test'], function () {
                         QUnit.start();
                     });
                 });
@@ -25,7 +25,6 @@
     </head>
     <body>
         <div id="qunit"></div>
-        <div id="qunit-fixture">
-        </div>
+        <div id="qunit-fixture"></div>
     </body>
 </html>

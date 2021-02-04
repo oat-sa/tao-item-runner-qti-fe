@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>IMS</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function () {
+                require(['qunitEnv'], function () {
+                    define('qtiCustomInteractionContext', [], function () {
+                        return {
+                            createPciInstance: function (typeIdentifier) {
+                                return {
+                                    typeIdentifier,
+                                    getInstance(dom, config) {
+                                        config.onready({
+                                            typeIdentifier,
+                                            dom,
+                                            config
+                                        });
+                                    }
+                                };
+                            }
+                        };
+                    });
+                    define('taoQtiItem/qtiCommonRenderer/helpers/container', function () {
+                        return {
+                            get(interaction) {
+                                return {
+                                    get() {
+                                        return 'dom for interaction';
+                                    }
+                                };
+                            }
+                        };
+                    });
+                    require(['taoQtiItem/test/qtiCommonRenderer/interactions/pci/ims/test'], function () {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+    </body>
+</html>
