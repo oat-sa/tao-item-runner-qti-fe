@@ -121,7 +121,7 @@
     "responseProcessing": {
         "serial": "response_templatesdriven_589665703f539403159372",
         "qtiClass": "responseProcessing",
-        "attributes": [],
+        "attributes": {},
         "debug": {
             "relatedItem": "item_589665700e6aa547084007"
         },
