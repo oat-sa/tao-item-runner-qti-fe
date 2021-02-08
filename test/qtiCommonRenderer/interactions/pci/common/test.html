@@ -6,19 +6,12 @@
         <script type="text/javascript" src="/environment/require.js"></script>
         <script type="text/javascript">
             require(['/environment/config.js'], function () {
+                requirejs.config({
+                    paths: {
+                        qtiCustomInteractionContext: '/test/qtiCommonRenderer/interactions/pci/common/qtiCustomInteractionContextMock'
+                    }
+                });
                 require(['qunitEnv'], function () {
-                    define('qtiCustomInteractionContext', [], function () {
-                        return {
-                            createPciInstance: function (typeIdentifier) {
-                                return {
-                                    typeIdentifier,
-                                    initialize(id, dom, properties, assetManager) {
-                                        this.initializeParameters = { id, dom, properties, assetManager };
-                                    }
-                                };
-                            }
-                        };
-                    });
                     define('taoQtiItem/qtiCommonRenderer/helpers/container', function () {
                         return {
                             get(interaction) {
