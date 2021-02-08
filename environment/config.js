@@ -41,7 +41,9 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
 
             /* LIBS */
             'lib/simulator': '/node_modules/@oat-sa/tao-core-shared-libs/lib/simulator',
-            ckeditor: '/node_modules/@oat-sa/tao-core-shared-libs/lib/ckeditor/ckeditor'
+            ckeditor: '/node_modules/@oat-sa/tao-core-shared-libs/lib/ckeditor/ckeditor',
+            select2: '/node_modules/@oat-sa/tao-core-libs/dist/select2',
+            'select2-origin': '/node_modules/select2'
             /* LIBS END */
         }, libPathDefinition),
         shim: {
@@ -53,6 +55,9 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
             },
             ckeditor: {
                 exports: 'CKEDITOR'
+            },
+            select2 : {
+                deps: ['jquery']
             }
         },
         waitSeconds: 15
