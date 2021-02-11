@@ -1,6 +1,6 @@
 {
     "name": "@oat-sa/tao-item-runner-qti",
-    "version": "0.17.2",
+    "version": "0.18.0",
     "displayName": "TAO Item Runner QTI",
     "description": "TAO QTI Item Runner modules",
     "files": [
@@ -24,7 +24,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/oat-sa/tao-item-runner-qti-fe.git"
+        "url": "git+https://github.com/oat-sa/tao-item-runner-qti-fe.git"
     },
     "keywords": [
         "tao",
@@ -88,6 +88,5 @@
     },
     "browserslist": [
         "extends @oat-sa/browserslist-config-tao"
-    ],
-    "dependencies": {}
+    ]
 }
