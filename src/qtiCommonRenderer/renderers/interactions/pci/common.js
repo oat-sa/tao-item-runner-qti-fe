@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2017-2021 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
  *
  */
 import _ from 'lodash';
@@ -62,6 +62,7 @@ export default function commonPciRenderer(runtime) {
                 properties,
                 pciAssetManager
             );
+            return Promise.resolve(pci);
         },
         /**
          *
