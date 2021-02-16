@@ -110,8 +110,8 @@ var uploadMime = {
                 interaction.attr('type', types[0]);
             }
         } else {
+            //For backward compatibility:
             //if there is more than one value, set into into TAO specific css classes
-            //qti 2.1 xsd indeed does not allow comma-separated multi mime type value for the attribute "type
             interaction.attr(
                 'class',
                 _.reduce(
@@ -122,6 +122,8 @@ var uploadMime = {
                     classes
                 ).trim()
             );
+
+            interaction.attr('type', types.join(','));
         }
     },
 
