@@ -61,7 +61,8 @@ export default {
             },
             {
                 mime: 'audio/x-wav',
-                label: __('WAV audio')
+                label: __('WAV audio'),
+                equivalent: ['audio/wav']
             },
             {
                 mime: 'video/mpeg',
@@ -175,7 +176,8 @@ export default {
             },
             {
                 mime: 'application/vnd.geogebra.file',
-                label: __('Geogebra data file')
+                label: __('Geogebra data file'),
+                equivalent: ['.ggb']
             },
             {
                 mime: 'text/x-h',
@@ -192,7 +194,7 @@ export default {
                 label: __('Hypertext markup language')
             },
             {
-                mime: 'application/x-javascript',
+                mime: 'text/javascript',
                 label: __('Javascript code')
             },
             {
@@ -215,7 +217,7 @@ export default {
                 equivalent: ['.mm']
             },
             {
-                mime: 'audio/m4a',
+                mime: 'audio/x-m4a',
                 label: __('MPEG-4 audio file')
             },
             {
@@ -245,8 +247,8 @@ export default {
             },
             {
                 mime: 'application/octet-stream',
-                label: __('Flowchart-based programming environment'),
-                equivalent: ['.rap']
+                label: __('Flowchart-based programming environment & TI Interactive Workbook'),
+                equivalent: ['.rap', '.tii']
             },
             {
                 mime: 'application/vnd.rn-realmedia',
@@ -328,7 +330,7 @@ export default {
                 equivalent: ['.7z']
             },
             {
-                mime: 'application/gzip',
+                mime: 'application/x-gzip',
                 label: __('GZip Compressed Archive')
             },
             {
