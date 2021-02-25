@@ -322,7 +322,8 @@ export default {
             },
             {
                 mime: 'application/vnd.ms-xpsdocument',
-                label: __('Microsoft XPS file')
+                label: __('Microsoft XPS file'),
+                equivalent: ['.xps']
             },
             {
                 mime: 'application/x-7z-compressed',
