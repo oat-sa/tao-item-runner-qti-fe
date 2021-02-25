@@ -21,30 +21,55 @@ import loggerFactory from 'core/logger';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instanciator from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/instanciator';
 
-var logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims');
+const logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims');
 
-var pciDoneCallback = function pciDoneCallback(pci, response, state, status) {
+const pciDoneCallback = pci => {
     //standard callback function to be implemented in a future story
     logger.info('pciDoneCallback called on PCI ' + pci.typeIdentifier);
 };
 
+/**
+ * Key under the IMS PCI constructor is stored on interaction
+ */
+const pciConstructorDataKey = 'pciConstructor';
+
 export default function defaultPciRenderer(runtime) {
     return {
-        getRequiredModules: function getRequiredModules() {
-            var requireEntries = [];
-            //load modules
-            _.forEach(runtime.modules, function(module, name) {
+        getRequiredModules() {
+            const requireEntries = [];
+            // load modules
+            _.forEach(runtime.modules, function (module, name) {
                 requireEntries.push(name);
             });
             return requireEntries;
         },
-        createInstance: function createInstance(interaction, context) {
-            var pci = instanciator.getPci(interaction);
-            var config;
-            var properties = _.clone(interaction.properties);
+        /**
+         * Saves the original IMS PCI module to be able to reinstanciate later
+         * @param {Object} interaction
+         * @param {Object} pciConstructor
+         */
+        setPCIConstructor(interaction, pciConstructor) {
+            interaction.data(pciConstructorDataKey, pciConstructor);
+        },
+        /**
+         * Returns with original IMS PCI module
+         * @param {Object} interaction
+         */
+        getPCIConstructor(interaction) {
+            return interaction.data(pciConstructorDataKey);
+        },
+        createInstance(interaction, context) {
+            let pciConstructor = this.getPCIConstructor(interaction);
+            const properties = _.clone(interaction.properties);
+
+            // save original IMS PCI module first time to be able to reinstanciate later if necessary
+            if (!pciConstructor) {
+                pciConstructor = instanciator.getPci(interaction);
+                this.setPCIConstructor(interaction, pciConstructor);
+            }
 
             // serialize any array or object properties
-            _.forOwn(properties, function(propVal, propKey) {
+            _.forOwn(properties, function (propVal, propKey) {
                 properties[propKey] = _.isArray(propVal) || _.isObject(propVal) ? JSON.stringify(propVal) : propVal;
             });
 
@@ -53,8 +78,8 @@ export default function defaultPciRenderer(runtime) {
                 pciReadyCallback = resolve;
             });
 
-            config = {
-                properties: properties,
+            const config = {
+                properties,
                 templateVariables: {}, //not supported yet
                 boundTo: context.response || {},
                 onready: pciReadyCallback,
@@ -62,7 +87,7 @@ export default function defaultPciRenderer(runtime) {
                 status: 'interacting' //only support interacting state currently(TODO: solution, review),
             };
 
-            pci.getInstance(containerHelper.get(interaction).get(0), config, context.state);
+            pciConstructor.getInstance(containerHelper.get(interaction).get(0), config, context.state);
 
             return readyPromise.then(instance => {
                 instanciator.setPci(interaction, instance);
@@ -72,8 +97,17 @@ export default function defaultPciRenderer(runtime) {
         destroy: function destroy(interaction) {
             instanciator.getPci(interaction).oncompleted();
         },
-        setState: _.noop,
-        getState: function getState(interaction) {
+        /**
+         * IMS PCI does not have setState, so PCI should be restored and recreated with new state.
+         * This function should run only in review mode.
+         * @param {Object} interaction
+         * @param {Object} state - state that should be set
+         */
+        setState(interaction, state) {
+            this.destroy(interaction);
+            this.createInstance(interaction, { state });
+        },
+        getState(interaction) {
             return instanciator.getPci(interaction).getState();
         }
     };
