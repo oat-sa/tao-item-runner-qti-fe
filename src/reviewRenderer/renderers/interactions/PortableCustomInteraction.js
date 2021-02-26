@@ -37,6 +37,11 @@ const getData = (customInteraction, data) => {
     return Object.assign({}, data, { markup, isInteractionDisabled });
 };
 
+/**
+ * Set back response for review mode
+ * @param {Object} interaction 
+ * @param {Object} serializedState 
+ */
 const setState = (interaction, serializedState) => {
     const pciRenderer = interaction.data('pci-renderer');
 
