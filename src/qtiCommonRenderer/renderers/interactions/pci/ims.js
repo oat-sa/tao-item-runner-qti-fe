@@ -102,10 +102,11 @@ export default function defaultPciRenderer(runtime) {
          * This function should run only in review mode.
          * @param {Object} interaction
          * @param {Object} state - state that should be set
+         * @returns {Promise<Object>} - Resolves with newly created instance
          */
         setReviewState(interaction, state) {
             this.destroy(interaction);
-            this.createInstance(interaction, { response: { RESPONSE: state.response } });
+            return this.createInstance(interaction, { response: { RESPONSE: state.response } });
         },
         setState: _.noop,
         getState(interaction) {
