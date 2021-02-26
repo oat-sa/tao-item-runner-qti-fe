@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2020-2021 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -37,4 +37,15 @@ const getData = (customInteraction, data) => {
     return Object.assign({}, data, { markup, isInteractionDisabled });
 };
 
-export default Object.assign({}, portableCustomInteraction, { template, getData });
+const setState = (interaction, serializedState) => {
+    const pciRenderer = interaction.data('pci-renderer');
+
+    // IMS renderer has a special function to restore response
+    if (typeof pciRenderer.setReviewState === 'function') {
+        pciRenderer.setReviewState(interaction, serializedState);
+    } else {
+        pciRenderer.setState(interaction, serializedState);
+    }
+};
+
+export default Object.assign({}, portableCustomInteraction, { template, getData, setState });

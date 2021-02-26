@@ -98,15 +98,16 @@ export default function defaultPciRenderer(runtime) {
             instanciator.getPci(interaction).oncompleted();
         },
         /**
-         * IMS PCI does not have setState, so PCI should be restored and recreated with new state.
+         * IMS PCI does not have setState, so PCI should be destroyed and reinstanciated with response.
          * This function should run only in review mode.
          * @param {Object} interaction
          * @param {Object} state - state that should be set
          */
-        setState(interaction, state) {
+        setReviewState(interaction, state) {
             this.destroy(interaction);
-            this.createInstance(interaction, { state });
+            this.createInstance(interaction, { response: { RESPONSE: state.response } });
         },
+        setState: _.noop,
         getState(interaction) {
             return instanciator.getPci(interaction).getState();
         }
