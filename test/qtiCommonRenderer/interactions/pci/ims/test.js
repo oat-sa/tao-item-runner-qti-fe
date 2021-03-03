@@ -64,4 +64,119 @@ define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function
             done();
         });
     });
+
+    QUnit.test('set/getPCIConstructor', function(assert) {
+        const interaction = {
+            _store: {},
+            data(key, data) {
+                if (typeof data === 'undefined') {
+                    return this._store[key];
+                }
+                this._store[key] = data;
+            }
+        };
+
+        const pciConstructor = {
+            getInstance() {}
+        };
+
+        ims().setPCIConstructor(interaction, pciConstructor);
+        
+        assert.equal(ims().getPCIConstructor(interaction), pciConstructor, 'get back set pci constructor');
+    });
+
+    QUnit.test('createInstance saves and reuses pci constructor', function(assert) {
+        const done = assert.async();
+
+        const typeIdentifier = 'bar';
+        const interaction = {
+            _store: {},
+            typeIdentifier,
+            data(key, data) {
+                if (typeof data === 'undefined') {
+                    return this._store[key];
+                }
+                this._store[key] = data;
+            }
+        };
+
+        ims().createInstance(interaction, {}).then(() => {
+            const pciConstructor = ims().getPCIConstructor(interaction);
+            assert.equal(typeof pciConstructor.getInstance, 'function', 'pci constructor is saved');
+            
+            return ims().createInstance(interaction, {});
+        }).then(instance => {
+            assert.equal(instance.typeIdentifier, typeIdentifier, 'pci can be recreated');
+            done();
+        });
+    });
+
+    QUnit.test('setReviewState reinstanciate PCI with new repsonse', function(assert) {
+        const done = assert.async();
+        assert.expect(3);
+
+        const typeIdentifier = 'bar';
+        const properties = {
+            bar: 'baz'
+        };
+        const interaction = {
+            _store: {},
+            typeIdentifier,
+            properties,
+            data(key, data) {
+                if (typeof data === 'undefined') {
+                    return this._store[key];
+                }
+                this._store[key] = data;
+            }
+        };
+        const response = { base: null };
+        const newResponse = { base: {string: 'abc'} };
+        const context = { response };
+
+        ims().createInstance(interaction, context).then(instance => {
+            assert.propEqual(
+                instance,
+                {
+                    typeIdentifier,
+                    dom: 'dom for interaction',
+                    config: {
+                        boundTo: response,
+                        ondone: {},
+                        onready: {},
+                        properties,
+                        status: 'interacting',
+                        templateVariables: {}
+                    }
+                },
+                'passes correct parameters to ims pci'
+            );
+            
+            // create an oncompleted function for the instance
+            instance.oncompleted = () => {
+                assert.ok(true, 'IMS PCI oncompleted function is called');
+            };
+
+            return ims().setReviewState(interaction, { response: newResponse });
+        }).then(instance => {
+            assert.propEqual(
+                instance,
+                {
+                    typeIdentifier,
+                    dom: 'dom for interaction',
+                    config: {
+                        boundTo: { RESPONSE: newResponse },
+                        ondone: {},
+                        onready: {},
+                        properties,
+                        status: 'interacting',
+                        templateVariables: {}
+                    }
+                },
+                'passes correct parameters to ims pci'
+            );
+
+            done();
+        });
+    });
 });
