@@ -30,6 +30,9 @@ const getData = (customInteraction, data) => {
     let markup = data.markup;
     const isInteractionDisabled = isInteractionDisabledForPci(data.typeIdentifier);
 
+    // Set review mode on for PCI
+    customInteraction.properties.isReviewMode = true;
+
     //remove ns + fix media file path
     markup = util.removeMarkupNamespaces(markup);
     markup = PortableElement.fixMarkupMediaSources(markup, this);
@@ -39,8 +42,8 @@ const getData = (customInteraction, data) => {
 
 /**
  * Set back response for review mode
- * @param {Object} interaction 
- * @param {Object} serializedState 
+ * @param {Object} interaction
+ * @param {Object} serializedState
  */
 const setState = (interaction, serializedState) => {
     const pciRenderer = interaction.data('pci-renderer');
