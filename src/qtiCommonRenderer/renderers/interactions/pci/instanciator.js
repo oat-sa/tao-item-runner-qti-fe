@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2017-2021 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
  *
  */
 import qtiCustomInteractionContext from 'qtiCustomInteractionContext';
@@ -26,9 +26,9 @@ export default {
      * @param {Object} interaction - the js object representing the interaction
      * @returns {Object} PCI instance
      */
-    getPci: function getPci(interaction) {
-        var pciTypeIdentifier,
-            pci = interaction.data('pci');
+    getPci(interaction) {
+        let pciTypeIdentifier;
+        let pci = interaction.data('pci');
 
         if (!pci) {
             pciTypeIdentifier = interaction.typeIdentifier;
@@ -43,5 +43,14 @@ export default {
         }
 
         return pci;
+    },
+
+    /**
+     * Associate a PCI instance to the interaction object
+     * @param {Object} interaction - the js object representing the interaction
+     * @param {Object} instance - PCI instance
+     */
+    setPci(interaction, instance) {
+        interaction.data('pci', instance);
     }
 };
