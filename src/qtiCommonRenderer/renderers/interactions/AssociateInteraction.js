@@ -24,6 +24,7 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
+import hider from 'ui/hider';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/associateInteraction';
 import pairTpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/associateInteraction.pair';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
@@ -99,7 +100,8 @@ var setChoice = function(interaction, $choice, $target) {
                 if (!$resultArea.children('.incomplete-pair').length) {
                     $resultArea.append(pairTpl({ empty: true }));
                     $resultArea.children('.incomplete-pair').fadeIn(600, function() {
-                        $(this).show();
+                        // $(this).show();
+                        hider.show(this);
                     });
                 }
             }
@@ -193,7 +195,8 @@ var renderEmptyPairs = function(interaction) {
 
     if (interaction.responseMappingMode || max === 0) {
         $resultArea.append(pairTpl({ empty: true }));
-        $resultArea.children('.incomplete-pair').show();
+        // $resultArea.children('.incomplete-pair').show();
+        hider.show($resultArea.children('.incomplete-pair'));
     } else {
         for (var i = 0; i < max; i++) {
             $resultArea.append(pairTpl());
