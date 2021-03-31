@@ -100,7 +100,6 @@ var setChoice = function(interaction, $choice, $target) {
                 if (!$resultArea.children('.incomplete-pair').length) {
                     $resultArea.append(pairTpl({ empty: true }));
                     $resultArea.children('.incomplete-pair').fadeIn(600, function() {
-                        // $(this).show();
                         hider.show(this);
                     });
                 }
@@ -195,7 +194,6 @@ var renderEmptyPairs = function(interaction) {
 
     if (interaction.responseMappingMode || max === 0) {
         $resultArea.append(pairTpl({ empty: true }));
-        // $resultArea.children('.incomplete-pair').show();
         hider.show($resultArea.children('.incomplete-pair'));
     } else {
         for (var i = 0; i < max; i++) {
