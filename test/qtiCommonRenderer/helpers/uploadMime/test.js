@@ -7,8 +7,7 @@ define([
 ) {
     'use strict';
 
-    QUnit.module('taoQtiItem/qtiCommonRenderer/helpers/uploadMime', {
-    });
+    QUnit.module('taoQtiItem/qtiCommonRenderer/helpers/uploadMime');
 
     QUnit.test('API', function(assert) {
         assert.ok(typeof uploadMime === 'object', 'The module expose an Object');
