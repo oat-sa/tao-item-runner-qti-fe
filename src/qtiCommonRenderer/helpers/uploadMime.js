@@ -64,7 +64,7 @@ var uploadMime = {
                 ).trim()
             );
 
-            interaction.attr('type', types.join(','));
+            interaction.attr('type', types.join(' '));
         }
     },
 
