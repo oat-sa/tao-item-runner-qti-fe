@@ -13,79 +13,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-21 (original work) Open Assessment Technologies SA ;
  */
 import _ from 'lodash';
 import __ from 'i18n';
+import mimeTypes from 'core/mimetype/definitions';
 
 var uploadMime = {
     /**
-     * @TODO these mime types are not up-to-date, in particular the MS ones
-     * refer to http://filext.com/faq/office_mime_types.php
-     * @type [{getMimeTypes: getMimeTypes}]
+     * Fetch mime type definitions
+     * (translation function for labels must be injected from here)
+     * @returns {Array}
      */
     getMimeTypes: function getMimeTypes() {
-        return [
-            { mime: 'application/zip', label: __('ZIP archive'), equivalent: ['application/x-zip-compressed'] },
-            { mime: 'text/plain', label: __('Plain text') },
-            { mime: 'application/pdf', label: __('PDF file') },
-            { mime: 'image/jpeg', label: __('JPEG image') },
-            { mime: 'image/png', label: __('PNG image') },
-            { mime: 'image/gif', label: __('GIF image') },
-            { mime: 'image/svg+xml', label: __('SVG image') },
-            { mime: 'audio/mpeg', label: __('MPEG audio'), equivalent: ['audio/mp3'] },
-            { mime: 'audio/x-ms-wma', label: __('Windows Media audio') },
-            { mime: 'audio/x-wav', label: __('WAV audio'), equivalent: ['audio/wav'] },
-            { mime: 'video/mpeg', label: __('MPEG video') },
-            { mime: 'video/mp4', label: __('MP4 video') },
-            { mime: 'video/quicktime', label: __('Quicktime video') },
-            { mime: 'video/x-ms-wmv', label: __('Windows Media video') },
-            {
-                mime: 'video/x-flv',
-                label: __('Flash video'),
-                equivalent: ['.flv']
-            },
-            {
-                mime: 'text/csv',
-                label: __('CSV file'),
-                equivalent: ['.csv']
-            },
-            {
-                mime: 'application/msword',
-                label: __('Microsoft Word'),
-                equivalent: ['application/vnd.openxmlformats-officedocument.wordprocessingml.document']
-            },
-            {
-                mime: 'application/vnd.ms-excel',
-                label: __('Microsoft Excel'),
-                equivalent: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
-            },
-            {
-                mime: 'application/vnd.ms-powerpoint',
-                label: __('Microsoft Powerpoint'),
-                equivalent: ['application/vnd.openxmlformats-officedocument.presentationml.presentation']
-            },
-            {
-                mime: 'application/vnd.oasis.opendocument.text',
-                label: __('OpenDocument text document'),
-                equivalent: ['.odf']
-            },
-            {
-                mime: 'application/vnd.oasis.opendocument.spreadsheet',
-                label: __('OpenDocument spreadsheet document'),
-                equivalent: ['.ods']
-            },
-            {
-                mime: 'text/x-c',
-                label: __('C++ file (.cpp)'),
-                equivalent: ['.cpp']
-            },
-            {
-                mime: 'text/pascal',
-                label: __('Pascal file (.pas)'),
-                equivalent: ['.pas']
-            }
-        ];
+        return mimeTypes.getList(__);
     },
 
     /**

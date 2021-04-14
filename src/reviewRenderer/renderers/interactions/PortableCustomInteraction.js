@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2020-2021 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -30,6 +30,9 @@ const getData = (customInteraction, data) => {
     let markup = data.markup;
     const isInteractionDisabled = isInteractionDisabledForPci(data.typeIdentifier);
 
+    // Set review mode on for PCI
+    customInteraction.properties.isReviewMode = true;
+
     //remove ns + fix media file path
     markup = util.removeMarkupNamespaces(markup);
     markup = PortableElement.fixMarkupMediaSources(markup, this);
@@ -37,4 +40,20 @@ const getData = (customInteraction, data) => {
     return Object.assign({}, data, { markup, isInteractionDisabled });
 };
 
-export default Object.assign({}, portableCustomInteraction, { template, getData });
+/**
+ * Set back response for review mode
+ * @param {Object} interaction
+ * @param {Object} serializedState
+ */
+const setState = (interaction, serializedState) => {
+    const pciRenderer = interaction.data('pci-renderer');
+
+    // IMS renderer has a special function to restore response
+    if (typeof pciRenderer.setReviewState === 'function') {
+        pciRenderer.setReviewState(interaction, serializedState);
+    } else {
+        pciRenderer.setState(interaction, serializedState);
+    }
+};
+
+export default Object.assign({}, portableCustomInteraction, { template, getData, setState });
