@@ -13,20 +13,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-21 (original work) Open Assessment Technologies SA ;
  */
 import _ from 'lodash';
 import __ from 'i18n';
-import mimeTypes from './data/mimeTypes';
+import mimeTypes from 'core/mimetype/definitions';
 
 var uploadMime = {
     /**
-     * @TODO these mime types are not up-to-date, in particular the MS ones
-     * refer to http://filext.com/faq/office_mime_types.php
-     * @type [{getMimeTypes: getMimeTypes}]
+     * Fetch mime type definitions
+     * (translation function for labels must be injected from here)
+     * @returns {Array}
      */
     getMimeTypes: function getMimeTypes() {
-        return mimeTypes.getList();
+        return mimeTypes.getList(__);
     },
 
     /**
