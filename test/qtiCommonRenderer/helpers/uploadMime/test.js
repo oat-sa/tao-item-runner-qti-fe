@@ -51,16 +51,6 @@ define([
         assert.deepEqual(typesWithEquiv, ['application/x-rar-compressed', 'application/x-rar', '.rar']);
     });
 
-    QUnit.test('getExpectedTypes - when has class', function(assert) {
-        const interaction = new Element();
-        interaction.attr('class', 'x-tao-upload-type-application_x-rar-compressed');
-
-        const types = uploadMime.getExpectedTypes(interaction);
-        const typesWithEquiv = uploadMime.getExpectedTypes(interaction, true);
-        assert.deepEqual(types, ['application/x-rar-compressed']);
-        assert.deepEqual(typesWithEquiv, ['application/x-rar-compressed', 'application/x-rar', '.rar']);
-    });
-
     QUnit.test('setExpectedTypes - single', function(assert) {
         const interaction = new Element();
 
@@ -77,7 +67,7 @@ define([
         uploadMime.setExpectedTypes(interaction, ['application/pdf', 'image/jpeg', 'audio/*', 'application/msword']);
         let type = interaction.attr('type');
         let classes = interaction.attr('class');
-        assert.equal(type, void 0);
+        assert.equal(type, 'application/pdf image/jpeg audio/* application/msword');
         assert.deepEqual(classes, 'x-tao-upload-type-application_pdf x-tao-upload-type-image_jpeg x-tao-upload-type-audio_* x-tao-upload-type-application_msword');
     });
 
