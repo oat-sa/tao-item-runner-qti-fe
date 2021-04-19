@@ -47,9 +47,14 @@ const uploadMime = {
             return;
         }
 
-        //For backward compatibility:
-        //if there is more than one value, set into into TAO specific css classes
-        if (types.length > 1) {
+        if (types.length === 1) {
+            //if there is only one value set into the qti standard type attribute
+            if (types[0] !== 'any/kind') {
+                interaction.attr('type', types[0]);
+            }
+        } else {
+            //For backward compatibility:
+            //if there is more than one value, set into into TAO specific css classes
             interaction.attr(
                 'class',
                 _.reduce(
@@ -60,9 +65,9 @@ const uploadMime = {
                     classes
                 ).trim()
             );
-        }
 
-        interaction.attr('type', types.join(delimetr));
+            interaction.attr('type', types.join(delimetr));
+        }
     },
 
     /**
