@@ -129,9 +129,9 @@ var expressionEngineFactory = function expressionEngineFactory(state) {
 };
 
 //register all processors
-_.forEach(expressionProcessors, function(expressionProcessor, name) {
-    const shortName = name.replace(/Processor$/, '');
-    processorFactory.register(shortName, processorFactory.types.EXPRESSION, expressionProcessor);
+_.forEach(expressionProcessors, function(expressionProcessor, nameWithSuffix) {
+    const name = nameWithSuffix.replace(/Processor$/, '');
+    processorFactory.register(name, processorFactory.types.EXPRESSION, expressionProcessor);
 });
 _.forEach(operatorProcessors, function(operatorProcessor, name) {
     processorFactory.register(name, processorFactory.types.OPERATOR, operatorProcessor);
