@@ -399,24 +399,17 @@ define([
                 var interaction = this._item.getInteractions()[0];
                 interaction.renderer.destroy(interaction);
 
-                var $gapFiller = $('.qti-choice[data-identifier="gapimg_1"]', $container);
-                var $hotspot = $('.main-image-box rect', $container).eq(5);
+                var $image = $('.main-image-box', $container);
 
                 interactUtils.tapOn(
-                    $gapFiller,
+                    $image,
                     function() {
-                        interactUtils.tapOn(
-                            $hotspot,
-                            function() {
-                                assert.deepEqual(
-                                    self.getState(),
-                                    { RESPONSE: { response: { list: { directedPair: [] } } } },
-                                    'Click does not trigger response once destroyed'
-                                );
-                                ready();
-                            },
-                            10
+                        assert.deepEqual(
+                            self.getState(),
+                            { RESPONSE: { response: { list: { directedPair: [] } } } },
+                            'Click does not trigger response once destroyed'
                         );
+                        ready();
                     },
                     10
                 );

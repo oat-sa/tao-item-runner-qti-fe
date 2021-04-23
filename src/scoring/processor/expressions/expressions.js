@@ -39,7 +39,7 @@ import variable from 'taoQtiItem/scoring/processor/expressions/variable';
 /**
  * An ExpressionProcessor
  * @typedef ExpressionProcessor
- * @property {Object} exression - the expression definition
+ * @property {Object} expression - the expression definition
  * @property {Object} preProcessor - helps you to parse and manipulate values
  * @property {Object} state - the session state (responses and variables)
  * @property {Funtion} process - the processing
@@ -47,17 +47,18 @@ import variable from 'taoQtiItem/scoring/processor/expressions/variable';
 
 /**
  * Lists all available expression processors
+ * Suffix 'Processor' added to keys here otherwise ES6 thinks property 'default' is an export inside the export
  * @exports taoQtiItem/scoring/processor/expressions/expressions
  */
 export default {
-    'baseValue': baseValue,
-    'correct': correct,
-    'default': defaultt,
-    'mapResponse': mapResponse,
-    'mapResponsePoint': mapResponsePoint,
-    'mathConstant': mathConstant,
-    'null': nulll,
-    'randomFloat': randomFloat,
-    'randomInteger': randomInteger,
-    'variable': variable
+    baseValueProcessor: baseValue,
+    correctProcessor: correct,
+    defaultProcessor: defaultt,
+    mapResponseProcessor: mapResponse,
+    mapResponsePointProcessor: mapResponsePoint,
+    mathConstantProcessor: mathConstant,
+    nullProcessor: nulll,
+    randomFloatProcessor: randomFloat,
+    randomIntegerProcessor: randomInteger,
+    variableProcessor: variable
 };
