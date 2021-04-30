@@ -51,7 +51,9 @@ export default {
                 'load',
                 function(e) {
                     if (e.target.rel === 'stylesheet') {
-                        adaptSize.height($elements);
+                        setTimeout(function () {
+                            adaptSize.height($elements);
+                        }, 300);
                     }
                 },
                 true
