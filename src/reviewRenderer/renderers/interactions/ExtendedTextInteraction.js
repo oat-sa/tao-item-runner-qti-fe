@@ -197,7 +197,8 @@ const inputLimiter = interaction => {
          */
         getCharsCount: () => {
             const value = _getTextContainerValue(interaction) || '';
-            return value.length;
+            // remove NO-BREAK SPACE in empty lines added and all new line symbols
+            return value.replace(/[\r\n]{1}\xA0[\r\n]{1}/gm, '\r').replace(/[\r\n]+/gm, '').length;
         },
 
         /**
