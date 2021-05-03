@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2015-2021 (original work) Open Assessment Technologies SA;
  *
  */
 import $ from 'jquery';
@@ -26,7 +26,7 @@ export default {
      *
      * @param {jQueryElement|widget} target
      */
-    adaptSize: function(target) {
+    adaptSize: function (target) {
         var $elements;
         var $container;
 
@@ -40,18 +40,19 @@ export default {
             // jquery elements
             default:
                 $elements = target;
-                $container = $($elements)
-                    .first()
-                    .parent();
+                $container = $($elements).first().parent();
         }
 
-        $container.waitForMedia(function() {
+        $container.waitForMedia(function () {
             adaptSize.height($elements);
             document.addEventListener(
                 'load',
-                function(e) {
+                function (e) {
                     if (e.target.rel === 'stylesheet') {
-                        adaptSize.height($elements);
+                        // give time to slower computers to apply loaded styles
+                        setTimeout(() => {
+                            adaptSize.height($elements);
+                        }, 0);
                     }
                 },
                 true
