@@ -4,4 +4,7 @@
         <span class="file-name placeholder col-8 truncate"></span>
         <a class="btn-download btn-info small"><span class="icon-download"></span></a>
     </div>
+    <div class="file-upload-preview lft visible-file-upload-preview runtime-visible-file-upload-preview">
+        <p class="nopreview">{{__ 'No preview available'}}</p>
+    </div>
 </div>

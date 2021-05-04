@@ -24,6 +24,7 @@ import template from 'taoQtiItem/reviewRenderer/tpl/interactions/uploadInteracti
 import uploadInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/UploadInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import __ from 'i18n';
+import 'ui/previewer';
 /**
  * Set the response to the rendered interaction.
  *
@@ -41,6 +42,7 @@ var setResponse = function setResponse(interaction, response) {
         downloadUrl,
         mime,
         downloadLink = document.createElement("a"),
+        $previewArea,
         $container = containerHelper.get(interaction);
 
     if (response.base !== null) {
@@ -63,6 +65,12 @@ var setResponse = function setResponse(interaction, response) {
                 downloadLink.click();
             });
 
+        $previewArea = $container.find('.file-upload-preview');
+        $previewArea.previewer({
+            url: downloadUrl,
+            name: filename,
+            mime: mime
+        });
     }
     interaction.data('_response', response);
 };
