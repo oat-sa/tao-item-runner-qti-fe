@@ -216,7 +216,7 @@ var _handleSelectedFiles = function _handleSelectedFiles(interaction, file, mess
 var _resetGui = function _resetGui(interaction) {
     var $container = containerHelper.get(interaction);
     $container.find('.file-name').text(__('No file selected'));
-    $container.find('.btn-info').text(__('Browse...'));
+    $container.find('.btn-upload').text(__('Browse...'));
 };
 
 /**

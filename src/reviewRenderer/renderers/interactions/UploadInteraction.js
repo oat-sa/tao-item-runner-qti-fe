@@ -22,5 +22,70 @@
  */
 import template from 'taoQtiItem/reviewRenderer/tpl/interactions/uploadInteraction';
 import uploadInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/UploadInteraction';
+import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
+import __ from 'i18n';
+/**
+ * Set the response to the rendered interaction.
+ *
+ * The response format follows the IMS PCI recommendation :
+ * http://www.imsglobal.org/assessment/pciv1p0cf/imsPCIv1p0cf.html#_Toc353965343
+ *
+ * Available base types are defined in the QTI v2.1 information model:
+ * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10321
+ *
+ * @param {object} interaction
+ * @param {object} response
+ */
+var setResponse = function setResponse(interaction, response) {
+    var filename,
+        downloadUrl,
+        mime,
+        downloadLink = document.createElement("a"),
+        $container = containerHelper.get(interaction);
 
-export default Object.assign({}, uploadInteraction, {template});
+    if (response.base !== null) {
+        filename =
+            typeof response.base.file.name !== 'undefined' ? response.base.file.name : 'previously-uploaded-file';
+        mime = response.base.file.mime;
+        downloadUrl = typeof response.base.file.data !== 'undefined' ? 'data:' + mime + ';base64,' + response.base.file.data : '';
+
+        $container
+            .find('.file-name')
+            .empty()
+            .text(filename);
+
+        $container
+            .find('.btn-download')
+            .click(function (e) {
+                e.preventDefault();
+                downloadLink.href = downloadUrl;
+                downloadLink.download = filename;
+                downloadLink.click();
+            });
+
+    }
+    interaction.data('_response', response);
+};
+
+/**
+ * Init rendering, called after template injected into the DOM
+ * All options are listed in the QTI v2.1 information model:
+ * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10321
+ *
+ * @param {object} interaction
+ */
+var render = function render(interaction) {
+    _resetGui(interaction);
+};
+
+var _resetGui = function _resetGui(interaction) {
+    var $container = containerHelper.get(interaction);
+    $container.find('.btn-download').append(__('Download'));
+};
+
+export default Object.assign({}, uploadInteraction, {
+    template,
+    setResponse,
+    render,
+    resetGui: _resetGui
+});

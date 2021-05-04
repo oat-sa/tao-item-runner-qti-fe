@@ -3,7 +3,7 @@
 	<div class="instruction-container"></div>
     <div class="file-upload fixed-grid-row lft">
         <div class="progressbar"></div>
-        <span class="btn-info small col-4"></span>
+        <span class="btn-info btn-upload small col-4"></span>
         <span class="file-name placeholder col-8 truncate"></span>
         <input type="file" {{#if accept}}accept="{{accept}}"{{/if}}/>
     </div>
