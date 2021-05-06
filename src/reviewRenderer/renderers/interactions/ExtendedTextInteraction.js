@@ -196,8 +196,16 @@ const inputLimiter = interaction => {
          * @return {Number} number of characters
          */
         getCharsCount: () => {
-            const value = _getTextContainerValue(interaction) || '';
-            return value.length;
+            let value = _getTextContainerValue(interaction) || '';
+
+            // convert it to text
+            if (_getFormat(interaction) === 'xhtml') {
+                const div = document.createElement('div');
+                div.innerHTML = value;
+                value = div.textContent || div.innerText || '';
+            }
+            // remove NO-BREAK SPACE in empty lines added and all new line symbols
+            return value.replace(/[\r\n]{1}\xA0[\r\n]{1}/gm, '\r').replace(/[\r\n]+/gm, '').length;
         },
 
         /**
