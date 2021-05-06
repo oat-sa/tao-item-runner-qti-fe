@@ -55,7 +55,7 @@ export default {
                     if (e.target.rel === 'stylesheet') {
                         // give time to slower computers to apply loaded styles
                         setTimeout(() => {
-                            //adaptSize.height($elements);
+                            adaptSize.height($elements);
                         }, 0);
                     }
                 },
