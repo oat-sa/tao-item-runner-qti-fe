@@ -45,6 +45,10 @@ export default {
 
         $container.waitForMedia(function () {
             adaptSize.height($elements);
+            // delay a resize as some browsers are not emitting the load event on the LINK elements (Chrome)
+            setTimeout(() => {
+                adaptSize.height($elements);
+            }, 300);
             document.addEventListener(
                 'load',
                 function (e) {
