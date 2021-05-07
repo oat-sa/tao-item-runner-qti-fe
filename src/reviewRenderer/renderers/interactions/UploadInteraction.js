@@ -37,19 +37,14 @@ import 'ui/previewer';
  * @param {object} interaction
  * @param {object} response
  */
-var setResponse = function setResponse(interaction, response) {
-    var filename,
-        downloadUrl,
-        mime,
-        downloadLink = document.createElement("a"),
-        $previewArea,
-        $container = containerHelper.get(interaction);
+function setResponse(interaction, response) {
+    const $container = containerHelper.get(interaction);
+    const $previewArea = $container.find('.file-upload-preview');
+    if (response.base && response.base.file) {
+        const downloadLink = document.createElement("a");
 
-    if (response.base !== null) {
-        filename =
-            typeof response.base.file.name !== 'undefined' ? response.base.file.name : 'previously-uploaded-file';
-        mime = response.base.file.mime;
-        downloadUrl = typeof response.base.file.data !== 'undefined' ? 'data:' + mime + ';base64,' + response.base.file.data : '';
+        const { name: filename, mime, data } = response.base.file;
+        const downloadUrl = data ? `data:${mime};base64,${response.base.file.data}` : '';
 
         $container
             .find('.file-name')
@@ -57,43 +52,45 @@ var setResponse = function setResponse(interaction, response) {
             .text(filename);
 
         $container
-            .find('.btn-download')
-            .click(function (e) {
+            .find('[data-control="download"]')
+            .on('click', e => {
                 e.preventDefault();
                 downloadLink.href = downloadUrl;
                 downloadLink.download = filename;
                 downloadLink.click();
             });
 
-        $previewArea = $container.find('.file-upload-preview');
         $previewArea.previewer({
             url: downloadUrl,
             name: filename,
             mime: mime
         });
+    } else {
+        $container
+            .find('.file-upload')
+            .hide();
+
+        $previewArea.css({
+            'min-width': '300px',
+            'min-height': '200px'
+        })
     }
     interaction.data('_response', response);
 };
 
-/**
- * Init rendering, called after template injected into the DOM
- * All options are listed in the QTI v2.1 information model:
- * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10321
- *
- * @param {object} interaction
- */
-var render = function render(interaction) {
-    _resetGui(interaction);
+function render(interaction) {
+    callResetGui(interaction);
 };
 
-var _resetGui = function _resetGui(interaction) {
-    var $container = containerHelper.get(interaction);
-    $container.find('.btn-download').append(__('Download'));
-};
+function callResetGui(interaction) {
+    const renderer = interaction.getRenderer();
+    if (_.isFunction(renderer.resetGui)) {
+        renderer.resetGui(interaction);
+    }
+}
 
 export default Object.assign({}, uploadInteraction, {
     template,
     setResponse,
-    render,
-    resetGui: _resetGui
+    render
 });
