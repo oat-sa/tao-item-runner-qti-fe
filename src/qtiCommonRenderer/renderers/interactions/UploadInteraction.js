@@ -63,7 +63,7 @@ var validateFileType = function validateFileType(file, interaction) {
  */
 var getMessageWrongType = function getMessageWrongType(interaction, userSelectedType, messageWrongType) {
     var types = uploadHelper.getExpectedTypes(interaction);
-    var expectedTypeLabels = _.map(_.uniq(types), function(type) {
+    var expectedTypeLabels = _.map(_.uniq(types), function (type) {
         var mime = _.find(uploadHelper.getMimeTypes(), { mime: type });
         if (mime) {
             return mime.label;
@@ -101,7 +101,7 @@ var _handleSelectedFiles = function _handleSelectedFiles(interaction, file, mess
         instructionMgr.appendInstruction(
             interaction,
             getMessageWrongType(interaction, filetype, messageWrongType),
-            function() {
+            function () {
                 this.setLevel('error');
                 //clear preview
             }
@@ -120,11 +120,11 @@ var _handleSelectedFiles = function _handleSelectedFiles(interaction, file, mess
 
     // Update file processing progress.
 
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         var base64Data, commaPosition, base64Raw, $previewArea;
 
         instructionMgr.removeInstructions(interaction);
-        instructionMgr.appendInstruction(interaction, _readyInstructions, function() {
+        instructionMgr.appendInstruction(interaction, _readyInstructions, function () {
             this.setLevel('success');
         });
         instructionMgr.validateInstructions(interaction);
@@ -146,7 +146,7 @@ var _handleSelectedFiles = function _handleSelectedFiles(interaction, file, mess
         });
 
         // we wait for the image to be completely loaded
-        $previewArea.waitForMedia(function() {
+        $previewArea.waitForMedia(function () {
             var $originalImg = $previewArea.find('img'),
                 $largeDisplay = $('.file-upload-preview-popup'),
                 $item = $('.qti-item'),
@@ -171,7 +171,7 @@ var _handleSelectedFiles = function _handleSelectedFiles(interaction, file, mess
                 return;
             }
 
-            $previewArea.on('click', function() {
+            $previewArea.on('click', function () {
                 var $modalBody;
 
                 $('.upload-ia-modal-bg').remove();
@@ -181,7 +181,7 @@ var _handleSelectedFiles = function _handleSelectedFiles(interaction, file, mess
                 $modalBody.empty().append($originalImg.clone());
 
                 $largeDisplay
-                    .on('opened.modal', function() {
+                    .on('opened.modal', function () {
                         // prevents the rest of the page from scrolling when modal is open
                         $('.tao-item-scope.tao-preview-scope').css('overflow', 'hidden');
 
@@ -191,7 +191,7 @@ var _handleSelectedFiles = function _handleSelectedFiles(interaction, file, mess
                             left: (modalWidth - itemWidth - 40) / -2
                         });
                     })
-                    .on('closed.modal', function() {
+                    .on('closed.modal', function () {
                         // make the page scrollable again
                         $('.tao-item-scope.tao-preview-scope').css('overflow', 'auto');
                     })
@@ -213,11 +213,18 @@ var _handleSelectedFiles = function _handleSelectedFiles(interaction, file, mess
     reader.readAsDataURL(file);
 };
 
-var _resetGui = function _resetGui(interaction) {
+function resetGui(interaction) {
     var $container = containerHelper.get(interaction);
     $container.find('.file-name').text(__('No file selected'));
-    $container.find('.btn-upload').text(__('Browse...'));
+    $container.find('.btn-info').text(__('Browse...'));
 };
+
+function callResetGui(interaction) {
+    const renderer = interaction.getRenderer();
+    if (_.isFunction(renderer.resetGui)) {
+        renderer.resetGui(interaction);
+    }
+}
 
 /**
  * Init rendering, called after template injected into the DOM
@@ -226,19 +233,19 @@ var _resetGui = function _resetGui(interaction) {
  *
  * @param {object} interaction
  */
-var render = function render(interaction) {
+function render(interaction) {
     var changeListener,
         self = this,
         $input;
     var $container = containerHelper.get(interaction);
-    _resetGui(interaction);
+    callResetGui(interaction);
 
     instructionMgr.appendInstruction(interaction, _initialInstructions);
 
     //init response
     interaction.data('_response', { base: null });
 
-    changeListener = function(e) {
+    changeListener = function (e) {
         var file = e.target.files[0];
 
         // Are you really sure something was selected
@@ -258,7 +265,7 @@ var render = function render(interaction) {
     $input.bind('change', changeListener);
 
     // IE Specific hack, prevents button to slightly move on click
-    $input.bind('mousedown', function(e) {
+    $input.bind('mousedown', function (e) {
         e.preventDefault();
         $(this).blur();
         return false;
@@ -266,7 +273,7 @@ var render = function render(interaction) {
 };
 
 var resetResponse = function resetResponse(interaction) {
-    _resetGui(interaction);
+    callResetGui(interaction);
 };
 
 /**
@@ -384,5 +391,5 @@ export default {
     getData: getCustomData,
 
     // Exposed private methods for qtiCreator
-    resetGui: _resetGui
+    resetGui: resetGui
 };
