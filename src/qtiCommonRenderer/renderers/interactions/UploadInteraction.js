@@ -213,6 +213,11 @@ var _handleSelectedFiles = function _handleSelectedFiles(interaction, file, mess
     reader.readAsDataURL(file);
 };
 
+/**
+ * Resets the GUI state to the default display.
+ *
+ * @param {Object} interaction
+ */
 function resetGui(interaction) {
     var $container = containerHelper.get(interaction);
     $container.find('.file-name').text(__('No file selected'));
