@@ -80,6 +80,8 @@ function setResponse(interaction, response) {
 
 function render(interaction) {
     callResetGui(interaction);
+    //init response
+    interaction.data('_response', { base: null });
 };
 
 function callResetGui(interaction) {
