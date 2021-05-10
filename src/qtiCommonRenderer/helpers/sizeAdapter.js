@@ -26,9 +26,9 @@ export default {
      *
      * @param {jQueryElement|widget} target
      */
-    adaptSize: function (target) {
-        var $elements;
-        var $container;
+    adaptSize(target) {
+        let $elements;
+        let $container;
 
         switch (true) {
             // widget
@@ -47,12 +47,9 @@ export default {
             adaptSize.height($elements);
             document.addEventListener(
                 'load',
-                function (e) {
-                    if (e.target.rel === 'stylesheet') {
-                        // give time to slower computers to apply loaded styles
-                        setTimeout(() => {
-                            adaptSize.height($elements);
-                        }, 0);
+                e => {
+                    if (e.target && e.target.rel === 'stylesheet') {
+                        adaptSize.height($elements);
                     }
                 },
                 true
