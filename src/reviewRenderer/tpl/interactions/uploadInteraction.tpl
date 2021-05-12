@@ -1,17 +1,10 @@
 <div class="qti-interaction qti-blockInteraction qti-uploadInteraction" data-serial="{{serial}}"{{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}>
 	{{#if prompt}}{{{prompt}}}{{/if}}
-	<div class="instruction-container"></div>
     <div class="file-upload fixed-grid-row lft">
-        <div class="progressbar"></div>
-        <span class="btn-info small col-4"></span>
         <span class="file-name placeholder col-8 truncate"></span>
-        <input disabled type="file" {{#if accept}}accept="{{accept}}"{{/if}}/>
+        <button type="button" data-control="download" class="btn-info small"><span class="icon-download"></span> {{__ "Download"}}</button>
     </div>
     <div class="file-upload-preview lft visible-file-upload-preview runtime-visible-file-upload-preview">
-        <p class="nopreview">{{__ 'No preview available'}}</p>
-    </div>
-    <div class="file-upload-preview-popup modal">
-        <div class="modal-body">
-        </div>
+        <p class="nopreview">{{__ 'No uploaded file'}}</p>
     </div>
 </div>

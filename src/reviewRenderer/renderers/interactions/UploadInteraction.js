@@ -22,5 +22,77 @@
  */
 import template from 'taoQtiItem/reviewRenderer/tpl/interactions/uploadInteraction';
 import uploadInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/UploadInteraction';
+import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
+import __ from 'i18n';
+import 'ui/previewer';
+/**
+ * Set the response to the rendered interaction.
+ *
+ * The response format follows the IMS PCI recommendation :
+ * http://www.imsglobal.org/assessment/pciv1p0cf/imsPCIv1p0cf.html#_Toc353965343
+ *
+ * Available base types are defined in the QTI v2.1 information model:
+ * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10321
+ *
+ * @param {object} interaction
+ * @param {object} response
+ */
+function setResponse(interaction, response) {
+    const $container = containerHelper.get(interaction);
+    const $previewArea = $container.find('.file-upload-preview');
+    if (response.base && response.base.file) {
+        const downloadLink = document.createElement("a");
 
-export default Object.assign({}, uploadInteraction, {template});
+        const { name: filename, mime, data } = response.base.file;
+        const downloadUrl = data ? `data:${mime};base64,${response.base.file.data}` : '';
+
+        $container
+            .find('.file-name')
+            .empty()
+            .text(filename);
+
+        $container
+            .find('[data-control="download"]')
+            .on('click', e => {
+                e.preventDefault();
+                downloadLink.href = downloadUrl;
+                downloadLink.download = filename;
+                downloadLink.click();
+            });
+
+        $previewArea.previewer({
+            url: downloadUrl,
+            name: filename,
+            mime: mime
+        });
+    } else {
+        $container
+            .find('.file-upload')
+            .hide();
+
+        $previewArea.css({
+            'min-width': '300px',
+            'min-height': '200px'
+        })
+    }
+    interaction.data('_response', response);
+};
+
+function render(interaction) {
+    callResetGui(interaction);
+    //init response
+    interaction.data('_response', { base: null });
+};
+
+function callResetGui(interaction) {
+    const renderer = interaction.getRenderer();
+    if (_.isFunction(renderer.resetGui)) {
+        renderer.resetGui(interaction);
+    }
+}
+
+export default Object.assign({}, uploadInteraction, {
+    template,
+    setResponse,
+    render
+});
