@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2021 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -29,6 +29,7 @@ import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import sizeAdapter from 'taoQtiItem/qtiCommonRenderer/helpers/sizeAdapter';
+import adaptSize from 'util/adaptSize';
 
 var KEY_CODE_SPACE = 32;
 var KEY_CODE_ENTER = 13;
@@ -292,7 +293,10 @@ var render = function render(interaction) {
     _setInstructions(interaction);
 
     if (interaction.attr('orientation') === 'horizontal') {
-        sizeAdapter.adaptSize($('.add-option, .result-area .target, .choice-area .qti-choice', $container));
+        const $elements = $('.add-option, .result-area .target, .choice-area .qti-choice', $container);
+        sizeAdapter.adaptSize($elements);
+
+        $(document).on('themeapplied.choiceInteraction', () => adaptSize.height($elements));
     }
 };
 
@@ -390,7 +394,9 @@ var destroy = function destroy(interaction) {
 
     //remove event
     $container.off('.commonRenderer');
-    $(document).off('.commonRenderer');
+    $(document)
+        .off('.commonRenderer')
+        .off('.choiceInteraction');
 
     //remove instructions
     instructionMgr.removeInstructions(interaction);
