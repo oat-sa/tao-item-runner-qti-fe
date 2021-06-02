@@ -48,7 +48,6 @@ export default {
                 }
                 //defer execution fix some rendering issue in chrome
                 if ($item.length) {
-                    $item.data('mathInitialized', true);
                     MathJax.Hub.Queue(['Typeset', MathJax.Hub, $item[0]]);
                     MathJax.Hub.Queue(resolve);
                 } else {
