@@ -39,7 +39,7 @@ export default {
     template: tpl,
     getContainer: containerHelper.get,
     render: function render(math) {
-        return new Promise(function(resolve) {
+        return new Promise(function (resolve) {
             var $item = containerHelper.get(math).closest('.qti-item');
             if (typeof MathJax !== 'undefined' && MathJax) {
                 //MathJax needs to be exported globally to integrate with tools like TTS, it's weird...
@@ -47,8 +47,7 @@ export default {
                     window.MathJax = MathJax;
                 }
                 //defer execution fix some rendering issue in chrome
-                if ($item.length && !$item.data('mathInitialized')) {
-                    $item.data('mathInitialized', true);
+                if ($item.length) {
                     MathJax.Hub.Queue(['Typeset', MathJax.Hub, $item[0]]);
                     MathJax.Hub.Queue(resolve);
                 } else {
