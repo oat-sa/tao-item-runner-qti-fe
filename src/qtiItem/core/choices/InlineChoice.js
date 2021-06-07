@@ -1,6 +1,6 @@
-import QtiTextVariableChoice from 'taoQtiItem/qtiItem/core/choices/TextVariableChoice';
+import QtiContainerChoice from 'taoQtiItem/qtiItem/core/choices/ContainerChoice';
 import Container from 'taoQtiItem/qtiItem/mixin/ContainerInline';
-var QtiInlineChoice = QtiTextVariableChoice.extend({
+var QtiInlineChoice = QtiContainerChoice.extend({
     qtiClass: 'inlineChoice'
 });
 Container.augment(QtiInlineChoice);
