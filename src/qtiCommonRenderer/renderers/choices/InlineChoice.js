@@ -30,7 +30,6 @@ export default {
     getContainer: containerHelper.get,
     template: tpl,
     getData: function getData(choice, data) {
-        data.body = _.unescape(data.body);
         return data;
     }
 };
