@@ -21,7 +21,6 @@
  * @author Sam Sipasseuth <sam@taotesting.com>
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-import _ from 'lodash';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/choices/inlineChoice';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 
