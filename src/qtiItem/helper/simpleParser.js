@@ -3,7 +3,7 @@ import $ from 'jquery';
 import util from 'taoQtiItem/qtiItem/helper/util';
 import Loader from 'taoQtiItem/qtiItem/core/Loader';
 
-var _parsableElements = ['img', 'object', 'printedVariable'];
+var _parsableElements = ['img', 'object', 'printedVariable', 'table'];
 var _qtiClassNames = {
     rubricblock: 'rubricBlock',
     printedvariable: 'printedVariable'
@@ -16,7 +16,8 @@ var _qtiAttributesNames = {
 var _defaultOptions = {
     ns: {
         math: '',
-        include: 'xi'
+        include: 'xi',
+        table: 'table'
     },
     loaded: null,
     model: null
@@ -46,7 +47,7 @@ function buildElement($elt) {
         attributes: {}
     };
 
-    $.each($elt[0].attributes, function() {
+    $.each($elt[0].attributes, function () {
         var attrName;
         if (this.specified) {
             attrName = _qtiAttributesNames[this.name] || this.name;
@@ -62,7 +63,7 @@ function buildMath($elt, options) {
 
     //set annotations:
     elt.annotations = {};
-    $elt.find(_getElementSelector('annotation', options.ns.math)).each(function() {
+    $elt.find(_getElementSelector('annotation', options.ns.math)).each(function () {
         var $annotation = $(this);
         var encoding = $annotation.attr('encoding');
         if (encoding) {
@@ -102,6 +103,17 @@ function buildTooltip(targetHtml, contentId, contentHtml) {
     };
 }
 
+function buildTable($elt) {
+    var elt = buildElement($elt);
+
+    //set table body
+    elt.body = {
+        body: $elt.html(),
+        elements: {}
+    };
+    return elt;
+}
+
 function parseContainer($container, options) {
     var ret = {
         serial: util.buildSerial('_container_'),
@@ -109,17 +121,21 @@ function parseContainer($container, options) {
         elements: {}
     };
 
-    _.each(_parsableElements, function(qtiClass) {
-        $container.find(qtiClass).each(function() {
+    _.each(_parsableElements, function (qtiClass) {
+        $container.find(qtiClass).each(function () {
             var $qtiElement = $(this);
             var element = buildElement($qtiElement, options);
 
+            // rendering the table
+            if (qtiClass === _defaultOptions.ns.table) {
+                element = buildTable($qtiElement, options);
+            }
             ret.elements[element.serial] = element;
             $qtiElement.replaceWith(_placeholder(element));
         });
     });
 
-    $container.find(_getElementSelector('math', options.ns.math)).each(function() {
+    $container.find(_getElementSelector('math', options.ns.math)).each(function () {
         var $qtiElement = $(this);
         var element = buildMath($qtiElement, options);
 
@@ -127,7 +143,7 @@ function parseContainer($container, options) {
         $qtiElement.replaceWith(_placeholder(element));
     });
 
-    $container.find(_getElementSelector('include', options.ns.include)).each(function() {
+    $container.find(_getElementSelector('include', options.ns.include)).each(function () {
         var $qtiElement = $(this);
         var element = buildElement($qtiElement, options);
 
@@ -135,7 +151,7 @@ function parseContainer($container, options) {
         $qtiElement.replaceWith(_placeholder(element));
     });
 
-    $container.find('[data-role="tooltip-target"]').each(function() {
+    $container.find('[data-role="tooltip-target"]').each(function () {
         var element,
             $target = $(this),
             $content,
@@ -166,7 +182,7 @@ function _placeholder(element) {
 }
 
 parser = {
-    parse: function(xmlStr, opts) {
+    parse: function (xmlStr, opts) {
         var options = _.merge(_.clone(_defaultOptions), opts || {});
 
         var $container = $(xmlStr);
