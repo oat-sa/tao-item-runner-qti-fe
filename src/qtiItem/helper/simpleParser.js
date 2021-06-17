@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +21,7 @@ import $ from 'jquery';
 import util from 'taoQtiItem/qtiItem/helper/util';
 import Loader from 'taoQtiItem/qtiItem/core/Loader';
 
-let _parsableElements = ['img', 'object', 'printedVariable', 'table'];
+let _parsableElements = ['img', 'object', 'table', 'printedVariable'];
 let _qtiClassNames = {
     rubricblock: 'rubricBlock',
     printedvariable: 'printedVariable'
@@ -34,11 +35,15 @@ let _defaultOptions = {
     ns: {
         math: '',
         include: 'xi',
-        table: 'table'
+        table: 'table',
+        image: 'img'
     },
     loaded: null,
     model: null
 };
+
+let tableItems = {};
+let items = [];
 
 let parser;
 
@@ -120,11 +125,21 @@ function buildTooltip(targetHtml, contentId, contentHtml) {
     };
 }
 
-function buildTable($elt, elt) {
+function buildTable($elt, elt, index, options) {
+    const $tableHtml = $($elt.html());
+    console.log($tableHtml);
     elt.body = {
         body: $elt.html(),
-        elements: {}
+        elements: tableItems
     };
+    $tableHtml.find(_getElementSelector('math', options.ns.math)).each(function () {
+        // alert('math fornf in tabel');
+        let $qtiElement = $(this);
+        console.log('new tabel elemnt', $qtiElement);
+        // let element = buildMath($qtiElement, options);
+        // elt.body.elements.elements[element.serial] = element;
+        // $qtiElement.replaceWith(_placeholder(element));
+    });
     return elt;
 }
 
@@ -136,15 +151,26 @@ function parseContainer($container, options) {
     };
 
     _.each(_parsableElements, function (qtiClass) {
-        $container.find(qtiClass).each(function () {
+        $container.find(qtiClass).each(function (index) {
             let $qtiElement = $(this);
             let element = buildElement($qtiElement, options);
-
             // rendering the table
             if (qtiClass === _defaultOptions.ns.table) {
-                element = buildTable($qtiElement, element);
+                element = buildTable($qtiElement, element, index, options);
+                ret.elements[element.serial] = element;
             }
-            ret.elements[element.serial] = element;
+            if (qtiClass === _defaultOptions.ns.image && !$qtiElement.parent().is('td')) {
+                element = buildElement($qtiElement, element);
+                ret.elements[element.serial] = element;
+            }
+            if (qtiClass === _defaultOptions.ns.image && $qtiElement.parent().is('td')) {
+                tableItems[element.serial] = element;
+                console.log('items', items);
+            }
+            if (qtiClass === 'object' && $qtiElement.parent().is('td')) {
+                tableItems[element.serial] = element;
+                console.log('table items', tableItems);
+            }
             $qtiElement.replaceWith(_placeholder(element));
         });
     });
@@ -187,7 +213,7 @@ function parseContainer($container, options) {
     });
 
     ret.body = $container.html();
-
+    tableItems = {};
     return ret;
 }
 
