@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -125,21 +124,11 @@ function buildTooltip(targetHtml, contentId, contentHtml) {
     };
 }
 
-function buildTable($elt, elt, index, options) {
-    const $tableHtml = $($elt.html());
-    console.log($tableHtml);
+function buildTable($elt, elt) {
     elt.body = {
         body: $elt.html(),
         elements: tableItems
     };
-    $tableHtml.find(_getElementSelector('math', options.ns.math)).each(function () {
-        // alert('math fornf in tabel');
-        let $qtiElement = $(this);
-        console.log('new tabel elemnt', $qtiElement);
-        // let element = buildMath($qtiElement, options);
-        // elt.body.elements.elements[element.serial] = element;
-        // $qtiElement.replaceWith(_placeholder(element));
-    });
     return elt;
 }
 
@@ -165,11 +154,9 @@ function parseContainer($container, options) {
             }
             if (qtiClass === _defaultOptions.ns.image && $qtiElement.parent().is('td')) {
                 tableItems[element.serial] = element;
-                console.log('items', items);
             }
             if (qtiClass === 'object' && $qtiElement.parent().is('td')) {
                 tableItems[element.serial] = element;
-                console.log('table items', tableItems);
             }
             $qtiElement.replaceWith(_placeholder(element));
         });
