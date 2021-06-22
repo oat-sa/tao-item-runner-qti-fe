@@ -20,7 +20,7 @@ import $ from 'jquery';
 import util from 'taoQtiItem/qtiItem/helper/util';
 import Loader from 'taoQtiItem/qtiItem/core/Loader';
 
-let _parsableElements = ['img', 'object', 'table', 'printedVariable'];
+let _parsableElements = ['img', 'object', 'printedVariable'];
 let _qtiClassNames = {
     rubricblock: 'rubricBlock',
     printedvariable: 'printedVariable'
@@ -35,14 +35,12 @@ let _defaultOptions = {
         math: '',
         include: 'xi',
         table: 'table',
-        image: 'img'
+        image: 'img',
+        object: ''
     },
     loaded: null,
     model: null
 };
-
-let tableItems = {};
-let items = [];
 
 let parser;
 
@@ -124,11 +122,37 @@ function buildTooltip(targetHtml, contentId, contentHtml) {
     };
 }
 
-function buildTable($elt, elt) {
+function buildTable($elt, elt, options) {
     elt.body = {
-        body: $elt.html(),
-        elements: tableItems
+        body: '',
+        elements: {}
     };
+
+    $elt.find(_getElementSelector('math', options.ns.math)).each(function () {
+        let $qtiElement = $(this);
+        let element = buildMath($qtiElement, options);
+
+        elt.body.elements[element.serial] = element;
+        $qtiElement.replaceWith(_placeholder(element));
+    });
+
+    $elt.find(_getElementSelector('img', options.ns.image)).each(function () {
+        let $qtiElement = $(this);
+        let element = buildElement($qtiElement, options);
+
+        elt.body.elements[element.serial] = element;
+        $qtiElement.replaceWith(_placeholder(element));
+    });
+
+    $elt.find(_getElementSelector('object', options.ns.object)).each(function () {
+        let $qtiElement = $(this);
+        let element = buildElement($qtiElement, options);
+
+        elt.body.elements[element.serial] = element;
+        $qtiElement.replaceWith(_placeholder(element));
+    });
+
+    elt.body.body = $elt.html();
     return elt;
 }
 
@@ -140,24 +164,19 @@ function parseContainer($container, options) {
     };
 
     _.each(_parsableElements, function (qtiClass) {
-        $container.find(qtiClass).each(function (index) {
+        $container.find(options.ns.table).each(function () {
             let $qtiElement = $(this);
             let element = buildElement($qtiElement, options);
-            // rendering the table
-            if (qtiClass === _defaultOptions.ns.table) {
-                element = buildTable($qtiElement, element, index, options);
-                ret.elements[element.serial] = element;
-            }
-            if (qtiClass === _defaultOptions.ns.image && !$qtiElement.parent().is('td')) {
-                element = buildElement($qtiElement, element);
-                ret.elements[element.serial] = element;
-            }
-            if (qtiClass === _defaultOptions.ns.image && $qtiElement.parent().is('td')) {
-                tableItems[element.serial] = element;
-            }
-            if (qtiClass === 'object' && $qtiElement.parent().is('td')) {
-                tableItems[element.serial] = element;
-            }
+
+            element = buildTable($qtiElement, element, options);
+            ret.elements[element.serial] = element;
+            $qtiElement.replaceWith(_placeholder(element));
+        });
+
+        $container.find(qtiClass).each(function () {
+            let $qtiElement = $(this);
+            let element = buildElement($qtiElement, options);
+
             $qtiElement.replaceWith(_placeholder(element));
         });
     });
@@ -198,9 +217,7 @@ function parseContainer($container, options) {
             }
         }
     });
-
     ret.body = $container.html();
-    tableItems = {};
     return ret;
 }
 
