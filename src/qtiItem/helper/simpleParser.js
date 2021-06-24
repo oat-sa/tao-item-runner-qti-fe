@@ -21,16 +21,16 @@ import util from 'taoQtiItem/qtiItem/helper/util';
 import Loader from 'taoQtiItem/qtiItem/core/Loader';
 
 const _parsableElements = ['img', 'object', 'printedVariable'];
-let _qtiClassNames = {
+const _qtiClassNames = {
     rubricblock: 'rubricBlock',
     printedvariable: 'printedVariable'
 };
-let _qtiAttributesNames = {
+const _qtiAttributesNames = {
     powerform: 'powerForm',
     mappingindicator: 'mappingIndicator'
 };
 
-let _defaultOptions = {
+const _defaultOptions = {
     ns: {
         math: '',
         include: 'xi',
@@ -60,7 +60,7 @@ function getQtiClassFromXmlDom($node) {
 function buildElement($elt) {
     const qtiClass = getQtiClassFromXmlDom($elt);
 
-    let elt = {
+    const elt = {
         qtiClass: qtiClass,
         serial: util.buildSerial(qtiClass + '_'),
         attributes: {}
@@ -78,13 +78,13 @@ function buildElement($elt) {
 }
 
 function buildMath($elt, options) {
-    let elt = buildElement($elt);
+    const elt = buildElement($elt);
 
     //set annotations:
     elt.annotations = {};
     $elt.find(_getElementSelector('annotation', options.ns.math)).each(function () {
-        let $annotation = $(this);
-        let encoding = $annotation.attr('encoding');
+        const $annotation = $(this);
+        const encoding = $annotation.attr('encoding');
         if (encoding) {
             elt.annotations[encoding] = _.unescape($annotation.html());
         }
@@ -135,14 +135,14 @@ function buildTable($elt, elt, options) {
 }
 
 function parseContainer($container, options) {
-    let ret = {
+    const ret = {
         serial: util.buildSerial('_container_'),
         body: '',
         elements: {}
     };
 
     $container.find('table').each(function () {
-        let $qtiElement = $(this);
+        const $qtiElement = $(this);
         let element = buildElement($qtiElement, options);
 
         element = buildTable($qtiElement, element, options);
@@ -151,32 +151,32 @@ function parseContainer($container, options) {
     });
 
     $container.find(_getElementSelector('img', '')).each(function () {
-        let $qtiElement = $(this);
-        let element = buildElement($qtiElement, options);
+        const $qtiElement = $(this);
+        const element = buildElement($qtiElement, options);
 
         ret.elements[element.serial] = element;
         $qtiElement.replaceWith(_placeholder(element));
     });
 
     $container.find(_getElementSelector('object', options.ns.object)).each(function () {
-        let $qtiElement = $(this);
-        let element = buildElement($qtiElement, options);
+        const $qtiElement = $(this);
+        const element = buildElement($qtiElement, options);
 
         ret.elements[element.serial] = element;
         $qtiElement.replaceWith(_placeholder(element));
     });
 
     $container.find(_getElementSelector('math', options.ns.math)).each(function () {
-        let $qtiElement = $(this);
-        let element = buildMath($qtiElement, options);
+        const $qtiElement = $(this);
+        const element = buildMath($qtiElement, options);
 
         ret.elements[element.serial] = element;
         $qtiElement.replaceWith(_placeholder(element));
     });
 
     $container.find(_getElementSelector('include', options.ns.include)).each(function () {
-        let $qtiElement = $(this);
-        let element = buildElement($qtiElement, options);
+        const $qtiElement = $(this);
+        const element = buildElement($qtiElement, options);
 
         ret.elements[element.serial] = element;
         $qtiElement.replaceWith(_placeholder(element));
@@ -205,8 +205,8 @@ function parseContainer($container, options) {
 
     _.each(_parsableElements, function (qtiClass) {
         $container.find(qtiClass).each(function () {
-            let $qtiElement = $(this);
-            let element = buildElement($qtiElement, options);
+            const $qtiElement = $(this);
+            const element = buildElement($qtiElement, options);
 
             $qtiElement.replaceWith(_placeholder(element));
         });
@@ -222,13 +222,13 @@ function _placeholder(element) {
 
 parser = {
     parse: function (xmlStr, opts) {
-        let options = _.merge(_.clone(_defaultOptions), opts || {});
+        const options = _.merge(_.clone(_defaultOptions), opts || {});
 
-        let $container = $(xmlStr);
+        const $container = $(xmlStr);
 
-        let element = buildElement($container, options);
+        const element = buildElement($container, options);
 
-        let data = parseContainer($container, options);
+        const data = parseContainer($container, options);
 
         let loader;
 
