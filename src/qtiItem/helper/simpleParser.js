@@ -20,7 +20,7 @@ import $ from 'jquery';
 import util from 'taoQtiItem/qtiItem/helper/util';
 import Loader from 'taoQtiItem/qtiItem/core/Loader';
 
-let _parsableElements = ['img', 'object', 'printedVariable'];
+const _parsableElements = ['img', 'object', 'printedVariable'];
 let _qtiClassNames = {
     rubricblock: 'rubricBlock',
     printedvariable: 'printedVariable'
@@ -128,31 +128,9 @@ function buildTable($elt, elt, options) {
         elements: {}
     };
 
-    $elt.find(_getElementSelector('math', options.ns.math)).each(function () {
-        let $qtiElement = $(this);
-        let element = buildMath($qtiElement, options);
-
-        elt.body.elements[element.serial] = element;
-        $qtiElement.replaceWith(_placeholder(element));
-    });
-
-    $elt.find(_getElementSelector('img', options.ns.image)).each(function () {
-        let $qtiElement = $(this);
-        let element = buildElement($qtiElement, options);
-
-        elt.body.elements[element.serial] = element;
-        $qtiElement.replaceWith(_placeholder(element));
-    });
-
-    $elt.find(_getElementSelector('object', options.ns.object)).each(function () {
-        let $qtiElement = $(this);
-        let element = buildElement($qtiElement, options);
-
-        elt.body.elements[element.serial] = element;
-        $qtiElement.replaceWith(_placeholder(element));
-    });
-
-    elt.body.body = $elt.html();
+    const $parsedTable = parseContainer($elt, options);
+    elt.body.body = $parsedTable.body;
+    elt.body.elements = $parsedTable.elements;
     return elt;
 }
 
@@ -163,22 +141,29 @@ function parseContainer($container, options) {
         elements: {}
     };
 
-    _.each(_parsableElements, function (qtiClass) {
-        $container.find(options.ns.table).each(function () {
-            let $qtiElement = $(this);
-            let element = buildElement($qtiElement, options);
+    $container.find('table').each(function () {
+        let $qtiElement = $(this);
+        let element = buildElement($qtiElement, options);
 
-            element = buildTable($qtiElement, element, options);
-            ret.elements[element.serial] = element;
-            $qtiElement.replaceWith(_placeholder(element));
-        });
+        element = buildTable($qtiElement, element, options);
+        ret.elements[element.serial] = element;
+        $qtiElement.replaceWith(_placeholder(element));
+    });
 
-        $container.find(qtiClass).each(function () {
-            let $qtiElement = $(this);
-            let element = buildElement($qtiElement, options);
+    $container.find(_getElementSelector('img', '')).each(function () {
+        let $qtiElement = $(this);
+        let element = buildElement($qtiElement, options);
 
-            $qtiElement.replaceWith(_placeholder(element));
-        });
+        ret.elements[element.serial] = element;
+        $qtiElement.replaceWith(_placeholder(element));
+    });
+
+    $container.find(_getElementSelector('object', options.ns.object)).each(function () {
+        let $qtiElement = $(this);
+        let element = buildElement($qtiElement, options);
+
+        ret.elements[element.serial] = element;
+        $qtiElement.replaceWith(_placeholder(element));
     });
 
     $container.find(_getElementSelector('math', options.ns.math)).each(function () {
@@ -217,6 +202,16 @@ function parseContainer($container, options) {
             }
         }
     });
+
+    _.each(_parsableElements, function (qtiClass) {
+        $container.find(qtiClass).each(function () {
+            let $qtiElement = $(this);
+            let element = buildElement($qtiElement, options);
+
+            $qtiElement.replaceWith(_placeholder(element));
+        });
+    });
+
     ret.body = $container.html();
     return ret;
 }
