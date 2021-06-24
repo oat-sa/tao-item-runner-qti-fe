@@ -67,7 +67,7 @@ define([
         });
     });
 
-    QUnit.module('Parser test');
+    QUnit.module('Parser testing');
 
     QUnit.cases
         .init([
