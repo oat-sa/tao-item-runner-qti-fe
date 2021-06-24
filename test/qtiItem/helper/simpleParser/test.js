@@ -67,7 +67,7 @@ define([
         });
     });
 
-    QUnit.module('Parser testing');
+    QUnit.module('Parser test');
 
     QUnit.cases
         .init([
@@ -77,6 +77,22 @@ define([
                 expectedBody: 'this is an image: {{img_XXX}}. How cool is that???',
                 expectedElement: 'img',
                 expectedAttributes: { src: 'my/image.png' }
+            },
+            {
+                title: 'printedVariable',
+                xml: '<div>this is a printedVariable: <printedVariable identifier="SCORE_TOTAL" base="10" powerForm="false" delimiter=";" mappingIndicator="=" format="%2g" index="-1" field="test"/>. How cool is that???</div>',
+                expectedBody: 'this is a printedVariable: {{printedVariable_XXX}}. How cool is that???',
+                expectedElement: 'printedVariable',
+                expectedAttributes: {
+                    identifier: 'SCORE_TOTAL',
+                    base: '10',
+                    powerForm: 'false',
+                    delimiter: ';',
+                    mappingIndicator: '=',
+                    format: '%2g',
+                    index: '-1',
+                    field: 'test'
+                }
             }
         ])
         .test('Simple elements parsing: ', function (data, assert) {

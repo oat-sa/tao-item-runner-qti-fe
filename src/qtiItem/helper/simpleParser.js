@@ -150,7 +150,7 @@ function parseContainer($container, options) {
         $qtiElement.replaceWith(_placeholder(element));
     });
 
-    $container.find(_getElementSelector('img', '')).each(function () {
+    $container.find(_getElementSelector('img', options.ns.image)).each(function () {
         const $qtiElement = $(this);
         const element = buildElement($qtiElement, options);
 
@@ -207,7 +207,7 @@ function parseContainer($container, options) {
         $container.find(qtiClass).each(function () {
             const $qtiElement = $(this);
             const element = buildElement($qtiElement, options);
-
+            ret.elements[element.serial] = element;
             $qtiElement.replaceWith(_placeholder(element));
         });
     });
