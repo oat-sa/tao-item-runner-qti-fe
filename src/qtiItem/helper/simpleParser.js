@@ -150,22 +150,6 @@ function parseContainer($container, options) {
         $qtiElement.replaceWith(_placeholder(element));
     });
 
-    $container.find(_getElementSelector('img', options.ns.image)).each(function () {
-        const $qtiElement = $(this);
-        const element = buildElement($qtiElement, options);
-
-        ret.elements[element.serial] = element;
-        $qtiElement.replaceWith(_placeholder(element));
-    });
-
-    $container.find(_getElementSelector('object', options.ns.object)).each(function () {
-        const $qtiElement = $(this);
-        const element = buildElement($qtiElement, options);
-
-        ret.elements[element.serial] = element;
-        $qtiElement.replaceWith(_placeholder(element));
-    });
-
     $container.find(_getElementSelector('math', options.ns.math)).each(function () {
         const $qtiElement = $(this);
         const element = buildMath($qtiElement, options);
