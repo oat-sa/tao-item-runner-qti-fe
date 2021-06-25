@@ -122,7 +122,7 @@ function buildTooltip(targetHtml, contentId, contentHtml) {
     };
 }
 
-function buildTable($elt, elt, options) {
+function parseTable($elt, elt, options) {
     elt.body = {
         body: '',
         elements: {}
@@ -140,12 +140,12 @@ function parseContainer($container, options) {
         body: '',
         elements: {}
     };
-
+    // table should be in top as it needs to be parsed first
     $container.find('table').each(function () {
         const $qtiElement = $(this);
         let element = buildElement($qtiElement, options);
 
-        element = buildTable($qtiElement, element, options);
+        element = parseTable($qtiElement, element, options);
         ret.elements[element.serial] = element;
         $qtiElement.replaceWith(_placeholder(element));
     });
