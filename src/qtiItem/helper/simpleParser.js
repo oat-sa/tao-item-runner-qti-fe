@@ -1,35 +1,55 @@
+/*
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2021 (original work) Open Assessment Technologies SA
+ **/
 import _ from 'lodash';
 import $ from 'jquery';
 import util from 'taoQtiItem/qtiItem/helper/util';
 import Loader from 'taoQtiItem/qtiItem/core/Loader';
 
-var _parsableElements = ['img', 'object', 'printedVariable'];
-var _qtiClassNames = {
+const _parsableElements = ['img', 'object', 'printedVariable'];
+const _qtiClassNames = {
     rubricblock: 'rubricBlock',
     printedvariable: 'printedVariable'
 };
-var _qtiAttributesNames = {
+const _qtiAttributesNames = {
     powerform: 'powerForm',
     mappingindicator: 'mappingIndicator'
 };
 
-var _defaultOptions = {
+const _defaultOptions = {
     ns: {
         math: '',
-        include: 'xi'
+        include: 'xi',
+        table: 'table',
+        image: 'img',
+        object: ''
     },
     loaded: null,
     model: null
 };
 
-var parser;
+let parser;
 
 function _getElementSelector(qtiClass, ns) {
     return ns ? ns + '\\:' + qtiClass + ',' + qtiClass : qtiClass;
 }
 
 function getQtiClassFromXmlDom($node) {
-    var qtiClass = $node.prop('tagName').toLowerCase();
+    let qtiClass = $node.prop('tagName').toLowerCase();
 
     //remove ns :
     qtiClass = qtiClass.replace(/.*:/, '');
@@ -38,16 +58,16 @@ function getQtiClassFromXmlDom($node) {
 }
 
 function buildElement($elt) {
-    var qtiClass = getQtiClassFromXmlDom($elt);
+    const qtiClass = getQtiClassFromXmlDom($elt);
 
-    var elt = {
+    const elt = {
         qtiClass: qtiClass,
         serial: util.buildSerial(qtiClass + '_'),
         attributes: {}
     };
 
-    $.each($elt[0].attributes, function() {
-        var attrName;
+    $.each($elt[0].attributes, function () {
+        let attrName;
         if (this.specified) {
             attrName = _qtiAttributesNames[this.name] || this.name;
             elt.attributes[attrName] = this.value;
@@ -58,13 +78,13 @@ function buildElement($elt) {
 }
 
 function buildMath($elt, options) {
-    var elt = buildElement($elt);
+    const elt = buildElement($elt);
 
     //set annotations:
     elt.annotations = {};
-    $elt.find(_getElementSelector('annotation', options.ns.math)).each(function() {
-        var $annotation = $(this);
-        var encoding = $annotation.attr('encoding');
+    $elt.find(_getElementSelector('annotation', options.ns.math)).each(function () {
+        const $annotation = $(this);
+        const encoding = $annotation.attr('encoding');
         if (encoding) {
             elt.annotations[encoding] = _.unescape($annotation.html());
         }
@@ -84,7 +104,7 @@ function buildMath($elt, options) {
 }
 
 function buildTooltip(targetHtml, contentId, contentHtml) {
-    var qtiClass = '_tooltip';
+    const qtiClass = '_tooltip';
 
     return {
         elements: {},
@@ -102,41 +122,52 @@ function buildTooltip(targetHtml, contentId, contentHtml) {
     };
 }
 
-function parseContainer($container, options) {
-    var ret = {
-        serial: util.buildSerial('_container_'),
+function parseTable($elt, elt, options) {
+    elt.body = {
         body: '',
         elements: {}
     };
 
-    _.each(_parsableElements, function(qtiClass) {
-        $container.find(qtiClass).each(function() {
-            var $qtiElement = $(this);
-            var element = buildElement($qtiElement, options);
+    const $parsedTable = parseContainer($elt, options);
+    elt.body.body = $parsedTable.body;
+    elt.body.elements = $parsedTable.elements;
+    return elt;
+}
 
-            ret.elements[element.serial] = element;
-            $qtiElement.replaceWith(_placeholder(element));
-        });
+function parseContainer($container, options) {
+    const ret = {
+        serial: util.buildSerial('_container_'),
+        body: '',
+        elements: {}
+    };
+    // table should be in top as it needs to be parsed first
+    $container.find('table').each(function () {
+        const $qtiElement = $(this);
+        let element = buildElement($qtiElement, options);
+
+        element = parseTable($qtiElement, element, options);
+        ret.elements[element.serial] = element;
+        $qtiElement.replaceWith(_placeholder(element));
     });
 
-    $container.find(_getElementSelector('math', options.ns.math)).each(function() {
-        var $qtiElement = $(this);
-        var element = buildMath($qtiElement, options);
+    $container.find(_getElementSelector('math', options.ns.math)).each(function () {
+        const $qtiElement = $(this);
+        const element = buildMath($qtiElement, options);
 
         ret.elements[element.serial] = element;
         $qtiElement.replaceWith(_placeholder(element));
     });
 
-    $container.find(_getElementSelector('include', options.ns.include)).each(function() {
-        var $qtiElement = $(this);
-        var element = buildElement($qtiElement, options);
+    $container.find(_getElementSelector('include', options.ns.include)).each(function () {
+        const $qtiElement = $(this);
+        const element = buildElement($qtiElement, options);
 
         ret.elements[element.serial] = element;
         $qtiElement.replaceWith(_placeholder(element));
     });
 
-    $container.find('[data-role="tooltip-target"]').each(function() {
-        var element,
+    $container.find('[data-role="tooltip-target"]').each(function () {
+        let element,
             $target = $(this),
             $content,
             contentId = $target.attr('aria-describedBy'),
@@ -156,8 +187,16 @@ function parseContainer($container, options) {
         }
     });
 
-    ret.body = $container.html();
+    _.each(_parsableElements, function (qtiClass) {
+        $container.find(qtiClass).each(function () {
+            const $qtiElement = $(this);
+            const element = buildElement($qtiElement, options);
+            ret.elements[element.serial] = element;
+            $qtiElement.replaceWith(_placeholder(element));
+        });
+    });
 
+    ret.body = $container.html();
     return ret;
 }
 
@@ -166,16 +205,16 @@ function _placeholder(element) {
 }
 
 parser = {
-    parse: function(xmlStr, opts) {
-        var options = _.merge(_.clone(_defaultOptions), opts || {});
+    parse: function (xmlStr, opts) {
+        const options = _.merge(_.clone(_defaultOptions), opts || {});
 
-        var $container = $(xmlStr);
+        const $container = $(xmlStr);
 
-        var element = buildElement($container, options);
+        const element = buildElement($container, options);
 
-        var data = parseContainer($container, options);
+        const data = parseContainer($container, options);
 
-        var loader;
+        let loader;
 
         if (!_.isUndefined(data.body)) {
             element.body = data;
