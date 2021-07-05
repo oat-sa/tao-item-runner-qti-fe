@@ -23,12 +23,12 @@ define([
     'taoQtiItem/qtiItem/core/Loader',
     'taoQtiItem/qtiItem/core/Container',
     'taoQtiItem/qtiXmlRenderer/renderers/Renderer'
-], function($, _, simpleParser, sampleXML, Loader, Container, XmlRenderer) {
+], function ($, _, simpleParser, sampleXML, Loader, Container, XmlRenderer) {
     'use strict';
 
     QUnit.module('This is a very old test');
 
-    QUnit.test('parse inline sample', function(assert) {
+    QUnit.test('parse inline sample', function (assert) {
         var ready = assert.async();
         var $rubricBlockXml = $(sampleXML).find('rubricBlock');
         var mathNs = 'm'; //for 'http://www.w3.org/1998/Math/MathML'
@@ -43,13 +43,13 @@ define([
         assert.equal(_.size(data.body.elements), 4, 'elements ok');
 
         loader = new Loader();
-        loader.loadRequiredClasses(data, function() {
+        loader.loadRequiredClasses(data, function () {
             var xmlRenderer;
             var container = new Container();
             this.loadContainer(container, data.body);
 
             xmlRenderer = new XmlRenderer({ shuffleChoices: false });
-            xmlRenderer.load(function() {
+            xmlRenderer.load(function () {
                 var xml = container.render(this);
 
                 var $container = $('<prompt>').html(xml);
@@ -80,8 +80,7 @@ define([
             },
             {
                 title: 'printedVariable',
-                xml:
-                    '<div>this is a printedVariable: <printedVariable identifier="SCORE_TOTAL" base="10" powerForm="false" delimiter=";" mappingIndicator="=" format="%2g" index="-1" field="test"/>. How cool is that???</div>',
+                xml: '<div>this is a printedVariable: <printedVariable identifier="SCORE_TOTAL" base="10" powerForm="false" delimiter=";" mappingIndicator="=" format="%2g" index="-1" field="test"/>. How cool is that???</div>',
                 expectedBody: 'this is a printedVariable: {{printedVariable_XXX}}. How cool is that???',
                 expectedElement: 'printedVariable',
                 expectedAttributes: {
@@ -96,7 +95,7 @@ define([
                 }
             }
         ])
-        .test('Simple elements parsing: ', function(data, assert) {
+        .test('Simple elements parsing: ', function (data, assert) {
             var parsed = simpleParser.parse(data.xml);
             var serialRegexp = /{{([a-z_]+)_[0-9a-z]*}}/i;
 
@@ -154,7 +153,7 @@ define([
                 expectedContent: ''
             }
         ])
-        .test('Valid tooltip parsing: ', function(data, assert) {
+        .test('Valid tooltip parsing: ', function (data, assert) {
             var parsed = simpleParser.parse(data.xml);
             var serialRegexp = /{{([a-z_]+)_[0-9a-z]*}}/i;
 
@@ -202,7 +201,7 @@ define([
                     'this is a tooltip: <span data-role="tooltip-content" aria-hidden="true" id="_tooltip-63etvf7pktf2jb16d2a09y">my <strong>Content</strong></span>. How cool is that???'
             }
         ])
-        .test('Incomplete tooltip parsing: ', function(data, assert) {
+        .test('Incomplete tooltip parsing: ', function (data, assert) {
             var parsed = simpleParser.parse(data.xml);
             var serialRegexp = /{{([a-z_]+)_[0-9a-z]*}}/i;
 
