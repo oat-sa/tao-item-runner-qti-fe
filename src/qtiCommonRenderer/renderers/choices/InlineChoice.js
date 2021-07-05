@@ -27,5 +27,19 @@ import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 export default {
     qtiClass: 'inlineChoice',
     getContainer: containerHelper.get,
-    template: tpl
+    template: tpl,
+    getData: function getData(choice, data) {
+        const widget = choice.metaData.widget;
+        let container = choice.getBody();
+        if (widget) {
+            container = widget.element.getBody();
+        }
+        data.body = container.render(
+            _.clone({ interaction: choice }, true),
+            null,
+            container.qtiClass + '.' + choice.qtiClass,
+            choice.getRenderer()
+        );
+        return data;
+    }
 };
