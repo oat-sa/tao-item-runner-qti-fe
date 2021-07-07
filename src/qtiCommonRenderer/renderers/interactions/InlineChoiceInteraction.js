@@ -35,9 +35,9 @@ import 'select2';
  * The value of the "empty" option
  * @type String
  */
-var _emptyValue = 'empty';
+const _emptyValue = 'empty';
 
-var _defaultOptions = {
+const _defaultOptions = {
     allowEmpty: true,
     placeholderText: __('select a choice')
 };
@@ -49,28 +49,41 @@ var _defaultOptions = {
  *
  * @param {object} interaction
  */
-var render = function(interaction, options) {
-    var opts = _.clone(_defaultOptions);
-    var required = !!interaction.attr('required');
-    var choiceTooltip;
-    var $container = containerHelper.get(interaction);
+const render = function (interaction, options) {
+    const opts = _.clone(_defaultOptions);
+    const required = !!interaction.attr('required');
+    let choiceTooltip;
+    const $container = containerHelper.get(interaction);
 
     _.extend(opts, options);
 
     if (opts.allowEmpty && !required) {
-        $container.find('option[value=' + _emptyValue + ']').text('--- ' + __('leave empty') + ' ---');
+        $container.find('div[data-identifier=' + _emptyValue + ']').text('--- ' + __('leave empty') + ' ---');
     } else {
-        $container.find('option[value=' + _emptyValue + ']').remove();
+        $container.find('div[data-identifier=' + _emptyValue + ']').remove();
     }
 
     $container.select2({
-        width: 'element',
+        data: $container
+            .find('div[role="option"]')
+            .map((i, opt) => ({
+                id: i,
+                markup: opt.outerHTML
+            }))
+            .get(),
+        formatResult: function (result) {
+            return result.markup;
+        },
+        formatSelection: function (data) {
+            return data.markup;
+        },
+        width: '100%',
         placeholder: opts.placeholderText,
         minimumResultsForSearch: -1,
         dropdownCssClass: 'qti-inlineChoiceInteraction-dropdown'
     });
 
-    var $el = $container.select2('container');
+    const $el = $container.select2('container');
 
     if (required) {
         //set up the tooltip plugin for the input
@@ -82,24 +95,17 @@ var render = function(interaction, options) {
     }
 
     $container
-        .on('change', function(e) {
+        .on('change', function (e) {
             //if tts component is loaded and click-to-speak function is activated - we must fix the situation when select2 prevents tts from working
             //for this a "one-moment" handler of option click is added and removed after event fired
-            if (
-                $(e.currentTarget)
-                    .closest('.qti-item')
-                    .hasClass('prevent-click-handler')
-            ) {
-                var $selectedIndex = $(e.currentTarget)[0].options.selectedIndex
+            if ($(e.currentTarget).closest('.qti-item').hasClass('prevent-click-handler')) {
+                const $selectedIndex = $(e.currentTarget)[0].options.selectedIndex
                     ? $(e.currentTarget)[0].options.selectedIndex
                     : null;
-                $container.find('option').one('click', function(e) {
+                $container.find('div[role="option"]').one('click', function (e) {
                     e.stopPropagation();
                 });
-                $container
-                    .find('option')
-                    .eq($selectedIndex)
-                    .trigger('click');
+                $container.find('div[role="option"]').eq($selectedIndex).trigger('click');
             }
 
             if (required && $container.val() !== '') {
@@ -108,27 +114,24 @@ var render = function(interaction, options) {
 
             containerHelper.triggerResponseChangeEvent(interaction);
         })
-        .on('select2-open', function() {
+        .on('select2-open', function () {
             if (required) {
                 choiceTooltip.hide();
             }
         })
-        .on('select2-close', function() {
+        .on('select2-close', function () {
             if (required && $container.val() === '') {
                 choiceTooltip.show();
             }
         });
 };
 
-var resetResponse = function(interaction) {
+const resetResponse = function (interaction) {
     _setVal(interaction, _emptyValue);
 };
 
-var _setVal = function(interaction, choiceIdentifier) {
-    containerHelper
-        .get(interaction)
-        .val(choiceIdentifier)
-        .select2('val', choiceIdentifier);
+const _setVal = function (interaction, choiceIdentifier) {
+    containerHelper.get(interaction).val(choiceIdentifier).select2('val', choiceIdentifier);
 };
 
 /**
@@ -143,12 +146,12 @@ var _setVal = function(interaction, choiceIdentifier) {
  * @param {object} interaction
  * @param {object} response
  */
-var setResponse = function(interaction, response) {
+const setResponse = function (interaction, response) {
     _setVal(interaction, pciResponse.unserialize(response, interaction)[0]);
 };
 
-var _getRawResponse = function(interaction) {
-    var value = containerHelper.get(interaction).val();
+const _getRawResponse = function (interaction) {
+    const value = containerHelper.get(interaction).val();
     return value && value !== _emptyValue ? [value] : [];
 };
 
@@ -164,7 +167,7 @@ var _getRawResponse = function(interaction) {
  * @param {object} interaction
  * @returns {object}
  */
-var getResponse = function(interaction) {
+const getResponse = function (interaction) {
     return pciResponse.serialize(_getRawResponse(interaction), interaction);
 };
 
@@ -172,8 +175,8 @@ var getResponse = function(interaction) {
  * Clean interaction destroy
  * @param {Object} interaction
  */
-var destroy = function(interaction) {
-    var $container = containerHelper.get(interaction);
+const destroy = function (interaction) {
+    const $container = containerHelper.get(interaction);
 
     //remove event
     $(document).off('.commonRenderer');
@@ -193,8 +196,8 @@ var destroy = function(interaction) {
  * @param {Object} interaction - the interaction instance
  * @param {Object} state - the interaction state
  */
-var setState = function setState(interaction, state) {
-    var $container;
+const setState = function setState(interaction, state) {
+    let $container;
 
     if (_.isObject(state)) {
         if (state.response) {
@@ -210,9 +213,9 @@ var setState = function setState(interaction, state) {
             $container.select2('disable').select2('close');
 
             $('option[data-identifier]', $container)
-                .sort(function(a, b) {
-                    var aIndex = _.indexOf(state.order, $(a).data('identifier'));
-                    var bIndex = _.indexOf(state.order, $(b).data('identifier'));
+                .sort(function (a, b) {
+                    const aIndex = _.indexOf(state.order, $(a).data('identifier'));
+                    const bIndex = _.indexOf(state.order, $(b).data('identifier'));
                     if (aIndex > bIndex) {
                         return 1;
                     }
@@ -235,10 +238,10 @@ var setState = function setState(interaction, state) {
  * @param {Object} interaction - the interaction instance
  * @returns {Object} the interaction current state
  */
-var getState = function getState(interaction) {
-    var $container;
-    var state = {};
-    var response = interaction.getResponse();
+const getState = function getState(interaction) {
+    let $container;
+    const state = {};
+    const response = interaction.getResponse();
 
     if (response) {
         state.response = response;
@@ -249,7 +252,7 @@ var getState = function getState(interaction) {
         $container = containerHelper.get(interaction);
 
         state.order = [];
-        $('option[data-identifier]', $container).each(function() {
+        $('option[data-identifier]', $container).each(function () {
             state.order.push($(this).data('identifier'));
         });
     }
@@ -263,12 +266,12 @@ var getState = function getState(interaction) {
 export default {
     qtiClass: 'inlineChoiceInteraction',
     template: tpl,
-    render: render,
+    render,
     getContainer: containerHelper.get,
-    setResponse: setResponse,
-    getResponse: getResponse,
-    resetResponse: resetResponse,
-    destroy: destroy,
-    setState: setState,
-    getState: getState
+    setResponse,
+    getResponse,
+    resetResponse,
+    destroy,
+    setState,
+    getState
 };
