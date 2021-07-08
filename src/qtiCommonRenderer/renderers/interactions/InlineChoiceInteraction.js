@@ -42,6 +42,8 @@ const _defaultOptions = {
     placeholderText: __('select a choice')
 };
 
+const optionSelector = 'div[role="option"]';
+
 /**
  * Init rendering, called after template injected into the DOM
  * All options are listed in the QTI v2.1 information model:
@@ -58,16 +60,16 @@ const render = function (interaction, options) {
     _.extend(opts, options);
 
     if (opts.allowEmpty && !required) {
-        $container.find('div[data-identifier=' + _emptyValue + ']').text('--- ' + __('leave empty') + ' ---');
+        $container.find(`div[data-identifier=${_emptyValue}]`).text('--- ' + __('leave empty') + ' ---');
     } else {
-        $container.find('div[data-identifier=' + _emptyValue + ']').remove();
+        $container.find(`div[data-identifier=${_emptyValue}]`).remove();
     }
 
     $container.select2({
         data: $container
-            .find('div[role="option"]')
+            .find(optionSelector)
             .map((i, opt) => ({
-                id: i,
+                id: $(opt).data('identifier'),
                 markup: opt.outerHTML
             }))
             .get(),
@@ -77,7 +79,7 @@ const render = function (interaction, options) {
         formatSelection: function (data) {
             return data.markup;
         },
-        width: '100%',
+        width: 'fit-content',
         placeholder: opts.placeholderText,
         minimumResultsForSearch: -1,
         dropdownCssClass: 'qti-inlineChoiceInteraction-dropdown'
@@ -102,10 +104,10 @@ const render = function (interaction, options) {
                 const $selectedIndex = $(e.currentTarget)[0].options.selectedIndex
                     ? $(e.currentTarget)[0].options.selectedIndex
                     : null;
-                $container.find('div[role="option"]').one('click', function (e) {
+                $container.find(optionSelector).one('click', function (e) {
                     e.stopPropagation();
                 });
-                $container.find('div[role="option"]').eq($selectedIndex).trigger('click');
+                $container.find(optionSelector).eq($selectedIndex).trigger('click');
             }
 
             if (required && $container.val() !== '') {
@@ -212,7 +214,7 @@ const setState = function setState(interaction, state) {
             //just in case the dropdown is opened
             $container.select2('disable').select2('close');
 
-            $('option[data-identifier]', $container)
+            $(optionSelector, $container)
                 .sort(function (a, b) {
                     const aIndex = _.indexOf(state.order, $(a).data('identifier'));
                     const bIndex = _.indexOf(state.order, $(b).data('identifier'));
@@ -252,7 +254,7 @@ const getState = function getState(interaction) {
         $container = containerHelper.get(interaction);
 
         state.order = [];
-        $('option[data-identifier]', $container).each(function () {
+        $(optionSelector, $container).each(function () {
             state.order.push($(this).data('identifier'));
         });
     }
