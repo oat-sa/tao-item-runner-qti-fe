@@ -20,7 +20,7 @@ define([
 
     QUnit.test('renders correclty', function(assert) {
         var ready = assert.async();
-        assert.expect(17);
+        assert.expect(14);
 
         var $container = $('#' + fixtureContainerId);
 
@@ -42,24 +42,19 @@ define([
                     'the container contains a the body element .qti-itemBody'
                 );
                 assert.equal(
-                    $container.find('select.qti-interaction').length,
+                    $container.find('div[role="listbox"].qti-interaction').length,
                     1,
                     'the container contains an interaction .qti-interaction'
                 );
                 assert.equal(
-                    $container.find('select.qti-interaction.qti-inlineChoiceInteraction').length,
+                    $container.find('div[role="listbox"].qti-interaction.qti-inlineChoiceInteraction').length,
                     1,
                     'the container contains a choice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option').length,
-                    5,
-                    'the interaction has 5 options'
-                );
-                assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices ' + $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length
                 );
 
                 //Check select2
@@ -77,34 +72,24 @@ define([
                 );
 
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option:nth-child(1)').val(),
-                    '',
-                    'the 1st choice has no value'
-                );
-                assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option:nth-child(1)').text(),
-                    '',
-                    'the 1st choice is empty'
-                );
-                assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option:nth-child(2)').val(),
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(1)').data('identifier'),
                     'empty',
-                    'the 2nd choice has a value of "empty"'
+                    'the 1st choice has a value of "empty"'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option:nth-child(3)').data('identifier'),
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(2)').data('identifier'),
                     'G',
-                    'the 3rd choice has the right identifier'
+                    'the 2nd choice has the right identifier ' + $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(3)').data('identifier')
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option:nth-child(4)').data('identifier'),
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(3)').data('identifier'),
                     'L',
-                    'the 4th choice has the right identifier'
+                    'the 3rd choice has the right identifier ' + $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(4)').data('identifier')
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option:nth-child(5)').data('identifier'),
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(4)').data('identifier'),
                     'Y',
-                    'the 5th choice has the right identifier'
+                    'the 4th choice has the right identifier ' + $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(4)').data('identifier'),
                 );
 
                 ready();
@@ -124,16 +109,16 @@ define([
 
         runner = qtiItemRunner('qti', inlineChoiceData)
             .on('render', function() {
-                var $select = $('select.qti-inlineChoiceInteraction', $container);
+                var $select = $('div[role="listbox"].qti-inlineChoiceInteraction', $container);
                 assert.equal(
                     $select.length,
                     1,
                     'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices ' + $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
                 );
 
                 var $select2Container = $('.select2-container', $container);
@@ -147,7 +132,7 @@ define([
                 assert.deepEqual(
                     state.RESPONSE,
                     { response: { base: { identifier: 'L' } } },
-                    'The lancaster response is selected'
+                    'The lancaster response is selected ' + JSON.stringify(state.RESPONSE)
                 );
                 ready();
             })
@@ -166,16 +151,16 @@ define([
 
         runner = qtiItemRunner('qti', inlineChoiceData)
             .on('render', function() {
-                var $select = $('select.qti-inlineChoiceInteraction', $container);
+                var $select = $('div[role="listbox"].qti-inlineChoiceInteraction', $container);
                 assert.equal(
                     $select.length,
                     1,
                     'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices ' +  $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
                 );
 
                 assert.equal($select.select2('val'), '', 'There is no choice selected');
@@ -183,7 +168,7 @@ define([
                 this.setState({ RESPONSE: { response: { base: { identifier: 'G' } } } });
 
                 _.delay(function() {
-                    assert.equal($select.select2('val'), 'G', 'The G choice is selected');
+                    assert.equal($select.select2('val'), 'G', 'The G choice is selected ' + $select.select2('val'));
 
                     ready();
                 }, 10);
@@ -205,16 +190,17 @@ define([
             .on('render', function() {
                 var self = this;
 
-                var $select = $('select.qti-inlineChoiceInteraction', $container);
+                var $select = $('div[role="listbox"].qti-inlineChoiceInteraction', $container);
                 assert.equal(
                     $select.length,
                     1,
                     'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices ' +                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+
                 );
 
                 var $select2Container = $('.select2-container', $container);
@@ -255,16 +241,17 @@ define([
             .on('render', function() {
                 var self = this;
 
-                var $select = $('select.qti-inlineChoiceInteraction', $container);
+                var $select = $('div[role="listbox"].qti-inlineChoiceInteraction', $container);
                 assert.equal(
                     $select.length,
                     1,
                     'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices ' +                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+
                 );
 
                 var $select2Container = $('.select2-container', $container);
@@ -273,14 +260,14 @@ define([
                 $select.select2('val', 'L').trigger('change');
 
                 _.delay(function() {
-                    assert.equal($select.val(), 'L', 'The value is set to Lancaster');
+                    assert.equal($select.val(), 'L', 'The value is set to Lancaster ' + $select.val());
 
                     //Call destroy manually
                     var interaction = self._item.getInteractions()[0];
                     interaction.renderer.resetResponse(interaction);
 
                     _.delay(function() {
-                        assert.equal($select.val(), 'empty', 'The value is now empty');
+                        assert.equal($select.val(), 'empty', 'The value is now empty ' + $select.val());
                         ready();
                     }, 100);
                 }, 100);
@@ -291,7 +278,7 @@ define([
 
     QUnit.test('restores order of shuffled choices', function(assert) {
         var ready = assert.async();
-        assert.expect(10);
+        assert.expect(8);
 
         var $container = $('#' + fixtureContainerId);
 
@@ -306,16 +293,17 @@ define([
             .on('render', function() {
                 var self = this;
 
-                var $select = $('select.qti-inlineChoiceInteraction', $container);
+                var $select = $('div[role="listbox"].qti-inlineChoiceInteraction', $container);
                 assert.equal(
                     $select.length,
                     1,
                     'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices ' +                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+
                 );
 
                 this.setState({
@@ -327,34 +315,24 @@ define([
 
                 _.delay(function() {
                     assert.equal(
-                        $container.find('select.qti-inlineChoiceInteraction option:nth-child(1)').val(),
-                        '',
-                        'the 1st choice has no value'
-                    );
-                    assert.equal(
-                        $container.find('select.qti-inlineChoiceInteraction option:nth-child(1)').text(),
-                        '',
-                        'the 1st choice is empty'
-                    );
-                    assert.equal(
-                        $container.find('select.qti-inlineChoiceInteraction option:nth-child(2)').val(),
+                        $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(1)').data('identifier'),
                         'empty',
-                        'the 2nd choice has a value of "empty"'
+                        'the 1st choice has a value of "empty" ' +                         $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(1)').data('identifier'),
                     );
                     assert.equal(
-                        $container.find('select.qti-inlineChoiceInteraction option:nth-child(3)').data('identifier'),
+                        $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(2)').data('identifier'),
                         'Y',
-                        'the 3rd choice has the right identifier'
+                        'the 2nd choice has the right identifier ' +                         $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(2)').data('identifier'),
                     );
                     assert.equal(
-                        $container.find('select.qti-inlineChoiceInteraction option:nth-child(4)').data('identifier'),
+                        $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(3)').data('identifier'),
                         'G',
-                        'the 4th choice has the right identifier'
+                        'the 3rd choice has the right identifier ' +                         $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(3)').data('identifier'),
                     );
                     assert.equal(
-                        $container.find('select.qti-inlineChoiceInteraction option:nth-child(5)').data('identifier'),
+                        $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(4)').data('identifier'),
                         'L',
-                        'the 5th choice has the right identifier'
+                        'the 4th choice has the right identifier ' +                         $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(4)').data('identifier'),
                     );
 
                     ready();
@@ -377,16 +355,16 @@ define([
 
         runner = qtiItemRunner('qti', inlineChoiceData)
             .on('render', function() {
-                var $select = $('select.qti-inlineChoiceInteraction', $container);
+                var $select = $('div[role="listbox"].qti-inlineChoiceInteraction', $container);
                 assert.equal(
                     $select.length,
                     1,
                     'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices'
                 );
 
                 ready();
