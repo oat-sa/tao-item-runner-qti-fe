@@ -54,7 +54,7 @@ define([
                 assert.equal(
                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
                     4,
-                    'the interaction has 4 choices ' + $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length
+                    'the interaction has 4 choices'
                 );
 
                 //Check select2
@@ -79,17 +79,17 @@ define([
                 assert.equal(
                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(2)').data('identifier'),
                     'G',
-                    'the 2nd choice has the right identifier ' + $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(3)').data('identifier')
+                    'the 2nd choice has the right identifier'
                 );
                 assert.equal(
                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(3)').data('identifier'),
                     'L',
-                    'the 3rd choice has the right identifier ' + $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(4)').data('identifier')
+                    'the 3rd choice has the right identifier'
                 );
                 assert.equal(
                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(4)').data('identifier'),
                     'Y',
-                    'the 4th choice has the right identifier ' + $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(4)').data('identifier'),
+                    'the 4th choice has the right identifier',
                 );
 
                 ready();
@@ -118,7 +118,7 @@ define([
                 assert.equal(
                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
                     4,
-                    'the interaction has 4 choices ' + $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    'the interaction has 4 choices',
                 );
 
                 var $select2Container = $('.select2-container', $container);
@@ -160,7 +160,7 @@ define([
                 assert.equal(
                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
                     4,
-                    'the interaction has 4 choices ' +  $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    'the interaction has 4 choices',
                 );
 
                 assert.equal($select.select2('val'), '', 'There is no choice selected');
@@ -199,8 +199,7 @@ define([
                 assert.equal(
                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
                     4,
-                    'the interaction has 4 choices ' +                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
-
+                    'the interaction has 4 choices',
                 );
 
                 var $select2Container = $('.select2-container', $container);
@@ -250,8 +249,7 @@ define([
                 assert.equal(
                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
                     4,
-                    'the interaction has 4 choices ' +                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
-
+                    'the interaction has 4 choices',
                 );
 
                 var $select2Container = $('.select2-container', $container);
@@ -260,14 +258,14 @@ define([
                 $select.select2('val', 'L').trigger('change');
 
                 _.delay(function() {
-                    assert.equal($select.val(), 'L', 'The value is set to Lancaster ' + $select.val());
+                    assert.equal($select.val(), 'L', 'The value is set to Lancaster');
 
                     //Call destroy manually
                     var interaction = self._item.getInteractions()[0];
                     interaction.renderer.resetResponse(interaction);
 
                     _.delay(function() {
-                        assert.equal($select.val(), 'empty', 'The value is now empty ' + $select.val());
+                        assert.equal($select.val(), 'empty', 'The value is now empty');
                         ready();
                     }, 100);
                 }, 100);
@@ -302,8 +300,7 @@ define([
                 assert.equal(
                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
                     4,
-                    'the interaction has 4 choices ' +                     $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
-
+                    'the interaction has 4 choices',
                 );
 
                 this.setState({
@@ -317,22 +314,22 @@ define([
                     assert.equal(
                         $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(1)').data('identifier'),
                         'empty',
-                        'the 1st choice has a value of "empty" ' +                         $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(1)').data('identifier'),
+                        'the 1st choice has a value of "empty"',
                     );
                     assert.equal(
                         $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(2)').data('identifier'),
                         'Y',
-                        'the 2nd choice has the right identifier ' +                         $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(2)').data('identifier'),
+                        'the 2nd choice has the right identifier',
                     );
                     assert.equal(
                         $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(3)').data('identifier'),
                         'G',
-                        'the 3rd choice has the right identifier ' +                         $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(3)').data('identifier'),
+                        'the 3rd choice has the right identifier',
                     );
                     assert.equal(
                         $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(4)').data('identifier'),
                         'L',
-                        'the 4th choice has the right identifier ' +                         $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(4)').data('identifier'),
+                        'the 4th choice has the right identifier',
                     );
 
                     ready();
