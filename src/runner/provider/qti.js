@@ -78,17 +78,14 @@ var qtiItemRuntimeProvider = {
         options = _.defaults(options || {}, { state: {} });
 
         if (this._item) {
-
-            // aaply RTL layout according to item language
-            this.on('ready', () => {
-                const $item = $(elt).find('.qti-item');
-                const itemLang = $item.attr('lang');
-                $item.find('.grid-row').attr('dir', locale.getLanguageDirection(itemLang));
-            });
-
             try {
                 //render item html
                 elt.innerHTML = this._item.render({});
+
+                // apply RTL layout according to item language
+                const $item = $(elt).find('.qti-item');
+                const itemLang = $item.attr('lang');
+                $item.find('.grid-row').attr('dir', locale.getLanguageDirection(itemLang));
             } catch (e) {
                 self.trigger('error', 'Error in template rendering : ' + e.message);
             }
