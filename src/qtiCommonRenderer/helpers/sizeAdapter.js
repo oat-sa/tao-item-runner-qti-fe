@@ -27,8 +27,8 @@ export default {
      * @param {jQueryElement|widget} target
      */
     adaptSize: function (target) {
-        var $elements;
-        var $container;
+        let $elements;
+        let $container;
 
         switch (true) {
             // widget
@@ -45,18 +45,12 @@ export default {
 
         $container.waitForMedia(function () {
             adaptSize.height($elements);
-            // delay a resize as some browsers are not emitting the load event on the LINK elements (Chrome)
-            setTimeout(() => {
-                adaptSize.height($elements);
-            }, 300);
             document.addEventListener(
                 'load',
-                function (e) {
-                    if (e.target.rel === 'stylesheet') {
+                e => {
+                    if (e.target && e.target.rel === 'stylesheet') {
                         // give time to slower computers to apply loaded styles
-                        setTimeout(() => {
-                            adaptSize.height($elements);
-                        }, 0);
+                        adaptSize.height($elements);
                     }
                 },
                 true
