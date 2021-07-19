@@ -539,7 +539,7 @@ var resetResponse = function(interaction) {
     });
 
     $choices.detach().sort(function(choice1, choice2) {
-        return _.indexOf(initialOrder, $(choice1).data('serial')) > _.indexOf(initialOrder, $(choice2).data('serial'));
+        return _.indexOf(initialOrder, $(choice1).data('serial')) - _.indexOf(initialOrder, $(choice2).data('serial'));
     });
     $choiceArea.prepend($choices);
 };
