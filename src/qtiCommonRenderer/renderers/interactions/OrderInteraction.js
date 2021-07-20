@@ -32,6 +32,87 @@ import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import interact from 'interact';
 import interactUtils from 'ui/interactUtils';
 
+const _freezeSize = function ($container) {
+    const $orderArea = $container.find('.order-interaction-area');
+    $orderArea.height($orderArea.height());
+};
+
+const _setInstructions = function (interaction) {
+    const $container = containerHelper.get(interaction);
+    const $choiceArea = $('.choice-area', $container),
+        $resultArea = $('.result-area', $container),
+        min = parseInt(interaction.attr('minChoices'), 10),
+        max = parseInt(interaction.attr('maxChoices'), 10);
+
+    if (min) {
+        instructionMgr.appendInstruction(interaction, __('You must use at least %d choices', min), function () {
+            if ($resultArea.find('>li').length >= min) {
+                this.setLevel('success');
+            } else {
+                this.reset();
+            }
+        });
+    }
+
+    if (max && max < _.size(interaction.getChoices())) {
+        const instructionMax = instructionMgr.appendInstruction(
+            interaction,
+            __('You can use maximum %d choices', max),
+            function () {
+                if ($resultArea.find('>li').length >= max) {
+                    $choiceArea.find('>li').addClass('deactivated');
+                    this.setMessage(__('Maximum choices reached'));
+                } else {
+                    $choiceArea.find('>li').removeClass('deactivated');
+                    this.reset();
+                }
+            }
+        );
+
+        interact(`${$choiceArea.selector} >li.deactivated`).on('tap', function (e) {
+            const $target = $(e.currentTarget);
+            $target.addClass('brd-error');
+            instructionMax.setLevel('warning', 2000);
+            setTimeout(function () {
+                $target.removeClass('brd-error');
+            }, 150);
+        });
+
+        // we don't check for isDragAndDropEnabled on purpose, as this binding is not to allow dragging,
+        // but only to provide feedback in case of a drag action on an inactive choice
+        interact(`${$choiceArea.selector} >li.deactivated`)
+            .draggable({
+                onstart: function (e) {
+                    const $target = $(e.target);
+                    $target.addClass('brd-error');
+                    instructionMax.setLevel('warning');
+                },
+                onend: function (e) {
+                    const $target = $(e.target);
+                    $target.removeClass('brd-error');
+                    instructionMax.setLevel('info');
+                }
+            })
+            .styleCursor(false);
+    }
+};
+
+const resetResponse = function (interaction) {
+    const $container = containerHelper.get(interaction);
+    const initialOrder = _.keys(interaction.getChoices());
+    const $choiceArea = $('.choice-area', $container).append($('.result-area>li', $container));
+    const $choices = $choiceArea.children('.qti-choice');
+
+    $container.find('.qti-choice.active').each(function deactivateChoice() {
+        interactUtils.tapOn(this);
+    });
+
+    $choices.detach().sort(function (choice1, choice2) {
+        return _.indexOf(initialOrder, $(choice1).data('serial')) - _.indexOf(initialOrder, $(choice2).data('serial'));
+    });
+    $choiceArea.prepend($choices);
+};
+
 /**
  * Init rendering, called after template injected into the DOM
  * All options are listed in the QTI v2.1 information model:
@@ -39,40 +120,41 @@ import interactUtils from 'ui/interactUtils';
  *
  * @param {Object} interaction - the interaction instance
  */
-var render = function(interaction) {
-    var $container = containerHelper.get(interaction),
+const render = function (interaction) {
+    const $container = containerHelper.get(interaction),
         $choiceArea = $container.find('.choice-area'),
         $resultArea = $container.find('.result-area'),
         $iconAdd = $container.find('.icon-add-to-selection'),
         $iconRemove = $container.find('.icon-remove-from-selection'),
         $iconBefore = $container.find('.icon-move-before'),
         $iconAfter = $container.find('.icon-move-after'),
-        $activeChoice = null,
-        choiceSelector = $choiceArea.selector + ' >li:not(.deactivated)',
-        resultSelector = $resultArea.selector + ' >li',
+        choiceSelector = `${$choiceArea.selector} >li:not(.deactivated)`,
+        resultSelector = `${$resultArea.selector} >li`,
+        $dragContainer = $container.find('.drag-container'),
+        orientation = interaction.attr('orientation') ? interaction.attr('orientation') : 'vertical';
+
+    let $activeChoice = null,
         scaleX,
         scaleY,
         isDragAndDropEnabled,
         dragOptions,
-        $dropzoneElement,
-        $dragContainer = $container.find('.drag-container'),
-        orientation = interaction.attr('orientation') ? interaction.attr('orientation') : 'vertical';
+        $dropzoneElement;
 
-    var _activeControls = function _activeControls() {
+    const _activeControls = function _activeControls() {
         $iconAdd.addClass('inactive');
         $iconRemove.removeClass('inactive').addClass('active');
         $iconBefore.removeClass('inactive').addClass('active');
         $iconAfter.removeClass('inactive').addClass('active');
     };
 
-    var _resetControls = function _resetControls() {
+    const _resetControls = function _resetControls() {
         $iconAdd.removeClass('inactive');
         $iconRemove.removeClass('active').addClass('inactive');
         $iconBefore.removeClass('active').addClass('inactive');
         $iconAfter.removeClass('active').addClass('inactive');
     };
 
-    var _setSelection = function _setSelection($choice) {
+    const _setSelection = function _setSelection($choice) {
         if ($activeChoice) {
             $activeChoice.removeClass('active');
         }
@@ -80,7 +162,7 @@ var render = function(interaction) {
         $activeChoice.addClass('active');
     };
 
-    var _resetSelection = function _resetSelection() {
+    const _resetSelection = function _resetSelection() {
         if ($activeChoice) {
             $activeChoice.removeClass('active');
             $activeChoice = null;
@@ -88,8 +170,8 @@ var render = function(interaction) {
         _resetControls();
     };
 
-    var _addChoiceToSelection = function _addChoiceToSelection($target, position) {
-        var $results = $(resultSelector);
+    const _addChoiceToSelection = function _addChoiceToSelection($target, position) {
+        const $results = $(resultSelector);
         _resetSelection();
 
         //move choice to the result list:
@@ -105,7 +187,7 @@ var render = function(interaction) {
         instructionMgr.validateInstructions(interaction);
     };
 
-    var _toggleResultSelection = function _toggleResultSelection($target) {
+    const _toggleResultSelection = function _toggleResultSelection($target) {
         if ($target.hasClass('active')) {
             _resetSelection();
         } else {
@@ -114,7 +196,7 @@ var render = function(interaction) {
         }
     };
 
-    var _removeChoice = function _removeChoice() {
+    const _removeChoice = function _removeChoice() {
         if ($activeChoice) {
             //restore choice back to choice list
             $choiceArea.append($activeChoice);
@@ -127,8 +209,8 @@ var render = function(interaction) {
         _resetSelection();
     };
 
-    var _moveResultBefore = function _moveResultBefore() {
-        var $prev = $activeChoice.prev();
+    const _moveResultBefore = function _moveResultBefore() {
+        const $prev = $activeChoice.prev();
 
         if ($prev.length) {
             $prev.before($activeChoice);
@@ -136,8 +218,8 @@ var render = function(interaction) {
         }
     };
 
-    var _moveResultAfter = function _moveResultAfter() {
-        var $next = $activeChoice.next();
+    const _moveResultAfter = function _moveResultAfter() {
+        const $next = $activeChoice.next();
 
         if ($next.length) {
             $next.after($activeChoice);
@@ -147,12 +229,12 @@ var render = function(interaction) {
 
     // Point & click handlers
 
-    interact($container.selector).on('tap', function() {
+    interact($container.selector).on('tap', function () {
         _resetSelection();
     });
 
-    interact(choiceSelector).on('tap', function(e) {
-        var $target = $(e.currentTarget);
+    interact(choiceSelector).on('tap', function (e) {
+        const $target = $(e.currentTarget);
 
         //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
         if ($target.closest('.qti-item').hasClass('prevent-click-handler')) {
@@ -162,15 +244,15 @@ var render = function(interaction) {
         e.stopPropagation();
 
         $iconAdd.addClass('triggered');
-        setTimeout(function() {
+        setTimeout(function () {
             $iconAdd.removeClass('triggered');
         }, 150);
 
         _addChoiceToSelection($target);
     });
 
-    interact(resultSelector).on('tap', function(e) {
-        var $target = $(e.currentTarget);
+    interact(resultSelector).on('tap', function (e) {
+        const $target = $(e.currentTarget);
 
         //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
         if ($target.closest('.qti-item').hasClass('prevent-click-handler')) {
@@ -181,13 +263,9 @@ var render = function(interaction) {
         _toggleResultSelection($target);
     });
 
-    interact($iconRemove.selector).on('tap', function(e) {
+    interact($iconRemove.selector).on('tap', function (e) {
         //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
-        if (
-            $(e.currentTarget)
-                .closest('.qti-item')
-                .hasClass('prevent-click-handler')
-        ) {
+        if ($(e.currentTarget).closest('.qti-item').hasClass('prevent-click-handler')) {
             return;
         }
 
@@ -195,13 +273,9 @@ var render = function(interaction) {
         _removeChoice();
     });
 
-    interact($iconBefore.selector).on('tap', function(e) {
+    interact($iconBefore.selector).on('tap', function (e) {
         //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
-        if (
-            $(e.currentTarget)
-                .closest('.qti-item')
-                .hasClass('prevent-click-handler')
-        ) {
+        if ($(e.currentTarget).closest('.qti-item').hasClass('prevent-click-handler')) {
             return;
         }
 
@@ -209,13 +283,9 @@ var render = function(interaction) {
         _moveResultBefore();
     });
 
-    interact($iconAfter.selector).on('tap', function(e) {
+    interact($iconAfter.selector).on('tap', function (e) {
         //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
-        if (
-            $(e.currentTarget)
-                .closest('.qti-item')
-                .hasClass('prevent-click-handler')
-        ) {
+        if ($(e.currentTarget).closest('.qti-item').hasClass('prevent-click-handler')) {
             return;
         }
 
@@ -230,7 +300,7 @@ var render = function(interaction) {
     }
 
     function _iFrameDragFix(draggableSelector, target) {
-        interactUtils.iFrameDragFixOn(function() {
+        interactUtils.iFrameDragFixOn(function () {
             if (_isDropzoneVisible()) {
                 interact($resultArea.selector).fire({
                     type: 'drop',
@@ -263,9 +333,9 @@ var render = function(interaction) {
         interact(choiceSelector)
             .draggable(
                 _.assign({}, dragOptions, {
-                    onstart: function(e) {
-                        var $target = $(e.target);
-                        var scale;
+                    onstart: function (e) {
+                        const $target = $(e.target);
+                        let scale;
                         $target.addClass('dragged');
 
                         _iFrameDragFix(choiceSelector, e.target);
@@ -273,15 +343,15 @@ var render = function(interaction) {
                         scaleX = scale[0];
                         scaleY = scale[1];
                     },
-                    onmove: function(e) {
-                        var $target = $(e.target);
+                    onmove: function (e) {
+                        const $target = $(e.target);
                         interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
                         if (_isDropzoneVisible()) {
                             _adjustDropzonePosition($target);
                         }
                     },
-                    onend: function(e) {
-                        var $target = $(e.target);
+                    onend: function (e) {
+                        const $target = $(e.target);
                         $target.removeClass('dragged');
 
                         interactUtils.restoreOriginalPosition($target);
@@ -295,9 +365,9 @@ var render = function(interaction) {
         interact(resultSelector)
             .draggable(
                 _.assign({}, dragOptions, {
-                    onstart: function(e) {
-                        var $target = $(e.target);
-                        var scale;
+                    onstart: function (e) {
+                        const $target = $(e.target);
+                        let scale;
                         $target.addClass('dragged');
 
                         _setSelection($target);
@@ -317,15 +387,15 @@ var render = function(interaction) {
                         scaleX = scale[0];
                         scaleY = scale[1];
                     },
-                    onmove: function(e) {
-                        var $target = $(e.target);
+                    onmove: function (e) {
+                        const $target = $(e.target);
                         interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
                         if (_isDropzoneVisible()) {
                             _adjustDropzonePosition($target);
                         }
                     },
-                    onend: function(e) {
-                        var $target = $(e.target),
+                    onend: function (e) {
+                        const $target = $(e.target),
                             hasBeenDroppedInResultArea = $target.parent === $resultArea;
 
                         $target.removeClass('dragged');
@@ -345,13 +415,13 @@ var render = function(interaction) {
         // makes result area droppable
         interact($resultArea.selector).dropzone({
             overlap: 0.5,
-            ondragenter: function(e) {
-                var $dragged = $(e.relatedTarget);
+            ondragenter: function (e) {
+                const $dragged = $(e.relatedTarget);
                 _insertDropzone($dragged);
                 $dragged.addClass('droppable');
             },
-            ondrop: function(e) {
-                var $dragged = $(e.relatedTarget),
+            ondrop: function (e) {
+                const $dragged = $(e.relatedTarget),
                     dropzoneIndex = $(resultSelector).index($dropzoneElement);
 
                 this.ondragleave(e);
@@ -359,8 +429,8 @@ var render = function(interaction) {
                 _addChoiceToSelection($dragged, dropzoneIndex);
                 interactUtils.restoreOriginalPosition($dragged);
             },
-            ondragleave: function(e) {
-                var $dragged = $(e.relatedTarget);
+            ondragleave: function (e) {
+                const $dragged = $(e.relatedTarget);
                 $dropzoneElement.remove();
                 $dragged.removeClass('droppable');
             }
@@ -372,17 +442,16 @@ var render = function(interaction) {
     }
 
     function _insertDropzone($dragged) {
-        var draggedMiddle = _getMiddleOf($dragged),
+        const draggedMiddle = _getMiddleOf($dragged),
             previousMiddle = {
                 x: 0,
                 y: 0
-            },
-            insertPosition,
-            $dropzone;
+            };
+        let insertPosition;
 
         // look for position where to insert dropzone
-        $(resultSelector).each(function(index) {
-            var currentMiddle = _getMiddleOf($(this));
+        $(resultSelector).each(function (index) {
+            const currentMiddle = _getMiddleOf($(this));
 
             if (orientation !== 'horizontal') {
                 if (draggedMiddle.y > previousMiddle.y && draggedMiddle.y < currentMiddle.y) {
@@ -400,9 +469,7 @@ var render = function(interaction) {
         });
         // append dropzone to DOM
         if (typeof insertPosition !== 'undefined') {
-            $(resultSelector)
-                .eq(insertPosition)
-                .before($dropzoneElement);
+            $(resultSelector).eq(insertPosition).before($dropzoneElement);
         } else {
             // no index found, we just append to the end
             $resultArea.append($dropzoneElement);
@@ -414,7 +481,7 @@ var render = function(interaction) {
     }
 
     function _adjustDropzonePosition($dragged) {
-        var draggedBox = $dragged.get(0).getBoundingClientRect(),
+        const draggedBox = $dragged.get(0).getBoundingClientRect(),
             $prevResult = $dropzoneElement.prev('.qti-choice'),
             $nextResult = $dropzoneElement.next('.qti-choice'),
             prevMiddle = $prevResult.length > 0 ? _getMiddleOf($prevResult) : false,
@@ -438,7 +505,7 @@ var render = function(interaction) {
     }
 
     function _getMiddleOf($element) {
-        var elementBox = $element.get(0).getBoundingClientRect();
+        const elementBox = $element.get(0).getBoundingClientRect();
         return {
             x: elementBox.left + elementBox.width / 2,
             y: elementBox.top + elementBox.height / 2
@@ -450,7 +517,7 @@ var render = function(interaction) {
     _setInstructions(interaction);
 
     //bind event listener in case the attributes change dynamically on runtime
-    $(document).on('attributeChange.qti-widget.commonRenderer', function(e, data) {
+    $(document).on('attributeChange.qti-widget.commonRenderer', function (e, data) {
         if (data.element.getSerial() === interaction.getSerial()) {
             if (data.key === 'maxChoices' || data.key === 'minChoices') {
                 instructionMgr.removeInstructions(interaction);
@@ -461,87 +528,6 @@ var render = function(interaction) {
     });
 
     _freezeSize($container);
-};
-
-var _freezeSize = function($container) {
-    var $orderArea = $container.find('.order-interaction-area');
-    $orderArea.height($orderArea.height());
-};
-
-var _setInstructions = function(interaction) {
-    var $container = containerHelper.get(interaction);
-    var $choiceArea = $('.choice-area', $container),
-        $resultArea = $('.result-area', $container),
-        min = parseInt(interaction.attr('minChoices'), 10),
-        max = parseInt(interaction.attr('maxChoices'), 10);
-
-    if (min) {
-        instructionMgr.appendInstruction(interaction, __('You must use at least %d choices', min), function() {
-            if ($resultArea.find('>li').length >= min) {
-                this.setLevel('success');
-            } else {
-                this.reset();
-            }
-        });
-    }
-
-    if (max && max < _.size(interaction.getChoices())) {
-        var instructionMax = instructionMgr.appendInstruction(
-            interaction,
-            __('You can use maximum %d choices', max),
-            function() {
-                if ($resultArea.find('>li').length >= max) {
-                    $choiceArea.find('>li').addClass('deactivated');
-                    this.setMessage(__('Maximum choices reached'));
-                } else {
-                    $choiceArea.find('>li').removeClass('deactivated');
-                    this.reset();
-                }
-            }
-        );
-
-        interact($choiceArea.selector + ' >li.deactivated').on('tap', function(e) {
-            var $target = $(e.currentTarget);
-            $target.addClass('brd-error');
-            instructionMax.setLevel('warning', 2000);
-            setTimeout(function() {
-                $target.removeClass('brd-error');
-            }, 150);
-        });
-
-        // we don't check for isDragAndDropEnabled on purpose, as this binding is not to allow dragging,
-        // but only to provide feedback in case of a drag action on an inactive choice
-        interact($choiceArea.selector + ' >li.deactivated')
-            .draggable({
-                onstart: function(e) {
-                    var $target = $(e.target);
-                    $target.addClass('brd-error');
-                    instructionMax.setLevel('warning');
-                },
-                onend: function(e) {
-                    var $target = $(e.target);
-                    $target.removeClass('brd-error');
-                    instructionMax.setLevel('info');
-                }
-            })
-            .styleCursor(false);
-    }
-};
-
-var resetResponse = function(interaction) {
-    var $container = containerHelper.get(interaction);
-    var initialOrder = _.keys(interaction.getChoices());
-    var $choiceArea = $('.choice-area', $container).append($('.result-area>li', $container));
-    var $choices = $choiceArea.children('.qti-choice');
-
-    $container.find('.qti-choice.active').each(function deactivateChoice() {
-        interactUtils.tapOn(this);
-    });
-
-    $choices.detach().sort(function(choice1, choice2) {
-        return _.indexOf(initialOrder, $(choice1).data('serial')) > _.indexOf(initialOrder, $(choice2).data('serial'));
-    });
-    $choiceArea.prepend($choices);
 };
 
 /**
@@ -558,30 +544,30 @@ var resetResponse = function(interaction) {
  * @param {object} interaction
  * @param {object} response
  */
-var setResponse = function(interaction, response) {
-    var $container = containerHelper.get(interaction);
-    var $choiceArea = $('.choice-area', $container);
-    var $resultArea = $('.result-area', $container);
+const setResponse = function (interaction, response) {
+    const $container = containerHelper.get(interaction);
+    const $choiceArea = $('.choice-area', $container);
+    const $resultArea = $('.result-area', $container);
 
     if (response === null || _.isEmpty(response)) {
         resetResponse(interaction);
     } else {
         try {
-            _.each(pciResponse.unserialize(response, interaction), function(identifier) {
-                $resultArea.append($choiceArea.find('[data-identifier="' + identifier + '"]'));
+            _.each(pciResponse.unserialize(response, interaction), function (identifier) {
+                $resultArea.append($choiceArea.find(`[data-identifier="${identifier}"]`));
             });
         } catch (e) {
-            throw new Error('wrong response format in argument : ' + e);
+            throw new Error(`wrong response format in argument : ${e}`);
         }
     }
 
     instructionMgr.validateInstructions(interaction);
 };
 
-var _getRawResponse = function(interaction) {
-    var $container = containerHelper.get(interaction);
-    var response = [];
-    $('.result-area>li', $container).each(function() {
+const _getRawResponse = function (interaction) {
+    const $container = containerHelper.get(interaction);
+    const response = [];
+    $('.result-area>li', $container).each(function () {
         response.push($(this).data('identifier'));
     });
     return response;
@@ -599,7 +585,7 @@ var _getRawResponse = function(interaction) {
  * @param {object} interaction
  * @returns {object}
  */
-var getResponse = function(interaction) {
+const getResponse = function (interaction) {
     return pciResponse.serialize(_getRawResponse(interaction), interaction);
 };
 
@@ -609,7 +595,7 @@ var getResponse = function(interaction) {
  * @param {Object} [data] - interaction custom data
  * @returns {Object} custom data
  */
-var getCustomData = function(interaction, data) {
+const getCustomData = function (interaction, data) {
     return _.merge(data || {}, {
         horizontal: interaction.attr('orientation') === 'horizontal'
     });
@@ -619,11 +605,11 @@ var getCustomData = function(interaction, data) {
  * Destroy the interaction by leaving the DOM exactly in the same state it was before loading the interaction.
  * @param {Object} interaction - the interaction
  */
-var destroy = function(interaction) {
-    var $container = containerHelper.get(interaction);
+const destroy = function (interaction) {
+    const $container = containerHelper.get(interaction);
 
     //first, remove all events
-    var selectors = [
+    const selectors = [
         '.choice-area >li:not(.deactivated)',
         '.result-area >li',
         '.icon-add-to-selection',
@@ -651,9 +637,7 @@ var destroy = function(interaction) {
  * @param {Object} interaction - the interaction instance
  * @param {Object} state - the interaction state
  */
-var setState = function setState(interaction, state) {
-    var $container;
-
+const setState = function setState(interaction, state) {
     if (_.isObject(state)) {
         if (state.response) {
             interaction.resetResponse();
@@ -662,12 +646,12 @@ var setState = function setState(interaction, state) {
 
         //restore order of previously shuffled choices
         if (_.isArray(state.order) && state.order.length === _.size(interaction.getChoices())) {
-            $container = containerHelper.get(interaction);
+            const $container = containerHelper.get(interaction);
 
             $('.choice-area .qti-choice', $container)
-                .sort(function(a, b) {
-                    var aIndex = _.indexOf(state.order, $(a).data('identifier'));
-                    var bIndex = _.indexOf(state.order, $(b).data('identifier'));
+                .sort(function (a, b) {
+                    const aIndex = _.indexOf(state.order, $(a).data('identifier'));
+                    const bIndex = _.indexOf(state.order, $(b).data('identifier'));
                     if (aIndex > bIndex) {
                         return 1;
                     }
@@ -688,10 +672,9 @@ var setState = function setState(interaction, state) {
  * @param {Object} interaction - the interaction instance
  * @returns {Object} the interaction current state
  */
-var getState = function getState(interaction) {
-    var $container;
-    var state = {};
-    var response = interaction.getResponse();
+const getState = function getState(interaction) {
+    const state = {};
+    const response = interaction.getResponse();
 
     if (response) {
         state.response = response;
@@ -699,10 +682,10 @@ var getState = function getState(interaction) {
 
     //we store also the choice order if shuffled
     if (interaction.attr('shuffle') === true) {
-        $container = containerHelper.get(interaction);
+        const $container = containerHelper.get(interaction);
 
         state.order = [];
-        $('.choice-area .qti-choice', $container).each(function() {
+        $('.choice-area .qti-choice', $container).each(function () {
             state.order.push($(this).data('identifier'));
         });
     }
@@ -717,12 +700,12 @@ export default {
     qtiClass: 'orderInteraction',
     getData: getCustomData,
     template: tpl,
-    render: render,
+    render,
     getContainer: containerHelper.get,
-    setResponse: setResponse,
-    getResponse: getResponse,
-    resetResponse: resetResponse,
-    destroy: destroy,
-    setState: setState,
-    getState: getState
+    setResponse,
+    getResponse,
+    resetResponse,
+    destroy,
+    setState,
+    getState
 };
