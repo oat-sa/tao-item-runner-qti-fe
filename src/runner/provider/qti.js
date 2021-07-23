@@ -85,7 +85,9 @@ var qtiItemRuntimeProvider = {
                 // apply RTL layout according to item language
                 const $item = $(elt).find('.qti-item');
                 const itemLang = $item.attr('lang');
-                $item.attr('dir', locale.getLanguageDirection(itemLang));
+                const dir = $item.attr('dir');
+                const $itemBody = $(elt).find('.qti-itemBody');
+                $itemBody.attr('dir', locale.getLanguageDirection(itemLang) || dir);
             } catch (e) {
                 self.trigger('error', 'Error in template rendering : ' + e.message);
             }
