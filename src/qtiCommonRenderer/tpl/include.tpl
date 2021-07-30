@@ -1,3 +1,3 @@
-<div class="qti-include" data-href="{{attributes.href}}">
+<div class="qti-include{{#if attributes.class}} {{attributes.class}}{{/if}}" data-href="{{attributes.href}}">
     {{{body}}}
 </div>
