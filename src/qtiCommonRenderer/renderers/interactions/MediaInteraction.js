@@ -37,6 +37,22 @@ const defaults = {
     type: 'video/mp4'
 };
 
+//some patterns to match context in which disable the media preview
+const reWebM = /.*\.webm/i;
+const reFirefoxVersion = /firefox\/([0-9]+\.*[0-9]*)/i;
+
+/**
+ * Checks if a media can be previewed safely
+ * @param {String} type - The type of media
+ * @param {String} url - The URL to the media
+ * @returns {Boolean}
+ */
+function canPreviewMedia(type, url) {
+    const firefox = reFirefoxVersion.exec(navigator.userAgent);
+    const webm = reWebM.test(url);
+    return !(webm && firefox && parseFloat(firefox[1]) >= 87);
+}
+
 /**
  * Init rendering, called after template injected into the DOM
  * All options are listed in the QTI v2.1 information model:
@@ -53,7 +69,6 @@ function render(interaction) {
         const media = interaction.object;
         const $item = $container.parents('.qti-item');
         const maxPlays = parseInt(interaction.attr('maxPlays'), 10) || 0;
-        const url = media.attr('data') || '';
 
         //check if the media can be played (using timesPlayed and maxPlays)
         const canBePlayed = () => maxPlays === 0 || maxPlays > parseInt($container.data('timesPlayed'), 10);
@@ -75,9 +90,15 @@ function render(interaction) {
         //intialize the player if not yet done
         const initMediaPlayer = () => {
             if (!interaction.mediaElement) {
+                const type = media.attr('type') || defaults.type;
+                const mediaUrl = media.attr('data') || '';
+                const url = mediaUrl && this.resolveUrl(mediaUrl);
+                const preview = canPreviewMedia(type, url);
+
                 interaction.mediaElement = mediaplayer({
-                    url: url && this.resolveUrl(url),
-                    type: media.attr('type') || defaults.type,
+                    url,
+                    type,
+                    preview,
                     canPause: $container.hasClass('pause'),
                     maxPlays: maxPlays,
                     canSeek: !maxPlays,
