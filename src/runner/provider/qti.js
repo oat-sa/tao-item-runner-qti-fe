@@ -34,6 +34,7 @@ import picManager from 'taoQtiItem/runner/provider/manager/picManager';
 import userModules from 'taoQtiItem/runner/provider/manager/userModules';
 import modalFeedbackHelper from 'taoQtiItem/qtiItem/helper/modalFeedback';
 import 'taoItems/assets/manager';
+import locale from 'util/locale';
 
 var timeout = (context.timeout > 0 ? context.timeout + 1 : 30) * 1000;
 
@@ -80,6 +81,15 @@ var qtiItemRuntimeProvider = {
             try {
                 //render item html
                 elt.innerHTML = this._item.render({});
+
+                // apply RTL layout according to item language
+                const $item = $(elt).find('.qti-item');
+                const $itemBody = $item.find('.qti-itemBody');
+                const itemDir = $itemBody.attr('dir');
+                if (!itemDir) {
+                    const itemLang = $item.attr('lang');
+                    $itemBody.attr('dir', locale.getLanguageDirection(itemLang));
+                }
             } catch (e) {
                 self.trigger('error', 'Error in template rendering : ' + e.message);
             }
