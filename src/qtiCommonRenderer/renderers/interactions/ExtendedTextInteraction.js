@@ -58,12 +58,12 @@ const render = function render(interaction) {
 
         const placeholderText = interaction.attr('placeholderText');
 
-        const getItemLanguage = function getItemLanguage() {
-            let itemLang = window.document.documentElement.querySelector('.qti-item').getAttribute('lang');
+        const getItemLanguage = () => {
+            let itemLang = $container.closest('.qti-item').attr('lang');
             let itemLocale = itemLang && itemLang.split('-')[0];
-            if (itemLocale) {
+            if (!itemLocale) {
                 itemLang = window.document.documentElement.getAttribute('lang');
-                itemLocale = itemLocale && itemLocale.split('-')[0];
+                itemLocale = itemLang && itemLang.split('-')[0];
             }
             return itemLocale;
         }
