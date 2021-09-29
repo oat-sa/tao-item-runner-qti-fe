@@ -427,7 +427,7 @@ define([
                     $interaction.length,
                     1,
                     'the container contains a text interaction .qti-extendedTextInteraction'
-                    );
+                );
 
                 var editor = ckEditor.replace($container[0], ckOptions);
                 ckConfigurator.getConfig(editor, "extendedText", ckOptions);
@@ -438,7 +438,7 @@ define([
                         ready();
                     }, 10);
                 });
-                    
+
             })
             .init()
             .render($container);
