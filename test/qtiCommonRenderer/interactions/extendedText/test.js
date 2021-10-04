@@ -5,8 +5,9 @@ define([
     'json!taoQtiItem/test/samples/json/postcard.json',
     'json!taoQtiItem/test/samples/json/formated-card.json',
     'lib/simulator/jquery.keystroker',
-    'ckeditor'
-], function($, _, qtiItemRunner, itemDataPlain, itemDataXhtml, keystroker, ckEditor) {
+    'ckeditor',
+    'taoQtiItem/qtiCommonRenderer/helpers/ckConfigurator'
+], function ($, _, qtiItemRunner, itemDataPlain, itemDataXhtml, keystroker, ckEditor, ckConfigurator) {
     'use strict';
 
     var runner;
@@ -401,6 +402,48 @@ define([
             .render($container);
     });
 
+    QUnit.test('display rtl mode on ckeditor', function (assert) {
+        var ready = assert.async();
+        assert.expect(3);
+
+        var $container = $('#' + fixtureContainerId + '10');
+
+        const ckOptions = {
+            resize_enabled: true,
+            secure: location.protocol === 'https:',
+            forceCustomDomain: true,
+            language: 'ar'
+        };
+        assert.equal($container.length, 1, 'the item container exists');
+
+        runner = qtiItemRunner('qti', itemDataXhtml)
+            .on('error', function (e) {
+                assert.ok(false, e);
+                ready();
+            })
+            .on('render', () => {
+                var $interaction = $('.qti-extendedTextInteraction', $container);
+                assert.equal(
+                    $interaction.length,
+                    1,
+                    'the container contains a text interaction .qti-extendedTextInteraction'
+                );
+
+                var editor = ckEditor.replace($container[0], ckOptions);
+                ckConfigurator.getConfig(editor, "extendedText", ckOptions);
+                editor.on('configLoaded', function () {
+                    _.delay(() => {
+                        editor.config = ckConfigurator.getConfig(editor, "extendedText", ckOptions);
+                        assert.equal(editor.config.language, 'ar', 'language has been changed');
+                        ready();
+                    }, 10);
+                });
+
+            })
+            .init()
+            .render($container);
+    });
+
     QUnit.cases.init([{
         title: 'filled response',
         response: { base: { string: '<strong>test</strong>' } },
@@ -573,6 +616,7 @@ define([
             .init()
             .render($container);
     });
+
 
     QUnit.module('Visual Test');
 
