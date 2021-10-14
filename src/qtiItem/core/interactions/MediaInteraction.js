@@ -29,6 +29,9 @@ var MediaInteraction = ObjectInteraction.extend({
             };
 
         return this._super(_.merge(defaultData, args.data), args.placeholder, args.subclass, renderer);
+    },
+    getNormalMaximum: function getNormalMaximum() {
+        return 0;
     }
 });
 export default MediaInteraction;
