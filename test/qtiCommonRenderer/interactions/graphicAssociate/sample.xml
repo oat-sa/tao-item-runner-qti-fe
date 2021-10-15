@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assessmentItem xmlns="http://www.imsglobal.org/xsd/imsqti_v2p2" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p2 http://www.imsglobal.org/xsd/qti/qtiv2p2/imsqti_v2p2.xsd" identifier="i615e93e7bc2fa8ebb4f196168fc52c" title="Item 1" label="min_noSet_max_1" xml:lang="en-US" adaptive="false" timeDependent="false" toolName="TAO" toolVersion="2021.08.1 LTS">
+  <responseDeclaration identifier="RESPONSE" cardinality="multiple" baseType="pair"/>
+  <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float" normalMaximum="0"/>
+  <outcomeDeclaration identifier="MAXSCORE" cardinality="single" baseType="float">
+    <defaultValue>
+      <value>0</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <stylesheet href="style/custom/tao-user-styles.css" type="text/css" media="all" title=""/>
+  <itemBody>
+    <div class="grid-row">
+      <div class="col-12">
+        <graphicAssociateInteraction responseIdentifier="RESPONSE" maxAssociations="2" minAssociations="2" class="responsive">
+          <prompt>Min 0 - Max 1</prompt>
+          <object data="assets/60869034ca3b2.jpg" type="image/jpeg" width="1024" height="342"/>
+          <associableHotspot identifier="associablehotspot_1" fixed="false" matchMax="0" matchMin="0" shape="rect" coords="65,149,240,317"/>
+          <associableHotspot identifier="associablehotspot_2" fixed="false" matchMax="0" matchMin="0" shape="rect" coords="663,213,845,331"/>
+          <associableHotspot identifier="associablehotspot_3" fixed="false" matchMax="0" matchMin="0" shape="circle" coords="321,101,37"/>
+          <associableHotspot identifier="associablehotspot_4" fixed="false" matchMax="0" matchMin="0" shape="circle" coords="463,92,25"/>
+        </graphicAssociateInteraction>
+      </div>
+    </div>
+  </itemBody>
+  <responseProcessing template="http://www.imsglobal.org/question/qti_v2p2/rptemplates/match_correct"/>
+</assessmentItem>
