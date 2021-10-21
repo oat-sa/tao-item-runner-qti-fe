@@ -13,28 +13,27 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2021 (original work) Open Assessment Technologies SA ;
  */
 
 define([
     'jquery',
     'core/mouseEvent',
-    'lodash',
     'taoQtiItem/runner/qtiItemRunner',
     'json!taoQtiItem/test/qtiCommonRenderer/interactions/graphicAssociate/sample.json'
-], function ($, triggerMouseEvent, _, qtiItemRunner, graphicAssociateData) {
+], function ($, triggerMouseEvent, qtiItemRunner, graphicAssociateData) {
     'use strict';
 
-    var runner;
-    var fixtureContainerId = 'item-container';
+    let runner;
+    const fixtureContainerId = 'item-container';
 
     //Override asset loading in order to resolve it from the runtime location
-    var strategies = [
+    const strategies = [
         {
             name: 'default',
             handle: function defaultStrategy(url) {
                 if (/assets/.test(url.toString())) {
-                    return '/test/qtiCommonRenderer/interactions/graphicAssociate/' + url.toString();
+                    return `/test/qtiCommonRenderer/interactions/graphicAssociate/${url.toString()}`;
                 }
                 return url.toString();
             }
@@ -42,7 +41,7 @@ define([
     ];
 
     QUnit.module('Graphic Associate Interaction', {
-        afterEach: function (assert) {
+        afterEach: function () {
             if (runner) {
                 runner.clear();
             }
@@ -50,10 +49,10 @@ define([
     });
 
     QUnit.test('renders correctly', function (assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(12);
 
-        var $container = $('#' + fixtureContainerId);
+        const $container = $(`#${fixtureContainerId}`);
 
         assert.equal($container.length, 1, 'the item container exists');
         assert.equal($container.children().length, 0, 'the container has no children');
@@ -66,7 +65,7 @@ define([
                 assert.equal($container.find('.qti-itemBody').length, 1, 'the container contains a the body element .qti-itemBody');
                 assert.equal($container.find('.qti-interaction').length, 1, 'the container contains an interaction .qti-interaction');
                 assert.equal($container.find('.qti-interaction.qti-graphicAssociateInteraction').length, 1, 'the container contains a choice interaction .qti-graphicAssociateInteraction');
-                assert.equal( $container.find('.qti-graphicAssociateInteraction .qti-prompt-container').length, 1, 'the interaction contains a prompt');
+                assert.equal($container.find('.qti-graphicAssociateInteraction .qti-prompt-container').length, 1, 'the interaction contains a prompt');
                 assert.equal($container.find('.qti-graphicAssociateInteraction .instruction-container').length, 1, 'the interaction contains a instruction box');
                 assert.equal($container.find('.qti-graphicAssociateInteraction .main-image-box').length, 1, 'the interaction contains a image');
                 assert.equal($container.find('.qti-graphicAssociateInteraction .main-image-box rect').length, 2, 'the interaction contains 2 gaps');
@@ -80,19 +79,19 @@ define([
             .assets(strategies)
             .init()
             .render($container);
-    })
+    });
 
     QUnit.test('destroys', function (assert) {
-        var ready = assert.async();
-        var $container = $('#' + fixtureContainerId);
+        const ready = assert.async();
+        const $container = $(`#${fixtureContainerId}`);
 
         assert.expect(3);
         assert.equal($container.length, 1, 'the item container exists');
 
         runner = qtiItemRunner('qti', graphicAssociateData)
             .on('render', function () {
-                var interaction = this._item.getInteractions()[0];
-                var $imageBox = $('.main-image-box', $container);
+                const interaction = this._item.getInteractions()[0];
+                const $imageBox = $('.main-image-box', $container);
 
                 assert.equal($imageBox.children().length, 1, 'the image box has elements');
                 interaction.renderer.destroy(interaction);
@@ -106,15 +105,15 @@ define([
     });
 
     QUnit.test('set the response', function (assert) {
-        var ready = assert.async();
-        var $container = $('#' + fixtureContainerId);
+        const ready = assert.async();
+        const $container = $(`#${fixtureContainerId}`);
 
         assert.expect(2);
 
         runner = qtiItemRunner('qti', graphicAssociateData)
             .on('render', function () {
-                var interaction = this._item.getInteractions()[0];
-                var $canvas = $('.main-image-box svg', $container);
+                const interaction = this._item.getInteractions()[0];
+                const $canvas = $('.main-image-box svg', $container);
 
                 assert.equal($('path', $canvas).length, 0, 'There is no target');
 
@@ -130,8 +129,8 @@ define([
     });
 
     QUnit.test('resets the response', function (assert) {
-        var ready = assert.async();
-        var $container = $('#' + fixtureContainerId);
+        const ready = assert.async();
+        const $container = $(`#${fixtureContainerId}`);
 
         assert.expect(3);
 
@@ -139,16 +138,14 @@ define([
 
         runner = qtiItemRunner('qti', graphicAssociateData)
             .on('render', function () {
-                var interaction = this._item.getInteractions()[0];
-                var $canvas = $('.main-image-box svg', $container);
+                const interaction = this._item.getInteractions()[0];
+                const $canvas = $('.main-image-box svg', $container);
 
                 triggerMouseEvent($canvas.find('rect').get(0), 'click', { bubbles: true });
                 triggerMouseEvent($canvas.find('rect').get(1), 'click', { bubbles: true });
 
                 setTimeout(function () {
-                    var $target;
-
-                    $target = $canvas.find('path');
+                    let $target = $canvas.find('path');
                     assert.equal($target.length, 3, 'an associate exists on image');
 
                     interaction.renderer.resetResponse(interaction);
@@ -163,4 +160,4 @@ define([
             .init()
             .render($container);
     });
-})
+});
