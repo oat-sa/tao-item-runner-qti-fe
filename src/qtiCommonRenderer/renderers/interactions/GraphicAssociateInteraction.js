@@ -401,6 +401,9 @@ var setResponse = function(interaction, response) {
     if (response && interaction.paper) {
         try {
             responseValues = pciResponse.unserialize(response, interaction);
+            if (responseValues.length === 2 && !Array.isArray(responseValues[0]) && !Array.isArray(responseValues[1])) {
+                responseValues = [responseValues];
+            }
         } catch (e) {}
 
         if (_.isArray(responseValues)) {

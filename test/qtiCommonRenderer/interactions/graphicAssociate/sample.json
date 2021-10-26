@@ -1,0 +1,154 @@
+{
+  "identifier": "i615e93e7bc2fa8ebb4f196168fc52c",
+  "serial": "item_615ec9fb946de765464791",
+  "qtiClass": "assessmentItem",
+  "attributes": {
+    "identifier": "i615e93e7bc2fa8ebb4f196168fc52c",
+    "title": "Item 1",
+    "label": "min_noSet_max_1",
+    "xml:lang": "en-US",
+    "adaptive": false,
+    "timeDependent": false,
+    "toolName": "TAO",
+    "toolVersion": "2021.08.1 LTS",
+    "class": ""
+  },
+  "body": {
+    "serial": "container_containeritembody_615ec9fb946d1757069749",
+    "body": "\n    <div class=\"grid-row\">\n      <div class=\"col-12\">\n        {{interaction_graphicassociateinteraction_615ec9fb9499c055380145}}\n      </div>\n    </div>\n  ",
+    "elements": {
+      "interaction_graphicassociateinteraction_615ec9fb9499c055380145": {
+        "serial": "interaction_graphicassociateinteraction_615ec9fb9499c055380145",
+        "qtiClass": "graphicAssociateInteraction",
+        "attributes": {
+          "responseIdentifier": "RESPONSE",
+          "maxAssociations": 1,
+          "minAssociations": 0,
+          "class": "responsive"
+        },
+        "debug": {
+          "relatedItem": "item_615ec9fb946de765464791"
+        },
+        "choices": {
+          "choice_associablehotspot_615ec9fb94a9d990645696": {
+            "identifier": "associablehotspot_1",
+            "serial": "choice_associablehotspot_615ec9fb94a9d990645696",
+            "qtiClass": "associableHotspot",
+            "attributes": {
+              "identifier": "associablehotspot_1",
+              "fixed": false,
+              "matchMax": 0,
+              "matchMin": 0,
+              "shape": "rect",
+              "coords": "65,149,240,317"
+            },
+            "debug": {
+              "relatedItem": "item_615ec9fb946de765464791"
+            }
+          },
+          "choice_associablehotspot_615ec9fb94b0c609828279": {
+            "identifier": "associablehotspot_2",
+            "serial": "choice_associablehotspot_615ec9fb94b0c609828279",
+            "qtiClass": "associableHotspot",
+            "attributes": {
+              "identifier": "associablehotspot_2",
+              "fixed": false,
+              "matchMax": 0,
+              "matchMin": 0,
+              "shape": "rect",
+              "coords": "663,213,845,331"
+            },
+            "debug": {
+              "relatedItem": "item_615ec9fb946de765464791"
+            }
+          }
+        },
+        "prompt": {
+          "serial": "container_containerstatic_615ec9fb94a0d911539838",
+          "body": "Min 0 - Max 1",
+          "elements": [],
+          "debug": {
+            "relatedItem": "item_615ec9fb946de765464791"
+          }
+        },
+        "object": {
+          "serial": "qtiobject_615ec9fb94b6c952246841",
+          "qtiClass": "object",
+          "attributes": {
+            "data": "assets\/60869034ca3b2.png",
+            "type": "image\/jpeg",
+            "width": 1024,
+            "height": 342
+          },
+          "debug": {
+            "relatedItem": ""
+          }
+        }
+      }
+    },
+    "debug": {
+      "relatedItem": "item_615ec9fb946de765464791"
+    }
+  },
+  "debug": {
+    "relatedItem": "item_615ec9fb946de765464791"
+  },
+  "namespaces": {
+    "": "http://www.imsglobal.org/xsd/imsqti_v2p2",
+    "m": "http://www.w3.org/1998/Math/MathML",
+    "xsi": "http://www.w3.org/2001/XMLSchema-instance"
+  },
+  "schemaLocations": {
+    "http://www.imsglobal.org/xsd/imsqti_v2p2": "http://www.imsglobal.org/xsd/qti/qtiv2p2/imsqti_v2p2.xsd"
+  },
+  "stylesheets": {},
+  "outcomes": {
+    "outcomedeclaration_615ec9fb9484a039524027": {
+      "identifier": "SCORE",
+      "serial": "outcomedeclaration_615ec9fb9484a039524027",
+      "qtiClass": "outcomeDeclaration",
+      "attributes": {
+        "identifier": "SCORE",
+        "cardinality": "single",
+        "baseType": "float",
+        "normalMaximum": 0
+      },
+      "debug": {
+        "relatedItem": "item_615ec9fb946de765464791"
+      },
+      "defaultValue": null
+    },
+    "outcomedeclaration_615ec9fb948a9173563438": {
+      "identifier": "MAXSCORE",
+      "serial": "outcomedeclaration_615ec9fb948a9173563438",
+      "qtiClass": "outcomeDeclaration",
+      "attributes": {
+        "identifier": "MAXSCORE",
+        "cardinality": "single",
+        "baseType": "float"
+      },
+      "debug": {
+        "relatedItem": "item_615ec9fb946de765464791"
+      },
+      "defaultValue": "0"
+    }
+  },
+  "responses": {
+    "responsedeclaration_615ec9fb947f0491856651": {
+      "identifier": "RESPONSE",
+      "serial": "responsedeclaration_615ec9fb947f0491856651",
+      "qtiClass": "responseDeclaration",
+      "attributes": {
+        "identifier": "RESPONSE",
+        "cardinality": "single",
+        "baseType": "pair"
+      },
+      "debug": {
+        "relatedItem": "item_615ec9fb946de765464791"
+      },
+      "defaultValue": []
+    }
+  },
+  "feedbacks": [],
+  "apipAccessibility": ""
+}
