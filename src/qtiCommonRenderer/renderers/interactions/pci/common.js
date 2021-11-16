@@ -58,6 +58,9 @@ export default function commonPciRenderer(runtime) {
                     }
                 }
             };
+            var pciConfig = Object.assign({
+                dir: $itemBody.attr('dir') || 'ltr'
+            }, properties);
 
             // Option 1 (event)
             $itemBody.on('change.direction', function(e, direction){
@@ -85,7 +88,7 @@ export default function commonPciRenderer(runtime) {
                     .get(interaction)
                     .children()
                     .get(0),
-                properties,
+                pciConfig,
                 pciAssetManager
             );
             return Promise.resolve(pci);
