@@ -44,6 +44,7 @@ var _slideTo = function(options) {
 const render = function(interaction) {
     const attributes = interaction.getAttributes(),
         $container = interaction.getContainer(),
+        direction = window.getComputedStyle($container[0]).getPropertyValue('direction') || 'ltr',
         $el = $('<div />').attr({ id: `${attributes.responseIdentifier}-qti-slider`, class: 'qti-slider' }), //slider element
         $sliderLabels = $('<div />').attr({ class: 'qti-slider-values' }),
         $sliderCurrentValue = $('<div />').attr({
