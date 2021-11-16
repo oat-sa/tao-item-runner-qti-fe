@@ -66,9 +66,25 @@ const render = function(interaction) {
         .append(`<span class="qti-slider-cur-value-text">${__('Current value:')}</span>`)
         .append('<span class="qti-slider-cur-value"></span>');
 
+    //setting the orientation of the slider
+    if (
+        typeof attributes.orientation !== 'undefined' &&
+        $.inArray(attributes.orientation, ['horizontal', 'vertical']) > -1
+    ) {
+        orientation = attributes.orientation;
+    }
+
+    let reversedLabels = false;
+    //for vertical only reverse matters
+    if(orientation === 'vertical') {
+        reversedLabels = reverse;
+    }else{
+        reversedLabels = ((!reverse && direction === 'rtl') || (reverse && direction !== 'rtl'));
+    }
+
     $sliderLabels
-        .append(`<span class="slider-min">${!reverse ? min : max}</span>`)
-        .append(`<span class="slider-max">${!reverse ? max : min}</span>`);
+        .append(`<span class="slider-min">${reversedLabels ? max : min }</span>`)
+        .append(`<span class="slider-max">${reversedLabels ? min : max}</span>`);
 
     interaction
         .getContainer()
@@ -77,13 +93,6 @@ const render = function(interaction) {
         .append($sliderCurrentValue)
         .append($sliderValue);
 
-    //setting the orientation of the slider
-    if (
-        typeof attributes.orientation !== 'undefined' &&
-        $.inArray(attributes.orientation, ['horizontal', 'vertical']) > -1
-    ) {
-        orientation = attributes.orientation;
-    }
 
     let sliderSize = 0;
 
