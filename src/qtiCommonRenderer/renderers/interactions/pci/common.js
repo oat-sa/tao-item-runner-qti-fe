@@ -21,6 +21,8 @@ import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instanciator from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/instanciator';
 
 export default function commonPciRenderer(runtime) {
+    var observer;
+
     return {
         getRequiredModules: function getRequiredModules() {
             var requireEntries = [];
@@ -43,6 +45,9 @@ export default function commonPciRenderer(runtime) {
             var pci = instanciator.getPci(interaction);
             var properties = _.clone(interaction.properties);
             var assetManager = context.assetManager;
+            var $interaction = containerHelper.get(interaction);
+            var $gridRow = $interaction.closest('.grid-row');
+            var $itemBody = $interaction.closest('.qti-itemBody');
             var pciAssetManager = {
                 resolve: function pciAssetResolve(url) {
                     var resolved = assetManager.resolveBy('portableElementLocation', url);
@@ -53,6 +58,27 @@ export default function commonPciRenderer(runtime) {
                     }
                 }
             };
+
+            // Option 1 (event)
+            $itemBody.on('change.direction', function(e, direction){
+                if (pci.changeDirection) {
+                    pci.changeDirection(direction);
+                  }
+            });
+
+            // Option 2 (observer)
+            observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                  if (mutation.type === 'attributes' && mutation.attributeName === 'dir' && pci.changeDirection) {
+                    pci.changeDirection(mutation.target.getAttribute('dir'));
+                  }
+                });
+            });
+
+            observer.observe($gridRow[0], {
+                attributes: true
+            });
+
             pci.initialize(
                 id,
                 containerHelper
@@ -70,6 +96,9 @@ export default function commonPciRenderer(runtime) {
          * @returns {Promise?} the interaction destroy step can be async and can return an optional Promise
          */
         destroy: function destroy(interaction) {
+            console.log('common:destroy');
+            // $itemBody.off('change.direction');
+            // observer.disconnect();
             return instanciator.getPci(interaction).destroy();
         },
         setState: function setState(interaction, state) {
