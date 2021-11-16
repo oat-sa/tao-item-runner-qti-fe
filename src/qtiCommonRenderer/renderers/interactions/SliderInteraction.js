@@ -125,7 +125,8 @@ const render = function(interaction) {
             max: max
         },
         step: step,
-        orientation: orientation
+        orientation,
+        direction
     }).on('slide', function() {
         let val = parseInt($(this).val());
         if (interaction.attr('reverse')) {
