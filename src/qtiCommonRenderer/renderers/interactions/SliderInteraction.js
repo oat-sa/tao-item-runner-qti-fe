@@ -44,6 +44,7 @@ var _slideTo = function(options) {
 const render = function(interaction) {
     const attributes = interaction.getAttributes(),
         $container = interaction.getContainer(),
+        direction = window.getComputedStyle($container[0]).getPropertyValue('direction') || 'ltr',
         $el = $('<div />').attr({ id: `${attributes.responseIdentifier}-qti-slider`, class: 'qti-slider' }), //slider element
         $sliderLabels = $('<div />').attr({ class: 'qti-slider-values' }),
         $sliderCurrentValue = $('<div />').attr({
@@ -65,9 +66,25 @@ const render = function(interaction) {
         .append(`<span class="qti-slider-cur-value-text">${__('Current value:')}</span>`)
         .append('<span class="qti-slider-cur-value"></span>');
 
+    //setting the orientation of the slider
+    if (
+        typeof attributes.orientation !== 'undefined' &&
+        $.inArray(attributes.orientation, ['horizontal', 'vertical']) > -1
+    ) {
+        orientation = attributes.orientation;
+    }
+
+    let reversedLabels = false;
+    //for vertical only reverse matters
+    if(orientation === 'vertical') {
+        reversedLabels = reverse;
+    }else{
+        reversedLabels = ((!reverse && direction === 'rtl') || (reverse && direction !== 'rtl'));
+    }
+
     $sliderLabels
-        .append(`<span class="slider-min">${!reverse ? min : max}</span>`)
-        .append(`<span class="slider-max">${!reverse ? max : min}</span>`);
+        .append(`<span class="slider-min">${reversedLabels ? max : min }</span>`)
+        .append(`<span class="slider-max">${reversedLabels ? min : max}</span>`);
 
     interaction
         .getContainer()
@@ -76,13 +93,6 @@ const render = function(interaction) {
         .append($sliderCurrentValue)
         .append($sliderValue);
 
-    //setting the orientation of the slider
-    if (
-        typeof attributes.orientation !== 'undefined' &&
-        $.inArray(attributes.orientation, ['horizontal', 'vertical']) > -1
-    ) {
-        orientation = attributes.orientation;
-    }
 
     let sliderSize = 0;
 
@@ -124,7 +134,8 @@ const render = function(interaction) {
             max: max
         },
         step: step,
-        orientation: orientation
+        orientation,
+        direction
     }).on('slide', function() {
         let val = parseInt($(this).val());
         if (interaction.attr('reverse')) {
