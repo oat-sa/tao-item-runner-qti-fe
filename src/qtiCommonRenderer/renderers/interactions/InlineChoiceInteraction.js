@@ -74,6 +74,7 @@ var render = function(interaction, options) {
         width: 'element',
         placeholder: opts.placeholderText,
         minimumResultsForSearch: -1,
+        containerCssClass: `${getItemDir()}`,
         dropdownCssClass: `qti-inlineChoiceInteraction-dropdown ${getItemDir()}`
     });
 
