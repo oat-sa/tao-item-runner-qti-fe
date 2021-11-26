@@ -64,18 +64,19 @@ var render = function(interaction, options) {
     }
 
     const getItemDir = () => {
-        let item = $container.closest('.qti-item');
+        const item = $container.closest('.qti-item');
         const itemBody = item.find('.qti-itemBody');
-        const itemDir = itemBody.attr('dir');
+        const itemDir = itemBody.attr('dir') | 'ltr';
         return itemDir;
     }
 
+    const dirClass = getItemDir();
     $container.select2({
         width: 'element',
         placeholder: opts.placeholderText,
         minimumResultsForSearch: -1,
-        containerCssClass: `${getItemDir()}`,
-        dropdownCssClass: `qti-inlineChoiceInteraction-dropdown ${getItemDir()}`
+        containerCssClass: `${dirClass}`,
+        dropdownCssClass: `qti-inlineChoiceInteraction-dropdown ${dirClass}`
     });
 
     var $el = $container.select2('container');
