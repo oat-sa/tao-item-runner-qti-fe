@@ -419,7 +419,7 @@ define([
 
                 assert.true(
                     $container.find('.select2-container.qti-inlineChoiceInteraction').hasClass(dirClass),
-                    'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
+                    'the inline choice interaction container has the correct direction class'
                 );
                 assert.equal(
                     $select.length,
@@ -460,7 +460,7 @@ define([
 
                 assert.true(
                     $container.find('.select2-container.qti-inlineChoiceInteraction').hasClass(dirClass),
-                    'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
+                    'the inline choice interaction container has the correct direction class'
                 );
                 assert.equal(
                     $select.length,
