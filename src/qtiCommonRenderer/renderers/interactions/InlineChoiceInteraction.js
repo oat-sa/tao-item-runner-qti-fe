@@ -64,9 +64,8 @@ var render = function(interaction, options) {
     }
 
     const getItemDir = () => {
-        const item = $container.closest('.qti-item');
-        const itemBody = item.find('.qti-itemBody');
-        const itemDir = itemBody.attr('dir') | 'ltr';
+        const itemBody = $container.closest('.qti-itemBody');
+        const itemDir = itemBody.attr('dir') || 'ltr';
         return itemDir;
     }
 
