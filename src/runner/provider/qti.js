@@ -22,6 +22,7 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
+import __ from 'i18n';
 import context from 'context';
 
 import QtiLoader from 'taoQtiItem/qtiItem/core/Loader';
@@ -60,7 +61,7 @@ var qtiItemRuntimeProvider = {
 
         this._loader.loadItemData(itemData, function (item) {
             if (!item) {
-                return self.trigger('error', 'Unable to load item from the given data.');
+                return self.trigger('error', __('Unable to load item from the given data.'));
             }
 
             self._item = item;
@@ -91,7 +92,7 @@ var qtiItemRuntimeProvider = {
                     $itemBody.attr('dir', locale.getLanguageDirection(itemLang));
                 }
             } catch (e) {
-                self.trigger('error', 'Error in template rendering : ' + e.message);
+                self.trigger('error', __('Error in template rendering: %s', e.message));
             }
             try {
                 if (options.portableElements) {
@@ -120,9 +121,7 @@ var qtiItemRuntimeProvider = {
                         _.delay(
                             reject,
                             timeout,
-                            new Error(
-                                'It seems that there is an error during item loading. The error has been reported. The test will be paused.'
-                            )
+                            new Error(__('It seems that there is an error during item loading. The error has been reported. The test will be paused.'))
                         );
                     })
                 ])
@@ -156,16 +155,15 @@ var qtiItemRuntimeProvider = {
                     })
                     .catch(function (renderingError) {
                         done(); // in case of postRendering issue, we are also done
-                        const error = new Error(
-                            'Error in post rendering : ' + renderingError instanceof Error
-                                ? renderingError.message
-                                : renderingError
-                        );
+                        const errorMsg = renderingError instanceof Error
+                            ? renderingError.message
+                            : renderingError;
+                        const error = new Error(__('Error in post rendering: %s', errorMsg));
                         error.unrecoverable = true;
                         self.trigger('error', error);
                     });
             } catch (err) {
-                self.trigger('error', 'Error in post rendering : ' + err.message);
+                self.trigger('error', __('Error in post rendering: %s', err.message));
             }
         }
     },
@@ -195,7 +193,7 @@ var qtiItemRuntimeProvider = {
                 })
                 .then(done)
                 .catch(function (err) {
-                    self.trigger('error', 'Something went wrong while destroying an interaction: ' + err.message);
+                    self.trigger('error', __('Something went wrong while destroying an interaction: %s', err.message));
                 });
         } else {
             done();
