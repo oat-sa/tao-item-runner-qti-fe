@@ -63,11 +63,19 @@ var render = function(interaction, options) {
         $container.find('option[value=' + _emptyValue + ']').remove();
     }
 
+    const getItemDir = () => {
+        const itemBody = $container.closest('.qti-itemBody');
+        const itemDir = itemBody.attr('dir') || 'ltr';
+        return itemDir;
+    }
+
+    const dirClass = getItemDir();
     $container.select2({
         width: 'element',
         placeholder: opts.placeholderText,
         minimumResultsForSearch: -1,
-        dropdownCssClass: 'qti-inlineChoiceInteraction-dropdown'
+        containerCssClass: `${dirClass}`,
+        dropdownCssClass: `qti-inlineChoiceInteraction-dropdown ${dirClass}`
     });
 
     var $el = $container.select2('container');
