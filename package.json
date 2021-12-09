@@ -1,6 +1,6 @@
 {
     "name": "@oat-sa/tao-item-runner-qti",
-    "version": "0.27.0",
+    "version": "0.27.1",
     "displayName": "TAO Item Runner QTI",
     "description": "TAO QTI Item Runner modules",
     "files": [
@@ -51,7 +51,7 @@
         "@oat-sa/tao-core-libs": "^0.4.4",
         "@oat-sa/tao-core-sdk": "^1.16.1",
         "@oat-sa/tao-core-shared-libs": "1.0.3",
-        "@oat-sa/tao-core-ui": "1.43.0",
+        "@oat-sa/tao-core-ui": "1.45.0",
         "@oat-sa/tao-item-runner": "^0.3.1",
         "@oat-sa/tao-qunit-testrunner": "^1.0.3",
         "async": "^0.2.10",
