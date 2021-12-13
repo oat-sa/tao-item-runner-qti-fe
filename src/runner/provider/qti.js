@@ -277,6 +277,14 @@ var qtiItemRuntimeProvider = {
                 done(renderingQueue);
             }, this.getLoadedClasses());
         });
+    },
+
+    /**
+     * Check if item is cleared
+     * @returns {boolean}
+     */
+    isCleared: function () {
+        return !this._item;
     }
 };
 
