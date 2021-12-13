@@ -164,7 +164,7 @@ define([
         var ready = assert.async();
         var container = document.getElementById(containerId);
 
-        assert.expect(6);
+        assert.expect(8);
 
         assert.ok(container instanceof HTMLElement, 'the item container exists');
         assert.equal(container.children.length, 0, 'the container has no children');
@@ -175,13 +175,13 @@ define([
             .on('render', function () {
                 assert.equal(typeof this._item, 'object', 'the item instance is attached to the runner');
                 assert.equal(container.children.length, 1, 'the container has children');
-
+                assert.equal(this.isCleared(), false, 'The runner is set up');
                 this.clear();
             })
             .on('clear', function () {
                 assert.equal(container.children.length, 0, 'the container children are removed');
                 assert.equal(this._item, null, 'the item instance is also cleared');
-
+                assert.equal(this.isCleared(), true, 'The runner cleared');
                 ready();
             })
             .init()
