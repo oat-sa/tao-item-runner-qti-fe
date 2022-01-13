@@ -20,6 +20,7 @@ import _ from 'lodash';
 import loggerFactory from 'core/logger';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instanciator from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/instanciator';
+import context from 'context';
 
 const logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims');
 
@@ -60,7 +61,12 @@ export default function defaultPciRenderer(runtime) {
         },
         createInstance(interaction, context) {
             let pciConstructor = this.getPCIConstructor(interaction);
-            const properties = _.clone(interaction.properties);
+
+            //get interaction xml:lang prop to put it into pci instance config
+            const language = interaction.rootElement && interaction.rootElement.attributes && interaction.rootElement.attributes['xml:lang'];
+            const userLanguage = context.locale;
+
+            const properties = Object.assign(_.clone(interaction.properties), {language, userLanguage});
 
             // save original IMS PCI module first time to be able to reinstanciate later if necessary
             if (!pciConstructor) {
