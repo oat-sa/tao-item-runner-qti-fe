@@ -63,7 +63,9 @@ export default function defaultPciRenderer(runtime) {
             let pciConstructor = this.getPCIConstructor(interaction);
 
             //get interaction xml:lang prop to put it into pci instance config
-            const language = interaction.rootElement && interaction.rootElement.attributes && interaction.rootElement.attributes['xml:lang'];
+            const contentLanguage = interaction.attributes && interaction.attributes.language;
+            const itemLanguage = interaction.rootElement && interaction.rootElement.attributes && interaction.rootElement.attributes['xml:lang'];
+            const language = contentLanguage || itemLanguage;
             const userLanguage = context.locale;
 
             const properties = Object.assign(_.clone(interaction.properties), {language, userLanguage});
