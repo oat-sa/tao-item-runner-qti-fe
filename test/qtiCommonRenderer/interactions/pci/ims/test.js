@@ -26,10 +26,16 @@ define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function
         const properties = {
             bar: 'baz'
         };
+        const attributes = {
+            language: 'ru_RU'
+        };
+
         const interaction = {
             _store: {},
             typeIdentifier,
             properties,
+            attributes,
+
             data(key, data) {
                 if (typeof data === 'undefined') {
                     return this._store[key];
@@ -38,19 +44,22 @@ define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function
             }
         };
         const response = { base: null };
-        const context = { response };
+        const context = { response, locale: 'ru_RU' };
 
         const instancePromise = ims().createInstance(interaction, context);
 
         assert.ok(instancePromise instanceof Promise, 'createInstance returns with a Promise');
 
         instancePromise.then(instance => {
+            console.log(instance.config);
             assert.propEqual(
                 instance,
                 {
                     typeIdentifier,
                     dom: 'dom for interaction',
                     config: {
+                        language: 'ru_RU',
+                        userLanguage: 'ru_RU',
                         boundTo: response,
                         ondone: {},
                         onready: {},
