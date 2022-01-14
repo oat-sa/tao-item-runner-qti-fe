@@ -20,7 +20,6 @@ import _ from 'lodash';
 import loggerFactory from 'core/logger';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instanciator from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/instanciator';
-import context from 'context';
 
 const logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims');
 
