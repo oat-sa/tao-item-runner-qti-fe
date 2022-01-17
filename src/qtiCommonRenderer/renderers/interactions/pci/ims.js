@@ -60,14 +60,7 @@ export default function defaultPciRenderer(runtime) {
         },
         createInstance(interaction, context) {
             let pciConstructor = this.getPCIConstructor(interaction);
-
-            //get interaction xml:lang prop to put it into pci instance config
-            const contentLanguage = interaction.attributes && interaction.attributes.language;
-            const itemLanguage = interaction.rootElement && interaction.rootElement.attributes && interaction.rootElement.attributes['xml:lang'];
-            const language = contentLanguage || itemLanguage;
-            const userLanguage = context && context.locale;
-
-            const properties = _.assign(_.clone(interaction.properties), {language, userLanguage});
+            const properties = _.clone(interaction.properties);
 
             // save original IMS PCI module first time to be able to reinstanciate later if necessary
             if (!pciConstructor) {

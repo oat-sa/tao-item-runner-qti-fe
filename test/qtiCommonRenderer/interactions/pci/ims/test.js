@@ -26,19 +26,10 @@ define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function
         const properties = {
             bar: 'baz'
         };
-
-        const itemAttributes = {
-            "xml:lang": 'ru_RU'
-        };
-
         const interaction = {
             _store: {},
             typeIdentifier,
             properties,
-            rootElement: {
-                attributes: itemAttributes
-            },
-
             data(key, data) {
                 if (typeof data === 'undefined') {
                     return this._store[key];
@@ -47,12 +38,7 @@ define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function
             }
         };
         const response = { base: null };
-        const context = { response, locale: 'ru_RU' };
-
-        const populatedProperties = Object.assign(properties, {
-            language: 'ru_RU',
-            userLanguage: 'ru_RU'
-        });
+        const context = { response };
 
         const instancePromise = ims().createInstance(interaction, context);
 
@@ -68,71 +54,7 @@ define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function
                         boundTo: response,
                         ondone: {},
                         onready: {},
-                        properties: populatedProperties,
-                        status: 'interacting',
-                        templateVariables: {}
-                    }
-                },
-                'passes correct parameters to ims pci'
-            );
-            done();
-        });
-    });
-
-    QUnit.test('content language is preferred over item language', function (assert) {
-        const done = assert.async();
-
-        const typeIdentifier = 'foo';
-        const properties = {
-            bar: 'baz'
-        };
-
-        const itemAttributes = {
-            "xml:lang": 'ru_RU'
-        };
-
-        const interactionAttributes = {
-            language: 'ru_BY'
-        };
-
-        const interaction = {
-            _store: {},
-            typeIdentifier,
-            properties,
-            rootElement: {
-                attributes: itemAttributes
-            },
-            attributes: interactionAttributes,
-
-            data(key, data) {
-                if (typeof data === 'undefined') {
-                    return this._store[key];
-                }
-                this._store[key] = data;
-            }
-        };
-        const response = { base: null };
-        const context = { response, locale: 'ru_RU' };
-
-        const populatedProperties = Object.assign(properties, {
-            language: 'ru_BY',
-            userLanguage: 'ru_RU'
-        });
-
-        const instancePromise = ims().createInstance(interaction, context);
-
-        instancePromise.then(instance => {
-            console.log(instance.config);
-            assert.propEqual(
-                instance,
-                {
-                    typeIdentifier,
-                    dom: 'dom for interaction',
-                    config: {
-                        boundTo: response,
-                        ondone: {},
-                        onready: {},
-                        properties: populatedProperties,
+                        properties,
                         status: 'interacting',
                         templateVariables: {}
                     }
@@ -222,11 +144,7 @@ define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function
                         boundTo: response,
                         ondone: {},
                         onready: {},
-                        properties: {
-                            "bar": "baz",
-                            language: undefined,
-                            userLanguage: undefined
-                        },
+                        properties,
                         status: 'interacting',
                         templateVariables: {}
                     }
@@ -250,11 +168,7 @@ define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function
                         boundTo: { RESPONSE: newResponse },
                         ondone: {},
                         onready: {},
-                        properties: {
-                            "bar": "baz",
-                            language: undefined,
-                            userLanguage: undefined
-                        },
+                        properties,
                         status: 'interacting',
                         templateVariables: {}
                     }
