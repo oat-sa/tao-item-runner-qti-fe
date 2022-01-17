@@ -59,7 +59,6 @@ define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function
         assert.ok(instancePromise instanceof Promise, 'createInstance returns with a Promise');
 
         instancePromise.then(instance => {
-            console.log(instance.config);
             assert.propEqual(
                 instance,
                 {
