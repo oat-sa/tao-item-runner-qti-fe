@@ -16,7 +16,7 @@
  * Copyright (c) 2021 (original work) Open Assessment Technologies SA ;
  */
 
-define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function (ims) {
+define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims', 'context'], function (ims, sharedContext) {
     'use strict';
 
     QUnit.test('createInstance', function (assert) {
@@ -47,7 +47,9 @@ define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function
             }
         };
         const response = { base: null };
-        const context = { response, locale: 'ru_RU' };
+        const context = { response };
+        //setup this once as because the context is shared
+        sharedContext.locale = 'ru_RU';
 
         const populatedProperties = Object.assign(properties, {
             language: 'ru_RU',
@@ -112,7 +114,7 @@ define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function
             }
         };
         const response = { base: null };
-        const context = { response, locale: 'ru_RU' };
+        const context = { response };
 
         const populatedProperties = Object.assign(properties, {
             language: 'ru_BY',
@@ -225,7 +227,7 @@ define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function
                         properties: {
                             "bar": "baz",
                             language: undefined,
-                            userLanguage: undefined
+                            userLanguage: "ru_RU"
                         },
                         status: 'interacting',
                         templateVariables: {}
@@ -253,7 +255,7 @@ define(['taoQtiItem/qtiCommonRenderer/renderers/interactions/pci/ims'], function
                         properties: {
                             "bar": "baz",
                             language: undefined,
-                            userLanguage: undefined
+                            userLanguage: "ru_RU"
                         },
                         status: 'interacting',
                         templateVariables: {}
