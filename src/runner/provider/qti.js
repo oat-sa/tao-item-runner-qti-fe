@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2022 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -113,10 +113,16 @@ var qtiItemRuntimeProvider = {
                     }
                 }
 
+                const itemPostRender = this._item.postRender(options);
+                let postRenderPromises = [];
+                if (itemPostRender.length) {
+                    postRenderPromises = itemPostRender.filter(render => render instanceof Promise);
+                }
+
                 // Race between postRendering and timeout
                 // postRendering waits for everything to be resolved or one reject
                 Promise.race([
-                    Promise.all(this._item.postRender(options)),
+                    Promise.all(postRenderPromises),
                     new Promise(function (resolve, reject) {
                         _.delay(
                             reject,
