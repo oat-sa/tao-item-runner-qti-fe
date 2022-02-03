@@ -69,3 +69,5 @@ dist
 
 # OS
 .DS_Store
+
+eslint_report.json
