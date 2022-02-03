@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015-2021 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2015-2022 (original work) Open Assessment Technologies SA;
  *
  */
 import $ from 'jquery';
@@ -44,16 +44,22 @@ export default {
         }
 
         $container.waitForMedia(function () {
-            adaptSize.height($elements);
-            document.addEventListener(
-                'load',
-                e => {
-                    if (e.target && e.target.rel === 'stylesheet') {
-                        adaptSize.height($elements);
-                    }
-                },
-                true
-            );
+            // Occasionally in caching scenarios, after waitForMedia(), image.height is reporting its naturalHeight instead of its CSS height
+            // The timeout allows adaptSize.height() to work with the true rendered heights of elements, instead of naturalHeights
+            setTimeout(() => {
+                adaptSize.height($elements);
+
+                // detect any CSS load, and adapt heights again after
+                document.addEventListener(
+                    'load',
+                    e => {
+                        if (e.target && e.target.rel === 'stylesheet') {
+                            adaptSize.height($elements);
+                        }
+                    },
+                    true
+                );
+            }, 1);
         });
     }
 };
