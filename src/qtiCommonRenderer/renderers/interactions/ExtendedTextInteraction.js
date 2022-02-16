@@ -475,6 +475,8 @@ function inputLimiter(interaction) {
              */
             const keyLimitHandler = e => {
                 const keyCode = e && e.data ? e.data.keyCode : e.which;
+                const isCke = _getFormat(interaction) === 'xhtml';
+                let newValue;
                 if (
                     !_.contains(ignoreKeyCodes, keyCode) &&
                     ((maxWords && this.getWordsCount() >= maxWords && _.contains(triggerKeyCodes, keyCode)) ||
@@ -485,6 +487,45 @@ function inputLimiter(interaction) {
                     } else {
                         e.preventDefault();
                         e.stopImmediatePropagation();
+                    }
+
+                    if (isCke) {
+                        newValue = e.data.domEvent.$.currentTarget.textContent;
+                    } else {
+                        newValue = e.currentTarget.value;
+                    }
+
+                    if (!newValue) {
+                        return false;
+                    }
+
+                    // limit by word or character count if required
+                    if (!_.isNull(maxWords)) {
+                        newValue = strLimiter.limitByWordCount(newValue, maxWords - this.getWordsCount());
+                    } else if (!_.isNull(maxLength)) {
+                        let totalLength = _countCharacters(newValue);
+
+                        if (totalLength > maxLength) {
+                            if (isCke) {
+                                try {
+                                    const editor = _getCKEditor(interaction);
+                                    editor && editor.focus();
+                                    editor.execCommand("undo");
+                                    this.updateCounter();
+                                } catch (e) {
+                                    logger.warn(`setText error ${e}!`);
+                                }
+                            } else {
+                                newValue = newValue.substring(0, newValue.length - 1);
+                                const textarea = containerHelper.get(interaction).find('textarea');
+                                _.defer(() => {
+                                    textarea[0].focus();
+                                    textarea[0].value = "";
+                                    textarea[0].setRangeText(newValue, 0, totalLength, "end");
+                                    this.updateCounter();
+                                })
+                            }
+                        }
                     }
                     return false;
                 }
@@ -582,9 +623,10 @@ function inputLimiter(interaction) {
          * @returns {Number} number of characters
          */
         getCharsCount: function getCharsCount() {
-            const value = _getTextareaValue(interaction) || '';
+            let value = _getTextareaValue(interaction) || '';
             // remove NO-BREAK SPACE in empty lines added and all new line symbols
-            return value.replace(/[\r\n]{1}\xA0[\r\n]{1}/gm, '\r').replace(/[\r\n]+/gm, '').length;
+            value.replace(/[\r\n]{1}\xA0[\r\n]{1}/gm, '\r').replace(/[\r\n]+/gm, '').length;
+            return _countCharacters(value);
         },
 
         /**
@@ -598,6 +640,34 @@ function inputLimiter(interaction) {
 
     return limiter;
 }
+
+/** NEW CODE TO CHECK IME CHARACTERS **/
+function _strip(html) {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    if (tmp.textContent == "" && typeof tmp.innerText == "undefined") {
+        return "";
+    }
+    return tmp.textContent || tmp.innerText;
+}
+
+function _countCharacters(text) {
+    let normalizedText = text.replace(/\s/g, "").replace(/&nbsp;/g, "");
+    normalizedText = normalizedText.replace(/(\r\n|\n|\r)/gm, "").replace(/&nbsp;/gi, " ");
+    normalizedText = _strip(normalizedText).replace(/^([\t\r\n]*)$/, "");
+    return _countBytes(normalizedText);
+}
+
+function _countBytes(text) {
+    var count = 0, stringLength = text.length, i;
+    text = String(text || "");
+    for (i = 0; i < stringLength; i++) {
+        var partCount = encodeURI(text[i]).split("%").length;
+        count += partCount == 1 ? 1 : partCount - 1;
+    }
+    return count;
+}
+/** NEW CODE TO CHECK IME CHARACTERS **/
 
 /**
  * return the value of the textarea or ckeditor data
