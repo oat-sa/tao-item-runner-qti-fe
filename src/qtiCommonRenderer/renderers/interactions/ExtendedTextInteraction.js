@@ -438,7 +438,6 @@ function inputLimiter(interaction) {
                 trigger: 'manual'
             });
             const patternHandler = function patternHandler(e) {
-                console.log('keyup');
                 if (isComposing || hasCompositionJustEnded) {
                     // IME composing fires keydown/keyup events
                     hasCompositionJustEnded = false;
