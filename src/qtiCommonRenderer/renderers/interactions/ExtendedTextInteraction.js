@@ -361,7 +361,6 @@ function inputLimiter(interaction) {
 
     if (expectedLength || expectedLines || patternMask) {
         enabled = true;
-
         $textarea = $('.text-container', $container);
         $charsCounter = $('.count-chars', $container);
         $wordsCounter = $('.count-words', $container);
@@ -439,6 +438,13 @@ function inputLimiter(interaction) {
                 trigger: 'manual'
             });
             const patternHandler = function patternHandler(e) {
+                console.log('keyup');
+                if (isComposing || hasCompositionJustEnded) {
+                    // IME composing fires keydown/keyup events
+                    hasCompositionJustEnded = false;
+                    return;
+                }
+
                 const isCke = _getFormat(interaction) === 'xhtml';
                 let newValue;
                 if (patternRegEx) {
@@ -467,6 +473,9 @@ function inputLimiter(interaction) {
                 }
             };
 
+            let isComposing = false;
+            let hasCompositionJustEnded = false;
+
             /**
              * This part works on keyboard input
              *
@@ -474,9 +483,16 @@ function inputLimiter(interaction) {
              * @returns {boolean}
              */
             const keyLimitHandler = e => {
+                if (isComposing) {
+                    return;
+                }
+                // Safari on OS X may send a keydown of 229 after compositionend
+                if (e.which !== 229) {
+                    hasCompositionJustEnded = false;
+                }
+
                 const keyCode = e && e.data ? e.data.keyCode : e.which;
                 const isCke = _getFormat(interaction) === 'xhtml';
-                let newValue;
                 if (
                     !_.contains(ignoreKeyCodes, keyCode) &&
                     ((maxWords && this.getWordsCount() >= maxWords && _.contains(triggerKeyCodes, keyCode)) ||
@@ -489,44 +505,23 @@ function inputLimiter(interaction) {
                         e.stopImmediatePropagation();
                     }
 
-                    if (isCke) {
-                        newValue = e.data.domEvent.$.currentTarget.textContent;
-                    } else {
-                        newValue = e.currentTarget.value;
-                    }
-
-                    if (!newValue) {
-                        return false;
-                    }
-
-                    // limit by word or character count if required
-                    if (!_.isNull(maxWords)) {
-                        newValue = strLimiter.limitByWordCount(newValue, maxWords - this.getWordsCount());
-                    } else if (!_.isNull(maxLength)) {
-                        let totalLength = _countCharacters(newValue);
-
-                        if (totalLength > maxLength) {
-                            if (isCke) {
-                                try {
-                                    const editor = _getCKEditor(interaction);
-                                    editor && editor.focus();
-                                    editor.execCommand("undo");
-                                    this.updateCounter();
-                                } catch (e) {
-                                    logger.warn(`setText error ${e}!`);
-                                }
-                            } else {
-                                newValue = newValue.substring(0, newValue.length - 1);
-                                const textarea = containerHelper.get(interaction).find('textarea');
-                                _.defer(() => {
-                                    textarea[0].focus();
-                                    textarea[0].value = "";
-                                    textarea[0].setRangeText(newValue, 0, totalLength, "end");
-                                    this.updateCounter();
-                                })
+                    if (this.getCharsCount() > maxLength) {
+                        if (isCke) {
+                            try {
+                                const editor = _getCKEditor(interaction);
+                                editor && editor.focus();
+                                editor.execCommand("undo");
+                                this.updateCounter();
+                            } catch (e) {
+                                logger.warn(`setText error ${e}!`);
                             }
+                        } else {
+                            const totalValue = $textarea[0].value;
+                            $textarea[0].value = totalValue.substring(0, maxLength);
+                            $textarea[0].focus();
                         }
                     }
+
                     return false;
                 }
                 _.defer(() => this.updateCounter());
@@ -590,6 +585,22 @@ function inputLimiter(interaction) {
                 _.defer(() => this.updateCounter());
             };
 
+            const handleCompositionStart = e => {
+                isComposing = true;
+                return e;
+            }
+
+            const handleCompositionEnd = e => {
+                isComposing = false;
+                hasCompositionJustEnded = true;
+                return e;
+            }
+
+            const handleBeforeInput = e => {
+                _.defer(() => this.updateCounter());
+                return e;
+            };
+
             if (_getFormat(interaction) === 'xhtml') {
                 cke = _getCKEditor(interaction);
                 cke.on('key', keyLimitHandler);
@@ -599,6 +610,9 @@ function inputLimiter(interaction) {
                 // cke.on('drop', nonKeyLimitHandler);
             } else {
                 $textarea
+                    .on('beforeinput.commonRenderer', handleBeforeInput)
+                    .on('compositionstart.commonRenderer', handleCompositionStart)
+                    .on('compositionend.commonRenderer', handleCompositionEnd)
                     .on('keyup.commonRenderer', patternHandler)
                     .on('keydown.commonRenderer', keyLimitHandler)
                     .on('paste.commonRenderer drop.commonRenderer', nonKeyLimitHandler);
@@ -623,10 +637,9 @@ function inputLimiter(interaction) {
          * @returns {Number} number of characters
          */
         getCharsCount: function getCharsCount() {
-            let value = _getTextareaValue(interaction) || '';
+            const value = _getTextareaValue(interaction) || '';
             // remove NO-BREAK SPACE in empty lines added and all new line symbols
-            value.replace(/[\r\n]{1}\xA0[\r\n]{1}/gm, '\r').replace(/[\r\n]+/gm, '').length;
-            return _countCharacters(value);
+            return value.replace(/[\r\n]{1}\xA0[\r\n]{1}/gm, '\r').replace(/[\r\n]+/gm, '').length;
         },
 
         /**
@@ -640,34 +653,6 @@ function inputLimiter(interaction) {
 
     return limiter;
 }
-
-/** NEW CODE TO CHECK IME CHARACTERS **/
-function _strip(html) {
-    const tmp = document.createElement("div");
-    tmp.innerHTML = html;
-    if (tmp.textContent == "" && typeof tmp.innerText == "undefined") {
-        return "";
-    }
-    return tmp.textContent || tmp.innerText;
-}
-
-function _countCharacters(text) {
-    let normalizedText = text.replace(/\s/g, "").replace(/&nbsp;/g, "");
-    normalizedText = normalizedText.replace(/(\r\n|\n|\r)/gm, "").replace(/&nbsp;/gi, " ");
-    normalizedText = _strip(normalizedText).replace(/^([\t\r\n]*)$/, "");
-    return _countBytes(normalizedText);
-}
-
-function _countBytes(text) {
-    var count = 0, stringLength = text.length, i;
-    text = String(text || "");
-    for (i = 0; i < stringLength; i++) {
-        var partCount = encodeURI(text[i]).split("%").length;
-        count += partCount == 1 ? 1 : partCount - 1;
-    }
-    return count;
-}
-/** NEW CODE TO CHECK IME CHARACTERS **/
 
 /**
  * return the value of the textarea or ckeditor data
