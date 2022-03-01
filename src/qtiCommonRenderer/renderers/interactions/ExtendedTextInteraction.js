@@ -432,6 +432,8 @@ function inputLimiter(interaction) {
                 2228237 // shift + enter in ckEditor
             ];
             let cke;
+            let isComposing = false;
+            let hasCompositionJustEnded = false;
 
             const invalidToolip = tooltip.error($container, __('This is not a valid answer'), {
                 position: 'bottom',
@@ -472,9 +474,6 @@ function inputLimiter(interaction) {
                 }
             };
 
-            let isComposing = false;
-            let hasCompositionJustEnded = false;
-
             /**
              * This part works on keyboard input
              *
@@ -511,8 +510,8 @@ function inputLimiter(interaction) {
                                 editor && editor.focus();
                                 editor.execCommand("undo");
                                 this.updateCounter();
-                            } catch (e) {
-                                logger.warn(`setText error ${e}!`);
+                            } catch (err) {
+                                logger.warn(`setText error ${err}!`);
                             }
                         } else {
                             const totalValue = $textarea[0].value;
@@ -587,13 +586,18 @@ function inputLimiter(interaction) {
             const handleCompositionStart = e => {
                 isComposing = true;
                 return e;
-            }
+            };
 
             const handleCompositionEnd = e => {
                 isComposing = false;
                 hasCompositionJustEnded = true;
+                // if plain text - then limit input right after composition end event
+                if (_getFormat(interaction) !== 'xhtml') {
+                    const totalValue = $textarea[0].value;
+                    $textarea[0].value = totalValue.substring(0, maxLength);
+                }
                 return e;
-            }
+            };
 
             const handleBeforeInput = e => {
                 _.defer(() => this.updateCounter());
@@ -602,6 +606,7 @@ function inputLimiter(interaction) {
 
             if (_getFormat(interaction) === 'xhtml') {
                 cke = _getCKEditor(interaction);
+                window.ckeinstance = cke;
                 cke.on('key', keyLimitHandler);
                 cke.on('change', patternHandler);
                 cke.on('paste', nonKeyLimitHandler);
@@ -610,6 +615,7 @@ function inputLimiter(interaction) {
             } else {
                 $textarea
                     .on('beforeinput.commonRenderer', handleBeforeInput)
+                    .on('input.commonRenderer', () => _.defer(() => this.updateCounter()))
                     .on('compositionstart.commonRenderer', handleCompositionStart)
                     .on('compositionend.commonRenderer', handleCompositionEnd)
                     .on('keyup.commonRenderer', patternHandler)
