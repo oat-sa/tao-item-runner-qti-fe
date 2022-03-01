@@ -606,7 +606,6 @@ function inputLimiter(interaction) {
 
             if (_getFormat(interaction) === 'xhtml') {
                 cke = _getCKEditor(interaction);
-                window.ckeinstance = cke;
                 cke.on('key', keyLimitHandler);
                 cke.on('change', patternHandler);
                 cke.on('paste', nonKeyLimitHandler);
