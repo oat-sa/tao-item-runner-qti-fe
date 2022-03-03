@@ -66,7 +66,7 @@ const render = function render(interaction) {
                 itemLocale = itemLang && itemLang.split('-')[0];
             }
             return itemLocale;
-        }
+        };
 
         const toolbarType = 'extendedText';
         const ckOptions = {
@@ -514,8 +514,8 @@ function inputLimiter(interaction) {
                                 logger.warn(`setText error ${err}!`);
                             }
                         } else {
-                            const totalValue = $textarea[0].value;
-                            $textarea[0].value = totalValue.substring(0, maxLength);
+                            const currentValue = $textarea[0].value;
+                            $textarea[0].value = currentValue.substring(0, maxLength);
                             $textarea[0].focus();
                         }
                     }
@@ -593,9 +593,10 @@ function inputLimiter(interaction) {
                 hasCompositionJustEnded = true;
                 // if plain text - then limit input right after composition end event
                 if (_getFormat(interaction) !== 'xhtml') {
-                    const totalValue = $textarea[0].value;
-                    $textarea[0].value = totalValue.substring(0, maxLength);
+                    const currentValue = $textarea[0].value;
+                    $textarea[0].value = currentValue.substring(0, maxLength);
                 }
+                _.defer(() => this.updateCounter());
                 return e;
             };
 
@@ -614,7 +615,9 @@ function inputLimiter(interaction) {
             } else {
                 $textarea
                     .on('beforeinput.commonRenderer', handleBeforeInput)
-                    .on('input.commonRenderer', () => _.defer(() => this.updateCounter()))
+                    .on('input.commonRenderer', () => {
+                        _.defer(() => this.updateCounter());
+                    })
                     .on('compositionstart.commonRenderer', handleCompositionStart)
                     .on('compositionend.commonRenderer', handleCompositionEnd)
                     .on('keyup.commonRenderer', patternHandler)
