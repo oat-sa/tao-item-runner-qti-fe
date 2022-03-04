@@ -592,7 +592,7 @@ function inputLimiter(interaction) {
                 isComposing = false;
                 hasCompositionJustEnded = true;
                 // if plain text - then limit input right after composition end event
-                if (_getFormat(interaction) !== 'xhtml') {
+                if (_getFormat(interaction) !== 'xhtml' && maxLength !== null) {
                     const currentValue = $textarea[0].value;
                     $textarea[0].value = currentValue.substring(0, maxLength);
                 }
