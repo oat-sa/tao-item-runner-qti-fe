@@ -512,7 +512,7 @@ function inputLimiter(interaction) {
                         e.stopImmediatePropagation();
                     }
 
-                    if (this.getCharsCount() > maxLength) {
+                    if (this.getCharsCount() > maxLength && maxLength !== null) {
                         if (!isCke) {
                             const currentValue = $textarea[0].value;
                             $textarea[0].value = currentValue.substring(0, maxLength);
