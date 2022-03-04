@@ -112,6 +112,15 @@ const render = function render(interaction) {
 
                 editor.on('instanceReady', function () {
                     _styleUpdater();
+                    const editable = this.editable();
+                    let previousSnapshot = this.getSnapshot();
+                    editable.on('input', () => {
+                        if (limiter.getCharsCount() > limiter.maxLength) {
+                            editable.setData(previousSnapshot, true);
+                            return;
+                        }
+                        previousSnapshot = this.getSnapshot();
+                    });
 
                     //TAO-6409, disable navigation from cke toolbar
                     if (editor.container && editor.container.$) {
@@ -504,16 +513,7 @@ function inputLimiter(interaction) {
                     }
 
                     if (this.getCharsCount() > maxLength) {
-                        if (isCke) {
-                            try {
-                                const editor = _getCKEditor(interaction);
-                                editor && editor.focus();
-                                editor.execCommand("undo");
-                                this.updateCounter();
-                            } catch (err) {
-                                logger.warn(`setText error ${err}!`);
-                            }
-                        } else {
+                        if (!isCke) {
                             const currentValue = $textarea[0].value;
                             $textarea[0].value = currentValue.substring(0, maxLength);
                             $textarea[0].focus();
@@ -608,7 +608,10 @@ function inputLimiter(interaction) {
             if (_getFormat(interaction) === 'xhtml') {
                 cke = _getCKEditor(interaction);
                 cke.on('key', keyLimitHandler);
-                cke.on('change', patternHandler);
+                cke.on('change', (evt) => {
+                    patternHandler(evt);
+                    _.defer(() => this.updateCounter());
+                });
                 cke.on('paste', nonKeyLimitHandler);
                 // @todo: drop requires cke 4.5
                 // cke.on('drop', nonKeyLimitHandler);
@@ -655,7 +658,8 @@ function inputLimiter(interaction) {
         updateCounter: function udpateCounter() {
             $charsCounter.text(this.getCharsCount());
             $wordsCounter.text(this.getWordsCount());
-        }
+        },
+        maxLength
     };
 
     return limiter;
