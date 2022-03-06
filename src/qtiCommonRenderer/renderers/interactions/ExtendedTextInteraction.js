@@ -114,9 +114,12 @@ const render = function render(interaction) {
                     _styleUpdater();
                     const editable = this.editable();
                     let previousSnapshot = this.getSnapshot();
+                    const range = editor.createRange();
                     editable.on('input', () => {
                         if (limiter.getCharsCount() > limiter.maxLength) {
                             editable.setData(previousSnapshot, true);
+                            range.moveToElementEditablePosition(editable, true);
+                            editor.getSelection().selectRanges([range]);
                             return;
                         }
                         previousSnapshot = this.getSnapshot();
