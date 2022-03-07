@@ -112,18 +112,6 @@ const render = function render(interaction) {
 
                 editor.on('instanceReady', function () {
                     _styleUpdater();
-                    const editable = this.editable();
-                    let previousSnapshot = this.getSnapshot();
-                    const range = editor.createRange();
-                    editable.on('input', () => {
-                        if (limiter.getCharsCount() > limiter.maxLength) {
-                            editable.setData(previousSnapshot, true);
-                            range.moveToElementEditablePosition(editable, true);
-                            editor.getSelection().selectRanges([range]);
-                            return;
-                        }
-                        previousSnapshot = this.getSnapshot();
-                    });
 
                     //TAO-6409, disable navigation from cke toolbar
                     if (editor.container && editor.container.$) {
@@ -610,6 +598,22 @@ function inputLimiter(interaction) {
 
             if (_getFormat(interaction) === 'xhtml') {
                 cke = _getCKEditor(interaction);
+                if(maxLength){
+                    cke.on('instanceReady', function(){
+                        const editable = this.editable();
+                        let previousSnapshot = this.getSnapshot();
+                        const range = this.createRange();
+                        editable.on('input', () => {
+                            if (limiter.getCharsCount() > limiter.maxLength) {
+                                editable.setData(previousSnapshot, true);
+                                range.moveToElementEditablePosition(editable, true);
+                                this.getSelection().selectRanges([range]);
+                                return;
+                            }
+                            previousSnapshot = this.getSnapshot();
+                        });
+                    });
+                }
                 cke.on('key', keyLimitHandler);
                 cke.on('change', (evt) => {
                     patternHandler(evt);
@@ -929,7 +933,7 @@ function getCustomData(interaction, data) {
     return _.merge(data || {}, {
         maxWords: !isNaN(maxWords) ? maxWords : 0,
         maxLength: !isNaN(maxLength) ? maxLength : 0,
-        attributes: !isNaN(expectedLength) ? { expectedLength: expectedLength * 72 } : undefined
+        attributes: !isNaN(expectedLength) ? { expectedLength: expectedLength * 72 } : void 0
     });
 }
 
