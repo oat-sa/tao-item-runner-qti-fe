@@ -598,24 +598,24 @@ function inputLimiter(interaction) {
 
             if (_getFormat(interaction) === 'xhtml') {
                 cke = _getCKEditor(interaction);
-                if(maxLength){
-                    cke.on('instanceReady', function(){
-                        const editable = this.editable();
-                        let previousSnapshot = this.getSnapshot();
+
+                if (maxLength) {
+                    let previousSnapshot = cke.getSnapshot();
+
+                    cke.on('key', function () {
                         const range = this.createRange();
-                        editable.on('input', () => {
-                            if (limiter.getCharsCount() > limiter.maxLength) {
-                                editable.setData(previousSnapshot, true);
-                                range.moveToElementEditablePosition(editable, true);
-                                this.getSelection().selectRanges([range]);
-                                return;
-                            }
-                            previousSnapshot = this.getSnapshot();
-                        });
+                        if (limiter.getCharsCount() > limiter.maxLength) {
+                            const editable = this.editable();
+                            editable.setData(previousSnapshot, true);
+                            range.moveToElementEditablePosition(editable, true);
+                            cke.getSelection().selectRanges([range]);
+                            return;
+                        }
+                        previousSnapshot = cke.getSnapshot();
                     });
                 }
                 cke.on('key', keyLimitHandler);
-                cke.on('change', (evt) => {
+                cke.on('change', evt => {
                     patternHandler(evt);
                     _.defer(() => this.updateCounter());
                 });
