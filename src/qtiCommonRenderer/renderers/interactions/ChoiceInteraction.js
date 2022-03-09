@@ -218,6 +218,7 @@ var _setInstructions = function _setInstructions(interaction) {
     } else if (max === choiceCount && min === 0) {
     // 4.Optional Multiple choices -> minChoices = 0, maxChoices = NumberOfChoicesDefined -> “You can select up to maxChoices as correct answer.”
         msg = __('You can select up to %s as correct answer.', max);
+        instructionMgr.appendInstruction(interaction, msg);
     } else if (min === 1) {
     // 5.Required Single answer up to limit on Multiple choices -> minChoices = 1, maxChoices = NumberOfChoicesDefined -> “You MUST define a least 1 choice as the correct answer up to maxChoices “
     // 6.Required Answer -> minChoices = 1 , maxChoices = 0 -> “You MUST define a least 1 choice for the correct answer“
