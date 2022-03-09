@@ -233,7 +233,7 @@ var _setInstructions = function _setInstructions(interaction) {
                 this.reset();
             }
         });
-    } else if(!(max === 0 && max === 0 || max === 0 && max === 1)) {
+    } else if(!(min === 0 && (max === 0 || max === 1))) {
         // 1.No Constraints -> minChoices = 0, maxChoices = 0 -> No message
         // 2.Optional Single choice -> minChoices = 0, maxChoices = 1 -> No message
         // 7.Custom choices constraints -> any combination of minChoices & maxChoices -> “You must select from minChoices to maxChoices choices. for the correct answer“
