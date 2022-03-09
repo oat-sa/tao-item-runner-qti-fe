@@ -46,10 +46,7 @@ var KEY_CODE_DOWN = 40;
  * @private
  */
 var _triggerInput = function _triggerInput($choiceBox, state) {
-    var $input = $choiceBox
-        .find('input:radio,input:checkbox')
-        .not('[disabled]')
-        .not('.disabled');
+    var $input = $choiceBox.find('input:radio,input:checkbox').not('[disabled]').not('.disabled');
     var $choiceBoxes = $choiceBox.add($choiceBox.siblings());
 
     if (!$input.length) {
@@ -86,7 +83,7 @@ var _pseudoLabel = function _pseudoLabel(interaction, $container) {
     $container.off('.commonRenderer');
 
     $container
-        .on('keydown.commonRenderer.keyNavigation', inputSelector, function(e) {
+        .on('keydown.commonRenderer.keyNavigation', inputSelector, function (e) {
             var $qtiChoice = $(this).closest('.qti-choice');
             var keyCode = e.keyCode ? e.keyCode : e.charCode;
 
@@ -110,7 +107,7 @@ var _pseudoLabel = function _pseudoLabel(interaction, $container) {
                     .focus();
             }
         })
-        .on('keyup.commonRenderer.keyNavigation', inputSelector, function(e) {
+        .on('keyup.commonRenderer.keyNavigation', inputSelector, function (e) {
             var keyCode = e.keyCode ? e.keyCode : e.charCode;
 
             if (keyCode === KEY_CODE_SPACE || keyCode === KEY_CODE_ENTER) {
@@ -120,7 +117,7 @@ var _pseudoLabel = function _pseudoLabel(interaction, $container) {
             }
         });
 
-    $container.on('click.commonRenderer', '.qti-choice', function(e) {
+    $container.on('click.commonRenderer', '.qti-choice', function (e) {
         var $choiceBox = $(this);
         var state;
         var eliminator = e.target.dataset && e.target.dataset.eliminable;
@@ -169,7 +166,7 @@ var _pseudoLabel = function _pseudoLabel(interaction, $container) {
 var _getRawResponse = function _getRawResponse(interaction) {
     var values = [];
     var $container = containerHelper.get(interaction);
-    $('.real-label > input[name=response-' + interaction.getSerial() + ']:checked', $container).each(function() {
+    $('.real-label > input[name=response-' + interaction.getSerial() + ']:checked', $container).each(function () {
         values.push($(this).val());
     });
     return values;
@@ -190,16 +187,13 @@ var _setInstructions = function _setInstructions(interaction) {
     var highlightInvalidInput = function highlightInvalidInput($choice) {
         var $input = $choice.find('.real-label > input'),
             $li = $choice.css('color', '#BA122B'),
-            $icon = $choice
-                .find('.real-label > span')
-                .css('color', '#BA122B')
-                .addClass('cross error');
+            $icon = $choice.find('.real-label > span').css('color', '#BA122B').addClass('cross error');
         var timeout = interaction.data('__instructionTimeout');
 
         if (timeout) {
             clearTimeout(timeout);
         }
-        timeout = setTimeout(function() {
+        timeout = setTimeout(function () {
             $input.prop('checked', false);
             $li.removeAttr('style');
             $icon.removeAttr('style').removeClass('cross');
@@ -211,11 +205,14 @@ var _setInstructions = function _setInstructions(interaction) {
 
     //if maxChoice = 1, use the radio group behaviour
     //if maxChoice = 0, infinite choice possible
-    if (max > 1 && max < choiceCount) {
+    if (max >= 1 && max < choiceCount) {
         if (max === min) {
             minInstructionSet = true;
-            msg = __('You must select exactly %s choices', max);
-            instructionMgr.appendInstruction(interaction, msg, function(data) {
+            msg =
+                max === 1
+                    ? __('You MUST select the choice for the correct answer')
+                    : __('You MUST select exactly %s choices', max);
+            instructionMgr.appendInstruction(interaction, msg, function (data) {
                 if (_getRawResponse(interaction).length >= max) {
                     this.setLevel('success');
                     if (this.checkState('fulfilled')) {
@@ -223,12 +220,12 @@ var _setInstructions = function _setInstructions(interaction) {
                             level: 'warning',
                             message: __('Maximum choices reached'),
                             timeout: 2000,
-                            start: function() {
+                            start: function () {
                                 if (data && data.choice) {
                                     highlightInvalidInput(data.choice);
                                 }
                             },
-                            stop: function() {
+                            stop: function () {
                                 this.update({ level: 'success', message: msg });
                             }
                         });
@@ -238,22 +235,21 @@ var _setInstructions = function _setInstructions(interaction) {
                     this.reset();
                 }
             });
-        } else if (max > min) {
-            msg =
-                max === 1 ? __('You can select maximum of 1 choice') : __('You can select maximum of %s choices', max);
-            instructionMgr.appendInstruction(interaction, msg, function(data) {
+        } else if (max > 1 && min === 0) {
+            msg = __('You can select up to %s as correct answer.', max);
+            instructionMgr.appendInstruction(interaction, msg, function (data) {
                 if (_getRawResponse(interaction).length >= max) {
                     this.setMessage(__('Maximum choices reached'));
                     if (this.checkState('fulfilled')) {
                         this.update({
                             level: 'warning',
                             timeout: 2000,
-                            start: function() {
+                            start: function () {
                                 if (data && data.choice) {
                                     highlightInvalidInput(data.choice);
                                 }
                             },
-                            stop: function() {
+                            stop: function () {
                                 this.setLevel('info');
                             }
                         });
@@ -266,11 +262,42 @@ var _setInstructions = function _setInstructions(interaction) {
         }
     }
 
-    if (!minInstructionSet && min > 0 && min < choiceCount) {
-        msg = min === 1 ? __('You must select at least 1 choice') : __('You must select at least %s choices', min);
-        instructionMgr.appendInstruction(interaction, msg, function() {
+    if (!minInstructionSet && min === 1) {
+        msg =
+            max === 0
+                ? __('You MUST define at least 1 choice for the correct answer')
+                : __('You MUST define at least 1 choice as the correct answer up to %s choices', max);
+        instructionMgr.appendInstruction(interaction, msg, function () {
             if (_getRawResponse(interaction).length >= min) {
                 this.setLevel('success');
+            } else {
+                this.reset();
+            }
+        });
+    }
+
+    if (!minInstructionSet && min > 1 && max > 1) {
+        msg = __('You must select from %s to %s choices for the correct answer', min, max);
+        instructionMgr.appendInstruction(interaction, msg, function (data) {
+            if (_getRawResponse(interaction).length >= min && _getRawResponse(interaction).length <= max) {
+                this.setLevel('success');
+            } else if (_getRawResponse(interaction).length >= max) {
+                this.setMessage(__('Maximum choices reached'));
+                if (this.checkState('fulfilled')) {
+                    this.update({
+                        level: 'warning',
+                        timeout: 2000,
+                        start: function () {
+                            if (data && data.choice) {
+                                highlightInvalidInput(data.choice);
+                            }
+                        },
+                        stop: function () {
+                            this.setLevel('info');
+                        }
+                    });
+                }
+                this.setState('fulfilled');
             } else {
                 this.reset();
             }
@@ -328,7 +355,7 @@ var setResponse = function setResponse(interaction, response) {
     var $container = containerHelper.get(interaction);
 
     try {
-        _.forEach(pciResponse.unserialize(response, interaction), function(identifier) {
+        _.forEach(pciResponse.unserialize(response, interaction), function (identifier) {
             var $input = $container.find('.real-label > input[value="' + identifier + '"]').prop('checked', true);
             $input.closest('.qti-choice').toggleClass('user-selected', true);
         });
@@ -394,9 +421,7 @@ var destroy = function destroy(interaction) {
 
     //remove event
     $container.off('.commonRenderer');
-    $(document)
-        .off('.commonRenderer')
-        .off('.choiceInteraction');
+    $(document).off('.commonRenderer').off('.choiceInteraction');
 
     //remove instructions
     instructionMgr.removeInstructions(interaction);
@@ -425,7 +450,7 @@ var setState = function setState(interaction, state) {
         //restore order of previously shuffled choices
         if (_.isArray(state.order) && state.order.length === _.size(interaction.getChoices())) {
             $('.qti-simpleChoice', $container)
-                .sort(function(a, b) {
+                .sort(function (a, b) {
                     var aIndex = _.indexOf(state.order, $(a).data('identifier'));
                     var bIndex = _.indexOf(state.order, $(b).data('identifier'));
                     if (aIndex > bIndex) {
@@ -442,7 +467,7 @@ var setState = function setState(interaction, state) {
 
         //restore eliminated choices
         if (isEliminable(interaction) && _.isArray(state.eliminated) && state.eliminated.length) {
-            _.forEach(state.eliminated, function(identifier) {
+            _.forEach(state.eliminated, function (identifier) {
                 $container.find('.qti-simpleChoice[data-identifier="' + identifier + '"]').addClass('eliminated');
             });
         }
@@ -467,7 +492,7 @@ var getState = function getState(interaction) {
     //we store also the choice order if shuffled
     if (interaction.attr('shuffle') === true) {
         state.order = [];
-        $('.qti-simpleChoice', $container).each(function() {
+        $('.qti-simpleChoice', $container).each(function () {
             state.order.push($(this).data('identifier'));
         });
     }
@@ -475,7 +500,7 @@ var getState = function getState(interaction) {
     //store the eliminated choices
     if (isEliminable(interaction)) {
         state.eliminated = [];
-        $container.find('.qti-simpleChoice.eliminated').each(function() {
+        $container.find('.qti-simpleChoice.eliminated').each(function () {
             state.eliminated.push($(this).data('identifier'));
         });
     }
