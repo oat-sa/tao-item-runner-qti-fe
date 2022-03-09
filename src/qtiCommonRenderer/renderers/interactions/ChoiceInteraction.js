@@ -217,9 +217,9 @@ var _setInstructions = function _setInstructions(interaction) {
         });
     } else if (max === choiceCount && min === 0) {
     // 4.Optional Multiple choices -> minChoices = 0, maxChoices = NumberOfChoicesDefined -> “You can select up to maxChoices as correct answer.”
-        msg = __('You can select up to %s as correct answer.', max);
+        msg = __('You can select up to %s as correct answer', max);
         instructionMgr.appendInstruction(interaction, msg);
-    } else if (min === 1) {
+    } else if (min === 1 && (max === 0 || max === choiceCount)) {
     // 5.Required Single answer up to limit on Multiple choices -> minChoices = 1, maxChoices = NumberOfChoicesDefined -> “You MUST define a least 1 choice as the correct answer up to maxChoices “
     // 6.Required Answer -> minChoices = 1 , maxChoices = 0 -> “You MUST define a least 1 choice for the correct answer“
         msg =
@@ -237,7 +237,7 @@ var _setInstructions = function _setInstructions(interaction) {
         // 1.No Constraints -> minChoices = 0, maxChoices = 0 -> No message
         // 2.Optional Single choice -> minChoices = 0, maxChoices = 1 -> No message
         // 7.Custom choices constraints -> any combination of minChoices & maxChoices -> “You must select from minChoices to maxChoices choices. for the correct answer“
-        msg = __('You must select from %s to %s choices for the correct answer', min, max);
+        msg = __('You must select from %s to %s choices for the correct answer', min || 0, max || 1);
         instructionMgr.appendInstruction(interaction, msg, function (data) {
             if (_getRawResponse(interaction).length >= min && _getRawResponse(interaction).length <= max) {
                 this.setLevel('success');
