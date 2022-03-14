@@ -204,40 +204,22 @@ var _setInstructions = function _setInstructions(interaction) {
 
     // if maxChoice = 1, use the radio group behaviour
     // if maxChoice = 0, infinite choice possible
-    // there are 7 cases according AUT-345 Choice interaction: reduce edge cases constraints
-    if (min === 1 && max === 1) {
-    // 3.Required Single choice -> minChoices = 1, maxChoices = 1 -> “You MUST select the choice for the correct answer”
-        msg = __('You MUST select the choice for the correct answer');
+    // there are 5 cases according AUT-345 Choice interaction: reduce edge cases constraints
+    if (min === 1 && (max === 1 || max === 0 || max === choiceCount || typeof max === 'undefined')) {
+        // Single choice: 2.Constraint: Answer required  -> minChoices = 1, maxChoices = 1 -> “You need to select at least 1 choice”
+        // Multiple Choice: 4.Constraint: Answer required -> minChoices = 1 / maxChoices = 0 -> “You need to select at least 1 choice”
+        // Multiple Choice: 5.Constraint: Other constraints -> minChoices = 1 / maxChoices = (N or Disabled)
+        msg = __('You need to select at least 1 choice');
         instructionMgr.appendInstruction(interaction, msg, function () {
-            if (_getRawResponse(interaction).length === 1) {
+            if (_getRawResponse(interaction).length >= 1) {
                 this.setLevel('success');
             } else {
                 this.reset();
             }
         });
-    } else if (max === choiceCount && min === 0) {
-    // 4.Optional Multiple choices -> minChoices = 0, maxChoices = NumberOfChoicesDefined -> “You can select up to maxChoices as correct answer.”
-        msg = __('You can select up to %s as correct answer', max);
-        instructionMgr.appendInstruction(interaction, msg);
-    } else if (min === 1 && (max === 0 || max === choiceCount)) {
-    // 5.Required Single answer up to limit on Multiple choices -> minChoices = 1, maxChoices = NumberOfChoicesDefined -> “You MUST define a least 1 choice as the correct answer up to maxChoices “
-    // 6.Required Answer -> minChoices = 1 , maxChoices = 0 -> “You MUST define a least 1 choice for the correct answer“
-        msg =
-            max === 0
-                ? __('You MUST define at least 1 choice for the correct answer')
-                : __('You MUST define at least 1 choice as the correct answer up to %s choices', max);
-        instructionMgr.appendInstruction(interaction, msg, function () {
-            if (_getRawResponse(interaction).length >= min) {
-                this.setLevel('success');
-            } else {
-                this.reset();
-            }
-        });
-    } else if(!(min === 0 && (max === 0 || max === 1))) {
-        // 1.No Constraints -> minChoices = 0, maxChoices = 0 -> No message
-        // 2.Optional Single choice -> minChoices = 0, maxChoices = 1 -> No message
-        // 7.Custom choices constraints -> any combination of minChoices & maxChoices -> “You must select from minChoices to maxChoices choices. for the correct answer“
-        msg = __('You must select from %s to %s choices for the correct answer', min || 0, max || 1);
+    } else if (min >=1 && max >=2) {
+        // Multiple Choice: 5. Constraint: Other constraints -> “You must select from minChoices to maxChoices choices. for the correct answer“
+        msg = __('You must select from %s to %s choices.', min, max);
         instructionMgr.appendInstruction(interaction, msg, function (data) {
             if (_getRawResponse(interaction).length >= min && _getRawResponse(interaction).length <= max) {
                 this.setLevel('success');
@@ -258,6 +240,16 @@ var _setInstructions = function _setInstructions(interaction) {
                     });
                 }
                 this.setState('fulfilled');
+            } else {
+                this.reset();
+            }
+        });
+    } else if (min && min === max) {
+        // Multiple Choice: 5. Constraint: Other constraints -> “You need to select {minChoices = maxChoices value} choices.“
+        msg = __('You need to select %s choices', min);
+        instructionMgr.appendInstruction(interaction, msg, function () {
+            if (_getRawResponse(interaction).length === min) {
+                this.setLevel('success');
             } else {
                 this.reset();
             }
