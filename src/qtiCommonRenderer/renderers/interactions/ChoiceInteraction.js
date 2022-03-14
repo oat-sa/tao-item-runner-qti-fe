@@ -209,7 +209,7 @@ var _setInstructions = function _setInstructions(interaction) {
         // Single choice: 2.Constraint: Answer required  -> minChoices = 1, maxChoices = 1 -> “You need to select at least 1 choice”
         // Multiple Choice: 4.Constraint: Answer required -> minChoices = 1 / maxChoices = 0 -> “You need to select at least 1 choice”
         // Multiple Choice: 5.Constraint: Other constraints -> minChoices = 1 / maxChoices = (N or Disabled)
-        msg = __('You need to select at least 1 choice');
+        msg = __('You need to select at least 1 choice.');
         instructionMgr.appendInstruction(interaction, msg, function () {
             if (_getRawResponse(interaction).length >= 1) {
                 this.setLevel('success');
@@ -219,7 +219,7 @@ var _setInstructions = function _setInstructions(interaction) {
         });
     } else if (min >=1 && max >=2) {
         // Multiple Choice: 5. Constraint: Other constraints -> “You must select from minChoices to maxChoices choices. for the correct answer“
-        msg = __('You must select from %s to %s choices.', min, max);
+        msg = __('You need to select from %s to %s choices.', min, max);
         instructionMgr.appendInstruction(interaction, msg, function (data) {
             if (_getRawResponse(interaction).length >= min && _getRawResponse(interaction).length <= max) {
                 this.setLevel('success');
