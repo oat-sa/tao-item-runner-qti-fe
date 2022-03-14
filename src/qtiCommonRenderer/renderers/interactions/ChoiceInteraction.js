@@ -217,7 +217,7 @@ var _setInstructions = function _setInstructions(interaction) {
                 this.reset();
             }
         });
-    } else if (min >=1 && max >=2) {
+    } else if (min >= 1 && max >= 2) {
         // Multiple Choice: 5. Constraint: Other constraints -> “You must select from minChoices to maxChoices choices. for the correct answer“
         msg = __('You need to select from %s to %s choices.', min, max);
         instructionMgr.appendInstruction(interaction, msg, function (data) {
@@ -245,10 +245,45 @@ var _setInstructions = function _setInstructions(interaction) {
             }
         });
     } else if (min && min === max) {
-        // Multiple Choice: 5. Constraint: Other constraints -> “You need to select {minChoices = maxChoices value} choices.“
+        // Multiple Choice: 5. Constraint: Other constraints -> minChoices ≠ Disabled / maxChoices ≠ Disabled -> “You need to select {minChoices = maxChoices value} choices.“
         msg = __('You need to select %s choices', min);
         instructionMgr.appendInstruction(interaction, msg, function () {
             if (_getRawResponse(interaction).length === min) {
+                this.setLevel('success');
+            } else {
+                this.reset();
+            }
+        });
+    } else if (max > 1 && typeof min === 'undefined') {
+        // Multiple Choice: 5. Constraint: Other constraints -> minChoices = Disabled / maxChoices ≠ Disabled  -> "You can select up to {maxChoices value} choices."
+        msg = __('You can select up to % choices.', max);
+        instructionMgr.appendInstruction(interaction, msg, function(data) {
+            if (_getRawResponse(interaction).length >= max) {
+                this.setMessage(__('Maximum choices reached'));
+                if (this.checkState('fulfilled')) {
+                    this.update({
+                        level: 'warning',
+                        timeout: 2000,
+                        start: function() {
+                            if (data && data.choice) {
+                                highlightInvalidInput(data.choice);
+                            }
+                        },
+                        stop: function() {
+                            this.setLevel('info');
+                        }
+                    });
+                }
+                this.setState('fulfilled');
+            } else {
+                this.reset();
+            }
+        });
+    } else if (min > 1 && typeof max === 'undefined') {
+        // Multiple Choice: 5. Constraint: Other constraints -> minChoices ≠ Disabled / maxChoices = Disabled   -> "You need to select at least {minChoices value} choices.""
+        msg = __('You need to select at least % choices.', min);
+        instructionMgr.appendInstruction(interaction, msg, function () {
+            if (_getRawResponse(interaction).length >= min) {
                 this.setLevel('success');
             } else {
                 this.reset();
