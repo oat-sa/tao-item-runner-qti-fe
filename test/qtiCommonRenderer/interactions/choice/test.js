@@ -13,7 +13,7 @@ define([
     var outsideContainerId = 'outside-container';
 
     QUnit.module('Choice Interaction', {
-        afterEach: function(assert) {
+        afterEach: function() {
             if (runner) {
                 runner.clear();
             }
@@ -22,7 +22,7 @@ define([
 
     QUnit.test('renders correclty', function(assert) {
         var ready = assert.async();
-        var $container = $('#' + fixtureContainerId);
+        var $container = $(`#${fixtureContainerId}`);
 
         assert.expect(17);
 
@@ -115,7 +115,7 @@ define([
 
     QUnit.test('enables to select a choice', function(assert) {
         var ready = assert.async();
-        var $container = $('#' + fixtureContainerId);
+        var $container = $(`#${fixtureContainerId}`);
 
         assert.expect(8);
 
@@ -156,7 +156,7 @@ define([
 
     QUnit.test('enables to select a unique choice', function(assert) {
         var ready = assert.async();
-        var $container = $('#' + fixtureContainerId);
+        var $container = $(`#${fixtureContainerId}`);
         var changes = 0;
 
         assert.expect(11);
@@ -217,7 +217,7 @@ define([
 
     QUnit.test('enables to select multiple choices', function(assert) {
         var ready = assert.async();
-        var $container = $('#' + fixtureContainerId);
+        var $container = $(`#${fixtureContainerId}`);
         var changes = 0;
 
         assert.expect(11);
@@ -276,7 +276,7 @@ define([
 
     QUnit.test('set the default response', function(assert) {
         var ready = assert.async();
-        var $container = $('#' + fixtureContainerId);
+        var $container = $(`#${fixtureContainerId}`);
 
         assert.expect(4);
 
@@ -305,7 +305,7 @@ define([
 
     QUnit.test('destroys', function(assert) {
         var ready = assert.async();
-        var $container = $('#' + fixtureContainerId);
+        var $container = $(`#${fixtureContainerId}`);
 
         assert.expect(5);
 
@@ -346,7 +346,7 @@ define([
 
     QUnit.test('resets the response', function(assert) {
         var ready = assert.async();
-        var $container = $('#' + fixtureContainerId);
+        var $container = $(`#${fixtureContainerId}`);
 
         assert.expect(7);
 
@@ -393,7 +393,7 @@ define([
 
     QUnit.test('restores order of shuffled choices', function(assert) {
         var ready = assert.async();
-        var $container = $('#' + fixtureContainerId);
+        var $container = $(`#${fixtureContainerId}`);
         var shuffled;
 
         assert.expect(9);
@@ -461,7 +461,7 @@ define([
 
     QUnit.test('get eliminated choices state', function(assert) {
         var ready = assert.async();
-        var $container = $('#' + fixtureContainerId);
+        var $container = $(`#${fixtureContainerId}`);
         var $discovery, $challenger, $pathfinder, $atlantis, $endeavour;
         var shuffled;
 
@@ -523,7 +523,7 @@ define([
         // Note: toggling state via events makes for unruly state management (and thus this mess of a test)
         var $eliminator;
         var $choice;
-        var $container = $('#' + fixtureContainerId);
+        var $container = $(`#${fixtureContainerId}`);
         var shuffled;
 
         assert.expect(3);
@@ -564,7 +564,7 @@ define([
 
     QUnit.test('check dashes and dots in the identifier', function(assert) {
         var ready = assert.async();
-        var $container = $('#' + fixtureContainerId);
+        var $container = $(`#${fixtureContainerId}`);
 
         assert.expect(4);
 
@@ -593,7 +593,7 @@ define([
 
     QUnit.test('Display and play', function(assert) {
         var ready = assert.async();
-        var $container = $('#' + outsideContainerId);
+        var $container = $(`#${outsideContainerId}`);
 
         assert.expect(4);
 
