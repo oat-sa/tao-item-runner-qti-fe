@@ -280,7 +280,7 @@ var _setInstructions = function _setInstructions(interaction) {
         });
     } else if (min > 1 && (typeof max === 'undefined' || max === 0)) {
         // Multiple Choice: 5. Constraint: Other constraints -> minChoices ≠ Disabled / maxChoices = Disabled or 0   -> "You need to select at least {minChoices value} choices.""
-        msg = __('You need to select at least % choices.', min);
+        msg = __('You need to select at least %s choices.', min);
         instructionMgr.appendInstruction(interaction, msg, function () {
             if (_getRawResponse(interaction).length >= min) {
                 this.setLevel('success');
