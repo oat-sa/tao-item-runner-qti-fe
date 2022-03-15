@@ -243,7 +243,7 @@ var _setInstructions = function _setInstructions(interaction) {
                 this.reset();
             }
         });
-    } else if (min && min === max) {
+    } else if (min > 1 && min === max) {
         // Multiple Choice: 5. Constraint: Other constraints -> minChoices ≠ Disabled / maxChoices ≠ Disabled -> “You need to select {minChoices = maxChoices value} choices.“
         msg = __('You need to select %s choices', min);
         instructionMgr.appendInstruction(interaction, msg, function () {
