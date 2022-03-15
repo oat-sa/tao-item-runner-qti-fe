@@ -205,8 +205,7 @@ var _setInstructions = function _setInstructions(interaction) {
     // if maxChoice = 1, use the radio group behaviour
     // if maxChoice = 0, infinite choice possible
     // there are 5 cases according AUT-345 Choice interaction: reduce edge cases constraints
-    if (min === 1 && (max === 1 || max === 0 || max === choiceCount || typeof max === 'undefined')) {
-        // Single choice: 2.Constraint: Answer required  -> minChoices = 1, maxChoices = 1 -> “You need to select at least 1 choice”
+    if (min === 1 && (max === 0 || max === choiceCount || typeof max === 'undefined')) {
         // Multiple Choice: 4.Constraint: Answer required -> minChoices = 1 / maxChoices = 0 -> “You need to select at least 1 choice”
         // Multiple Choice: 5.Constraint: Other constraints -> minChoices = 1 / maxChoices = (N or Disabled)
         msg = __('You need to select at least 1 choice.');
@@ -290,6 +289,9 @@ var _setInstructions = function _setInstructions(interaction) {
             }
         });
     }
+    // Single choice: 1.Constraint: None -> minChoices = 0 / maxChoices = 1 -> No messages
+    // Single choice: 2.Constraint: Answer required  -> minChoices = 1, maxChoices = 1 -> No messages
+    // Multiple Choice: 3.Constraint: None  -> minChoices = 0, maxChoices = 0 -> No messages
 };
 
 /**
