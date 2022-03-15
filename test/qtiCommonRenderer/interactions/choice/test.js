@@ -247,8 +247,8 @@ define([
                 );
                 assert.equal(
                     $container.find('.qti-choiceInteraction .instruction-container').children().length,
-                    2,
-                    'the interaction has 2 instructions'
+                    1,
+                    'the interaction has 1 instructions'
                 );
                 assert.equal($discovery.length, 1, 'the Discovery choice exists');
                 assert.equal($discovery.length, 1, 'the Challenger choice exists');
