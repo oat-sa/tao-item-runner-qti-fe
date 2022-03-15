@@ -255,7 +255,7 @@ var _setInstructions = function _setInstructions(interaction) {
         });
     } else if (max > 1 && typeof min === 'undefined') {
         // Multiple Choice: 5. Constraint: Other constraints -> minChoices = Disabled / maxChoices ≠ Disabled  -> "You can select up to {maxChoices value} choices."
-        msg = __('You can select up to % choices.', max);
+        msg = __('You can select up to %s choices.', max);
         instructionMgr.appendInstruction(interaction, msg, function(data) {
             if (_getRawResponse(interaction).length >= max) {
                 this.setMessage(__('Maximum choices reached'));
