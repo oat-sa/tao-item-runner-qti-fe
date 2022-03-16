@@ -253,7 +253,7 @@ const _setInstructions = function _setInstructions(interaction) {
                 this.reset();
             }
         });
-    } else if (max > 1 && typeof min === 'undefined') {
+    } else if (max > 1 && (typeof min === 'undefined' || max === 0)) {
         // Multiple Choice: 5. Constraint: Other constraints -> minChoices = Disabled / maxChoices ≠ Disabled  -> "You can select up to {maxChoices value} choices."
         msg = __('You can select up to %s choices.', max);
         instructionMgr.appendInstruction(interaction, msg, function (data) {
