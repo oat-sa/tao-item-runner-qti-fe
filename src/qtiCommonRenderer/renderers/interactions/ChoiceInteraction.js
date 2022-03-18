@@ -221,6 +221,7 @@ const _setInstructions = function _setInstructions(interaction) {
         msg = min !== max ? __('You need to select from %s to %s choices.', min, max) : __('You need to select %s choices.', min);
         instructionMgr.appendInstruction(interaction, msg, function (data) {
             if (_getRawResponse(interaction).length >= min && _getRawResponse(interaction).length < max) {
+                this.reset();
                 this.setLevel('success');
             } else if (_getRawResponse(interaction).length >= max) {
                 this.setMessage(__('Maximum choices reached'));
