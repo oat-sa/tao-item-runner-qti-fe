@@ -222,7 +222,8 @@ const _setInstructions = function _setInstructions(interaction) {
         instructionMgr.appendInstruction(interaction, msg, function (data) {
             if (_getRawResponse(interaction).length >= min && _getRawResponse(interaction).length <= max) {
                 this.setLevel('success');
-            } else if (_getRawResponse(interaction).length >= max) {
+            }
+            if (_getRawResponse(interaction).length >= max) {
                 this.setMessage(__('Maximum choices reached'));
                 if (this.checkState('fulfilled')) {
                     this.update({
