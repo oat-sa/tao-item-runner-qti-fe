@@ -25,7 +25,8 @@ import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
 import strLimiter from 'util/strLimiter';
-import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/extendedTextInteraction';
+import template from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/extendedTextInteraction';
+import countTpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/constraints/count';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
 import ckEditor from 'ckeditor';
@@ -926,14 +927,27 @@ function getState(interaction) {
 }
 
 function getCustomData(interaction, data) {
-    const pattern = interaction.attr('patternMask'),
-        maxWords = parseInt(patternMaskHelper.parsePattern(pattern, 'words')),
-        maxLength = parseInt(patternMaskHelper.parsePattern(pattern, 'chars')),
-        expectedLength = parseInt(interaction.attr('expectedLines'), 10);
+    const pattern = interaction.attr('patternMask');
+    const maxWords = parseInt(patternMaskHelper.parsePattern(pattern, 'words'), 10);
+    const maxLength = parseInt(patternMaskHelper.parsePattern(pattern, 'chars'), 10);
+    const expectedLines = parseInt(interaction.attr('expectedLines'), 10);
+    const expectedLength = !isNaN(expectedLines) ? expectedLines * 72 : parseInt(interaction.attr('expectedLength'), 10);
+
+    const countChars = countTpl({ name: 'count-chars', value: 0 });
+    const countWords = countTpl({ name: 'count-words', value: 0 });
+    const countExpectedLength = countTpl({ name: 'count-expected-length', value: expectedLength });
+    const countMaxLength = countTpl({ name: 'count-max-length', value: maxLength });
+    const countMaxWords = countTpl({ name: 'count-max-words', value: maxWords });
+
     return _.merge(data || {}, {
         maxWords: !isNaN(maxWords) ? maxWords : 0,
         maxLength: !isNaN(maxLength) ? maxLength : 0,
-        attributes: !isNaN(expectedLength) ? { expectedLength: expectedLength * 72 } : void 0
+        attributes: !isNaN(expectedLines) ? { expectedLength } : void 0,
+        constraintHints: {
+            expectedLength: __('%s of %s characters recommended.', countChars, countExpectedLength),
+            maxLength: __('%s of %s characters maximum.', countChars, countMaxLength),
+            maxWords: __('%s of %s words maximum.', countWords, countMaxWords),
+        }
     });
 }
 
@@ -943,7 +957,7 @@ function getCustomData(interaction, data) {
  */
 export default {
     qtiClass: 'extendedTextInteraction',
-    template: tpl,
+    template: template,
     render: render,
     getContainer: containerHelper.get,
     setResponse: setResponse,
