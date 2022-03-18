@@ -218,7 +218,7 @@ const _setInstructions = function _setInstructions(interaction) {
         });
     } else if (min >= 1 && max >= 2) {
         // Multiple Choice: 5. Constraint: Other constraints -> “You must select from minChoices to maxChoices choices. for the correct answer“
-        msg = min !== 1 && max ? __('You need to select from %s to %s choices.', min, max) : __('You need to select %s choices.', min);
+        msg = min !== max ? __('You need to select from %s to %s choices.', min, max) : __('You need to select %s choices.', min);
         instructionMgr.appendInstruction(interaction, msg, function (data) {
             if (_getRawResponse(interaction).length >= min && _getRawResponse(interaction).length <= max) {
                 this.setLevel('success');
