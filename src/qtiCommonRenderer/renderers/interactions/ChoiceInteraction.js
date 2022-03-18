@@ -220,10 +220,9 @@ const _setInstructions = function _setInstructions(interaction) {
         // Multiple Choice: 5. Constraint: Other constraints -> “You must select from minChoices to maxChoices choices. for the correct answer“
         msg = min !== max ? __('You need to select from %s to %s choices.', min, max) : __('You need to select %s choices.', min);
         instructionMgr.appendInstruction(interaction, msg, function (data) {
-            if (_getRawResponse(interaction).length >= min && _getRawResponse(interaction).length <= max) {
+            if (_getRawResponse(interaction).length >= min && _getRawResponse(interaction).length < max) {
                 this.setLevel('success');
-            }
-            if (_getRawResponse(interaction).length >= max) {
+            } else if (_getRawResponse(interaction).length >= max) {
                 this.setMessage(__('Maximum choices reached'));
                 if (this.checkState('fulfilled')) {
                     this.update({
