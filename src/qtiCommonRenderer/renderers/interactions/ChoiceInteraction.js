@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2021 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2022 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -31,12 +31,12 @@ import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import sizeAdapter from 'taoQtiItem/qtiCommonRenderer/helpers/sizeAdapter';
 import adaptSize from 'util/adaptSize';
 
-var KEY_CODE_SPACE = 32;
-var KEY_CODE_ENTER = 13;
-var KEY_CODE_LEFT = 37;
-var KEY_CODE_UP = 38;
-var KEY_CODE_RIGHT = 39;
-var KEY_CODE_DOWN = 40;
+const KEY_CODE_SPACE = 32;
+const KEY_CODE_ENTER = 13;
+const KEY_CODE_LEFT = 37;
+const KEY_CODE_UP = 38;
+const KEY_CODE_RIGHT = 39;
+const KEY_CODE_DOWN = 40;
 
 /**
  * Propagate the checked state to the actual input.
@@ -45,12 +45,9 @@ var KEY_CODE_DOWN = 40;
  * @param {Boolean} state
  * @private
  */
-var _triggerInput = function _triggerInput($choiceBox, state) {
-    var $input = $choiceBox
-        .find('input:radio,input:checkbox')
-        .not('[disabled]')
-        .not('.disabled');
-    var $choiceBoxes = $choiceBox.add($choiceBox.siblings());
+const _triggerInput = function _triggerInput($choiceBox, state) {
+    const $input = $choiceBox.find('input:radio,input:checkbox').not('[disabled]').not('.disabled');
+    const $choiceBoxes = $choiceBox.add($choiceBox.siblings());
 
     if (!$input.length) {
         return;
@@ -80,15 +77,15 @@ var _triggerInput = function _triggerInput($choiceBox, state) {
  * @param {Object} interaction - the interaction instance
  * @param {jQueryElement} $container
  */
-var _pseudoLabel = function _pseudoLabel(interaction, $container) {
-    var inputSelector =
+const _pseudoLabel = function _pseudoLabel(interaction, $container) {
+    const inputSelector =
         '.qti-choice input:radio:not([disabled]):not(.disabled), .qti-choice input:checkbox:not([disabled]):not(.disabled)';
     $container.off('.commonRenderer');
 
     $container
-        .on('keydown.commonRenderer.keyNavigation', inputSelector, function(e) {
-            var $qtiChoice = $(this).closest('.qti-choice');
-            var keyCode = e.keyCode ? e.keyCode : e.charCode;
+        .on('keydown.commonRenderer.keyNavigation', inputSelector, function (e) {
+            const $qtiChoice = $(this).closest('.qti-choice');
+            const keyCode = e.keyCode ? e.keyCode : e.charCode;
 
             if (keyCode === KEY_CODE_UP || keyCode === KEY_CODE_LEFT) {
                 e.preventDefault();
@@ -110,8 +107,8 @@ var _pseudoLabel = function _pseudoLabel(interaction, $container) {
                     .focus();
             }
         })
-        .on('keyup.commonRenderer.keyNavigation', inputSelector, function(e) {
-            var keyCode = e.keyCode ? e.keyCode : e.charCode;
+        .on('keyup.commonRenderer.keyNavigation', inputSelector, function (e) {
+            const keyCode = e.keyCode ? e.keyCode : e.charCode;
 
             if (keyCode === KEY_CODE_SPACE || keyCode === KEY_CODE_ENTER) {
                 e.preventDefault();
@@ -120,11 +117,11 @@ var _pseudoLabel = function _pseudoLabel(interaction, $container) {
             }
         });
 
-    $container.on('click.commonRenderer', '.qti-choice', function(e) {
-        var $choiceBox = $(this);
-        var state;
-        var eliminator = e.target.dataset && e.target.dataset.eliminable;
-        var input = this.querySelector('.real-label > input');
+    $container.on('click.commonRenderer', '.qti-choice', function (e) {
+        const $choiceBox = $(this);
+        let state;
+        const eliminator = e.target.dataset && e.target.dataset.eliminable;
+        const input = this.querySelector('.real-label > input');
 
         // if the click has been triggered by a keyboard check, prevent this listener to cancel this check
         if (e.originalEvent && $(e.originalEvent.target).is('input')) {
@@ -166,10 +163,10 @@ var _pseudoLabel = function _pseudoLabel(interaction, $container) {
  * @param {Object} interaction - the interaction instance
  * @returns {Array} the list of choices identifiers
  */
-var _getRawResponse = function _getRawResponse(interaction) {
-    var values = [];
-    var $container = containerHelper.get(interaction);
-    $('.real-label > input[name=response-' + interaction.getSerial() + ']:checked', $container).each(function() {
+const _getRawResponse = function _getRawResponse(interaction) {
+    const values = [];
+    const $container = containerHelper.get(interaction);
+    $('.real-label > input[name=response-' + interaction.getSerial() + ']:checked', $container).each(function () {
         values.push($(this).val());
     });
     return values;
@@ -180,26 +177,22 @@ var _getRawResponse = function _getRawResponse(interaction) {
  * @private
  * @param {Object} interaction - the interaction instance
  */
-var _setInstructions = function _setInstructions(interaction) {
-    var min = interaction.attr('minChoices'),
-        max = interaction.attr('maxChoices'),
-        msg,
-        choiceCount = _.size(interaction.getChoices()),
-        minInstructionSet = false;
+const _setInstructions = function _setInstructions(interaction) {
+    const min = interaction.attr('minChoices');
+    const max = interaction.attr('maxChoices');
+    let msg;
+    const choiceCount = _.size(interaction.getChoices());
 
-    var highlightInvalidInput = function highlightInvalidInput($choice) {
-        var $input = $choice.find('.real-label > input'),
-            $li = $choice.css('color', '#BA122B'),
-            $icon = $choice
-                .find('.real-label > span')
-                .css('color', '#BA122B')
-                .addClass('cross error');
-        var timeout = interaction.data('__instructionTimeout');
+    const highlightInvalidInput = function highlightInvalidInput($choice) {
+        const $input = $choice.find('.real-label > input');
+        const $li = $choice.css('color', '#BA122B');
+        const $icon = $choice.find('.real-label > span').css('color', '#BA122B').addClass('cross error');
+        let timeout = interaction.data('__instructionTimeout');
 
         if (timeout) {
             clearTimeout(timeout);
         }
-        timeout = setTimeout(function() {
+        timeout = setTimeout(function () {
             $input.prop('checked', false);
             $li.removeAttr('style');
             $icon.removeAttr('style').removeClass('cross');
@@ -209,66 +202,87 @@ var _setInstructions = function _setInstructions(interaction) {
         interaction.data('__instructionTimeout', timeout);
     };
 
-    //if maxChoice = 1, use the radio group behaviour
-    //if maxChoice = 0, infinite choice possible
-    if (max > 1 && max < choiceCount) {
-        if (max === min) {
-            minInstructionSet = true;
-            msg = __('You must select exactly %s choices', max);
-            instructionMgr.appendInstruction(interaction, msg, function(data) {
-                if (_getRawResponse(interaction).length >= max) {
-                    this.setLevel('success');
-                    if (this.checkState('fulfilled')) {
-                        this.update({
-                            level: 'warning',
-                            message: __('Maximum choices reached'),
-                            timeout: 2000,
-                            start: function() {
-                                if (data && data.choice) {
-                                    highlightInvalidInput(data.choice);
-                                }
-                            },
-                            stop: function() {
-                                this.update({ level: 'success', message: msg });
+    // if maxChoice = 1, use the radio group behaviour
+    // if maxChoice = 0, infinite choice possible
+    // there are 5 cases according AUT-345 Choice interaction: reduce edge cases constraints
+    if (min === 1 && (max === 0 || max === choiceCount || typeof max === 'undefined')) {
+        // Multiple Choice: 4.Constraint: Answer required -> minChoices = 1 / maxChoices = 0 -> “You need to select at least 1 choice”
+        // Multiple Choice: 5.Constraint: Other constraints -> minChoices = 1 / maxChoices = (N or Disabled)
+        msg = __('You need to select at least 1 choice.');
+        instructionMgr.appendInstruction(interaction, msg, function () {
+            if (_getRawResponse(interaction).length >= 1) {
+                this.setLevel('success');
+            } else {
+                this.reset();
+            }
+        });
+    } else if (min >= 1 && max >= 2 && min !== max) {
+        // Multiple Choice: 5. Constraint: Other constraints -> “You must select from minChoices to maxChoices choices. for the correct answer“
+        msg = __('You need to select from %s to %s choices.', min, max);
+        instructionMgr.appendInstruction(interaction, msg, function (data) {
+            if (_getRawResponse(interaction).length >= min && _getRawResponse(interaction).length < max) {
+                this.reset();
+                this.setLevel('success');
+            } else if (_getRawResponse(interaction).length >= max) {
+                this.setMessage(__('Maximum choices reached'));
+                if (this.checkState('fulfilled')) {
+                    this.update({
+                        level: 'warning',
+                        timeout: 2000,
+                        start: function () {
+                            if (data && data.choice) {
+                                highlightInvalidInput(data.choice);
                             }
-                        });
-                    }
-                    this.setState('fulfilled');
-                } else {
-                    this.reset();
+                        },
+                        stop: function () {
+                            this.setLevel('info');
+                        }
+                    });
                 }
-            });
-        } else if (max > min) {
-            msg =
-                max === 1 ? __('You can select maximum of 1 choice') : __('You can select maximum of %s choices', max);
-            instructionMgr.appendInstruction(interaction, msg, function(data) {
-                if (_getRawResponse(interaction).length >= max) {
-                    this.setMessage(__('Maximum choices reached'));
-                    if (this.checkState('fulfilled')) {
-                        this.update({
-                            level: 'warning',
-                            timeout: 2000,
-                            start: function() {
-                                if (data && data.choice) {
-                                    highlightInvalidInput(data.choice);
-                                }
-                            },
-                            stop: function() {
-                                this.setLevel('info');
+                this.setState('fulfilled');
+            } else {
+                this.reset();
+            }
+        });
+    } else if (min > 1 && min === max) {
+        // Multiple Choice: 5. Constraint: Other constraints -> minChoices ≠ Disabled / maxChoices ≠ Disabled -> “You need to select {minChoices = maxChoices value} choices.“
+        msg = __('You need to select %s choices', min);
+        instructionMgr.appendInstruction(interaction, msg, function () {
+            if (_getRawResponse(interaction).length === min) {
+                this.setLevel('success');
+            } else {
+                this.reset();
+            }
+        });
+    } else if (max > 1 && max < choiceCount && (typeof min === 'undefined' || min === 0)) {
+        // Multiple Choice: 5. Constraint: Other constraints -> minChoices = Disabled / maxChoices ≠ Disabled  -> "You can select up to {maxChoices value} choices."
+        msg = __('You can select up to %s choices.', max);
+        instructionMgr.appendInstruction(interaction, msg, function (data) {
+            if (_getRawResponse(interaction).length >= max) {
+                this.setMessage(__('Maximum choices reached'));
+                if (this.checkState('fulfilled')) {
+                    this.update({
+                        level: 'warning',
+                        timeout: 2000,
+                        start: function () {
+                            if (data && data.choice) {
+                                highlightInvalidInput(data.choice);
                             }
-                        });
-                    }
-                    this.setState('fulfilled');
-                } else {
-                    this.reset();
+                        },
+                        stop: function () {
+                            this.setLevel('info');
+                        }
+                    });
                 }
-            });
-        }
-    }
-
-    if (!minInstructionSet && min > 0 && min < choiceCount) {
-        msg = min === 1 ? __('You must select at least 1 choice') : __('You must select at least %s choices', min);
-        instructionMgr.appendInstruction(interaction, msg, function() {
+                this.setState('fulfilled');
+            } else {
+                this.reset();
+            }
+        });
+    } else if (min > 1 && (typeof max === 'undefined' || max === 0)) {
+        // Multiple Choice: 5. Constraint: Other constraints -> minChoices ≠ Disabled / maxChoices = Disabled or 0   -> "You need to select at least {minChoices value} choices.""
+        msg = __('You need to select at least %s choices.', min);
+        instructionMgr.appendInstruction(interaction, msg, function () {
             if (_getRawResponse(interaction).length >= min) {
                 this.setLevel('success');
             } else {
@@ -276,6 +290,9 @@ var _setInstructions = function _setInstructions(interaction) {
             }
         });
     }
+    // Single choice: 1.Constraint: None -> minChoices = 0 / maxChoices = 1 -> No messages
+    // Single choice: 2.Constraint: Answer required  -> minChoices = 1, maxChoices = 1 -> No messages
+    // Multiple Choice: 3.Constraint: None  -> minChoices = 0, maxChoices = 0 -> No messages
 };
 
 /**
@@ -285,8 +302,8 @@ var _setInstructions = function _setInstructions(interaction) {
  *
  * @param {Object} interaction - the interaction instance
  */
-var render = function render(interaction) {
-    var $container = containerHelper.get(interaction);
+const render = function render(interaction) {
+    const $container = containerHelper.get(interaction);
 
     _pseudoLabel(interaction, $container);
 
@@ -305,8 +322,8 @@ var render = function render(interaction) {
  *
  * @param {Object} interaction - the interaction instance
  */
-var resetResponse = function resetResponse(interaction) {
-    var $container = containerHelper.get(interaction);
+const resetResponse = function resetResponse(interaction) {
+    const $container = containerHelper.get(interaction);
 
     $('.real-label > input', $container).prop('checked', false);
 };
@@ -324,12 +341,12 @@ var resetResponse = function resetResponse(interaction) {
  * @param {Object} interaction - the interaction instance
  * @param {0bject} response - the PCI formated response
  */
-var setResponse = function setResponse(interaction, response) {
-    var $container = containerHelper.get(interaction);
+const setResponse = function setResponse(interaction, response) {
+    const $container = containerHelper.get(interaction);
 
     try {
-        _.forEach(pciResponse.unserialize(response, interaction), function(identifier) {
-            var $input = $container.find('.real-label > input[value="' + identifier + '"]').prop('checked', true);
+        _.forEach(pciResponse.unserialize(response, interaction), function (identifier) {
+            const $input = $container.find('.real-label > input[value="' + identifier + '"]').prop('checked', true);
             $input.closest('.qti-choice').toggleClass('user-selected', true);
         });
         instructionMgr.validateInstructions(interaction);
@@ -350,7 +367,7 @@ var setResponse = function setResponse(interaction, response) {
  * @param {Object} interaction - the interaction instance
  * @returns {Object} the response formatted in PCI
  */
-var getResponse = function getResponse(interaction) {
+const getResponse = function getResponse(interaction) {
     return pciResponse.serialize(_getRawResponse(interaction), interaction);
 };
 
@@ -360,7 +377,7 @@ var getResponse = function getResponse(interaction) {
  * @param {Object} interaction
  * @returns {boolean}
  */
-var isEliminable = function isEliminable(interaction) {
+const isEliminable = function isEliminable(interaction) {
     return /\beliminable\b/.test(interaction.attr('class'));
 };
 
@@ -370,8 +387,8 @@ var isEliminable = function isEliminable(interaction) {
  * @param {Object} [data] - interaction custom data
  * @returns {Object} custom data
  */
-var getCustomData = function getCustomData(interaction, data) {
-    var listStyles = (interaction.attr('class') || '').match(/\blist-style-[\w-]+/) || [];
+const getCustomData = function getCustomData(interaction, data) {
+    const listStyles = (interaction.attr('class') || '').match(/\blist-style-[\w-]+/) || [];
     return _.merge(data || {}, {
         horizontal: interaction.attr('orientation') === 'horizontal',
         listStyle: listStyles.pop(),
@@ -383,10 +400,10 @@ var getCustomData = function getCustomData(interaction, data) {
  * Destroy the interaction by leaving the DOM exactly in the same state it was before loading the interaction.
  * @param {Object} interaction - the interaction
  */
-var destroy = function destroy(interaction) {
-    var $container = containerHelper.get(interaction);
+const destroy = function destroy(interaction) {
+    const $container = containerHelper.get(interaction);
 
-    var timeout = interaction.data('__instructionTimeout');
+    const timeout = interaction.data('__instructionTimeout');
 
     if (timeout) {
         clearTimeout(timeout);
@@ -394,9 +411,7 @@ var destroy = function destroy(interaction) {
 
     //remove event
     $container.off('.commonRenderer');
-    $(document)
-        .off('.commonRenderer')
-        .off('.choiceInteraction');
+    $(document).off('.commonRenderer').off('.choiceInteraction');
 
     //remove instructions
     instructionMgr.removeInstructions(interaction);
@@ -411,23 +426,21 @@ var destroy = function destroy(interaction) {
  * @param {Object} interaction - the interaction instance
  * @param {Object} state - the interaction state
  */
-var setState = function setState(interaction, state) {
-    var $container;
-
+const setState = function setState(interaction, state) {
     if (_.isObject(state)) {
         if (state.response) {
             interaction.resetResponse();
             interaction.setResponse(state.response);
         }
 
-        $container = containerHelper.get(interaction);
+        const $container = containerHelper.get(interaction);
 
         //restore order of previously shuffled choices
         if (_.isArray(state.order) && state.order.length === _.size(interaction.getChoices())) {
             $('.qti-simpleChoice', $container)
-                .sort(function(a, b) {
-                    var aIndex = _.indexOf(state.order, $(a).data('identifier'));
-                    var bIndex = _.indexOf(state.order, $(b).data('identifier'));
+                .sort(function (a, b) {
+                    const aIndex = _.indexOf(state.order, $(a).data('identifier'));
+                    const bIndex = _.indexOf(state.order, $(b).data('identifier'));
                     if (aIndex > bIndex) {
                         return 1;
                     }
@@ -442,7 +455,7 @@ var setState = function setState(interaction, state) {
 
         //restore eliminated choices
         if (isEliminable(interaction) && _.isArray(state.eliminated) && state.eliminated.length) {
-            _.forEach(state.eliminated, function(identifier) {
+            _.forEach(state.eliminated, function (identifier) {
                 $container.find('.qti-simpleChoice[data-identifier="' + identifier + '"]').addClass('eliminated');
             });
         }
@@ -455,10 +468,10 @@ var setState = function setState(interaction, state) {
  * @param {Object} interaction - the interaction instance
  * @returns {Object} the interaction current state
  */
-var getState = function getState(interaction) {
-    var $container = containerHelper.get(interaction);
-    var state = {};
-    var response = interaction.getResponse();
+const getState = function getState(interaction) {
+    const $container = containerHelper.get(interaction);
+    const state = {};
+    const response = interaction.getResponse();
 
     if (response) {
         state.response = response;
@@ -467,7 +480,7 @@ var getState = function getState(interaction) {
     //we store also the choice order if shuffled
     if (interaction.attr('shuffle') === true) {
         state.order = [];
-        $('.qti-simpleChoice', $container).each(function() {
+        $('.qti-simpleChoice', $container).each(function () {
             state.order.push($(this).data('identifier'));
         });
     }
@@ -475,7 +488,7 @@ var getState = function getState(interaction) {
     //store the eliminated choices
     if (isEliminable(interaction)) {
         state.eliminated = [];
-        $container.find('.qti-simpleChoice.eliminated').each(function() {
+        $container.find('.qti-simpleChoice.eliminated').each(function () {
             state.eliminated.push($(this).data('identifier'));
         });
     }
