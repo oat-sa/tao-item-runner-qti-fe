@@ -66,7 +66,7 @@ const render = function render(interaction) {
                 itemLocale = itemLang && itemLang.split('-')[0];
             }
             return itemLocale;
-        }
+        };
 
         const toolbarType = 'extendedText';
         const ckOptions = {
@@ -361,7 +361,6 @@ function inputLimiter(interaction) {
 
     if (expectedLength || expectedLines || patternMask) {
         enabled = true;
-
         $textarea = $('.text-container', $container);
         $charsCounter = $('.count-chars', $container);
         $wordsCounter = $('.count-words', $container);
@@ -433,12 +432,20 @@ function inputLimiter(interaction) {
                 2228237 // shift + enter in ckEditor
             ];
             let cke;
+            let isComposing = false;
+            let hasCompositionJustEnded = false;
 
             const invalidToolip = tooltip.error($container, __('This is not a valid answer'), {
                 position: 'bottom',
                 trigger: 'manual'
             });
             const patternHandler = function patternHandler(e) {
+                if (isComposing || hasCompositionJustEnded) {
+                    // IME composing fires keydown/keyup events
+                    hasCompositionJustEnded = false;
+                    return;
+                }
+
                 const isCke = _getFormat(interaction) === 'xhtml';
                 let newValue;
                 if (patternRegEx) {
@@ -474,7 +481,16 @@ function inputLimiter(interaction) {
              * @returns {boolean}
              */
             const keyLimitHandler = e => {
+                if (isComposing) {
+                    return;
+                }
+                // Safari on OS X may send a keydown of 229 after compositionend
+                if (e.which !== 229) {
+                    hasCompositionJustEnded = false;
+                }
+
                 const keyCode = e && e.data ? e.data.keyCode : e.which;
+                const isCke = _getFormat(interaction) === 'xhtml';
                 if (
                     !_.contains(ignoreKeyCodes, keyCode) &&
                     ((maxWords && this.getWordsCount() >= maxWords && _.contains(triggerKeyCodes, keyCode)) ||
@@ -486,6 +502,15 @@ function inputLimiter(interaction) {
                         e.preventDefault();
                         e.stopImmediatePropagation();
                     }
+
+                    if (this.getCharsCount() > maxLength && maxLength !== null) {
+                        if (!isCke) {
+                            const currentValue = $textarea[0].value;
+                            $textarea[0].value = currentValue.substring(0, maxLength);
+                            $textarea[0].focus();
+                        }
+                    }
+
                     return false;
                 }
                 _.defer(() => this.updateCounter());
@@ -549,15 +574,62 @@ function inputLimiter(interaction) {
                 _.defer(() => this.updateCounter());
             };
 
+            const handleCompositionStart = e => {
+                isComposing = true;
+                return e;
+            };
+
+            const handleCompositionEnd = e => {
+                isComposing = false;
+                hasCompositionJustEnded = true;
+                // if plain text - then limit input right after composition end event
+                if (_getFormat(interaction) !== 'xhtml' && maxLength !== null) {
+                    const currentValue = $textarea[0].value;
+                    $textarea[0].value = currentValue.substring(0, maxLength);
+                }
+                _.defer(() => this.updateCounter());
+                return e;
+            };
+
+            const handleBeforeInput = e => {
+                _.defer(() => this.updateCounter());
+                return e;
+            };
+
             if (_getFormat(interaction) === 'xhtml') {
                 cke = _getCKEditor(interaction);
+
+                if (maxLength) {
+                    let previousSnapshot = cke.getSnapshot();
+
+                    cke.on('key', function () {
+                        const range = this.createRange();
+                        if (limiter.getCharsCount() > limiter.maxLength) {
+                            const editable = this.editable();
+                            editable.setData(previousSnapshot, true);
+                            range.moveToElementEditablePosition(editable, true);
+                            cke.getSelection().selectRanges([range]);
+                            return;
+                        }
+                        previousSnapshot = cke.getSnapshot();
+                    });
+                }
                 cke.on('key', keyLimitHandler);
-                cke.on('change', patternHandler);
+                cke.on('change', evt => {
+                    patternHandler(evt);
+                    _.defer(() => this.updateCounter());
+                });
                 cke.on('paste', nonKeyLimitHandler);
                 // @todo: drop requires cke 4.5
                 // cke.on('drop', nonKeyLimitHandler);
             } else {
                 $textarea
+                    .on('beforeinput.commonRenderer', handleBeforeInput)
+                    .on('input.commonRenderer', () => {
+                        _.defer(() => this.updateCounter());
+                    })
+                    .on('compositionstart.commonRenderer', handleCompositionStart)
+                    .on('compositionend.commonRenderer', handleCompositionEnd)
                     .on('keyup.commonRenderer', patternHandler)
                     .on('keydown.commonRenderer', keyLimitHandler)
                     .on('paste.commonRenderer drop.commonRenderer', nonKeyLimitHandler);
@@ -593,7 +665,8 @@ function inputLimiter(interaction) {
         updateCounter: function udpateCounter() {
             $charsCounter.text(this.getCharsCount());
             $wordsCounter.text(this.getWordsCount());
-        }
+        },
+        maxLength
     };
 
     return limiter;
@@ -860,7 +933,7 @@ function getCustomData(interaction, data) {
     return _.merge(data || {}, {
         maxWords: !isNaN(maxWords) ? maxWords : 0,
         maxLength: !isNaN(maxLength) ? maxLength : 0,
-        attributes: !isNaN(expectedLength) ? { expectedLength: expectedLength * 72 } : undefined
+        attributes: !isNaN(expectedLength) ? { expectedLength: expectedLength * 72 } : void 0
     });
 }
 
