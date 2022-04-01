@@ -29,18 +29,10 @@
     {{/if}}
     <div class="text-counter">
         {{#if attributes.expectedLength}}
-            <span class="count-chars">0</span> {{__ "of"}} <span class="count-expected-length">{{attributes.expectedLength}}</span> {{__ "characters"}} {{__ "recommended"}}.
+            {{{dompurify constraintHints.expectedLength}}}
         {{else}}
-            {{#if maxLength}}
-                <span class="text-counter-chars"><span class="count-chars">0</span> {{__ "of"}} <span class="count-max-length">{{maxLength}}</span> {{__ "characters"}} {{__ "maximum"}}.</span>
-            {{else}}
-                <span class="text-counter-chars" style="display: none"><span class="count-chars">0</span> {{__ "of"}} <span class="count-max-length">{{maxLength}}</span> {{__ "characters"}} {{__ "maximum"}}.</span>
-            {{/if}}
-            {{#if maxWords}}
-                <span class="text-counter-words"><span class="count-words">0</span> {{__ "of"}} <span class="count-max-words">{{maxWords}}</span> {{__ "words"}} {{__ "maximum"}}.</span>
-            {{else}}
-                <span class="text-counter-words" style="display: none"><span class="count-words">0</span> {{__ "of"}} <span class="count-max-words">{{maxWords}}</span> {{__ "words"}} {{__ "maximum"}}.</span>
-            {{/if}}
+            <span class="text-counter-chars"{{#unless maxLength}} style="display: none"{{/unless}}>{{{dompurify constraintHints.maxLength}}}</span>
+            <span class="text-counter-words"{{#unless maxWords}} style="display: none"{{/unless}}>{{{dompurify constraintHints.maxWords}}}</span>
         {{/if}}
     </div>
 </div>

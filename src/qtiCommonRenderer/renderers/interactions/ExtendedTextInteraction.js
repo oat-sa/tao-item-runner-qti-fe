@@ -25,7 +25,8 @@ import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
 import strLimiter from 'util/strLimiter';
-import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/extendedTextInteraction';
+import template from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/extendedTextInteraction';
+import countTpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/constraints/count';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
 import ckEditor from 'ckeditor';
@@ -535,8 +536,8 @@ function inputLimiter(interaction) {
                     newValue = e.originalEvent.clipboardData
                         ? e.originalEvent.clipboardData.getData('text')
                         : e.originalEvent.dataTransfer.getData('text') ||
-                          e.originalEvent.dataTransfer.getData('text/plain') ||
-                          '';
+                        e.originalEvent.dataTransfer.getData('text/plain') ||
+                        '';
                 }
 
                 // prevent insertion of non-limited data
@@ -925,15 +926,39 @@ function getState(interaction) {
     return state;
 }
 
-function getCustomData(interaction, data) {
-    const pattern = interaction.attr('patternMask'),
-        maxWords = parseInt(patternMaskHelper.parsePattern(pattern, 'words')),
-        maxLength = parseInt(patternMaskHelper.parsePattern(pattern, 'chars')),
-        expectedLength = parseInt(interaction.attr('expectedLines'), 10);
+/**
+ * Hydrates the dataset for the interaction with respect to its attributes.
+ *
+ * @param {object} interaction - the interaction instance
+ * @param {object} data - the default data object
+ * @returns {object} the hydrated data set
+ */
+function getData(interaction, data) {
+    const pattern = interaction.attr('patternMask');
+    const maxWords = parseInt(patternMaskHelper.parsePattern(pattern, 'words'), 10);
+    const maxLength = parseInt(patternMaskHelper.parsePattern(pattern, 'chars'), 10);
+    const expectedLines = parseInt(interaction.attr('expectedLines'), 10);
+    const expectedLength = !isNaN(expectedLines) ? expectedLines * 72 : parseInt(interaction.attr('expectedLength'), 10);
+
+    // Build DOM placeholders, this is needed to properly assemble the constraint hints
+    // The interaction will later rely on this to bind the values
+    const countChars = countTpl({ name: 'count-chars', value: 0 });
+    const countWords = countTpl({ name: 'count-words', value: 0 });
+    const countExpectedLength = countTpl({ name: 'count-expected-length', value: expectedLength });
+    const countMaxLength = countTpl({ name: 'count-max-length', value: maxLength });
+    const countMaxWords = countTpl({ name: 'count-max-words', value: maxWords });
+
     return _.merge(data || {}, {
         maxWords: !isNaN(maxWords) ? maxWords : 0,
         maxLength: !isNaN(maxLength) ? maxLength : 0,
-        attributes: !isNaN(expectedLength) ? { expectedLength: expectedLength * 72 } : void 0
+        attributes: !isNaN(expectedLines) ? { expectedLength } : void 0,
+        // Build the constraint hints from translated text and DOM placeholders
+        // The template will render them as it, then the interaction will update the value from the binding
+        constraintHints: {
+            expectedLength: __('%s of %s characters recommended.', countChars, countExpectedLength),
+            maxLength: __('%s of %s characters maximum.', countChars, countMaxLength),
+            maxWords: __('%s of %s words maximum.', countWords, countMaxWords),
+        }
     });
 }
 
@@ -943,19 +968,19 @@ function getCustomData(interaction, data) {
  */
 export default {
     qtiClass: 'extendedTextInteraction',
-    template: tpl,
-    render: render,
     getContainer: containerHelper.get,
-    setResponse: setResponse,
-    getResponse: getResponse,
-    getData: getCustomData,
-    resetResponse: resetResponse,
-    destroy: destroy,
-    getState: getState,
-    setState: setState,
-    enable: enable,
-    disable: disable,
-    clearText: clearText,
-    setText: setText,
-    inputLimiter: inputLimiter
+    template,
+    render,
+    setResponse,
+    getResponse,
+    getData,
+    resetResponse,
+    destroy,
+    getState,
+    setState,
+    enable,
+    disable,
+    clearText,
+    setText,
+    inputLimiter
 };
