@@ -822,5 +822,21 @@ export default {
             max = 0;
         }
         return max;
+    },
+    pciInteraction: function pciInteraction(interaction) {
+        var responseDeclaration = interaction.getResponseDeclaration();
+        var template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
+        var max;
+        if (template === 'MATCH_CORRECT') {
+            if (
+                _.isArray(responseDeclaration.correctResponse) &&
+                (responseDeclaration.correctResponse.length)
+            ) {
+                max = 1;
+            } else {
+                max = 0;
+            }
+        }
+        return max;
     }
 };

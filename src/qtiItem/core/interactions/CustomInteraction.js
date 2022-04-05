@@ -3,6 +3,7 @@ import Interaction from 'taoQtiItem/qtiItem/core/interactions/Interaction';
 import CustomElement from 'taoQtiItem/qtiItem/mixin/CustomElement';
 import NamespacedElement from 'taoQtiItem/qtiItem/mixin/NamespacedElement';
 import rendererConfig from 'taoQtiItem/qtiItem/helper/rendererConfig';
+import maxScore from 'taoQtiItem/qtiItem/helper/maxScore';
 
 var CustomInteraction = Interaction.extend({
     qtiClass: 'customInteraction',
@@ -129,6 +130,9 @@ var CustomInteraction = Interaction.extend({
             }
         });
         return this;
+    },
+    getNormalMaximum: function getNormalMaximum() {
+        return maxScore.pciInteraction(this);
     }
 });
 
