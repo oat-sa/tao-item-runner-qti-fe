@@ -823,6 +823,12 @@ export default {
         }
         return max;
     },
+
+    /**
+     * Compute the maximum score of a "custom" typed interaction
+     * @param {Object} interaction - a standard interaction model object
+     * @returns {Number}
+     */
     customInteractionBased(interaction) {
         const responseDeclaration = interaction.getResponseDeclaration();
         const template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
