@@ -823,13 +823,13 @@ export default {
         }
         return max;
     },
-    pciInteraction: function pciInteraction(interaction) {
+    customInteractionBased(interaction) {
         var responseDeclaration = interaction.getResponseDeclaration();
         var template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
         var max;
         if (template === 'MATCH_CORRECT') {
             if (
-                _.isArray(responseDeclaration.correctResponse) &&
+                Array.isArray(responseDeclaration.correctResponse) &&
                 (responseDeclaration.correctResponse.length)
             ) {
                 max = 1;

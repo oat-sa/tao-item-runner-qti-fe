@@ -131,8 +131,8 @@ var CustomInteraction = Interaction.extend({
         });
         return this;
     },
-    getNormalMaximum: function getNormalMaximum() {
-        return maxScore.pciInteraction(this);
+    getNormalMaximum() {
+        return maxScore.customInteractionBased(this);
     }
 });
 
