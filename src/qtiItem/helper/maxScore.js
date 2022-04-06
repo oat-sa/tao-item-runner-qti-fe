@@ -824,9 +824,9 @@ export default {
         return max;
     },
     customInteractionBased(interaction) {
-        var responseDeclaration = interaction.getResponseDeclaration();
-        var template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
-        var max;
+        const responseDeclaration = interaction.getResponseDeclaration();
+        const template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
+        let max;
         if (template === 'MATCH_CORRECT') {
             if (
                 Array.isArray(responseDeclaration.correctResponse) &&
@@ -836,6 +836,8 @@ export default {
             } else {
                 max = 0;
             }
+        } else {
+            max = 0;
         }
         return max;
     }
