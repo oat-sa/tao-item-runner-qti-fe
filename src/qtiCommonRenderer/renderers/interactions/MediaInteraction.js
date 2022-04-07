@@ -135,6 +135,9 @@ function render(interaction) {
                             this.disable();
                         }
 
+                        // on slow network the resize runs before ready, so it should be called again
+                        resize();
+
                         // declare the item ready when player is ready to play.
                         resolve();
                     })
