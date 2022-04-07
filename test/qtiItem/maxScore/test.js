@@ -216,7 +216,7 @@ define([
             maxScore: 4
         },
         { title: 'upload', data: dataUpload, expectedMaximum: undefined, maxScore: undefined },
-        { title: 'custom interaction', data: dataPci, expectedMaximum: undefined, maxScore: undefined },
+        { title: 'custom interaction', data: dataPci, expectedMaximum: 0, maxScore: 0 },
         { title: 'custom response processing', data: dataCustomRp, expectedMaximum: undefined, maxScore: undefined },
         {
             title: 'upload and choice - correct',
