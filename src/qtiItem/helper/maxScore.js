@@ -822,5 +822,29 @@ export default {
             max = 0;
         }
         return max;
+    },
+
+    /**
+     * Compute the maximum score of a "custom" typed interaction
+     * @param {Object} interaction - a standard interaction model object
+     * @returns {Number}
+     */
+    customInteractionBased(interaction) {
+        const responseDeclaration = interaction.getResponseDeclaration();
+        const template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
+        let max;
+        if (template === 'MATCH_CORRECT') {
+            if (
+                Array.isArray(responseDeclaration.correctResponse) &&
+                (responseDeclaration.correctResponse.length)
+            ) {
+                max = 1;
+            } else {
+                max = 0;
+            }
+        } else {
+            max = 0;
+        }
+        return max;
     }
 };
