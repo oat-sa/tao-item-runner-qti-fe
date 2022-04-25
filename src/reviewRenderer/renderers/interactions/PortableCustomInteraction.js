@@ -26,7 +26,7 @@ import util from 'taoQtiItem/qtiItem/helper/util';
 import PortableElement from 'taoQtiItem/qtiCommonRenderer/helpers/PortableElement';
 import { isInteractionDisabledForPci } from 'taoQtiItem/reviewRenderer/helpers/pci';
 
-const getData = (customInteraction, data) => {
+const getData = function (customInteraction, data) {
     let markup = data.markup;
     const isInteractionDisabled = isInteractionDisabledForPci(data.typeIdentifier);
 
