@@ -7,7 +7,7 @@ function load(xinclude, baseUrl, callback) {
     const href = xinclude.attr('href');
     if (href && baseUrl) {
         const fileUrl = `text!${baseUrl}${href}`;
-        // reset the previous definition of the XML, to recive updated passage
+        // reset the previous definition of the XML, to receive updated passage
         require.undef(fileUrl);
         // require xml
         require([fileUrl], function (stimulusXml) {
