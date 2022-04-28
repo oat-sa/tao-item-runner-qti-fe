@@ -79,7 +79,9 @@ function render(interaction) {
          * @param {jQueryElement} $container   - container element to adapt
          */
         const resize = _.debounce(() => {
-            if (interaction.mediaElement) {
+            // only resize when width in px
+            // new version has width in %
+            if (interaction.mediaElement && media.attr('width') && !/%/.test(media.attr('width'))) {
                 const height = $container.find('.media-container').height();
                 const width = $container.find('.media-container').width();
 
@@ -110,16 +112,13 @@ function render(interaction) {
                     renderTo: $('.media-container', $container)
                 })
                     .on('render', () => {
-                        // to support old sizes in px
-                        if (media.attr('width') && !/%/.test(media.attr('width'))) {
-                            resize();
+                        resize();
 
-                            $(window)
-                                .off('resize.mediaInteraction')
-                                .on('resize.mediaInteraction', resize);
+                        $(window)
+                            .off('resize.mediaInteraction')
+                            .on('resize.mediaInteraction', resize);
 
-                            $item.off('resize.gridEdit').on('resize.gridEdit', resize);
-                        }
+                        $item.off('resize.gridEdit').on('resize.gridEdit', resize);
                         /**
                          * @event playerrendered
                          */
