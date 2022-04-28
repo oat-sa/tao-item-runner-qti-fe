@@ -10,13 +10,20 @@ define([
     var isHeadless = /(PhantomJS|HeadlessChrome)/.test(navigator.userAgent);
     var videoSampleUrl = '/test/samples/json/media/sample.mp4';
     var audioSampleUrl = '/test/samples/json/media/sample.mp3';
+    var runner;
 
-    QUnit.module('Media Interaction');
+    QUnit.module('Media Interaction', {
+        beforeEach: function() {
+            runner = null;
+        },
+        afterEach: function() {
+            runner.clear();
+        }
+    });
 
     QUnit.test('video renders correctly', function(assert) {
         var ready = assert.async();
         var $container;
-        var runner;
 
         assert.expect(13);
 
@@ -25,7 +32,7 @@ define([
         assert.equal($container.length, 1, 'the item container exists');
         assert.equal($container.children().length, 0, 'the container has no children');
 
-        $container.one('playerrendered', function() {
+        $container.on('playerrendered', function() {
             //Check DOM
             assert.equal($container.children().length, 1, 'the container exists');
             assert.equal(
@@ -80,9 +87,10 @@ define([
                 'i1429259831305858',
                 'the .qti-item node has the right identifier'
             );
-            runner.clear();
 
-            ready();
+            setTimeout(function() {
+                ready();
+            }, 250);
         });
         runner = qtiItemRunner('qti', videoItemData)
             .on('error', function(e) {
@@ -102,7 +110,6 @@ define([
     QUnit.test('audio renders correctly', function(assert) {
         var ready = assert.async();
         var $container;
-        var runner;
 
         assert.expect(15);
 
@@ -176,8 +183,10 @@ define([
                 'i1429259831305858',
                 'the .qti-item node has the right identifier'
             );
-            runner.clear();
-            ready();
+
+            setTimeout(function() {
+                ready();
+            }, 250);
         });
 
         runner = qtiItemRunner('qti', audioItemData)
@@ -198,7 +207,6 @@ define([
     QUnit.test('get state', function(assert) {
         var ready = assert.async();
         var $container;
-        var runner;
 
         assert.expect(5);
 
@@ -208,11 +216,10 @@ define([
 
         $container.one('playerrendered', function() {
             var $mediaInteraction = $container.find('.qti-mediaInteraction');
-            var $play = $('.control [data-control=play]', $mediaInteraction);
-            var toState = setTimeout(function() {
+            var $play = $('.control [data-control=play]');
+            var afterPlayHandler = setTimeout(function() {
                 var state = runner.getState();
-                assert.ok(state.RESPONSE.player.position > 0, 'The player position has changed');
-                runner.clear();
+                assert.ok(state.RESPONSE.player.position === 0, 'The player position loaded from config');
                 ready();
             }, 1000);
 
@@ -224,17 +231,12 @@ define([
                 //so we just skip the test :
                 if ($('.mediaplayer', $mediaInteraction).hasClass('error')) {
                     assert.ok(true, 'Skipping');
-                    clearTimeout(toState);
-
+                    clearTimeout(afterPlayHandler);
                     ready();
-                } else {
-                    $play.click();
                 }
             }, 250);
         });
-        if (runner) {
-            runner.clear();
-        }
+
         runner = qtiItemRunner('qti', audioItemData)
             .on('init', function() {
                 var state = this.getState();
@@ -244,9 +246,7 @@ define([
                     {
                         RESPONSE: {
                             response: {
-                                base: {
-                                    integer: 0
-                                }
+                                base: null
                             },
                             player: {
                                 position: 0,
@@ -278,7 +278,6 @@ define([
         QUnit.test('set state', function(assert) {
             var ready = assert.async();
             var $container;
-            var runner;
 
             assert.expect(3);
 
@@ -290,7 +289,7 @@ define([
                 'The media interaction is not yet rendered'
             );
 
-            $container.on('playerrendered', function() {
+            $container.one('playerrendered', function() {
                 var $mediaInteraction = $container.find('.qti-mediaInteraction');
                 assert.equal($mediaInteraction.length, 1, 'The mediaInteraction is rendered');
                 if ($('.mediaplayer', $mediaInteraction).hasClass('error') || isHeadless) {
@@ -307,7 +306,6 @@ define([
                             assert.ok(state.RESPONSE.player.position > 0, 'The player position has changed');
                         }
                         $container.off('playerrendered');
-                        runner.clear();
                         ready();
                     }, 250);
                 }
@@ -318,9 +316,7 @@ define([
                     this.setState({
                         RESPONSE: {
                             response: {
-                                base: {
-                                    integer: 0
-                                }
+                                base: null
                             },
                             player: {
                                 position: 1.1,
@@ -343,11 +339,18 @@ define([
                 .init()
                 .render($container);
         });
-        QUnit.module('Visual Test');
+
+        QUnit.module('Visual Test', {
+            beforeEach: function() {
+                runner = null;
+            },
+            afterEach: function() {
+                runner.clear();
+            }
+        });
         QUnit.test('Display and play', function(assert) {
             var ready = assert.async();
             var $container;
-            var runner;
 
             assert.expect(4);
 
