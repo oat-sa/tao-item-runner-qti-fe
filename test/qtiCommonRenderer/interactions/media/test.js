@@ -10,20 +10,12 @@ define([
     var isHeadless = /(PhantomJS|HeadlessChrome)/.test(navigator.userAgent);
     var videoSampleUrl = '/test/samples/json/media/sample.mp4';
     var audioSampleUrl = '/test/samples/json/media/sample.mp3';
-    var runner;
 
-    QUnit.module('Media Interaction', {
-        beforeEach: function() {
-            runner = null;
-        },
-        afterEach: function() {
-            runner.clear();
-        }
-    });
-
+    QUnit.module('Media Interaction');
     QUnit.test('video renders correctly', function(assert) {
         var ready = assert.async();
         var $container;
+        var runner;
 
         assert.expect(13);
 
@@ -89,12 +81,14 @@ define([
             );
 
             setTimeout(function() {
+                runner.clear();
                 ready();
             }, 250);
         });
         runner = qtiItemRunner('qti', videoItemData)
             .on('error', function(e) {
                 assert.ok(false, e);
+                runner.clear();
                 ready();
             })
             .assets(function(url) {
@@ -110,6 +104,7 @@ define([
     QUnit.test('audio renders correctly', function(assert) {
         var ready = assert.async();
         var $container;
+        var runner;
 
         assert.expect(15);
 
@@ -185,6 +180,7 @@ define([
             );
 
             setTimeout(function() {
+                runner.clear();
                 ready();
             }, 250);
         });
@@ -192,6 +188,7 @@ define([
         runner = qtiItemRunner('qti', audioItemData)
             .on('error', function(e) {
                 assert.ok(false, e);
+                runner.clear();
                 ready();
             })
             .assets(function(url) {
@@ -207,6 +204,7 @@ define([
     QUnit.test('get state', function(assert) {
         var ready = assert.async();
         var $container;
+        var runner;
 
         assert.expect(5);
 
@@ -220,6 +218,7 @@ define([
             var afterPlayHandler = setTimeout(function() {
                 var state = runner.getState();
                 assert.ok(state.RESPONSE.player.position === 0, 'The player position loaded from config');
+                runner.clear();
                 ready();
             }, 1000);
 
@@ -232,6 +231,7 @@ define([
                 if ($('.mediaplayer', $mediaInteraction).hasClass('error')) {
                     assert.ok(true, 'Skipping');
                     clearTimeout(afterPlayHandler);
+                    runner.clear();
                     ready();
                 }
             }, 250);
@@ -260,6 +260,7 @@ define([
             })
             .on('error', function(err) {
                 assert.ok(false, err);
+                runner.clear();
                 ready();
             })
             .assets(function(url) {
@@ -278,6 +279,7 @@ define([
         QUnit.test('set state', function(assert) {
             var ready = assert.async();
             var $container;
+            var runner;
 
             assert.expect(3);
 
@@ -306,6 +308,7 @@ define([
                             assert.ok(state.RESPONSE.player.position > 0, 'The player position has changed');
                         }
                         $container.off('playerrendered');
+                        runner.clear();
                         ready();
                     }, 250);
                 }
@@ -328,6 +331,7 @@ define([
                 })
                 .on('error', function(err) {
                     assert.ok(false, err);
+                    runner.clear();
                     ready();
                 })
                 .assets(function(url) {
@@ -340,17 +344,11 @@ define([
                 .render($container);
         });
 
-        QUnit.module('Visual Test', {
-            beforeEach: function() {
-                runner = null;
-            },
-            afterEach: function() {
-                runner.clear();
-            }
-        });
+        QUnit.module('Visual Test');
         QUnit.test('Display and play', function(assert) {
             var ready = assert.async();
             var $container;
+            var runner;
 
             assert.expect(4);
 
@@ -368,6 +366,7 @@ define([
                 );
                 assert.equal($container.find('.qti-mediaInteraction video').length, 1, 'the interaction has element');
 
+                runner.clear();
                 ready();
             });
             runner = qtiItemRunner('qti', videoItemData)
