@@ -6,8 +6,11 @@ import Loader from 'taoQtiItem/qtiItem/core/Loader';
 function load(xinclude, baseUrl, callback) {
     const href = xinclude.attr('href');
     if (href && baseUrl) {
-        //require xml :
-        require([`text!${baseUrl}${href}`], function (stimulusXml) {
+        const fileUrl = `text!${baseUrl}${href}`;
+        // reset the previous definition of the XML, to receive updated passage
+        require.undef(fileUrl);
+        // require xml
+        require([fileUrl], function (stimulusXml) {
             const $wrapper = $.parseXML(stimulusXml);
             const $sampleXMLrootNode = $wrapper.children;
             const $stimulus = $('<include>').append($sampleXMLrootNode);
