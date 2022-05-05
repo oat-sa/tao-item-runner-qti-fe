@@ -219,7 +219,7 @@ function setResponse(interaction, response) {
         try {
             const maxPlays = parseInt(interaction.attr('maxPlays'), 10) || 0;
             const responseValues = pciResponse.unserialize(response, interaction);
-            const timesPlayed = parseInt(responseValues[0], 10);
+            const timesPlayed = parseInt(responseValues[0], 10) || 0;
             getContainer(interaction).data('timesPlayed', timesPlayed);
 
             if (interaction.mediaElement) {
@@ -265,6 +265,10 @@ function resetResponse(interaction) {
  * @returns {Object}
  */
 function getResponse(interaction) {
+    if (!getContainer(interaction).data('timesPlayed')) {
+        return { base: null };
+    }
+
     return pciResponse.serialize(_getRawResponse(interaction), interaction);
 }
 
