@@ -71,6 +71,6 @@ export default {
      * @param {jQueryElement|widget} target
      */
     resetSize(target) {
-        target.$container.find(itemSelector).height('auto');
+        adaptSize.resetHeight(target.$container.find(itemSelector));
     }
 };
