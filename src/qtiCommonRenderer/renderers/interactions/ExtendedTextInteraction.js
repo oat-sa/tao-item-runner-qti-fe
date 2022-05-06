@@ -553,9 +553,9 @@ function inputLimiter(interaction) {
                 }
 
                 // limit by word or character count if required
-                if (!_.isNull(maxWords)) {
+                if (maxWords) {
                     newValue = strLimiter.limitByWordCount(newValue, maxWords - this.getWordsCount());
-                } else if (!_.isNull(maxLength)) {
+                } else if (maxLength) {
                     newValue = strLimiter.limitByCharCount(newValue, maxLength - this.getCharsCount());
                 }
 
