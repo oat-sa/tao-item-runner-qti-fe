@@ -369,8 +369,8 @@ function inputLimiter(interaction) {
         $maxWordsCounter = $('.count-max-words', $container);
 
         if (patternMask !== '') {
-            maxWords = patternMaskHelper.parsePattern(patternMask, 'words');
-            maxLength = patternMaskHelper.parsePattern(patternMask, 'chars');
+            maxWords = parseInt(patternMaskHelper.parsePattern(patternMask, 'words'), 10);
+            maxLength = parseInt(patternMaskHelper.parsePattern(patternMask, 'chars'), 10);
             maxWords = _.isNaN(maxWords) ? 0 : maxWords;
             maxLength = _.isNaN(maxLength) ? 0 : maxLength;
             if (!maxLength && !maxWords) {
@@ -494,7 +494,7 @@ function inputLimiter(interaction) {
                 const isCke = _getFormat(interaction) === 'xhtml';
                 if (
                     !_.contains(ignoreKeyCodes, keyCode) &&
-                    ((maxWords && this.getWordsCount() >= maxWords && _.contains(triggerKeyCodes, keyCode)) ||
+                    ((maxWords && this.getWordsCount() >= maxWords && !_.contains(triggerKeyCodes, keyCode)) ||
                         (maxLength && this.getCharsCount() >= maxLength))
                 ) {
                     if (e.cancel) {
@@ -504,7 +504,7 @@ function inputLimiter(interaction) {
                         e.stopImmediatePropagation();
                     }
 
-                    if (this.getCharsCount() > maxLength && maxLength !== null) {
+                    if (maxLength && this.getCharsCount() > maxLength) {
                         if (!isCke) {
                             const currentValue = $textarea[0].value;
                             $textarea[0].value = currentValue.substring(0, maxLength);
@@ -536,8 +536,8 @@ function inputLimiter(interaction) {
                     newValue = e.originalEvent.clipboardData
                         ? e.originalEvent.clipboardData.getData('text')
                         : e.originalEvent.dataTransfer.getData('text') ||
-                        e.originalEvent.dataTransfer.getData('text/plain') ||
-                        '';
+                          e.originalEvent.dataTransfer.getData('text/plain') ||
+                          '';
                 }
 
                 // prevent insertion of non-limited data
@@ -938,7 +938,9 @@ function getData(interaction, data) {
     const maxWords = parseInt(patternMaskHelper.parsePattern(pattern, 'words'), 10);
     const maxLength = parseInt(patternMaskHelper.parsePattern(pattern, 'chars'), 10);
     const expectedLines = parseInt(interaction.attr('expectedLines'), 10);
-    const expectedLength = !isNaN(expectedLines) ? expectedLines * 72 : parseInt(interaction.attr('expectedLength'), 10);
+    const expectedLength = !isNaN(expectedLines)
+        ? expectedLines * 72
+        : parseInt(interaction.attr('expectedLength'), 10);
 
     // Build DOM placeholders, this is needed to properly assemble the constraint hints
     // The interaction will later rely on this to bind the values
@@ -957,7 +959,7 @@ function getData(interaction, data) {
         constraintHints: {
             expectedLength: __('%s of %s characters recommended.', countChars, countExpectedLength),
             maxLength: __('%s of %s characters maximum.', countChars, countMaxLength),
-            maxWords: __('%s of %s words maximum.', countWords, countMaxWords),
+            maxWords: __('%s of %s words maximum.', countWords, countMaxWords)
         }
     });
 }
