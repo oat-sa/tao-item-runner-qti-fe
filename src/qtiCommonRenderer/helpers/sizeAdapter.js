@@ -20,6 +20,8 @@ import $ from 'jquery';
 import adaptSize from 'util/adaptSize';
 import 'ui/waitForMedia';
 
+const itemSelector = '.add-option, .result-area .target, .choice-area .qti-choice';
+
 export default {
     /**
      * Resize jQueryElement that have changed their dimensions due to a change of the content
@@ -33,7 +35,7 @@ export default {
         switch (true) {
             // widget
             case typeof target.$container !== 'undefined':
-                $elements = target.$container.find('.add-option, .result-area .target, .choice-area .qti-choice');
+                $elements = target.$container.find(itemSelector);
                 $container = target.$container;
                 break;
 
@@ -61,5 +63,14 @@ export default {
                 );
             }, 1);
         });
+    },
+
+    /**
+     * Reset height to jQueryElement(s) to auto
+     *
+     * @param {jQueryElement|widget} target
+     */
+    resetSize(target) {
+        adaptSize.resetHeight(target.$container.find(itemSelector));
     }
 };
