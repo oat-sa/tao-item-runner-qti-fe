@@ -24,6 +24,7 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
+import features from 'services/features';
 import strLimiter from 'util/strLimiter';
 import template from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/extendedTextInteraction';
 import countTpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/constraints/count';
@@ -83,6 +84,11 @@ const render = function render(interaction) {
                 $el.attr('placeholder', placeholderText);
             }
             if (_getFormat(interaction) === 'xhtml') {
+                
+                if(!features.isVisible('taoQtiItem/creator/interaction/extendedText/property/xhtmlConstraints') && !features.isVisible('taoQtiItem/creator/interaction/extendedText/property/xhtmlRecommendations')) {
+                    $container.find('.text-counter').hide();
+                }
+
                 _styleUpdater = function () {
                     let qtiItemStyle, $editorBody, qtiItem;
 
