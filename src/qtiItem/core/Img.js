@@ -10,7 +10,8 @@ var Img = Element.extend({
             defaultData = {};
 
         defaultData.attributes = {
-            src: renderer.resolveUrl(this.attr('src'))
+            src: renderer.resolveUrl(this.attr('src')),
+            figcaption: this.attr('figcaption')
         };
 
         return this._super(_.merge(defaultData, args.data), args.placeholder, args.subclass, renderer);
