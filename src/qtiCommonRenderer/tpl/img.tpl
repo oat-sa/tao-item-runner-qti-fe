@@ -1,6 +1,9 @@
-<img
+<qh5:figure
+    id="figureImg"
     data-serial="{{serial}}"
     data-qti-class="img"
+>
+<img
     src="{{attributes.src}}"
     alt="{{attributes.alt}}"
     {{#if attributes.id}}id="{{attributes.id}}"{{/if}}
@@ -15,3 +18,6 @@
     {{#if attributes.[aria-live]}} aria-live="{{attributes.[aria-live]}}"{{/if}}
     {{#if attributes.role}} role="{{attributes.role}}"{{/if}}
     />
+{{#if attributes.figcaption}}
+<qh5:figcaption>{{attributes.figcaption}}</qh5:figcaption>
+</qh5:figure>{{/if}}
