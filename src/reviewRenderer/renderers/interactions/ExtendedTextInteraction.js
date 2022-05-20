@@ -183,9 +183,15 @@ const inputLimiter = interaction => {
          * @return {Number} number of words
          */
         getWordsCount: () => {
-            const value = _getTextContainerValue(interaction) || '';
+            let value = _getTextContainerValue(interaction) || '';
             if (_.isEmpty(value)) {
                 return 0;
+            }
+            // convert it to text
+            if (_getFormat(interaction) === 'xhtml') {
+                const div = document.createElement('div');
+                div.innerHTML = value;
+                value = div.textContent || div.innerText || '';
             }
             // leading and trailing white space don't qualify as words
             return value.trim().replace(/\s+/gi, ' ').split(' ').length;
