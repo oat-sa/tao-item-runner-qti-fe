@@ -5,6 +5,7 @@ export default {
     _simpleFeedbackRule: 'taoQtiItem/qtiItem/core/response/SimpleFeedbackRule',
     stylesheet: 'taoQtiItem/qtiItem/core/Stylesheet',
     math: 'taoQtiItem/qtiItem/core/Math',
+    figure: 'taoQtiItem/qtiItem/core/Figure',
     img: 'taoQtiItem/qtiItem/core/Img',
     object: 'taoQtiItem/qtiItem/core/Object',
     outcomeDeclaration: 'taoQtiItem/qtiItem/core/variables/OutcomeDeclaration',

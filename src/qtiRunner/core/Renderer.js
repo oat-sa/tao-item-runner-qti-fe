@@ -84,6 +84,7 @@ var _renderableClasses = [
     'responseProcessing',
     '_simpleFeedbackRule',
     '_tooltip',
+    'figure',
     'img',
     'math',
     'object',

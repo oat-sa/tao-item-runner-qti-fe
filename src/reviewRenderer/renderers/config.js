@@ -63,6 +63,7 @@ const locations = {
     outcomeDeclaration: false,
     responseDeclaration: false,
     responseProcessing: false,
+    figure: 'taoQtiItem/qtiCommonRenderer/renderers/Figure',
     img: 'taoQtiItem/qtiCommonRenderer/renderers/Img',
     math: 'taoQtiItem/qtiCommonRenderer/renderers/Math',
     object: 'taoQtiItem/qtiCommonRenderer/renderers/Object',
