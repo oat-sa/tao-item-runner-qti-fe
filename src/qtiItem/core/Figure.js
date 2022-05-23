@@ -18,6 +18,7 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import Element from 'taoQtiItem/qtiItem/core/Element';
+import Container from 'taoQtiItem/qtiItem/mixin/Container';
 import rendererConfig from 'taoQtiItem/qtiItem/helper/rendererConfig';
 
 var Figure = Element.extend({
@@ -196,5 +197,7 @@ var Figure = Element.extend({
         return !this.bdy;
     }
 });
+
+Container.augment(Figure);
 
 export default Figure;
