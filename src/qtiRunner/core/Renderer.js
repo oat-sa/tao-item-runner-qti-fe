@@ -86,6 +86,7 @@ var _renderableClasses = [
     '_tooltip',
     'figure',
     'img',
+    'figcaption',
     'math',
     'object',
     'table',

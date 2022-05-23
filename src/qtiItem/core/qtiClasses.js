@@ -7,6 +7,7 @@ export default {
     math: 'taoQtiItem/qtiItem/core/Math',
     figure: 'taoQtiItem/qtiItem/core/Figure',
     img: 'taoQtiItem/qtiItem/core/Img',
+    figcaption: 'taoQtiItem/qtiItem/core/Figcaption',
     object: 'taoQtiItem/qtiItem/core/Object',
     outcomeDeclaration: 'taoQtiItem/qtiItem/core/variables/OutcomeDeclaration',
     responseDeclaration: 'taoQtiItem/qtiItem/core/variables/ResponseDeclaration',
