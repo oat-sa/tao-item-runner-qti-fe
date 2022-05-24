@@ -23,13 +23,8 @@ import rendererConfig from 'taoQtiItem/qtiItem/helper/rendererConfig';
 
 var Figure = Element.extend({
     qtiClass: 'figure',
-    init: function(body) {
-        this._super(); //generate serial, attributes array always empty
-        if (body && typeof body !== 'string') {
-            throw 'the body of a container must be a string';
-        }
-        this.bdy = body || '';
-        this.elements = {};
+    init: function(serial, attributes) {
+        this._super(serial, attributes);
     },
     body: function(body) {
         if (typeof body === 'undefined') {
@@ -197,7 +192,6 @@ var Figure = Element.extend({
         return !this.bdy;
     }
 });
-
 Container.augment(Figure);
 
 export default Figure;
