@@ -16,44 +16,20 @@
  * Copyright (c) 2022 (original work) Open Assessment Technologies SA
  *
  */
-import $ from 'jquery';
-import _ from 'lodash';
 import IdentifiedElement from 'taoQtiItem/qtiItem/core/IdentifiedElement';
-import rendererConfig from 'taoQtiItem/qtiItem/helper/rendererConfig';
+
+import Container from 'taoQtiItem/qtiItem/mixin/Container';
 
 var Figcaption = IdentifiedElement.extend({
-    init: function(serial, attributes, text) {
+    qtiClass: 'figcaption',
+    init: function(serial, attributes) {
         this._super(serial, attributes);
-        this.val(text || '');
     },
     is: function(qtiClass) {
         return qtiClass === 'figcaption' || this._super(qtiClass);
-    },
-    val: function(text) {
-        if (typeof text === 'undefined') {
-            return this.text;
-        } else {
-            if (typeof text === 'string') {
-                this.text = text;
-                $(document).trigger('figcaptionTextChange', {
-                    figcaption: this,
-                    text: text
-                });
-            } else {
-                throw 'text must be a string';
-            }
-        }
-        return this;
-    },
-    render: function() {
-        var args = rendererConfig.getOptionsFromArguments(arguments),
-            renderer = args.renderer || this.getRenderer(),
-            defaultData = {
-                body: this.text
-            };
-
-        return this._super(_.merge(defaultData, args.data), args.placeholder, args.subclass, renderer);
     }
 });
+
+Container.augment(Figcaption);
 
 export default Figcaption;
