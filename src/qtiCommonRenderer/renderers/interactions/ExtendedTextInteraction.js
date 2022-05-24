@@ -41,6 +41,9 @@ import loggerFactory from 'core/logger';
  */
 const logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/ExtendedTextInteraction.js');
 
+const hideXhtmlConstraints = !features.isVisible('taoQtiItem/creator/interaction/extendedText/property/xhtmlConstraints');
+const hideXhtmlRecommendations = !features.isVisible('taoQtiItem/creator/interaction/extendedText/property/xhtmlRecommendations');
+
 /**
  * Init rendering, called after template injected into the DOM
  * All options are listed in the QTI v2.1 information model:
@@ -84,9 +87,13 @@ const render = function render(interaction) {
                 $el.attr('placeholder', placeholderText);
             }
             if (_getFormat(interaction) === 'xhtml') {
-                
-                if(!features.isVisible('taoQtiItem/creator/interaction/extendedText/property/xhtmlConstraints') && !features.isVisible('taoQtiItem/creator/interaction/extendedText/property/xhtmlRecommendations')) {
+
+                if(hideXhtmlConstraints && hideXhtmlRecommendations) {
                     $container.find('.text-counter').hide();
+                }
+
+                if(hideXhtmlConstraints) {
+                    limiter.enabled = false;
                 }
 
                 _styleUpdater = function () {
