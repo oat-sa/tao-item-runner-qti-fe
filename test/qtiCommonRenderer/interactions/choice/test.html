@@ -7,6 +7,13 @@
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
+                    define('services/features', function() {
+                        return {
+                            isVisible: function() {
+                                return true;
+                            }
+                        }
+                    });
                     require(['taoQtiItem/test/qtiCommonRenderer/interactions/choice/test'], function() {
                         QUnit.config.reorder = false;
                         QUnit.start();
