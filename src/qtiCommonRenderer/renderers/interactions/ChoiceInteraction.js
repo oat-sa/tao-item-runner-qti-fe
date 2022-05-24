@@ -30,6 +30,7 @@ import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/in
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import sizeAdapter from 'taoQtiItem/qtiCommonRenderer/helpers/sizeAdapter';
 import adaptSize from 'util/adaptSize';
+import features from 'services/features';
 
 const KEY_CODE_SPACE = 32;
 const KEY_CODE_ENTER = 13;
@@ -392,7 +393,8 @@ const getCustomData = function getCustomData(interaction, data) {
     return _.merge(data || {}, {
         horizontal: interaction.attr('orientation') === 'horizontal',
         listStyle: listStyles.pop(),
-        eliminable: isEliminable(interaction)
+        eliminable: isEliminable(interaction),
+        allowEliminationVisible: features.isVisible('taoQtiItem/creator/interaction/choice/property/allowElimination')
     });
 };
 
