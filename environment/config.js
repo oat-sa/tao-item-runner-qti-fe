@@ -97,4 +97,11 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
     }));
     define('taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory', [], () => {});
     define('taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy', [], () => {});
+    define('services/features', function() {
+        return {
+            isVisible: function() {
+                return true;
+            }
+        }
+    });
 });
