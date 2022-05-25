@@ -17,19 +17,23 @@
  *
  */
 import IdentifiedElement from 'taoQtiItem/qtiItem/core/IdentifiedElement';
-
 import Container from 'taoQtiItem/qtiItem/mixin/ContainerFigcapture';
+import NamespacedElement from 'taoQtiItem/qtiItem/mixin/NamespacedElement';
 
 var Figcaption = IdentifiedElement.extend({
     qtiClass: 'figcaption',
-    init: function(serial, attributes) {
+    defaultNsName: 'qh5',
+    defaultNsUri: 'http://www.imsglobal.org/xsd/imsqtiv2p2_html5_v1p0',
+    nsUriFragment: 'Figcaption',
+    init: function (serial, attributes) {
         this._super(serial, attributes);
     },
-    is: function(qtiClass) {
+    is: function (qtiClass) {
         return qtiClass === 'figcaption' || this._super(qtiClass);
     }
 });
 
 Container.augment(Figcaption);
+NamespacedElement.augment(Figcaption);
 
 export default Figcaption;
