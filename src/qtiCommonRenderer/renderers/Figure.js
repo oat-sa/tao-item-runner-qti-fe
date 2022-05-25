@@ -17,8 +17,10 @@
  */
 
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure';
+import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 
 export default {
     qtiClass: 'figure',
+    getContainer: containerHelper.get,
     template: tpl
 };
