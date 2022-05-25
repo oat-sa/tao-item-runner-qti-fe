@@ -22,12 +22,14 @@
  */
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/choices/simpleChoice.choiceInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
+import features from 'services/features';
 
 export default {
     qtiClass: 'simpleChoice.choiceInteraction',
     getContainer: containerHelper.get,
     getData: function(choice, data) {
         data.unique = parseInt(data.interaction.attributes.maxChoices) === 1;
+        data.allowElimination = features.isVisible('taoQtiItem/creator/interaction/choice/property/allowElimination');
         return data;
     },
     template: tpl
