@@ -18,7 +18,7 @@
  */
 import IdentifiedElement from 'taoQtiItem/qtiItem/core/IdentifiedElement';
 
-import Container from 'taoQtiItem/qtiItem/mixin/Container';
+import Container from 'taoQtiItem/qtiItem/mixin/ContainerFigcapture';
 
 var Figcaption = IdentifiedElement.extend({
     qtiClass: 'figcaption',
