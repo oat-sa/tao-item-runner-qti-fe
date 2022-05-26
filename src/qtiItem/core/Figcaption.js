@@ -16,11 +16,11 @@
  * Copyright (c) 2022 (original work) Open Assessment Technologies SA
  *
  */
-import IdentifiedElement from 'taoQtiItem/qtiItem/core/IdentifiedElement';
+import Element from 'taoQtiItem/qtiItem/core/Element';
 import Container from 'taoQtiItem/qtiItem/mixin/ContainerFigcapture';
 import NamespacedElement from 'taoQtiItem/qtiItem/mixin/NamespacedElement';
 
-var Figcaption = IdentifiedElement.extend({
+var Figcaption = Element.extend({
     qtiClass: 'figcaption',
     defaultNsName: 'qh5',
     defaultNsUri: 'http://www.imsglobal.org/xsd/imsqtiv2p2_html5_v1p0',
