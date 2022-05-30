@@ -24,7 +24,7 @@ var Figcaption = Element.extend({
     qtiClass: 'figcaption',
     defaultNsName: 'qh5',
     defaultNsUri: 'http://www.imsglobal.org/xsd/imsqtiv2p2_html5_v1p0',
-    nsUriFragment: 'Figcaption',
+    nsUriFragment: 'imsqtiv2p2_html5_v1p0',
     init: function (serial, attributes) {
         this._super(serial, attributes);
     },
