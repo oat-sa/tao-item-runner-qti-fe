@@ -1,1 +1,1 @@
-<figure data-identifier="{{attributes.identifier}}" data-serial="{{serial}}"{{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}>{{{body}}}</figure>
+<figure data-serial="{{serial}}"{{#if attributes.class}} class="{{attributes.class}}"{{/if}}{{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}>{{{body}}}</figure>
