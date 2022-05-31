@@ -32,7 +32,8 @@ var Figure = Element.extend({
         return qtiClass === 'figure' || this._super(qtiClass);
     },
     isEmpty: function () {
-        return !this.bdy;
+        const imgElements = this.getElements('img');
+        return imgElements && Object.values(imgElements).length && Object.values(imgElements)[0].isEmpty();
     }
 });
 Container.augment(Figure);
