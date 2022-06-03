@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2020 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2022 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -436,6 +436,18 @@ function inputLimiter(interaction) {
             let isComposing = false;
             let hasCompositionJustEnded = false;
 
+            const acceptKeyCode = keyCode => _.contains(ignoreKeyCodes, keyCode);
+            const emptyText = txt => txt && txt.trim() === '' || /\^s*$/.test(txt);
+            const hasSpace = txt => /\s+/.test(txt);
+            const cancelEvent = e => {
+                if (e.cancel) {
+                    e.cancel();
+                } else {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                }
+                return false;
+            };
             const invalidToolip = tooltip.error($container, __('This is not a valid answer'), {
                 position: 'bottom',
                 trigger: 'manual'
@@ -490,30 +502,38 @@ function inputLimiter(interaction) {
                     hasCompositionJustEnded = false;
                 }
 
-                const keyCode = e && e.data ? e.data.keyCode : e.which;
+                const keyCode = e.data ? e.data.keyCode : e.which;
                 const isCke = _getFormat(interaction) === 'xhtml';
-                if (
-                    !_.contains(ignoreKeyCodes, keyCode) &&
-                    ((maxWords && this.getWordsCount() >= maxWords && !_.contains(triggerKeyCodes, keyCode)) ||
-                        (maxLength && this.getCharsCount() >= maxLength))
-                ) {
-                    if (e.cancel) {
-                        e.cancel();
+                const wordsCount = maxWords && this.getWordsCount();
+                const charsCount = maxLength && this.getCharsCount();
+
+                if (maxWords && wordsCount >= maxWords) {
+                    let left, right, middle;
+
+                    if (isCke) {
+                        // TODO
                     } else {
-                        e.preventDefault();
-                        e.stopImmediatePropagation();
+                        const { selectionStart, selectionEnd, value } = $textarea[0];
+                        left = value.substring(Math.max(0, selectionStart - 1), selectionStart);
+                        right = value.substring(selectionEnd, selectionEnd + 1);
+                        middle = value.substring(selectionStart, selectionEnd);
                     }
 
-                    if (maxLength && this.getCharsCount() > maxLength) {
-                        if (!isCke) {
-                            const currentValue = $textarea[0].value;
-                            $textarea[0].value = currentValue.substring(0, maxLength);
-                            $textarea[0].focus();
-                        }
+                    if ((!emptyText(left) && !emptyText(right) && !hasSpace(middle) && (keyCode === 13 || keyCode === 32)) ||
+                        (emptyText(left) && emptyText(right) && !middle && !acceptKeyCode(keyCode) && keyCode !== 32)) {
+                        return cancelEvent(e);
                     }
-
-                    return false;
                 }
+
+                if (maxLength && charsCount >= maxLength && !acceptKeyCode(keyCode)) {
+                    if (!isCke && charsCount > maxLength) {
+                        const textarea = $textarea[0];
+                        textarea.value = textarea.value.substring(0, maxLength);
+                        textarea.focus();
+                    }
+                    return cancelEvent(e);
+                }
+
                 _.defer(() => this.updateCounter());
             };
 
@@ -541,12 +561,7 @@ function inputLimiter(interaction) {
                 }
 
                 // prevent insertion of non-limited data
-                if (e.cancel) {
-                    e.cancel();
-                } else {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                }
+                cancelEvent(e);
 
                 if (!newValue) {
                     return false;
