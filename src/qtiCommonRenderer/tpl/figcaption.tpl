@@ -1,1 +1,1 @@
-<figcaption{{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}>{{body}}</figcaption>
+<figcaption{{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}>{{{body}}}</figcaption>
