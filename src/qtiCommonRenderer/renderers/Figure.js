@@ -22,5 +22,24 @@ import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 export default {
     qtiClass: 'figure',
     getContainer: containerHelper.get,
-    template: tpl
+    template: tpl,
+    render: function(figure) {
+        const $figure = containerHelper.get(figure);
+        const $img = $figure.find('img');
+        if ($img.attr('width') && !/[0-9]+%/.test($img.attr('width'))) {
+            // absolute size
+            $figure.css({
+                width: $img.attr('width')
+            });
+        } else {
+            // responsive
+            $figure.css({
+                width: $img.attr('width'),
+                height: $img.attr('height')
+            });
+        }
+        if ($img[0]) {
+            $img[0].setAttribute('width', '100%');
+        }
+    }
 };
