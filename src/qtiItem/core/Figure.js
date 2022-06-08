@@ -20,7 +20,7 @@ import Element from 'taoQtiItem/qtiItem/core/Element';
 import Container from 'taoQtiItem/qtiItem/mixin/ContainerFigure';
 import NamespacedElement from 'taoQtiItem/qtiItem/mixin/NamespacedElement';
 
-var Figure = Element.extend({
+const Figure = Element.extend({
     qtiClass: 'figure',
     defaultNsName: 'qh5',
     defaultNsUri: 'http://www.imsglobal.org/xsd/imsqtiv2p2_html5_v1p0',

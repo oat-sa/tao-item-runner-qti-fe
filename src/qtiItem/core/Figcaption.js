@@ -17,10 +17,10 @@
  *
  */
 import Element from 'taoQtiItem/qtiItem/core/Element';
-import Container from 'taoQtiItem/qtiItem/mixin/ContainerFigcapture';
+import Container from 'taoQtiItem/qtiItem/mixin/ContainerFigcaption';
 import NamespacedElement from 'taoQtiItem/qtiItem/mixin/NamespacedElement';
 
-var Figcaption = Element.extend({
+const Figcaption = Element.extend({
     qtiClass: 'figcaption',
     defaultNsName: 'qh5',
     defaultNsUri: 'http://www.imsglobal.org/xsd/imsqtiv2p2_html5_v1p0',

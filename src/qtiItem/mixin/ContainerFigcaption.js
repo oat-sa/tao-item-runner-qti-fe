@@ -20,12 +20,12 @@ import Mixin from 'taoQtiItem/qtiItem/mixin/Mixin';
 import Container from 'taoQtiItem/qtiItem/mixin/Container';
 import _ from 'lodash';
 
-var methods = {};
+const methods = {};
 _.extend(methods, Container.methods);
 _.extend(methods, {
     initContainer: function (body) {
         Container.methods.initContainer.call(this, body);
-        this.bdy.contentModel = 'figcapture';
+        this.bdy.contentModel = 'figcaption';
     }
 });
 

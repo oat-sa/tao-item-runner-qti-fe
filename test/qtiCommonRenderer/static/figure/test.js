@@ -13,10 +13,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2022 (original work) Open Assessment Technologies SA;
  */
 /**
- * @author Christophe Noël <christophe@taotesting.com>
+ * @author Hanna Dzmitryieva <hanna@taotesting.com>
  */
 define([
     'jquery',
@@ -27,13 +27,13 @@ define([
 ], function($, _, qtiItemRunner, Figure, itemData) {
     'use strict';
 
-    var runner;
-    var fixtureContainerId = '#item-container';
-    var outsideContainerId = '#outside-container';
-    var imageSampleUrl = '/test/samples/json/static/tao-logo.png';
+    let runner;
+    const fixtureContainerId = '#item-container';
+    const outsideContainerId = '#outside-container';
+    const imageSampleUrl = '/test/samples/json/static/tao-logo.png';
 
     QUnit.module('Order Interaction', {
-        afterEach: function(assert) {
+        afterEach: function() {
             if (runner) {
                 runner.clear();
             }
@@ -43,8 +43,8 @@ define([
     QUnit.module('Figure renderer');
 
     QUnit.test('renders correctly', function(assert) {
-        var ready = assert.async();
-        var $container = $(fixtureContainerId);
+        const ready = assert.async();
+        const $container = $(fixtureContainerId);
 
         assert.expect(7);
 
@@ -77,8 +77,8 @@ define([
     QUnit.module('Visual test');
 
     QUnit.test('display and play', function(assert) {
-        var ready = assert.async();
-        var $container = $(outsideContainerId);
+        const ready = assert.async();
+        const $container = $(outsideContainerId);
 
         assert.expect(3);
 
