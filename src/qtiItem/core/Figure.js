@@ -33,7 +33,11 @@ const Figure = Element.extend({
     },
     isEmpty: function () {
         const imgElements = this.getElements('img');
-        return imgElements && Object.values(imgElements).length && Object.values(imgElements)[0].isEmpty();
+        if (imgElements && Object.values(imgElements).length) {
+            return Object.values(imgElements)[0].isEmpty();
+        } else {
+            return true;
+        }
     }
 });
 Container.augment(Figure);
