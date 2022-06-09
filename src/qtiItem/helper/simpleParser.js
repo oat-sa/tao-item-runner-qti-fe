@@ -145,12 +145,17 @@ function parseFigure($elt, elt, options) {
     const $parsedFigure= parseContainer($elt, options);
     elt.body.body = $parsedFigure.body;
     elt.body.elements = $parsedFigure.elements;
-    const $qtiElement = $elt.find(_getElementSelector('figcaption', options.ns.figcaption));
-    if ($qtiElement.length) {
-        const element = buildElement($qtiElement);
+    const $figcaption = $elt.find(_getElementSelector('figcaption', options.ns.figcaption));
+    if ($figcaption.length) {
+        const element = buildElement($figcaption);
+        element.body = {
+            body: $figcaption.html(),
+            elements: {}
+        };
         elt.body.elements[element.serial] = element;
-        $qtiElement.replaceWith(_placeholder(element));
+        $figcaption.replaceWith(_placeholder(element));
     }
+    elt.body.body = $elt.html();
     return elt;
 }
 
