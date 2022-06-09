@@ -389,10 +389,11 @@ const isEliminable = function isEliminable(interaction) {
  * @returns {Object} custom data
  */
 const getCustomData = function getCustomData(interaction, data) {
+    const listStylesVisible = features.isVisible('taoQtiItem/creator/interaction/choice/property/listStyle');
     const listStyles = (interaction.attr('class') || '').match(/\blist-style-[\w-]+/) || [];
     return _.merge(data || {}, {
         horizontal: interaction.attr('orientation') === 'horizontal',
-        listStyle: listStyles.pop(),
+        listStyle: listStylesVisible ? listStyles.pop() : void 0,
         eliminable: isEliminable(interaction),
         allowEliminationVisible: features.isVisible('taoQtiItem/creator/interaction/choice/property/allowElimination')
     });
