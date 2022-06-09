@@ -26,20 +26,10 @@ export default {
     render: function(figure) {
         const $figure = containerHelper.get(figure);
         const $img = $figure.find('img');
-        if ($img.attr('width') && !/[0-9]+%/.test($img.attr('width'))) {
-            // absolute size
-            $figure.css({
-                width: $img.attr('width')
-            });
-        } else {
-            // responsive
-            $figure.css({
-                width: $img.attr('width'),
-                height: $img.attr('height')
-            });
-        }
-        if ($img[0]) {
-            $img[0].setAttribute('width', '100%');
+        if ($img.length) {
+            // move width from image to figure
+            $figure.css({ width: $img.attr('width') });
+            $img.attr('width', '100%');
         }
     }
 };
