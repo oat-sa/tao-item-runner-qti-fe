@@ -232,22 +232,10 @@ var _createTexts = function _createTexts(paper, size) {
             content: number,
             title: __('Remove'),
             style: 'order-text',
-            hide: true
+            hide: true,
+            disableEvents: true
         });
 
-        //clicking the text will has the same effect that clicking the shape: unselect.
-        text.click(function() {
-            paper.forEach(function(element) {
-                if (element.data('number') === number && element.events) {
-                    //we just need to retrieve the right element
-                    //call the click event
-                    var evt = _.where(element.events, { name: 'click' });
-                    if (evt.length && evt[0] && typeof evt[0].f === 'function') {
-                        evt[0].f.call(element);
-                    }
-                }
-            });
-        });
         texts.push(text);
     });
     return texts;
