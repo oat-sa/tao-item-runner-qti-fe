@@ -186,6 +186,14 @@ var _selectShape = function _selectShape(paper, element, $orderList) {
  */
 var _unselectShape = function _unselectShape(paper, element, $orderList) {
     var number = element.data('number');
+    var unsetNumbers = $orderList
+        .children(':not(.disabled)')
+        .map(function() {
+            return $(this).data('number');
+        });
+    unsetNumbers.push(number);
+
+    var activeNumber = Math.min.apply(Math, unsetNumbers) || number;
 
     //update element state
     element.active = false;
@@ -198,7 +206,11 @@ var _unselectShape = function _unselectShape(paper, element, $orderList) {
         .children()
         .removeClass('active')
         .filter('[data-number=' + number + ']')
-        .removeClass('disabled')
+        .removeClass('disabled');
+
+    // Set (min) active number
+    $orderList
+        .find('li[data-number="' + activeNumber + '"]')
         .addClass('active');
 };
 
