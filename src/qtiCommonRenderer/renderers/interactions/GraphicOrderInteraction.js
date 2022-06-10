@@ -186,12 +186,13 @@ var _selectShape = function _selectShape(paper, element, $orderList) {
  */
 var _unselectShape = function _unselectShape(paper, element, $orderList) {
     var number = element.data('number');
-    var unsetNumbers = $orderList
+    var unsetNumbers = [number];
+
+    $orderList
         .children(':not(.disabled)')
-        .map(function() {
-            return $(this).data('number');
+        .each(function() {
+            unsetNumbers.push($(this).data('number'));
         });
-    unsetNumbers.push(number);
 
     var activeNumber = Math.min.apply(Math, unsetNumbers) || number;
 
