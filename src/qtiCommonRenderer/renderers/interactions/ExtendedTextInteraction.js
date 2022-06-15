@@ -428,7 +428,7 @@ function inputLimiter(interaction) {
                 1114202, // Ctrl + z
                 1114200 // Ctrl + x
             ];
-            const triggerKeyCodes = [
+            const spaceKeyCodes = [
                 32, // space
                 13, // enter
                 2228237 // shift + enter in ckEditor
@@ -557,7 +557,7 @@ function inputLimiter(interaction) {
                     //   AND the selection is empty,
                     //   AND the keystroke is not from the list of accepted codes,
                     //   AND the keystroke is not a space
-                    if ((!emptyOrSpace(left) && !emptyOrSpace(right) && !hasSpace(middle) && (keyCode === 13 || keyCode === 32)) ||
+                    if ((!emptyOrSpace(left) && !emptyOrSpace(right) && !hasSpace(middle) && _.contains(spaceKeyCodes, keyCode)) ||
                         (emptyOrSpace(left) && emptyOrSpace(right) && !middle && !acceptKeyCode(keyCode) && keyCode !== 32)) {
                         return cancelEvent(e);
                     }
