@@ -25,12 +25,15 @@ import _ from 'lodash';
 import $ from 'jquery';
 import __ from 'i18n';
 import 'core/mouseEvent';
+import features from 'services/features';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/orderInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import interact from 'interact';
 import interactUtils from 'ui/interactUtils';
+
+const orientationSelectionEnabled = features.isVisible('taoQtiItem/creator/interaction/order/property/orientation');
 
 const _freezeSize = function ($container) {
     const $orderArea = $container.find('.order-interaction-area');
@@ -131,7 +134,7 @@ const render = function (interaction) {
         choiceSelector = `${$choiceArea.selector} >li:not(.deactivated)`,
         resultSelector = `${$resultArea.selector} >li`,
         $dragContainer = $container.find('.drag-container'),
-        orientation = interaction.attr('orientation') ? interaction.attr('orientation') : 'vertical';
+        orientation = (interaction.attr('orientation') && orientationSelectionEnabled) ? interaction.attr('orientation') : 'vertical';
 
     let $activeChoice = null,
         scaleX,
@@ -597,7 +600,7 @@ const getResponse = function (interaction) {
  */
 const getCustomData = function (interaction, data) {
     return _.merge(data || {}, {
-        horizontal: interaction.attr('orientation') === 'horizontal'
+        horizontal: interaction.attr('orientation') === 'horizontal' && orientationSelectionEnabled
     });
 };
 
