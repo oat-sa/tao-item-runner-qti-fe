@@ -510,6 +510,7 @@ var GraphicHelper = {
      * @param {String} [options.id] - the element identifier
      * @param {String} [options.style = 'small-text'] - the style name according to the graphic-style.json keys
      * @param {String} [options.title] - the text tooltip content
+     * @param {String} [options.disableEvents] - ignore events for the node
      * @param {Boolean} [options.hide = false] - if the text starts hidden
      * @returns {Raphael.Element} the created text
      */
@@ -520,6 +521,7 @@ var GraphicHelper = {
         var content = options.content || '';
         var style = options.style || 'small-text';
         var title = options.title || '';
+        var disableEvents = options.disableEvents || false;
         var factor = 1;
 
         if (paper.width && paper.w) {
@@ -536,6 +538,10 @@ var GraphicHelper = {
         }
 
         text.attr(gstyle[style]);
+
+        if(disableEvents) {
+            text.node.setAttribute('pointer-events', 'none');
+        }
 
         if (typeof factor !== 'undefined' && factor !== 1) {
             fontSize = parseInt(text.attr('font-size'), 10);

@@ -186,6 +186,15 @@ var _selectShape = function _selectShape(paper, element, $orderList) {
  */
 var _unselectShape = function _unselectShape(paper, element, $orderList) {
     var number = element.data('number');
+    var unsetNumbers = [number];
+
+    $orderList
+        .children(':not(.disabled)')
+        .each(function() {
+            unsetNumbers.push($(this).data('number'));
+        });
+
+    var activeNumber = Math.min.apply(Math, unsetNumbers) || number;
 
     //update element state
     element.active = false;
@@ -198,7 +207,11 @@ var _unselectShape = function _unselectShape(paper, element, $orderList) {
         .children()
         .removeClass('active')
         .filter('[data-number=' + number + ']')
-        .removeClass('disabled')
+        .removeClass('disabled');
+
+    // Set (min) active number
+    $orderList
+        .find('li[data-number="' + activeNumber + '"]')
         .addClass('active');
 };
 
@@ -220,22 +233,10 @@ var _createTexts = function _createTexts(paper, size) {
             content: number,
             title: __('Remove'),
             style: 'order-text',
-            hide: true
+            hide: true,
+            disableEvents: true
         });
 
-        //clicking the text will has the same effect that clicking the shape: unselect.
-        text.click(function() {
-            paper.forEach(function(element) {
-                if (element.data('number') === number && element.events) {
-                    //we just need to retrieve the right element
-                    //call the click event
-                    var evt = _.where(element.events, { name: 'click' });
-                    if (evt.length && evt[0] && typeof evt[0].f === 'function') {
-                        evt[0].f.call(element);
-                    }
-                }
-            });
-        });
         texts.push(text);
     });
     return texts;
