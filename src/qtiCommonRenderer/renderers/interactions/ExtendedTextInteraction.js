@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2020 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2022 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -52,7 +52,7 @@ const hideXhtmlRecommendations = !features.isVisible('taoQtiItem/creator/interac
  * @param {Object} interaction - the extended text interaction model
  * @returns {Promise} rendering is async
  */
-const render = function render(interaction) {
+function render(interaction) {
     return new Promise(function (resolve, reject) {
         let $el, expectedLength, minStrings, patternMask, placeholderType, editor;
         let _styleUpdater, themeLoaded, _getNumStrings;
@@ -242,19 +242,19 @@ const render = function render(interaction) {
             resolve();
         }
     });
-};
+}
 
 /**
  * Reset the textarea / ckEditor
  * @param {Object} interaction - the extended text interaction model
  */
-const resetResponse = function (interaction) {
+function resetResponse(interaction) {
     if (_getFormat(interaction) === 'xhtml') {
         _getCKEditor(interaction).setData('');
     } else {
         containerHelper.get(interaction).find('input, textarea').val('');
     }
-};
+}
 
 /**
  * Set the response to the rendered interaction.
@@ -268,7 +268,7 @@ const resetResponse = function (interaction) {
  * @param {Object} interaction - the extended text interaction model
  * @param {object} response
  */
-const setResponse = (interaction, response) => {
+function setResponse(interaction, response) {
     const _setMultipleVal = (identifier, value) => {
         interaction.getContainer().find(`#${identifier}`).val(value);
     };
@@ -289,7 +289,7 @@ const setResponse = (interaction, response) => {
     } else {
         throw new Error('wrong response format in argument.');
     }
-};
+}
 
 /**
  * Return the response of the rendered interaction
@@ -303,7 +303,7 @@ const setResponse = (interaction, response) => {
  * @param {Object} interaction - the extended text interaction model
  * @returns {object}
  */
-const getResponse = function (interaction) {
+function getResponse(interaction) {
     const $container = containerHelper.get(interaction);
     const attributes = interaction.getAttributes();
     const responseDeclaration = interaction.getResponseDeclaration();
@@ -357,7 +357,7 @@ const getResponse = function (interaction) {
     }
 
     return ret;
-};
+}
 
 /**
  * Creates an input limiter object
@@ -369,6 +369,7 @@ function inputLimiter(interaction) {
     const expectedLength = interaction.attr('expectedLength');
     const expectedLines = interaction.attr('expectedLines');
     const patternMask = interaction.attr('patternMask');
+    const isCke = _getFormat(interaction) === 'xhtml';
     let patternRegEx;
     let $textarea, $charsCounter, $wordsCounter, maxWords, maxLength, $maxLengthCounter, $maxWordsCounter;
     let enabled = false;
@@ -382,8 +383,8 @@ function inputLimiter(interaction) {
         $maxWordsCounter = $('.count-max-words', $container);
 
         if (patternMask !== '') {
-            maxWords = patternMaskHelper.parsePattern(patternMask, 'words');
-            maxLength = patternMaskHelper.parsePattern(patternMask, 'chars');
+            maxWords = parseInt(patternMaskHelper.parsePattern(patternMask, 'words'), 10);
+            maxLength = parseInt(patternMaskHelper.parsePattern(patternMask, 'chars'), 10);
             maxWords = _.isNaN(maxWords) ? 0 : maxWords;
             maxLength = _.isNaN(maxLength) ? 0 : maxLength;
             if (!maxLength && !maxWords) {
@@ -401,12 +402,12 @@ function inputLimiter(interaction) {
         /**
          * Is the limiter enabled regarding the interaction configuration
          */
-        enabled: enabled,
+        enabled,
 
         /**
          * Listen for text input into the interaction and limit it if necessary
          */
-        listenTextInput: function listenTextInput() {
+        listenTextInput() {
             const ignoreKeyCodes = [
                 8, // backspace
                 13, // enter
@@ -440,15 +441,29 @@ function inputLimiter(interaction) {
                 1114202, // Ctrl + z
                 1114200 // Ctrl + x
             ];
-            const triggerKeyCodes = [
+            const spaceKeyCodes = [
                 32, // space
                 13, // enter
                 2228237 // shift + enter in ckEditor
             ];
-            let cke;
             let isComposing = false;
             let hasCompositionJustEnded = false;
 
+            const acceptKeyCode = keyCode => _.contains(ignoreKeyCodes, keyCode);
+            const emptyOrSpace = txt => txt && txt.trim() === '' || /\^s*$/.test(txt);
+            const hasSpace = txt => /\s+/.test(txt);
+            const getCharBefore = (str, pos) => str && str.substring(Math.max(0, pos - 1), pos);
+            const getCharAfter = (str, pos) => str && str.substring(pos, pos + 1);
+            const noSpaceNode = node => node.type === ckEditor.NODE_TEXT || (!node.isBlockBoundary() && node.getName() !== 'br');
+            const cancelEvent = e => {
+                if (e.cancel) {
+                    e.cancel();
+                } else {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                }
+                return false;
+            };
             const invalidToolip = tooltip.error($container, __('This is not a valid answer'), {
                 position: 'bottom',
                 trigger: 'manual'
@@ -460,9 +475,8 @@ function inputLimiter(interaction) {
                     return;
                 }
 
-                const isCke = _getFormat(interaction) === 'xhtml';
-                let newValue;
                 if (patternRegEx) {
+                    let newValue;
                     if (isCke) {
                         // cke has its own object structure
                         newValue = this.getData();
@@ -503,30 +517,74 @@ function inputLimiter(interaction) {
                     hasCompositionJustEnded = false;
                 }
 
-                const keyCode = e && e.data ? e.data.keyCode : e.which;
-                const isCke = _getFormat(interaction) === 'xhtml';
-                if (
-                    !_.contains(ignoreKeyCodes, keyCode) &&
-                    ((maxWords && this.getWordsCount() >= maxWords && _.contains(triggerKeyCodes, keyCode)) ||
-                        (maxLength && this.getCharsCount() >= maxLength))
-                ) {
-                    if (e.cancel) {
-                        e.cancel();
-                    } else {
-                        e.preventDefault();
-                        e.stopImmediatePropagation();
-                    }
+                const keyCode = e.data ? e.data.keyCode : e.which;
+                const wordsCount = maxWords && this.getWordsCount();
+                const charsCount = maxLength && this.getCharsCount();
 
-                    if (this.getCharsCount() > maxLength && maxLength !== null) {
-                        if (!isCke) {
-                            const currentValue = $textarea[0].value;
-                            $textarea[0].value = currentValue.substring(0, maxLength);
-                            $textarea[0].focus();
+                if (maxWords && wordsCount >= maxWords) {
+                    let left, right, middle;
+
+                    if (isCke) {
+                        const editor = _getCKEditor(interaction);
+                        const sel = editor.getSelection();
+                        const range = sel.getRanges()[0];
+
+                        if (range.startContainer && range.startContainer.type === ckEditor.NODE_TEXT) {
+                            left = getCharBefore(range.startContainer.getText(), range.startOffset);
                         }
+                        if (!left) {
+                            const node = range.getPreviousNode();
+                            if (noSpaceNode(node)) {
+                                const text = node.getText();
+                                left = getCharBefore(text, text && text.length);
+                            } else {
+                                left = ' ';
+                            }
+                        }
+
+                        if (range.endContainer && range.endContainer.type === ckEditor.NODE_TEXT) {
+                            right = getCharAfter(range.endContainer.getText(), range.endOffset);
+                        }
+                        if (!right) {
+                            const node = range.getNextNode();
+                            if (noSpaceNode(node)) {
+                                right = getCharAfter(node.getText(), 0);
+                            } else {
+                                right = ' ';
+                            }
+                        }
+
+                        middle = sel.getSelectedText();
+                    } else {
+                        const { selectionStart, selectionEnd, value } = $textarea[0];
+                        left = getCharBefore(value, selectionStart);
+                        right = getCharAfter(value, selectionEnd);
+                        middle = value.substring(selectionStart, selectionEnd);
                     }
 
-                    return false;
+                    // Will prevent the keystroke:
+                    // - IF there is a word part before and after the selection,
+                    //   AND the selection does not contain spaces,
+                    //   AND the keystroke is either a space or enter
+                    // - IF there is no word part before and after the selection,
+                    //   AND the selection is empty,
+                    //   AND the keystroke is not from the list of accepted codes,
+                    //   AND the keystroke is not a space
+                    if ((!emptyOrSpace(left) && !emptyOrSpace(right) && !hasSpace(middle) && _.contains(spaceKeyCodes, keyCode)) ||
+                        (emptyOrSpace(left) && emptyOrSpace(right) && !middle && !acceptKeyCode(keyCode) && keyCode !== 32)) {
+                        return cancelEvent(e);
+                    }
                 }
+
+                if (maxLength && charsCount >= maxLength && !acceptKeyCode(keyCode)) {
+                    if (!isCke && charsCount > maxLength) {
+                        const textarea = $textarea[0];
+                        textarea.value = textarea.value.substring(0, maxLength);
+                        textarea.focus();
+                    }
+                    return cancelEvent(e);
+                }
+
                 _.defer(() => this.updateCounter());
             };
 
@@ -537,7 +595,6 @@ function inputLimiter(interaction) {
              */
             const nonKeyLimitHandler = e => {
                 let newValue;
-                const isCke = _getFormat(interaction) === 'xhtml';
 
                 if (typeof $(e.target).attr('data-clipboard') === 'string') {
                     newValue = $(e.target).attr('data-clipboard');
@@ -549,26 +606,21 @@ function inputLimiter(interaction) {
                     newValue = e.originalEvent.clipboardData
                         ? e.originalEvent.clipboardData.getData('text')
                         : e.originalEvent.dataTransfer.getData('text') ||
-                        e.originalEvent.dataTransfer.getData('text/plain') ||
-                        '';
+                          e.originalEvent.dataTransfer.getData('text/plain') ||
+                          '';
                 }
 
                 // prevent insertion of non-limited data
-                if (e.cancel) {
-                    e.cancel();
-                } else {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                }
+                cancelEvent(e);
 
                 if (!newValue) {
                     return false;
                 }
 
                 // limit by word or character count if required
-                if (!_.isNull(maxWords)) {
+                if (maxWords) {
                     newValue = strLimiter.limitByWordCount(newValue, maxWords - this.getWordsCount());
-                } else if (!_.isNull(maxLength)) {
+                } else if (maxLength) {
                     newValue = strLimiter.limitByCharCount(newValue, maxLength - this.getCharsCount());
                 }
 
@@ -611,29 +663,29 @@ function inputLimiter(interaction) {
             };
 
             if (_getFormat(interaction) === 'xhtml') {
-                cke = _getCKEditor(interaction);
+                const editor = _getCKEditor(interaction);
 
                 if (maxLength) {
-                    let previousSnapshot = cke.getSnapshot();
+                    let previousSnapshot = editor.getSnapshot();
 
-                    cke.on('key', function () {
+                    editor.on('key', function () {
                         const range = this.createRange();
                         if (limiter.getCharsCount() > limiter.maxLength) {
                             const editable = this.editable();
                             editable.setData(previousSnapshot, true);
                             range.moveToElementEditablePosition(editable, true);
-                            cke.getSelection().selectRanges([range]);
+                            editor.getSelection().selectRanges([range]);
                             return;
                         }
-                        previousSnapshot = cke.getSnapshot();
+                        previousSnapshot = editor.getSnapshot();
                     });
                 }
-                cke.on('key', keyLimitHandler);
-                cke.on('change', evt => {
+                editor.on('key', keyLimitHandler);
+                editor.on('change', evt => {
                     patternHandler(evt);
                     _.defer(() => this.updateCounter());
                 });
-                cke.on('paste', nonKeyLimitHandler);
+                editor.on('paste', nonKeyLimitHandler);
                 // @todo: drop requires cke 4.5
                 // cke.on('drop', nonKeyLimitHandler);
             } else {
@@ -654,7 +706,7 @@ function inputLimiter(interaction) {
          * Get the number of words that are actually written in the response field
          * @returns {Number} number of words
          */
-        getWordsCount: function getWordsCount() {
+        getWordsCount() {
             const value = _getTextareaValue(interaction) || '';
             if (_.isEmpty(value)) {
                 return 0;
@@ -667,7 +719,7 @@ function inputLimiter(interaction) {
          * Get the number of characters that are actually written in the response field
          * @returns {Number} number of characters
          */
-        getCharsCount: function getCharsCount() {
+        getCharsCount() {
             const value = _getTextareaValue(interaction) || '';
             // remove NO-BREAK SPACE in empty lines added and all new line symbols
             return value.replace(/[\r\n]{1}\xA0[\r\n]{1}/gm, '\r').replace(/[\r\n]+/gm, '').length;
@@ -676,10 +728,11 @@ function inputLimiter(interaction) {
         /**
          * Update the counter element
          */
-        updateCounter: function udpateCounter() {
+        updateCounter() {
             $charsCounter.text(this.getCharsCount());
             $wordsCounter.text(this.getWordsCount());
         },
+
         maxLength
     };
 
@@ -951,7 +1004,9 @@ function getData(interaction, data) {
     const maxWords = parseInt(patternMaskHelper.parsePattern(pattern, 'words'), 10);
     const maxLength = parseInt(patternMaskHelper.parsePattern(pattern, 'chars'), 10);
     const expectedLines = parseInt(interaction.attr('expectedLines'), 10);
-    const expectedLength = !isNaN(expectedLines) ? expectedLines * 72 : parseInt(interaction.attr('expectedLength'), 10);
+    const expectedLength = !isNaN(expectedLines)
+        ? expectedLines * 72
+        : parseInt(interaction.attr('expectedLength'), 10);
 
     // Build DOM placeholders, this is needed to properly assemble the constraint hints
     // The interaction will later rely on this to bind the values
@@ -970,7 +1025,7 @@ function getData(interaction, data) {
         constraintHints: {
             expectedLength: __('%s of %s characters recommended.', countChars, countExpectedLength),
             maxLength: __('%s of %s characters maximum.', countChars, countMaxLength),
-            maxWords: __('%s of %s words maximum.', countWords, countMaxWords),
+            maxWords: __('%s of %s words maximum.', countWords, countMaxWords)
         }
     });
 }
