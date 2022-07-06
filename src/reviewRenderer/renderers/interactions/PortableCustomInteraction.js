@@ -35,7 +35,7 @@ const getData = function (customInteraction, data) {
 
     //remove ns + fix media file path
     markup = util.removeMarkupNamespaces(markup);
-    markup = PortableElement.fixMarkupMediaSources(markup, this);
+    markup = PortableElement.fixMarkupMediaSources(markup, customInteraction.renderer);
 
     return Object.assign({}, data, { markup, isInteractionDisabled });
 };
