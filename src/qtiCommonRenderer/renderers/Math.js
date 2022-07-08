@@ -23,7 +23,6 @@
  * @author Sam Sipasseuth <sam@taotesting.com>
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-import _ from 'lodash';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/math';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import MathJax from 'mathJax';
