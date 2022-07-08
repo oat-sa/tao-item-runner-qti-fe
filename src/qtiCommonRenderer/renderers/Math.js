@@ -40,23 +40,15 @@ export default {
     getContainer: containerHelper.get,
     render: function render(math) {
         return new Promise(function (resolve) {
-            //for performance it's better to run `MathJax Typeset` at once for all math on the page;
-            //but if you do it when there are already MathJax-rendered elements on the page,
-            //  in some cases MathJax won't recognize that and produce duplicated output;
-            //so we run `Typeset` for all elements if none of them are rendered yet (test-runner item load in delivery),
-            //but only for current element otherwise (working in Authoring)
             const $self = containerHelper.get(math);
-            const $item = $self.closest('.qti-item');
-            const itemHasRenderedMath = $item.find('.MathJax[data-mathml]').length > 0;
-            const $mathjaxScope = itemHasRenderedMath ? $self : $item;
             if (typeof MathJax !== 'undefined' && MathJax) {
                 //MathJax needs to be exported globally to integrate with tools like TTS, it's weird...
                 if (!window.MathJax) {
                     window.MathJax = MathJax;
                 }
                 //defer execution fix some rendering issue in chrome
-                if ($mathjaxScope.length) {
-                    MathJax.Hub.Queue(['Typeset', MathJax.Hub, $mathjaxScope[0]]);
+                if ($self.length) {
+                    MathJax.Hub.Queue(['Typeset', MathJax.Hub, $self[0]]);
                     MathJax.Hub.Queue(resolve);
                 } else {
                     resolve();
