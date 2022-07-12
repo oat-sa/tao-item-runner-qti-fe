@@ -23,7 +23,6 @@
  * @author Sam Sipasseuth <sam@taotesting.com>
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-import _ from 'lodash';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/math';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import MathJax from 'mathJax';
@@ -40,15 +39,15 @@ export default {
     getContainer: containerHelper.get,
     render: function render(math) {
         return new Promise(function (resolve) {
-            var $item = containerHelper.get(math).closest('.qti-item');
+            const $self = containerHelper.get(math);
             if (typeof MathJax !== 'undefined' && MathJax) {
                 //MathJax needs to be exported globally to integrate with tools like TTS, it's weird...
                 if (!window.MathJax) {
                     window.MathJax = MathJax;
                 }
                 //defer execution fix some rendering issue in chrome
-                if ($item.length) {
-                    MathJax.Hub.Queue(['Typeset', MathJax.Hub, $item[0]]);
+                if ($self.length) {
+                    MathJax.Hub.Queue(['Typeset', MathJax.Hub, $self[0]]);
                     MathJax.Hub.Queue(resolve);
                 } else {
                     resolve();
