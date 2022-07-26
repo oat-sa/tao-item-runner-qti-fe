@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2022 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -36,10 +36,49 @@ import tooltip from 'ui/tooltip';
  * Hide the tooltip for the text input
  * @param {jQuery} $input
  */
-var hideTooltip = function hideTooltip($input) {
+const hideTooltip = function hideTooltip($input) {
     if ($input.data('$tooltip')) {
         $input.data('$tooltip').hide();
     }
+};
+
+const DELIMETER_SYMBOL = '.';
+const MINUS_SYMBOL = '-';
+const cleanupIntegerRegExp = new RegExp('\\D', 'g') // Remove all non-digits except the delimeter
+const cleanupFloatRegExp = new RegExp(`[^\\d|\\${DELIMETER_SYMBOL}]`, 'g') // Remove all non-digits except delimeters
+
+const formatInteger = function formatInteger($input) {
+    const inputValue = $input.val();
+    const prefix = inputValue.indexOf(MINUS_SYMBOL) === 0 ? MINUS_SYMBOL : '';
+
+    return prefix + inputValue.replace(cleanupIntegerRegExp, '');
+};
+
+const formatFloat = function formatFloat($input) {
+    const inputValue = $input.val();
+    const prefix = inputValue.indexOf(MINUS_SYMBOL) === 0 ? MINUS_SYMBOL : '';
+    const firstDelimeterPosition = inputValue.indexOf(DELIMETER_SYMBOL);
+    const lastDelimeterPosition = inputValue.lastIndexOf(DELIMETER_SYMBOL);
+
+    let delimeter = firstDelimeterPosition;
+    let chars = inputValue.replace(cleanupFloatRegExp, '');
+
+    // Delimeter has to shift
+    if(firstDelimeterPosition !== lastDelimeterPosition) {
+        const prevDelimeterPoistion = $input.data('delimeter');
+
+        delimeter = prevDelimeterPoistion === firstDelimeterPosition ? lastDelimeterPosition : firstDelimeterPosition;
+        chars = chars.split('')
+            .filter((char, index) => {
+                if((char === DELIMETER_SYMBOL && index !== delimeter)) return;
+                return char;
+            })
+            .join('');
+    }
+
+    $input.data({delimeter});
+
+    return prefix + chars;
 };
 
 /**
@@ -83,10 +122,18 @@ var render = function render(interaction) {
     // Setting up baseType
     switch (baseType) {
         case 'integer':
-            $input.attr('inputmode', 'numeric');
+            $input
+                .attr({inputmode: 'numeric'})
+                .on('input.commonRenderer', function(e) {
+                    $input.val(formatInteger($input));
+                });
             break;
         case 'float':
-            $input.attr('inputmode', 'decimal');
+            $input
+                .attr({inputmode: 'decimal'})
+                .on('input.commonRenderer', function(e) {
+                    $input.val(formatFloat($input));
+                });
             break;
         default:
             $input.attr('inputmode', 'text');
