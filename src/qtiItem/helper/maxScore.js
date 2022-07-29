@@ -121,9 +121,6 @@ export default {
                     maxScoreOutcome.buildIdentifier('MAXSCORE', false);
                 }
                 maxScoreOutcome.setDefaultValue(maxScore);
-            } else {
-                //remove MAXSCORE:
-                item.removeOutcome('MAXSCORE');
             }
         }
     },
