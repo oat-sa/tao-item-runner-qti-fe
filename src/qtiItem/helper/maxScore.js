@@ -124,13 +124,20 @@ export default {
 
             }
         }
-        
+
         //handle special case, when responseProcessing is set to none and MAXSCORE is setup manually
         //remove MAXSCORE if externalProcessing is not set up:
         maxScoreOutcome = item.getOutcomeDeclaration('MAXSCORE');
-        if(maxScoreOutcome && !(maxScoreOutcome.attributes && maxScoreOutcome.attributes.externalScored)) {
-            item.removeOutcome('MAXSCORE');
-        }
+        if(maxScoreOutcome && item.responseProcessing && item.responseProcessing.processingType !== 'templateDriven') {
+            if(maxScoreOutcome.attributes && maxScoreOutcome.attributes.externalScored) {
+                if(_.isUndefined(maxScoreOutcome.defaultValue)) {
+                    maxScoreOutcome.setDefaultValue(1)
+                }
+            } else {
+                item.removeOutcome('MAXSCORE');
+            }
+        } 
+        
         
     },
 
