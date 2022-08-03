@@ -121,8 +121,17 @@ export default {
                     maxScoreOutcome.buildIdentifier('MAXSCORE', false);
                 }
                 maxScoreOutcome.setDefaultValue(maxScore);
+
             }
         }
+        
+        //handle special case, when responseProcessing is set to none and MAXSCORE is setup manually
+        //remove MAXSCORE if externalProcessing is not set up:
+        maxScoreOutcome = item.getOutcomeDeclaration('MAXSCORE');
+        if(maxScoreOutcome && !(maxScoreOutcome.attributes && maxScoreOutcome.attributes.externalScored)) {
+            item.removeOutcome('MAXSCORE');
+        }
+        
     },
 
     /**
