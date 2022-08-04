@@ -134,17 +134,15 @@ export default {
                     if(response.template === 'no_response_processing'){
                         if(maxScoreOutcome.attributes && maxScoreOutcome.attributes.externalScored) {
                             if(_.isUndefined(maxScoreOutcome.defaultValue)) {
-                                maxScoreOutcome.setDefaultValue(1)
+                                maxScoreOutcome.setDefaultValue(1);
                             }
                         } else {
                             item.removeOutcome('MAXSCORE');
                         }
                     }
                 }
-
             }
         } 
-                
     },
 
     /**
@@ -185,7 +183,6 @@ export default {
             requiredChoiceCount,
             totalAnswerableResponse,
             sortedMapEntries,
-            i,
             missingMapsCount;
 
         options = _.defaults(options || {}, { maxChoices: 0, minChoices: 0 });
