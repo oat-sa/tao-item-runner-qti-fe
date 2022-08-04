@@ -123,22 +123,28 @@ export default {
                 maxScoreOutcome.setDefaultValue(maxScore);
 
             }
-        }
 
-        //handle special case, when responseProcessing is set to none and MAXSCORE is setup manually
-        //remove MAXSCORE if externalProcessing is not set up:
-        maxScoreOutcome = item.getOutcomeDeclaration('MAXSCORE');
-        if(maxScoreOutcome && item.responseProcessing && item.responseProcessing.processingType !== 'templateDriven') {
-            if(maxScoreOutcome.attributes && maxScoreOutcome.attributes.externalScored) {
-                if(_.isUndefined(maxScoreOutcome.defaultValue)) {
-                    maxScoreOutcome.setDefaultValue(1)
+            //handle special case, when responseProcessing is set to none and MAXSCORE is setup manually
+            //remove MAXSCORE if externalProcessing is not set up:
+            maxScoreOutcome = item.getOutcomeDeclaration('MAXSCORE');
+            if(maxScoreOutcome) {
+                var interactions = item.responseProcessing.getRootElement().getInteractions();
+                if(interactions.length === 1) {
+                    const response = interactions[0].getResponseDeclaration();
+                    if(response.template === 'no_response_processing'){
+                        if(maxScoreOutcome.attributes && maxScoreOutcome.attributes.externalScored) {
+                            if(_.isUndefined(maxScoreOutcome.defaultValue)) {
+                                maxScoreOutcome.setDefaultValue(1)
+                            }
+                        } else {
+                            item.removeOutcome('MAXSCORE');
+                        }
+                    }
                 }
-            } else {
-                item.removeOutcome('MAXSCORE');
+
             }
         } 
-        
-        
+                
     },
 
     /**
