@@ -107,8 +107,8 @@ export default {
                 }, maxScore);
             }
 
+            maxScoreOutcome = item.getOutcomeDeclaration('MAXSCORE');
             if (!hasInvalidInteraction || customOutcomes.size()) {
-                maxScoreOutcome = item.getOutcomeDeclaration('MAXSCORE');
                 if (!maxScoreOutcome) {
                     //add new outcome
                     maxScoreOutcome = new OutcomeDeclaration({
