@@ -133,7 +133,7 @@ export default {
                     item.removeOutcome('MAXSCORE');
                 }
             }
-        } 
+        }
     },
 
     /**
