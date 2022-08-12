@@ -107,8 +107,8 @@ export default {
                 }, maxScore);
             }
 
+            maxScoreOutcome = item.getOutcomeDeclaration('MAXSCORE');
             if (!hasInvalidInteraction || customOutcomes.size()) {
-                maxScoreOutcome = item.getOutcomeDeclaration('MAXSCORE');
                 if (!maxScoreOutcome) {
                     //add new outcome
                     maxScoreOutcome = new OutcomeDeclaration({
@@ -121,9 +121,17 @@ export default {
                     maxScoreOutcome.buildIdentifier('MAXSCORE', false);
                 }
                 maxScoreOutcome.setDefaultValue(maxScore);
-            } else {
-                //remove MAXSCORE:
-                item.removeOutcome('MAXSCORE');
+            }
+
+            //handle special case when MAXSCORE is set up manually for some interaction like ExtendedText
+            if(hasInvalidInteraction && maxScoreOutcome) {
+                if(maxScoreOutcome.attributes && maxScoreOutcome.attributes.externalScored) {
+                    if(_.isUndefined(maxScoreOutcome.defaultValue)) {
+                        maxScoreOutcome.setDefaultValue(1);
+                    }
+                } else {
+                    item.removeOutcome('MAXSCORE');
+                }
             }
         }
     },
@@ -166,7 +174,6 @@ export default {
             requiredChoiceCount,
             totalAnswerableResponse,
             sortedMapEntries,
-            i,
             missingMapsCount;
 
         options = _.defaults(options || {}, { maxChoices: 0, minChoices: 0 });
