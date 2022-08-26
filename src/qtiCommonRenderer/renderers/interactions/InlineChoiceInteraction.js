@@ -58,7 +58,7 @@ var render = function(interaction, options) {
     _.extend(opts, options);
 
     if (opts.allowEmpty && !required) {
-        $container.find('option[value=' + _emptyValue + ']').text(__('--- leave empty ---') || '--- ' + __('leave empty') + ' ---');
+        $container.find('option[value=' + _emptyValue + ']').text(__('--- leave empty ---'));
     } else {
         $container.find('option[value=' + _emptyValue + ']').remove();
     }
@@ -67,7 +67,7 @@ var render = function(interaction, options) {
         const itemBody = $('.qti-itemBody');
         const itemDir = itemBody.attr('dir') || 'ltr';
         return itemDir;
-    }
+    };
 
     const dirClass = getItemDir();
     $container.select2({
