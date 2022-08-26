@@ -67,7 +67,7 @@ var render = function(interaction, options) {
         const itemBody = $('.qti-itemBody');
         const itemDir = itemBody.attr('dir') || 'ltr';
         return itemDir;
-    }
+    };
 
     const dirClass = getItemDir();
     $container.select2({
