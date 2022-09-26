@@ -849,6 +849,22 @@ export default {
             } else {
                 max = 0;
             }
+        } else if (template === 'MAP_RESPONSE') {
+            //at least a map entry is required to be valid QTI
+            if (!responseDeclaration.mapEntries || !_.size(responseDeclaration.mapEntries)) {
+                return 0;
+            }
+
+            const values = _.values(responseDeclaration.mapEntries)
+                .map(function(v) {
+                    return parseFloat(v);
+                });
+            max = _.max(values);
+
+            //compare the calculated maximum with the mapping upperbound
+            if (responseDeclaration.mappingAttributes.upperBound) {
+                max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
+            }
         } else {
             max = 0;
         }
