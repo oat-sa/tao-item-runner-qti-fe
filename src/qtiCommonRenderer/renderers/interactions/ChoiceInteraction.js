@@ -248,10 +248,25 @@ const _setInstructions = function _setInstructions(interaction) {
     } else if (min > 1 && min === max) {
         // Multiple Choice: 5. Constraint: Other constraints -> minChoices ≠ Disabled / maxChoices ≠ Disabled -> “You need to select {minChoices = maxChoices value} choices.“
         msg = __('You need to select %s choices', min);
-        instructionMgr.appendInstruction(interaction, msg, function () {
+        instructionMgr.appendInstruction(interaction, msg, function (data) {
             if (_getRawResponse(interaction).length === min) {
                 this.setLevel('success');
-            } else {
+            } else if (_getRawResponse(interaction).length >= max) {
+                this.setMessage(__('Maximum choices reached'));
+                this.update({
+                    level: 'warning',
+                    timeout: 2000,
+                    start: function () {
+                        if (data && data.choice) {
+                            highlightInvalidInput(data.choice);
+                        }
+                    },
+                    stop: function () {
+                        this.setLevel('info');
+                    }
+                });
+                this.setState('fulfilled');
+            }  else {
                 this.reset();
             }
         });
