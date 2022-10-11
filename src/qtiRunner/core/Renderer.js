@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2022 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -40,42 +40,7 @@ if(typeof hb.compile !== 'function'){
     hb = require('handlebars');
 }
 
-var _isValidRenderer = function(renderer) {
-    var valid = true;
-
-    if (typeof renderer !== 'object') {
-        return false;
-    }
-
-    var classCorrect = false;
-    if (renderer.qtiClass) {
-        if (_.indexOf(_renderableClasses, renderer.qtiClass) >= 0) {
-            classCorrect = true;
-        } else {
-            var pos = renderer.qtiClass.indexOf('.');
-            if (pos > 0) {
-                var qtiClass = renderer.qtiClass.slice(0, pos);
-                var subClass = renderer.qtiClass.slice(pos + 1);
-                if (_renderableSubclasses[qtiClass] && _.indexOf(_renderableSubclasses[qtiClass], subClass) >= 0) {
-                    classCorrect = true;
-                }
-            }
-        }
-    }
-    if (!classCorrect) {
-        valid = false;
-        throw new Error('invalid qti class name in renderer declaration : ' + renderer.qtiClass);
-    }
-
-    if (!renderer.template) {
-        valid = false;
-        throw new Error('missing template in renderer declaration : ' + renderer.qtiClass);
-    }
-
-    return valid;
-};
-
-var _renderableClasses = [
+const _renderableClasses = [
     '_container',
     'assessmentItem',
     'stylesheet',
@@ -84,7 +49,9 @@ var _renderableClasses = [
     'responseProcessing',
     '_simpleFeedbackRule',
     '_tooltip',
+    'figure',
     'img',
+    'figcaption',
     'math',
     'object',
     'table',
@@ -127,7 +94,7 @@ var _renderableClasses = [
 /**
  * The list of qti element dependencies. It is used internally to load dependent qti classes
  */
-var _dependencies = {
+const _dependencies = {
     assessmentItem: ['stylesheet', '_container', 'prompt', 'modalFeedback'],
     rubricBlock: ['_container'],
     associateInteraction: ['simpleAssociableChoice'],
@@ -146,7 +113,7 @@ var _dependencies = {
 /**
  * The list of supported qti subclasses.
  */
-var _renderableSubclasses = {
+const _renderableSubclasses = {
     simpleAssociableChoice: ['associateInteraction', 'matchInteraction'],
     simpleChoice: ['choiceInteraction', 'orderInteraction']
 };
@@ -154,8 +121,43 @@ var _renderableSubclasses = {
 /**
  * List of the default properties for the item
  */
-var _defaults = {
+const _defaults = {
     shuffleChoices: true
+};
+
+const _isValidRenderer = function(renderer) {
+    let valid = true;
+
+    if (typeof renderer !== 'object') {
+        return false;
+    }
+
+    let classCorrect = false;
+    if (renderer.qtiClass) {
+        if (_.indexOf(_renderableClasses, renderer.qtiClass) >= 0) {
+            classCorrect = true;
+        } else {
+            const pos = renderer.qtiClass.indexOf('.');
+            if (pos > 0) {
+                const qtiClass = renderer.qtiClass.slice(0, pos);
+                const subClass = renderer.qtiClass.slice(pos + 1);
+                if (_renderableSubclasses[qtiClass] && _.indexOf(_renderableSubclasses[qtiClass], subClass) >= 0) {
+                    classCorrect = true;
+                }
+            }
+        }
+    }
+    if (!classCorrect) {
+        valid = false;
+        throw new Error('invalid qti class name in renderer declaration : ' + renderer.qtiClass);
+    }
+
+    if (!renderer.template) {
+        valid = false;
+        throw new Error('missing template in renderer declaration : ' + renderer.qtiClass);
+    }
+
+    return valid;
 };
 
 /**
@@ -176,16 +178,16 @@ function getDocumentBaseUrl() {
  * @param {preRenderDecorator} [options.decorators.before] - to set up a pre decorator
  * @param {postRenderDecorator} [options.decorators.after] - to set up a post decorator
  */
-var Renderer = function(options) {
+const Renderer = function(options) {
     /**
      * Store the registered renderer location
      */
-    var _locations = {};
+    const _locations = {};
 
     /**
      * Store loaded renderers
      */
-    var _renderers = {};
+    const _renderers = {};
 
     options = _.defaults(options || {}, _defaults);
 
@@ -200,12 +202,12 @@ var Renderer = function(options) {
      * Get the actual renderer of the give qti class or subclass:
      * e.g. simplceChoice, simpleChoice.choiceInteraction, simpleChoice.orderInteraction
      */
-    var _getClassRenderer = function(qtiClass) {
-        var ret = null;
+    const _getClassRenderer = function(qtiClass) {
+        let ret = null;
         if (_renderers[qtiClass]) {
             ret = _renderers[qtiClass];
         } else {
-            var pos = qtiClass.indexOf('.');
+            const pos = qtiClass.indexOf('.');
             if (pos > 0) {
                 qtiClass = qtiClass.slice(0, pos);
                 if (_renderers[qtiClass]) {
@@ -223,7 +225,7 @@ var Renderer = function(options) {
      * @returns {Boolean} `true` if the class has been successfully registered
      */
     function registerRendererClass(qtiClass, list) {
-        var success = false;
+        let success = false;
         if (_locations[qtiClass] === false) {
             //mark this class as not renderable
             _renderers[qtiClass] = false;
@@ -271,7 +273,7 @@ var Renderer = function(options) {
     };
 
     this.getCustomMessage = function getCustomMessage(elementName, messageKey) {
-        var messages = this.getOption('messages');
+        const messages = this.getOption('messages');
         if (messages && elementName && messages[elementName] && _.isString(messages[elementName][messageKey])) {
             //currently not translatable but potentially could be if the need raises
             return hb.compile(messages[elementName][messageKey]);
@@ -305,12 +307,11 @@ var Renderer = function(options) {
      * @throws {Error} if the renderer is not set or has no template bound
      */
     this.renderTpl = function(element, data, qtiSubclass) {
-        var res;
-        var ret = '';
-        var tplFound = false;
-        var qtiClass = qtiSubclass || element.qtiClass;
-        var renderer = _getClassRenderer(qtiClass);
-        var decorators = this.getOption('decorators');
+        let res;
+        let ret = '';
+        const qtiClass = qtiSubclass || element.qtiClass;
+        const renderer = _getClassRenderer(qtiClass);
+        const decorators = this.getOption('decorators');
 
         if (!renderer || !_.isFunction(renderer.template)) {
             throw new Error('no renderer template loaded under the class name : ' + qtiClass);
@@ -350,9 +351,9 @@ var Renderer = function(options) {
     };
 
     this.getData = function(element, data, qtiSubclass) {
-        var ret = data,
-            qtiClass = qtiSubclass || element.qtiClass,
-            renderer = _getClassRenderer(qtiClass);
+        let ret = data;
+        const qtiClass = qtiSubclass || element.qtiClass;
+        const renderer = _getClassRenderer(qtiClass);
 
         if (renderer) {
             if (typeof renderer.getData === 'function') {
@@ -368,21 +369,21 @@ var Renderer = function(options) {
     };
 
     this.getContainer = function(qtiElement, $scope, qtiSubclass) {
-        var ret = null,
-            qtiClass = qtiSubclass || qtiElement.qtiClass,
-            renderer = _getClassRenderer(qtiClass);
+        let ret = null;
+        const qtiClass = qtiSubclass || qtiElement.qtiClass;
+        const renderer = _getClassRenderer(qtiClass);
 
         if (renderer) {
             ret = renderer.getContainer(qtiElement, $scope);
         } else {
-            throw 'no renderer found for the class : ' + qtiElement.qtiClass;
+            throw new Error('no renderer found for the class : ' + qtiElement.qtiClass);
         }
         return ret;
     };
 
     this.postRender = function(qtiElement, data, qtiSubclass) {
-        var qtiClass = qtiSubclass || qtiElement.qtiClass;
-        var renderer = _getClassRenderer(qtiClass);
+        const qtiClass = qtiSubclass || qtiElement.qtiClass;
+        const renderer = _getClassRenderer(qtiClass);
 
         if (renderer && typeof renderer.render === 'function') {
             return renderer.render.call(this, qtiElement, data);
@@ -390,50 +391,50 @@ var Renderer = function(options) {
     };
 
     this.setResponse = function(qtiInteraction, response, qtiSubclass) {
-        var ret = false,
-            qtiClass = qtiSubclass || qtiInteraction.qtiClass,
-            renderer = _getClassRenderer(qtiClass);
+        let ret = false;
+        const qtiClass = qtiSubclass || qtiInteraction.qtiClass;
+        const renderer = _getClassRenderer(qtiClass);
 
         if (renderer) {
             if (typeof renderer.setResponse === 'function') {
                 ret = renderer.setResponse.call(this, qtiInteraction, response);
-                var $container = renderer.getContainer.call(this, qtiInteraction);
+                const $container = renderer.getContainer.call(this, qtiInteraction);
                 if ($container instanceof $ && $container.length) {
                     $container.trigger('responseSet', [qtiInteraction, response]);
                 }
             }
         } else {
-            throw 'no renderer registered under the name : ' + qtiClass;
+            throw new Error('no renderer registered under the name : ' + qtiClass);
         }
         return ret;
     };
 
     this.getResponse = function(qtiInteraction, qtiSubclass) {
-        var ret = false,
-            qtiClass = qtiSubclass || qtiInteraction.qtiClass,
-            renderer = _getClassRenderer(qtiClass);
+        let ret = false;
+        const qtiClass = qtiSubclass || qtiInteraction.qtiClass;
+        const renderer = _getClassRenderer(qtiClass);
 
         if (renderer) {
             if (typeof renderer.getResponse === 'function') {
                 ret = renderer.getResponse.call(this, qtiInteraction);
             }
         } else {
-            throw 'no renderer registered under the name : ' + qtiClass;
+            throw new Error('no renderer registered under the name : ' + qtiClass);
         }
         return ret;
     };
 
     this.resetResponse = function(qtiInteraction, qtiSubclass) {
-        var ret = false,
-            qtiClass = qtiSubclass || qtiInteraction.qtiClass,
-            renderer = _getClassRenderer(qtiClass);
+        let ret = false;
+        const qtiClass = qtiSubclass || qtiInteraction.qtiClass;
+        const renderer = _getClassRenderer(qtiClass);
 
         if (renderer) {
             if (typeof renderer.resetResponse === 'function') {
                 ret = renderer.resetResponse.call(this, qtiInteraction);
             }
         } else {
-            throw 'no renderer registered under the name : ' + qtiClass;
+            throw new Error('no renderer registered under the name : ' + qtiClass);
         }
         return ret;
     };
@@ -449,9 +450,9 @@ var Renderer = function(options) {
      * @throws {Error} if no renderer is registered
      */
     this.getState = function(qtiInteraction, qtiSubclass) {
-        var ret = false;
-        var qtiClass = qtiSubclass || qtiInteraction.qtiClass;
-        var renderer = _getClassRenderer(qtiClass);
+        let ret = false;
+        const qtiClass = qtiSubclass || qtiInteraction.qtiClass;
+        const renderer = _getClassRenderer(qtiClass);
 
         if (renderer) {
             if (_.isFunction(renderer.getState)) {
@@ -460,7 +461,7 @@ var Renderer = function(options) {
                 ret = renderer.getResponse.call(this, qtiInteraction);
             }
         } else {
-            throw 'no renderer registered under the name : ' + qtiClass;
+            throw new Error('no renderer registered under the name : ' + qtiClass);
         }
         return ret;
     };
@@ -476,8 +477,8 @@ var Renderer = function(options) {
      * @throws {Error} if no renderer is found
      */
     this.setState = function(qtiInteraction, state, qtiSubclass) {
-        var qtiClass = qtiSubclass || qtiInteraction.qtiClass;
-        var renderer = _getClassRenderer(qtiClass);
+        const qtiClass = qtiSubclass || qtiInteraction.qtiClass;
+        const renderer = _getClassRenderer(qtiClass);
 
         if (renderer) {
             if (_.isFunction(renderer.setState)) {
@@ -487,7 +488,7 @@ var Renderer = function(options) {
                 renderer.setResponse.call(this, qtiInteraction, state);
             }
         } else {
-            throw 'no renderer registered under the name : ' + qtiClass;
+            throw new Error('no renderer registered under the name : ' + qtiClass);
         }
     };
 
@@ -498,16 +499,16 @@ var Renderer = function(options) {
      * @throws {Error} if no renderer is found
      */
     this.destroy = function(qtiInteraction, qtiSubclass) {
-        var ret = false,
-            qtiClass = qtiSubclass || qtiInteraction.qtiClass,
-            renderer = _getClassRenderer(qtiClass);
+        let ret = false;
+        const qtiClass = qtiSubclass || qtiInteraction.qtiClass;
+        const renderer = _getClassRenderer(qtiClass);
 
         if (renderer) {
             if (_.isFunction(renderer.destroy)) {
                 ret = renderer.destroy.call(this, qtiInteraction);
             }
         } else {
-            throw 'no renderer registered under the name : ' + qtiClass;
+            throw new Error('no renderer registered under the name : ' + qtiClass);
         }
         return ret;
     };
@@ -521,10 +522,10 @@ var Renderer = function(options) {
     };
 
     this.load = function(callback, requiredClasses) {
-        var self = this;
-        var required = [];
+        const self = this;
+        let required = [];
 
-        var themeData = themesHelper.getCurrentThemeData();
+        const themeData = themesHelper.getCurrentThemeData();
         if (themeData) {
             options.themes = themeData;
         }
@@ -544,14 +545,14 @@ var Renderer = function(options) {
 
                 //add dependencies
                 _.each(requiredClasses, function(reqClass) {
-                    var deps = _dependencies[reqClass];
+                    const deps = _dependencies[reqClass];
                     if (deps) {
                         requiredClasses = _.union(requiredClasses, deps);
                     }
                 });
 
                 _.forEach(requiredClasses, function(qtiClass) {
-                    var requiredSubClasses;
+                    let requiredSubClasses;
                     if (_renderableSubclasses[qtiClass]) {
                         requiredSubClasses = _.intersection(requiredClasses, _renderableSubclasses[qtiClass]);
                         _.each(requiredSubClasses, function(subclass) {
@@ -634,9 +635,8 @@ var Renderer = function(options) {
      * @returns {Array} the choices
      */
     this.getShuffledChoices = function(interaction, reshuffle, returnedType) {
-        var choices = [];
-        var shuffled = [];
-        var serial, i;
+        let choices = [];
+        let serial, i;
 
         if (Element.isA(interaction, 'interaction')) {
             serial = interaction.getSerial();
@@ -721,8 +721,8 @@ var Renderer = function(options) {
             //already absolute or base64 encoded
             return relUrl;
         } else {
-            var absUrl = '';
-            var runtimeLocations = this.getOption('runtimeLocations');
+            let absUrl = '';
+            const runtimeLocations = this.getOption('runtimeLocations');
 
             if (runtimeLocations && _.size(runtimeLocations)) {
                 _.forIn(runtimeLocations, function(runtimeLocation, typeIdentifier) {
@@ -736,7 +736,7 @@ var Renderer = function(options) {
             if (absUrl) {
                 return absUrl;
             } else {
-                var baseUrl = this.getOption('baseUrl') || getDocumentBaseUrl();
+                const baseUrl = this.getOption('baseUrl') || getDocumentBaseUrl();
                 return baseUrl + relUrl;
             }
         }
@@ -769,8 +769,8 @@ export default {
      * @param {Object} [defaultOptions] - the renderer options
      */
     build: function(renderersLocations, name, defaultOptions) {
-        var NewRenderer = function() {
-            var options = _.isPlainObject(arguments[0]) ? arguments[0] : {};
+        const NewRenderer = function() {
+            const options = _.isPlainObject(arguments[0]) ? arguments[0] : {};
 
             Renderer.apply(this);
 

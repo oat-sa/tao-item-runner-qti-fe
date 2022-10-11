@@ -363,6 +363,9 @@ var Loader = Class.extend({
         if (!(bodyData && typeof bodyData.body === 'string' && typeof bodyData.elements === 'object')) {
             throw new Error('wrong bodydata format');
         }
+        //merge attributes when loading element data
+        const attributes = _.defaults(bodyData.attributes || {}, bodyObject.attributes || {});
+        bodyObject.setAttributes(attributes);
 
         for (let serial in bodyData.elements) {
             const eltData = bodyData.elements[serial];

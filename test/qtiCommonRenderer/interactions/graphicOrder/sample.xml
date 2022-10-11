@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assessmentItem xmlns="http://www.imsglobal.org/xsd/imsqti_v2p2" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p2 http://www.imsglobal.org/xsd/qti/qtiv2p2/imsqti_v2p2.xsd" identifier="i62a3147b138ca32082fe09df0385602" title="Item 1" label="Item 1" xml:lang="en-US" adaptive="false" timeDependent="false" toolName="TAO" toolVersion="2022.06">
+  <responseDeclaration identifier="RESPONSE" cardinality="ordered" baseType="identifier">
+    <correctResponse>
+      <value><![CDATA[hotspot_7]]></value>
+      <value><![CDATA[hotspot_2]]></value>
+      <value><![CDATA[hotspot_6]]></value>
+      <value><![CDATA[hotspot_3]]></value>
+      <value><![CDATA[hotspot_5]]></value>
+      <value><![CDATA[hotspot_4]]></value>
+      <value><![CDATA[hotspot_1]]></value>
+    </correctResponse>
+  </responseDeclaration>
+  <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float" normalMaximum="1"/>
+  <outcomeDeclaration identifier="MAXSCORE" cardinality="single" baseType="float">
+    <defaultValue>
+      <value>1</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <itemBody>
+    <div class="grid-row">
+      <div class="col-12">
+        <graphicOrderInteraction responseIdentifier="RESPONSE" class="responsive">
+          <object data="assets/sample.png" type="image/png" width="536" height="482"/>
+          <hotspotChoice identifier="hotspot_1" fixed="false" shape="circle" coords="248,251,42"/>
+          <hotspotChoice identifier="hotspot_2" fixed="false" shape="rect" coords="209,294,296,471"/>
+          <hotspotChoice identifier="hotspot_3" fixed="false" shape="rect" coords="19,23,125,320"/>
+          <hotspotChoice identifier="hotspot_4" fixed="false" shape="rect" coords="418,8,523,303"/>
+          <hotspotChoice identifier="hotspot_5" fixed="false" shape="rect" coords="160,27,393,182"/>
+          <hotspotChoice identifier="hotspot_6" fixed="false" shape="ellipse" coords="389,444,50,30"/>
+          <hotspotChoice identifier="hotspot_7" fixed="false" shape="poly" coords="27,424,90,463,144,466,185,392,154,346,82,348,26,392"/>
+        </graphicOrderInteraction>
+      </div>
+    </div>
+  </itemBody>
+  <responseProcessing template="http://www.imsglobal.org/question/qti_v2p2/rptemplates/match_correct"/>
+</assessmentItem>

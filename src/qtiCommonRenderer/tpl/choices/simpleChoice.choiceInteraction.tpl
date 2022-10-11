@@ -29,7 +29,9 @@
             </div>
         </div>
     </div>
+    {{#if allowElimination}}
     <label data-eliminable="container" data-label="{{__ "Eliminate"}}">
         <span data-eliminable="trigger" class="icon-checkbox"></span>
     </label>
+    {{/if}}
 </li>

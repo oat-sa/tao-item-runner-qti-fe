@@ -3,7 +3,7 @@ define([
     'lodash',
     'taoQtiItem/runner/qtiItemRunner',
     'json!taoQtiItem/test/samples/json/richardIII-1.json'
-], function($, _, qtiItemRunner, inlineChoiceData) {
+], function ($, _, qtiItemRunner, inlineChoiceData) {
     'use strict';
 
     var runner;
@@ -368,5 +368,89 @@ define([
             })
             .init()
             .render($container);
+    });
+
+    QUnit.module('Support direction mode');
+
+    QUnit.test('Display LTR mode', function (assert) {
+        const ready = assert.async();
+        assert.expect(5);
+
+        const $container = $(`#${fixtureContainerId}`);
+
+        assert.equal($container.length, 1, 'the item container exists');
+        assert.equal($container.children().length, 0, 'the container has no children');
+        const dirClass = 'ltr';
+        runner = qtiItemRunner('qti', inlineChoiceData)
+            .on('render', function () {
+                const $select = $('select', $container);
+                $select.select2({
+                    width: 'element',
+                    placeholder: 'select a choice',
+                    minimumResultsForSearch: -1,
+                    containerCssClass: `${dirClass}`,
+                    dropdownCssClass: `qti-inlineChoiceInteraction-dropdown ${dirClass}`
+                });
+
+                assert.true(
+                    $container.find('.select2-container.qti-inlineChoiceInteraction').hasClass(dirClass),
+                    'the inline choice interaction container has the correct direction class'
+                );
+                assert.equal(
+                    $select.length,
+                    1,
+                    'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
+                );
+                assert.equal(
+                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
+                    3,
+                    'the interaction has 3 choices'
+                );
+
+                ready();
+            })
+            .init()
+            .render($container);
+    });
+
+    QUnit.test('Display RTL mode', function (assert) {
+        const ready = assert.async();
+        assert.expect(5);
+
+        const $container = $(`#${fixtureContainerId}`);
+
+        assert.equal($container.length, 1, 'the item container exists');
+        assert.equal($container.children().length, 0, 'the container has no children');
+        const dirClass = 'rtl';
+        runner = qtiItemRunner('qti', inlineChoiceData)
+            .on('render', function () {
+                const $select = $('select', $container);
+                $select.select2({
+                    width: 'element',
+                    placeholder: 'select a choice',
+                    minimumResultsForSearch: -1,
+                    containerCssClass: `${dirClass}`,
+                    dropdownCssClass: `qti-inlineChoiceInteraction-dropdown ${dirClass}`
+                });
+
+                assert.true(
+                    $container.find('.select2-container.qti-inlineChoiceInteraction').hasClass(dirClass),
+                    'the inline choice interaction container has the correct direction class'
+                );
+                assert.equal(
+                    $select.length,
+                    1,
+                    'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
+                );
+                assert.equal(
+                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
+                    3,
+                    'the interaction has 3 choices'
+                );
+
+                ready();
+        })
+        .init()
+        .render($container);
     });
 });

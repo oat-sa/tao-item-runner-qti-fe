@@ -401,6 +401,9 @@ var setResponse = function(interaction, response) {
     if (response && interaction.paper) {
         try {
             responseValues = pciResponse.unserialize(response, interaction);
+            if (responseValues.length === 2 && !Array.isArray(responseValues[0]) && !Array.isArray(responseValues[1])) {
+                responseValues = [responseValues];
+            }
         } catch (e) {}
 
         if (_.isArray(responseValues)) {
@@ -452,12 +455,14 @@ var resetResponse = function resetResponse(interaction) {
         }
     });
 
-    //remove the paths, but outside the forEach as it is implemented as a linked list
-    interaction.paper.forEach(function(elt) {
-        if (elt.data('assoc-path')) {
-            toRemove.push(elt);
-        }
-    });
+    if (interaction && interaction.paper) {
+        //remove the paths, but outside the forEach as it is implemented as a linked list
+        interaction.paper.forEach(function(elt) {
+            if (elt.data('assoc-path')) {
+                toRemove.push(elt);
+            }
+        });
+    }
     _.invoke(toRemove, 'remove');
 };
 

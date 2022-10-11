@@ -1,6 +1,6 @@
 <div
   {{#if attributes.id}}id="{{attributes.id}}"{{/if}}
-  class="qti-interaction qti-blockInteraction qti-choiceInteraction{{#if attributes.class}} {{attributes.class}}{{/if}}"
+  class="qti-interaction qti-blockInteraction qti-choiceInteraction{{#if attributes.class}} {{attributes.class}}{{/if}}{{#if allowEliminationVisible}} allow-elimination-visible{{/if}}"
   data-serial="{{serial}}"
   data-qti-class="choiceInteraction"
   {{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}

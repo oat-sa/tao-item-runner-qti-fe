@@ -107,8 +107,8 @@ export default {
                 }, maxScore);
             }
 
+            maxScoreOutcome = item.getOutcomeDeclaration('MAXSCORE');
             if (!hasInvalidInteraction || customOutcomes.size()) {
-                maxScoreOutcome = item.getOutcomeDeclaration('MAXSCORE');
                 if (!maxScoreOutcome) {
                     //add new outcome
                     maxScoreOutcome = new OutcomeDeclaration({
@@ -121,9 +121,17 @@ export default {
                     maxScoreOutcome.buildIdentifier('MAXSCORE', false);
                 }
                 maxScoreOutcome.setDefaultValue(maxScore);
-            } else {
-                //remove MAXSCORE:
-                item.removeOutcome('MAXSCORE');
+            }
+
+            //handle special case when MAXSCORE is set up manually for some interaction like ExtendedText
+            if(hasInvalidInteraction && maxScoreOutcome) {
+                if(maxScoreOutcome.attributes && maxScoreOutcome.attributes.externalScored) {
+                    if(_.isUndefined(maxScoreOutcome.defaultValue)) {
+                        maxScoreOutcome.setDefaultValue(1);
+                    }
+                } else {
+                    item.removeOutcome('MAXSCORE');
+                }
             }
         }
     },
@@ -166,7 +174,6 @@ export default {
             requiredChoiceCount,
             totalAnswerableResponse,
             sortedMapEntries,
-            i,
             missingMapsCount;
 
         options = _.defaults(options || {}, { maxChoices: 0, minChoices: 0 });
@@ -819,6 +826,46 @@ export default {
                 max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
             }
         } else if (template === 'MAP_RESPONSE_POINT') {
+            max = 0;
+        }
+        return max;
+    },
+
+    /**
+     * Compute the maximum score of a "custom" typed interaction
+     * @param {Object} interaction - a standard interaction model object
+     * @returns {Number}
+     */
+    customInteractionBased(interaction) {
+        const responseDeclaration = interaction.getResponseDeclaration();
+        const template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
+        let max;
+        if (template === 'MATCH_CORRECT') {
+            if (
+                Array.isArray(responseDeclaration.correctResponse) &&
+                (responseDeclaration.correctResponse.length)
+            ) {
+                max = 1;
+            } else {
+                max = 0;
+            }
+        } else if (template === 'MAP_RESPONSE') {
+            //at least a map entry is required to be valid QTI
+            if (!responseDeclaration.mapEntries || !_.size(responseDeclaration.mapEntries)) {
+                return 0;
+            }
+
+            const values = _.values(responseDeclaration.mapEntries)
+                .map(function(v) {
+                    return parseFloat(v);
+                });
+            max = _.max(values);
+
+            //compare the calculated maximum with the mapping upperbound
+            if (responseDeclaration.mappingAttributes.upperBound) {
+                max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
+            }
+        } else {
             max = 0;
         }
         return max;

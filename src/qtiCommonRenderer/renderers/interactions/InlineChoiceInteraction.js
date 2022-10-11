@@ -65,6 +65,13 @@ const render = function (interaction, options) {
         $container.find(`div[data-identifier=${_emptyValue}]`).remove();
     }
 
+    const getItemDir = () => {
+        const itemBody = $('.qti-itemBody');
+        const itemDir = itemBody.attr('dir') || 'ltr';
+        return itemDir;
+    };
+
+    const dirClass = getItemDir();
     $container.select2({
         data: $container
             .find(optionSelector)
@@ -82,7 +89,8 @@ const render = function (interaction, options) {
         width: 'fit-content',
         placeholder: opts.placeholderText,
         minimumResultsForSearch: -1,
-        dropdownCssClass: 'qti-inlineChoiceInteraction-dropdown'
+        containerCssClass: `${dirClass}`,
+        dropdownCssClass: `qti-inlineChoiceInteraction-dropdown ${dirClass}`
     });
 
     const $el = $container.select2('container');

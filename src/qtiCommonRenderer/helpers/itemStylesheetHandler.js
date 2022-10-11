@@ -59,6 +59,14 @@ var attach = function attach(stylesheets) {
             //we need to set the href after the link is appended to the head (for our dear IE)
             $link.removeAttr('href').attr('href', href);
 
+            if (stylesheet.attr('onload')) {
+                $link[0].onload = stylesheet.attr('onload');
+            }
+
+            if (stylesheet.attr('onerror')) {
+                $link[0].onerror = stylesheet.attr('onerror');
+            }
+
             $link.one('load', informLoaded).appendTo($head);
         }
     });

@@ -20,6 +20,8 @@
 /**
  * @author Ansul Sharma <ansultaotesting.com>
  */
+import $ from 'jquery';
+import _ from 'lodash';
 import template from 'taoQtiItem/reviewRenderer/tpl/interactions/extendedTextInteraction';
 import patternMaskHelper from 'taoQtiItem/qtiCommonRenderer/helpers/patternMask';
 import extendedTextInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/ExtendedTextInteraction';
@@ -157,8 +159,8 @@ const inputLimiter = interaction => {
         $maxWordsCounter = $('.count-max-words', $container);
 
         if (patternMask !== '') {
-            maxWords = patternMaskHelper.parsePattern(patternMask, 'words');
-            maxLength = patternMaskHelper.parsePattern(patternMask, 'chars');
+            maxWords = parseInt(patternMaskHelper.parsePattern(patternMask, 'words'), 10);
+            maxLength = parseInt(patternMaskHelper.parsePattern(patternMask, 'chars'), 10);
             maxWords = _.isNaN(maxWords) ? 0 : maxWords;
             maxLength = _.isNaN(maxLength) ? 0 : maxLength;
             if (!maxLength && !maxWords) {
@@ -183,9 +185,15 @@ const inputLimiter = interaction => {
          * @return {Number} number of words
          */
         getWordsCount: () => {
-            const value = _getTextContainerValue(interaction) || '';
+            let value = _getTextContainerValue(interaction) || '';
             if (_.isEmpty(value)) {
                 return 0;
+            }
+            // convert it to text
+            if (_getFormat(interaction) === 'xhtml') {
+                const div = document.createElement('div');
+                div.innerHTML = value;
+                value = div.textContent || div.innerText || '';
             }
             // leading and trailing white space don't qualify as words
             return value.trim().replace(/\s+/gi, ' ').split(' ').length;

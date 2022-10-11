@@ -36,7 +36,9 @@ const _defaultOptions = {
         include: 'xi',
         table: 'table',
         image: 'img',
-        object: ''
+        object: '',
+        figure: 'qh5',
+        figcaption: 'qh5'
     },
     loaded: null,
     model: null
@@ -134,6 +136,29 @@ function parseTable($elt, elt, options) {
     return elt;
 }
 
+function parseFigure($elt, elt, options) {
+    elt.body = {
+        body: '',
+        elements: {}
+    };
+
+    const $parsedFigure= parseContainer($elt, options);
+    elt.body.body = $parsedFigure.body;
+    elt.body.elements = $parsedFigure.elements;
+    const $figcaption = $elt.find(_getElementSelector('figcaption', options.ns.figcaption));
+    if ($figcaption.length) {
+        const element = buildElement($figcaption);
+        element.body = {
+            body: $figcaption.html(),
+            elements: {}
+        };
+        elt.body.elements[element.serial] = element;
+        $figcaption.replaceWith(_placeholder(element));
+    }
+    elt.body.body = $elt.html();
+    return elt;
+}
+
 function parseContainer($container, options) {
     const ret = {
         serial: util.buildSerial('_container_'),
@@ -146,6 +171,16 @@ function parseContainer($container, options) {
         let element = buildElement($qtiElement, options);
 
         element = parseTable($qtiElement, element, options);
+        ret.elements[element.serial] = element;
+        $qtiElement.replaceWith(_placeholder(element));
+    });
+
+    // figure should be in top as it needs to be parsed first
+    $container.find(_getElementSelector('figure', options.ns.figure)).each(function () {
+        const $qtiElement = $(this);
+        let element = buildElement($qtiElement, options);
+
+        element = parseFigure($qtiElement, element, options);
         ret.elements[element.serial] = element;
         $qtiElement.replaceWith(_placeholder(element));
     });
