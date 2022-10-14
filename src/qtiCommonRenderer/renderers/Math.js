@@ -47,7 +47,12 @@ export default {
                 }
                 //defer execution fix some rendering issue in chrome
                 if ($self.length) {
-                    MathJax.Hub.Queue(['Typeset', MathJax.Hub, $self[0]]);
+                    $self.each(
+                        function( index ) {
+                            MathJax.Hub.Queue(['Typeset', MathJax.Hub,
+                                 $self[index]])
+                        }
+                    )
                     MathJax.Hub.Queue(resolve);
                 } else {
                     resolve();
