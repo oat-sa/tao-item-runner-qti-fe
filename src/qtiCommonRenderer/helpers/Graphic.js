@@ -462,6 +462,8 @@ var GraphicHelper = {
     /**
      * Get the QTI coordinates from a Raphael Element
      * @param {Raphael.Element} element - the shape to get the coords from
+     * @param {Raphael.Element} paper - the interaction paper
+     * @param {number} width - width of background image
      * @returns {String} the QTI coords
      */
     qtiCoords: function qtiCoords(element, paper, width) {
