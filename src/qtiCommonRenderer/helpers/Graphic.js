@@ -195,6 +195,7 @@ var GraphicHelper = {
         var imgWidth = options.width || $container.innerWidth();
         var imgHeight = options.height || $container.innerHeight();
 
+
         paper = scaleRaphael(id, imgWidth, imgHeight);
         image = paper.image(options.img, 0, 0, imgWidth, imgHeight);
         image.id = options.imgId || image.id;
@@ -234,10 +235,10 @@ var GraphicHelper = {
             maxWidth = $body.width();
             containerWidth = $editor.innerWidth();
 
-            if (givenWidth > 0) {
-                if (givenWidth < maxWidth) {
+            if (givenWidth > 0 || containerWidth > maxWidth) {
+                if (givenWidth > 0 && givenWidth < maxWidth) {
                     containerWidth = givenWidth;
-                } else {
+                } else if (containerWidth > maxWidth) {
                     containerWidth = maxWidth;
                 }
 
@@ -251,9 +252,8 @@ var GraphicHelper = {
                 if (typeof options.resize === 'function') {
                     options.resize(containerWidth, factor);
                 }
-
-                $container.trigger('resized.qti-widget');
             }
+            $container.trigger('resized.qti-widget');
         }
 
         return paper;
