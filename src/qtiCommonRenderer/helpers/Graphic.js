@@ -467,13 +467,14 @@ var GraphicHelper = {
      * @param {Raphael.Element} element - the shape to get the coords from
      * @returns {String} the QTI coords
      */
-    qtiCoords: function qtiCoords(element) {
+    qtiCoords: function qtiCoords(element, paper, width) {
         var mapper = raph2qtiCoordsMapper[element.type];
         var result = '';
+        var factor = paper && width ? width / paper.w : 1;
 
         if (_.isFunction(mapper)) {
             result = _.map(mapper.call(raph2qtiCoordsMapper, element.attr()), function(coord) {
-                return _.parseInt(coord);
+                return Math.round(coord * factor);
             }).join(',');
         }
 
