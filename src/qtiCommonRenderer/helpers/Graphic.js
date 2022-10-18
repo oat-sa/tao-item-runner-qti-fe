@@ -225,23 +225,20 @@ var GraphicHelper = {
          * @private
          */
         function resizePaper(e, givenWidth) {
-            var diff, maxWidth, containerWidth, containerHeight, factor;
+            var maxWidth, containerWidth, containerHeight, factor;
 
             if (e) {
                 e.stopPropagation();
             }
 
-            diff = $editor.outerWidth() - $editor.width() + ($container.outerWidth() - $container.width()) + 1;
             maxWidth = $body.width();
-            containerWidth = $container.innerWidth();
+            containerWidth = $editor.innerWidth();
 
-            if (containerWidth > 0 || givenWidth > 0) {
-                if (givenWidth < containerWidth && givenWidth < maxWidth) {
-                    containerWidth = givenWidth - diff;
-                } else if (containerWidth > maxWidth) {
-                    containerWidth = maxWidth - diff;
+            if (givenWidth > 0) {
+                if (givenWidth < maxWidth) {
+                    containerWidth = givenWidth;
                 } else {
-                    containerWidth -= diff;
+                    containerWidth = maxWidth;
                 }
 
                 factor = containerWidth / imgWidth;
