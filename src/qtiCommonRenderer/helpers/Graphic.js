@@ -195,6 +195,7 @@ var GraphicHelper = {
         var imgWidth = options.width || $container.innerWidth();
         var imgHeight = options.height || $container.innerHeight();
 
+
         paper = scaleRaphael(id, imgWidth, imgHeight);
         image = paper.image(options.img, 0, 0, imgWidth, imgHeight);
         image.id = options.imgId || image.id;
@@ -225,23 +226,20 @@ var GraphicHelper = {
          * @private
          */
         function resizePaper(e, givenWidth) {
-            var diff, maxWidth, containerWidth, containerHeight, factor;
+            var maxWidth, containerWidth, containerHeight, factor;
 
             if (e) {
                 e.stopPropagation();
             }
 
-            diff = $editor.outerWidth() - $editor.width() + ($container.outerWidth() - $container.width()) + 1;
             maxWidth = $body.width();
-            containerWidth = $container.innerWidth();
+            containerWidth = $editor.innerWidth();
 
-            if (containerWidth > 0 || givenWidth > 0) {
-                if (givenWidth < containerWidth && givenWidth < maxWidth) {
-                    containerWidth = givenWidth - diff;
+            if (givenWidth > 0 || containerWidth > maxWidth) {
+                if (givenWidth > 0 && givenWidth < maxWidth) {
+                    containerWidth = givenWidth;
                 } else if (containerWidth > maxWidth) {
-                    containerWidth = maxWidth - diff;
-                } else {
-                    containerWidth -= diff;
+                    containerWidth = maxWidth;
                 }
 
                 factor = containerWidth / imgWidth;
@@ -254,9 +252,8 @@ var GraphicHelper = {
                 if (typeof options.resize === 'function') {
                     options.resize(containerWidth, factor);
                 }
-
-                $container.trigger('resized.qti-widget');
             }
+            $container.trigger('resized.qti-widget');
         }
 
         return paper;
@@ -465,15 +462,18 @@ var GraphicHelper = {
     /**
      * Get the QTI coordinates from a Raphael Element
      * @param {Raphael.Element} element - the shape to get the coords from
+     * @param {Raphael.Element} paper - the interaction paper
+     * @param {number} width - width of background image
      * @returns {String} the QTI coords
      */
-    qtiCoords: function qtiCoords(element) {
+    qtiCoords: function qtiCoords(element, paper, width) {
         var mapper = raph2qtiCoordsMapper[element.type];
         var result = '';
+        var factor = paper && width ? width / paper.w : 1;
 
         if (_.isFunction(mapper)) {
             result = _.map(mapper.call(raph2qtiCoordsMapper, element.attr()), function(coord) {
-                return _.parseInt(coord);
+                return Math.round(coord * factor);
             }).join(',');
         }
 
