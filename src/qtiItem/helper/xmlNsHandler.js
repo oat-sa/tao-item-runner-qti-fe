@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA
+ * Copyright (c) 2017-2022 (original work) Open Assessment Technologies SA
  */
 
 /**
@@ -26,7 +26,7 @@
  * @see http://www.imsglobal.org/xsd/qti/qtiv2p2/imsqti_v2p2.xsd
  * @type {string}
  */
-var prefixed = 'article|aside|bdi|figure|footer|header|nav|rb|rp|rt|rtc|ruby|section';
+const prefixed = 'article|aside|bdi|figure|footer|header|nav|rb|rp|rt|rtc|ruby|section';
 
 /**
  * Find a possibly existing prefix
@@ -36,7 +36,7 @@ var prefixed = 'article|aside|bdi|figure|footer|header|nav|rb|rp|rt|rtc|ruby|sec
  * @returns {*}
  */
 function getPrefix(namespaces, html5Ns) {
-    var key;
+    let key;
     for (key in namespaces) {
         if (namespaces[key] === html5Ns) {
             return key;
@@ -52,9 +52,9 @@ export default {
      * @param body
      */
     stripNs: function stripNs(body) {
-        var pattern = '([\\w]+)\\:(' + prefixed + ')';
-        var openRegEx = new RegExp('(<' + pattern + ')', 'gi');
-        var closeRegEx = new RegExp('(<\\/' + pattern + '>)', 'gi');
+        const pattern = '([\\w]+)\\:(' + prefixed + ')';
+        const openRegEx = new RegExp('(<' + pattern + ')', 'gi');
+        const closeRegEx = new RegExp('(<\\/' + pattern + '>)', 'gi');
         return body.replace(openRegEx, '<$3').replace(closeRegEx, '</$3>');
     },
 
@@ -65,23 +65,28 @@ export default {
      * @param namespaces
      * @returns {*}
      */
-    restoreNs: function restoreNs(xml, namespaces) {
-        var xmlRe = new RegExp('(<(' + prefixed + ')[^>]*>|<\\/(' + prefixed + ')>)', 'gi');
-        var tagRe = new RegExp('((<)(' + prefixed + ')([^>]*)(>)|(<\\/)(' + prefixed + ')(>))', 'i');
-        var xmlMatch = xml.match(xmlRe);
-        var imsXsd = 'http://www.imsglobal.org/xsd';
-        var html5Ns = imsXsd + '/imsqtiv2p2_html5_v1p0';
-        var prefix = getPrefix(namespaces, html5Ns);
-        var prefixAtt = 'xmlns:' + prefix + '="' + html5Ns + '"';
-        var i = xmlMatch ? xmlMatch.length : 0;
-        var tagMatch;
+    restoreNs: function restoreNs(xml, namespaces, ignoreMarkup = false) {
+        let xmlCopy = xml;
+        if (ignoreMarkup) {
+            // cut from xmlCopy <markup...>...</markup>
+            // because markup should be html without namespace qh5
+            xmlCopy = xml.replace(/((?=<markup)(.|\n)*?(?:<\/markup>)+)/gim, '');
+        }
+        const xmlRe = new RegExp('(<(' + prefixed + ')[^>]*>|<\\/(' + prefixed + ')>)', 'gi');
+        const tagRe = new RegExp('((<)(' + prefixed + ')([^>]*)(>)|(<\\/)(' + prefixed + ')(>))', 'i');
+        const xmlMatch = xmlCopy.match(xmlRe);
+        const imsXsd = 'http://www.imsglobal.org/xsd';
+        const html5Ns = imsXsd + '/imsqtiv2p2_html5_v1p0';
+        const prefix = getPrefix(namespaces, html5Ns);
+        const prefixAtt = 'xmlns:' + prefix + '="' + html5Ns + '"';
+        let i = xmlMatch ? xmlMatch.length : 0;
 
         if (!xmlMatch) {
             return xml;
         }
 
         while (i--) {
-            tagMatch = xmlMatch[i].match(tagRe);
+            const tagMatch = xmlMatch[i].match(tagRe);
             xml = xml.replace(
                 xmlMatch[i],
                 tagMatch[5]
