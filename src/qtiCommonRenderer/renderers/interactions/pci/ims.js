@@ -115,7 +115,16 @@ export default function defaultPciRenderer(runtime) {
          */
         setReviewState(interaction, state) {
             this.destroy(interaction);
-            return this.createInstance(interaction, { response: { RESPONSE: state.response } });
+            let response = state.response;
+            // in case response is empty, check if record is set
+            if (_.isEmpty(response) && state.record) {
+                if (_.isString(state.record)) {
+                    response = JSON.parse(state.record);
+                } else {
+                    response = state.record;
+                }
+            }
+            return this.createInstance(interaction, { response: { RESPONSE: response } });
         },
         setState: _.noop,
         getState(interaction) {
