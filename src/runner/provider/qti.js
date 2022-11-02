@@ -36,6 +36,7 @@ import userModules from 'taoQtiItem/runner/provider/manager/userModules';
 import modalFeedbackHelper from 'taoQtiItem/qtiItem/helper/modalFeedback';
 import 'taoItems/assets/manager';
 import locale from 'util/locale';
+import alignmentHelper from 'ui/mediaEditor/plugins/mediaAlignment/helper';
 
 var timeout = (context.timeout > 0 ? context.timeout + 1 : 30) * 1000;
 
@@ -91,6 +92,12 @@ var qtiItemRuntimeProvider = {
                     const itemLang = $item.attr('lang');
                     $itemBody.attr('dir', locale.getLanguageDirection(itemLang));
                 }
+
+                // Add parent class to force inline flow on Figure tag
+                const figures = $itemBody.find(`.${alignmentHelper.INLINE_CLASS}`);
+                figures.each((i, fig) => {
+                    $(fig).parent().parent().addClass(`parent-${alignmentHelper.INLINE_CLASS}`);
+                })
             } catch (e) {
                 self.trigger('error', __('Error in template rendering: %s', e.message));
             }
