@@ -97,7 +97,7 @@ var qtiItemRuntimeProvider = {
                 const figures = $itemBody.find(`.${alignmentHelper.INLINE_CLASS}`);
                 figures.each((i, fig) => {
                     $(fig).parent().parent().addClass(`parent-${alignmentHelper.INLINE_CLASS}`);
-                })
+                });
             } catch (e) {
                 self.trigger('error', __('Error in template rendering: %s', e.message));
             }
