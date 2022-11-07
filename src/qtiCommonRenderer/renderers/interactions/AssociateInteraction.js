@@ -788,7 +788,7 @@ var _getRawResponse = function(interaction) {
             .find('div')
             .each(function() {
                 var serial = $(this).data('serial');
-                if (serial) {
+                if (serial && !this.getElementsByClassName('mediaplayer')) {
                     pair.push(interaction.getChoice(serial).id());
                 }
             });
