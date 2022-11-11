@@ -314,6 +314,31 @@ const _getRawResponse = function(interaction) {
     });
     return response;
 };
+const _setInstructions = function(interaction) {
+    const min = parseInt(interaction.attr('minAssociations'), 10);
+    const max = parseInt(interaction.attr('maxAssociations'), 10);
+
+    //infinite association:
+    if (min === 0) {
+        if (max === 0) {
+            instructionMgr.appendInstruction(interaction, __('You may make as many association pairs as you want.'));
+        }
+    } else {
+        if (max === 0) {
+            instructionMgr.appendInstruction(interaction, __('The maximum number of association is unlimited.'));
+        }
+        //the max value is implicit since the appropriate number of empty pairs have already been created
+        let msg = __('You need to make') + ' ';
+        msg += min > 1 ? __('at least') + ' ' + min + ' ' + __('association pairs') : __('one association pair');
+        instructionMgr.appendInstruction(interaction, msg, function() {
+            if (_getRawResponse(interaction).length >= min) {
+                this.setLevel('success');
+            } else {
+                this.reset();
+            }
+        });
+    }
+};
 /**
  * Init rendering, called after template injected into the DOM
  * All options are listed in the QTI v2.1 information model:
@@ -536,31 +561,6 @@ const render = function(interaction) {
             _resetSelection();
             e.preventDefault();
         });
-        const _setInstructions = function(interaction) {
-            const min = parseInt(interaction.attr('minAssociations'), 10);
-            const max = parseInt(interaction.attr('maxAssociations'), 10);
-
-            //infinite association:
-            if (min === 0) {
-                if (max === 0) {
-                    instructionMgr.appendInstruction(interaction, __('You may make as many association pairs as you want.'));
-                }
-            } else {
-                if (max === 0) {
-                    instructionMgr.appendInstruction(interaction, __('The maximum number of association is unlimited.'));
-                }
-                //the max value is implicit since the appropriate number of empty pairs have already been created
-                let msg = __('You need to make') + ' ';
-                msg += min > 1 ? __('at least') + ' ' + min + ' ' + __('association pairs') : __('one association pair');
-                instructionMgr.appendInstruction(interaction, msg, function() {
-                    if (_getRawResponse(interaction).length >= min) {
-                        this.setLevel('success');
-                    } else {
-                        this.reset();
-                    }
-                });
-            }
-        };
 
         if (!interaction.responseMappingMode) {
             _setInstructions(interaction);
