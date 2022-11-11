@@ -41,7 +41,7 @@ const setChoice = function(interaction, $choice, $target) {
     let usage = $choice.data('usage') || 0;
 
     if (!choiceSerial) {
-        throw 'empty choice serial';
+        throw new Error('empty choice serial');
     }
 
     //to track number of times a choice is used in a pair
@@ -295,7 +295,25 @@ const scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
         }
     };
 };
-
+const _getRawResponse = function(interaction) {
+    const response = [];
+    const $container = containerHelper.get(interaction);
+    $('.result-area>li', $container).each(function() {
+        const pair = [];
+        $(this)
+            .find('div')
+            .each(function() {
+                const serial = $(this).data('serial');
+                if (serial && !/^qtiobject_/.test(serial) && !/^object_/.test(serial)) {
+                    pair.push(interaction.getChoice(serial).id());
+                }
+            });
+        if (pair.length === 2) {
+            response.push(pair);
+        }
+    });
+    return response;
+};
 /**
  * Init rendering, called after template injected into the DOM
  * All options are listed in the QTI v2.1 information model:
@@ -306,7 +324,7 @@ const scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
 const render = function(interaction) {
     const self = this;
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve) {
         const $container = containerHelper.get(interaction);
         const $choiceArea = $container.find('.choice-area');
         const $resultArea = $container.find('.result-area');
@@ -365,6 +383,12 @@ const render = function(interaction) {
         const _isModeEditing = function() {
             return $activeChoice && !$activeChoice.data('identifier');
         };
+        const _activateChoice = function($choice) {
+            _resetSelection();
+            $activeChoice = $choice;
+            $choice.addClass('active');
+            $resultArea.find('>li>.target').addClass('empty');
+        };
 
         const _handleChoiceActivate = function($target) {
             if ($target.hasClass('deactivated')) {
@@ -386,12 +410,25 @@ const render = function(interaction) {
                 }
             }
         };
+        const _activateResult = function($target) {
+            const targetSerial = $target.data('serial');
 
-        const _activateChoice = function($choice) {
-            _resetSelection();
-            $activeChoice = $choice;
-            $choice.addClass('active');
-            $resultArea.find('>li>.target').addClass('empty');
+            $activeChoice = $target;
+            $activeChoice.addClass('active');
+
+            $resultArea
+                .find('>li>.target')
+                .filter(function() {
+                    return $(this).data('serial') !== targetSerial;
+                })
+                .addClass('empty');
+
+            $choiceArea
+                .find('>li:not(.deactivated)')
+                .filter(function() {
+                    return $(this).data('serial') !== targetSerial;
+                })
+                .addClass('empty');
         };
 
         const _handleResultActivate = function($target) {
@@ -441,27 +478,6 @@ const render = function(interaction) {
                 _activateResult($target);
                 $target.append($bin);
             }
-        };
-
-        const _activateResult = function($target) {
-            const targetSerial = $target.data('serial');
-
-            $activeChoice = $target;
-            $activeChoice.addClass('active');
-
-            $resultArea
-                .find('>li>.target')
-                .filter(function() {
-                    return $(this).data('serial') !== targetSerial;
-                })
-                .addClass('empty');
-
-            $choiceArea
-                .find('>li:not(.deactivated)')
-                .filter(function() {
-                    return $(this).data('serial') !== targetSerial;
-                })
-                .addClass('empty');
         };
 
         // Point & click handlers
@@ -520,6 +536,31 @@ const render = function(interaction) {
             _resetSelection();
             e.preventDefault();
         });
+        const _setInstructions = function(interaction) {
+            const min = parseInt(interaction.attr('minAssociations'), 10);
+            const max = parseInt(interaction.attr('maxAssociations'), 10);
+
+            //infinite association:
+            if (min === 0) {
+                if (max === 0) {
+                    instructionMgr.appendInstruction(interaction, __('You may make as many association pairs as you want.'));
+                }
+            } else {
+                if (max === 0) {
+                    instructionMgr.appendInstruction(interaction, __('The maximum number of association is unlimited.'));
+                }
+                //the max value is implicit since the appropriate number of empty pairs have already been created
+                let msg = __('You need to make') + ' ';
+                msg += min > 1 ? __('at least') + ' ' + min + ' ' + __('association pairs') : __('one association pair');
+                instructionMgr.appendInstruction(interaction, msg, function() {
+                    if (_getRawResponse(interaction).length >= min) {
+                        this.setLevel('success');
+                    } else {
+                        this.reset();
+                    }
+                });
+            }
+        };
 
         if (!interaction.responseMappingMode) {
             _setInstructions(interaction);
@@ -699,32 +740,6 @@ const render = function(interaction) {
     });
 };
 
-const _setInstructions = function(interaction) {
-    const min = parseInt(interaction.attr('minAssociations'), 10);
-    const max = parseInt(interaction.attr('maxAssociations'), 10);
-
-    //infinite association:
-    if (min === 0) {
-        if (max === 0) {
-            instructionMgr.appendInstruction(interaction, __('You may make as many association pairs as you want.'));
-        }
-    } else {
-        if (max === 0) {
-            instructionMgr.appendInstruction(interaction, __('The maximum number of association is unlimited.'));
-        }
-        //the max value is implicit since the appropriate number of empty pairs have already been created
-        let msg = __('You need to make') + ' ';
-        msg += min > 1 ? __('at least') + ' ' + min + ' ' + __('association pairs') : __('one association pair');
-        instructionMgr.appendInstruction(interaction, msg, function() {
-            if (_getRawResponse(interaction).length >= min) {
-                this.setLevel('success');
-            } else {
-                this.reset();
-            }
-        });
-    }
-};
-
 const resetResponse = function(interaction) {
     const $container = containerHelper.get(interaction);
 
@@ -778,26 +793,6 @@ const _setPairs = function(interaction, pairs) {
  */
 const setResponse = function(interaction, response) {
     _setPairs(interaction, pciResponse.unserialize(response, interaction));
-};
-
-const _getRawResponse = function(interaction) {
-    const response = [];
-    const $container = containerHelper.get(interaction);
-    $('.result-area>li', $container).each(function() {
-        const pair = [];
-        $(this)
-            .find('div')
-            .each(function() {
-                const serial = $(this).data('serial');
-                if (serial && !/^qtiobject_/.test(serial) && !/^object_/.test(serial)) {
-                       pair.push(interaction.getChoice(serial).id());
-                }
-            });
-        if (pair.length === 2) {
-            response.push(pair);
-        }
-    });
-    return response;
 };
 
 /**
