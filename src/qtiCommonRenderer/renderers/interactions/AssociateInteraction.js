@@ -779,16 +779,16 @@ var setResponse = function(interaction, response) {
     _setPairs(interaction, pciResponse.unserialize(response, interaction));
 };
 
-var _getRawResponse = function(interaction) {
-    var response = [];
-    var $container = containerHelper.get(interaction);
+const _getRawResponse = function(interaction) {
+    const response = [];
+    const $container = containerHelper.get(interaction);
     $('.result-area>li', $container).each(function() {
-        var pair = [];
+        const pair = [];
         $(this)
             .find('div')
             .each(function() {
-                var serial = $(this).data('serial');
-                if (serial && pair.length !== 2) {
+                const serial = $(this).data('serial');
+                if (serial && !/^qtiobject_/.test(serial)) {
                        pair.push(interaction.getChoice(serial).id());
                 }
             });
