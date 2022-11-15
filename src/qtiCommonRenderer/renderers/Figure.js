@@ -23,6 +23,15 @@ export default {
     qtiClass: 'figure',
     getContainer: containerHelper.get,
     template: tpl,
+    getData: function (elem, data) {
+        let showFigure = false;
+        if (data.attributes.class && ['wrap-left', 'wrap-right'].includes(data.attributes.class)) {
+            showFigure = true;
+        }
+        data.attributes.showFigure = showFigure;
+        elem.attributes.showFigure = showFigure;
+        return data;
+    },
     render: function(figure) {
         const $figure = containerHelper.get(figure);
         const $img = $figure.find('img');
