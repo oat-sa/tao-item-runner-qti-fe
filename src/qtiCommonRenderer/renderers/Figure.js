@@ -31,6 +31,8 @@ export default {
             _.some(elem.bdy['elements'], childElement => {
                 if (childElement.serial.includes('figcaption')) {
                     showFigure = true;
+                    data.attributes.class = 'wrap-left';
+                    elem.attributes.class = 'wrap-left';                    
                 }
             });
         }        
