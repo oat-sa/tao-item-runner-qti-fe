@@ -15,7 +15,7 @@
  *
  * Copyright (c) 2022 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  */
-
+import _ from 'lodash';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 
@@ -32,10 +32,10 @@ export default {
                 if (childElement.serial.includes('figcaption')) {
                     showFigure = true;
                     data.attributes.class = 'wrap-left';
-                    elem.attributes.class = 'wrap-left';                    
+                    elem.attributes.class = 'wrap-left';
                 }
             });
-        }        
+        }
         data.attributes.showFigure = showFigure;
         elem.attributes.showFigure = showFigure;
         return data;
