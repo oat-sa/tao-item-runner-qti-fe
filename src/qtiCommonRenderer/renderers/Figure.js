@@ -27,7 +27,7 @@ export default {
         let showFigure = false;
         if (data.attributes.class && ['wrap-left', 'wrap-right'].includes(data.attributes.class)) {
             showFigure = true;
-        } else if (!data.attributes.showFigure) {
+        } else {
             _.some(elem.bdy['elements'], childElement => {
                 if (childElement.serial.includes('figcaption')) {
                     showFigure = true;
