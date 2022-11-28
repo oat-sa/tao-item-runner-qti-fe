@@ -42,7 +42,7 @@ const _defaultOptions = {
     placeholderText: __('select a choice')
 };
 
-const optionSelector = 'div[role="option"]';
+const optionSelector = 'span[role="option"]';
 
 /**
  * Init rendering, called after template injected into the DOM
@@ -60,9 +60,9 @@ const render = function (interaction, options) {
     _.extend(opts, options);
 
     if (opts.allowEmpty && !required) {
-        $container.find(`div[data-identifier=${_emptyValue}]`).text('--- ' + __('leave empty') + ' ---');
+        $container.find(`span[data-identifier=${_emptyValue}]`).text('--- ' + __('leave empty') + ' ---');
     } else {
-        $container.find(`div[data-identifier=${_emptyValue}]`).remove();
+        $container.find(`span[data-identifier=${_emptyValue}]`).remove();
     }
 
     const getItemDir = () => {

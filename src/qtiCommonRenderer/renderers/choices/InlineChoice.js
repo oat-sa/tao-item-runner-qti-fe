@@ -27,5 +27,14 @@ import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 export default {
     qtiClass: 'inlineChoice',
     getContainer: containerHelper.get,
-    template: tpl
+    template: tpl,
+     getData: function getData(choice, data) {
+         if(data.body.indexOf('<div class="qti-block">') != -1) {
+             let stripedChoice = data.body
+                 .replace('<div class="qti-block">', '' )
+                 .replace('</div>', '' )
+             data.body = stripedChoice;
+         }
+         return data;
+     }
 };
