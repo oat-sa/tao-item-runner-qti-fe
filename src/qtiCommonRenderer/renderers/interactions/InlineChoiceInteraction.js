@@ -50,6 +50,7 @@ const optionSelector = 'span[role="option"]';
  * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10321
  *
  * @param {object} interaction
+ * @param {object} options - object containing available options
  */
 const render = function (interaction, options) {
     const opts = _.clone(_defaultOptions);
@@ -60,7 +61,7 @@ const render = function (interaction, options) {
     _.extend(opts, options);
 
     if (opts.allowEmpty && !required) {
-        $container.find(`span[data-identifier=${_emptyValue}]`).text('--- ' + __('leave empty') + ' ---');
+        $container.find(`span[data-identifier=${_emptyValue}]`).text(`--- ${__(`leave empty`)}---`);
     } else {
         $container.find(`span[data-identifier=${_emptyValue}]`).remove();
     }
@@ -112,8 +113,8 @@ const render = function (interaction, options) {
                 const $selectedIndex = $(e.currentTarget)[0].options.selectedIndex
                     ? $(e.currentTarget)[0].options.selectedIndex
                     : null;
-                $container.find(optionSelector).one('click', function (e) {
-                    e.stopPropagation();
+                $container.find(optionSelector).one('click', function (ev) {
+                    ev.stopPropagation();
                 });
                 $container.find(optionSelector).eq($selectedIndex).trigger('click');
             }
@@ -136,13 +137,15 @@ const render = function (interaction, options) {
         });
 };
 
+const _setVal = function (interaction, choiceIdentifier) {
+    containerHelper.get(interaction).val(choiceIdentifier).select2('val', choiceIdentifier);
+};
+
 const resetResponse = function (interaction) {
     _setVal(interaction, _emptyValue);
 };
 
-const _setVal = function (interaction, choiceIdentifier) {
-    containerHelper.get(interaction).val(choiceIdentifier).select2('val', choiceIdentifier);
-};
+
 
 /**
  * Set the response to the rendered interaction.
