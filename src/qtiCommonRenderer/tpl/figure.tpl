@@ -5,7 +5,7 @@
     {{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}
 >{{{body}}}</figure>
 {{else}}
-<span data-serial="{{serial}}">
+<span data-serial="{{serial}}" data-figure="true">
     {{{body}}}
 </span>
 {{/if}}
