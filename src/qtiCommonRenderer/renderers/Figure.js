@@ -43,7 +43,7 @@ export default {
     render: function(figure) {
         const $figure = containerHelper.get(figure);
         const $img = $figure.find('img');
-        if ($img.length) {
+        if ($img.length && $figure.prop('tagName') === 'FIGURE') {
             // move width from image to figure
             $figure.css({ width: $img.attr('width') });
             $img.attr('width', '100%');
