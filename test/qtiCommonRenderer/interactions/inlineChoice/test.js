@@ -6,9 +6,9 @@ define([
 ], function ($, _, qtiItemRunner, inlineChoiceData) {
     'use strict';
 
-    var runner;
-    var fixtureContainerId = 'item-container';
-    var outsideContainerId = 'outside-container';
+    let runner;
+    const fixtureContainerId = 'item-container';
+    const outsideContainerId = 'outside-container';
 
     QUnit.module('Inline Choice Interaction', {
         afterEach: function(assert) {
@@ -19,10 +19,10 @@ define([
     });
 
     QUnit.test('renders correclty', function(assert) {
-        var ready = assert.async();
-        assert.expect(17);
+        const ready = assert.async();
+        assert.expect(14);
 
-        var $container = $('#' + fixtureContainerId);
+        const $container = $('#' + fixtureContainerId);
 
         assert.equal($container.length, 1, 'the item container exists');
         assert.equal($container.children().length, 0, 'the container has no children');
@@ -42,24 +42,19 @@ define([
                     'the container contains a the body element .qti-itemBody'
                 );
                 assert.equal(
-                    $container.find('select.qti-interaction').length,
+                    $container.find('span.qti-interaction').length,
                     1,
                     'the container contains an interaction .qti-interaction'
                 );
                 assert.equal(
-                    $container.find('select.qti-interaction.qti-inlineChoiceInteraction').length,
+                    $container.find('span.qti-interaction.qti-interaction.qti-inlineChoiceInteraction').length,
                     1,
                     'the container contains a choice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option').length,
-                    5,
-                    'the interaction has 5 options'
-                );
-                assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('.qti-inlineChoiceInteraction span[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices'
                 );
 
                 //Check select2
@@ -77,34 +72,24 @@ define([
                 );
 
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option:nth-child(1)').val(),
-                    '',
-                    'the 1st choice has no value'
-                );
-                assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option:nth-child(1)').text(),
-                    '',
-                    'the 1st choice is empty'
-                );
-                assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option:nth-child(2)').val(),
+                    $container.find('span[role="listbox"].qti-inlineChoiceInteraction span[role="option"]:nth-child(1)').data('identifier'),
                     'empty',
-                    'the 2nd choice has a value of "empty"'
+                    'the 1st choice has a value of "empty"'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option:nth-child(3)').data('identifier'),
+                    $container.find('span[role="listbox"].qti-inlineChoiceInteraction span[role="option"]:nth-child(2)').data('identifier'),
                     'G',
+                    'the 2nd choice has the right identifier'
+                );
+                assert.equal(
+                    $container.find('span[role="listbox"].qti-inlineChoiceInteraction span[role="option"]:nth-child(3)').data('identifier'),
+                    'L',
                     'the 3rd choice has the right identifier'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option:nth-child(4)').data('identifier'),
-                    'L',
-                    'the 4th choice has the right identifier'
-                );
-                assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option:nth-child(5)').data('identifier'),
+                    $container.find('span[role="listbox"].qti-inlineChoiceInteraction span[role="option"]:nth-child(4)').data('identifier'),
                     'Y',
-                    'the 5th choice has the right identifier'
+                    'the 4th choice has the right identifier',
                 );
 
                 ready();
@@ -114,29 +99,29 @@ define([
     });
 
     QUnit.test('enables to select a choice', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(8);
 
-        var $container = $('#' + fixtureContainerId);
+        const $container = $('#' + fixtureContainerId);
 
         assert.equal($container.length, 1, 'the item container exists');
         assert.equal($container.children().length, 0, 'the container has no children');
 
         runner = qtiItemRunner('qti', inlineChoiceData)
             .on('render', function() {
-                var $select = $('select.qti-inlineChoiceInteraction', $container);
+                const $select = $('div[role="listbox"].qti-inlineChoiceInteraction', $container);
                 assert.equal(
                     $select.length,
                     1,
                     'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices',
                 );
 
-                var $select2Container = $('.select2-container', $container);
+                const $select2Container = $('.select2-container', $container);
                 assert.equal($select2Container.length, 1, 'select2 is initialized');
 
                 $select.select2('val', 'L').trigger('change');
@@ -147,7 +132,7 @@ define([
                 assert.deepEqual(
                     state.RESPONSE,
                     { response: { base: { identifier: 'L' } } },
-                    'The lancaster response is selected'
+                    'The lancaster response is selected ' + JSON.stringify(state.RESPONSE)
                 );
                 ready();
             })
@@ -156,26 +141,26 @@ define([
     });
 
     QUnit.test('set the default response', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(6);
 
-        var $container = $('#' + fixtureContainerId);
+        const $container = $('#' + fixtureContainerId);
 
         assert.equal($container.length, 1, 'the item container exists');
         assert.equal($container.children().length, 0, 'the container has no children');
 
         runner = qtiItemRunner('qti', inlineChoiceData)
             .on('render', function() {
-                var $select = $('select.qti-inlineChoiceInteraction', $container);
+                const $select = $('div[role="listbox"].qti-inlineChoiceInteraction', $container);
                 assert.equal(
                     $select.length,
                     1,
                     'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices',
                 );
 
                 assert.equal($select.select2('val'), '', 'There is no choice selected');
@@ -183,7 +168,7 @@ define([
                 this.setState({ RESPONSE: { response: { base: { identifier: 'G' } } } });
 
                 _.delay(function() {
-                    assert.equal($select.select2('val'), 'G', 'The G choice is selected');
+                    assert.equal($select.select2('val'), 'G', 'The G choice is selected ' + $select.select2('val'));
 
                     ready();
                 }, 10);
@@ -193,35 +178,35 @@ define([
     });
 
     QUnit.test('destroys', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(6);
 
-        var $container = $('#' + fixtureContainerId);
+        const $container = $('#' + fixtureContainerId);
 
         assert.equal($container.length, 1, 'the item container exists');
         assert.equal($container.children().length, 0, 'the container has no children');
 
         runner = qtiItemRunner('qti', inlineChoiceData)
             .on('render', function() {
-                var self = this;
+                const self = this;
 
-                var $select = $('select.qti-inlineChoiceInteraction', $container);
+                const $select = $('div[role="listbox"].qti-inlineChoiceInteraction', $container);
                 assert.equal(
                     $select.length,
                     1,
                     'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices',
                 );
 
-                var $select2Container = $('.select2-container', $container);
+                const $select2Container = $('.select2-container', $container);
                 assert.equal($select2Container.length, 1, 'select2 is initialized');
 
                 //Call destroy manually
-                var interaction = this._item.getInteractions()[0];
+                const interaction = this._item.getInteractions()[0];
                 interaction.renderer.destroy(interaction);
 
                 _.delay(function() {
@@ -243,31 +228,31 @@ define([
     });
 
     QUnit.test('resets the response', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(7);
 
-        var $container = $('#' + fixtureContainerId);
+        const $container = $('#' + fixtureContainerId);
 
         assert.equal($container.length, 1, 'the item container exists');
         assert.equal($container.children().length, 0, 'the container has no children');
 
         runner = qtiItemRunner('qti', inlineChoiceData)
             .on('render', function() {
-                var self = this;
+                const self = this;
 
-                var $select = $('select.qti-inlineChoiceInteraction', $container);
+                const $select = $('div[role="listbox"].qti-inlineChoiceInteraction', $container);
                 assert.equal(
                     $select.length,
                     1,
                     'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices',
                 );
 
-                var $select2Container = $('.select2-container', $container);
+                const $select2Container = $('.select2-container', $container);
                 assert.equal($select2Container.length, 1, 'select2 is initialized');
 
                 $select.select2('val', 'L').trigger('change');
@@ -276,7 +261,7 @@ define([
                     assert.equal($select.val(), 'L', 'The value is set to Lancaster');
 
                     //Call destroy manually
-                    var interaction = self._item.getInteractions()[0];
+                    const interaction = self._item.getInteractions()[0];
                     interaction.renderer.resetResponse(interaction);
 
                     _.delay(function() {
@@ -290,32 +275,32 @@ define([
     });
 
     QUnit.test('restores order of shuffled choices', function(assert) {
-        var ready = assert.async();
-        assert.expect(10);
+        const ready = assert.async();
+        assert.expect(8);
 
-        var $container = $('#' + fixtureContainerId);
+        const $container = $('#' + fixtureContainerId);
 
         assert.equal($container.length, 1, 'the item container exists');
         assert.equal($container.children().length, 0, 'the container has no children');
 
         //Hack the item data to set the shuffle attr to true
-        var shuffled = _.cloneDeep(inlineChoiceData);
+        const shuffled = _.cloneDeep(inlineChoiceData);
         shuffled.body.elements.interaction_inlinechoiceinteraction_547464dbc7afc574464937.attributes.shuffle = true;
 
         runner = qtiItemRunner('qti', shuffled)
             .on('render', function() {
-                var self = this;
+                const self = this;
 
-                var $select = $('select.qti-inlineChoiceInteraction', $container);
+                const $select = $('div[role="listbox"].qti-inlineChoiceInteraction', $container);
                 assert.equal(
                     $select.length,
                     1,
                     'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices',
                 );
 
                 this.setState({
@@ -327,34 +312,24 @@ define([
 
                 _.delay(function() {
                     assert.equal(
-                        $container.find('select.qti-inlineChoiceInteraction option:nth-child(1)').val(),
-                        '',
-                        'the 1st choice has no value'
-                    );
-                    assert.equal(
-                        $container.find('select.qti-inlineChoiceInteraction option:nth-child(1)').text(),
-                        '',
-                        'the 1st choice is empty'
-                    );
-                    assert.equal(
-                        $container.find('select.qti-inlineChoiceInteraction option:nth-child(2)').val(),
+                        $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(1)').data('identifier'),
                         'empty',
-                        'the 2nd choice has a value of "empty"'
+                        'the 1st choice has a value of "empty"',
                     );
                     assert.equal(
-                        $container.find('select.qti-inlineChoiceInteraction option:nth-child(3)').data('identifier'),
+                        $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(2)').data('identifier'),
                         'Y',
-                        'the 3rd choice has the right identifier'
+                        'the 2nd choice has the right identifier',
                     );
                     assert.equal(
-                        $container.find('select.qti-inlineChoiceInteraction option:nth-child(4)').data('identifier'),
+                        $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(3)').data('identifier'),
                         'G',
-                        'the 4th choice has the right identifier'
+                        'the 3rd choice has the right identifier',
                     );
                     assert.equal(
-                        $container.find('select.qti-inlineChoiceInteraction option:nth-child(5)').data('identifier'),
+                        $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"]:nth-child(4)').data('identifier'),
                         'L',
-                        'the 5th choice has the right identifier'
+                        'the 4th choice has the right identifier',
                     );
 
                     ready();
@@ -367,26 +342,26 @@ define([
     QUnit.module('Visual Test');
 
     QUnit.test('Display and play', function(assert) {
-        var ready = assert.async();
+        const ready = assert.async();
         assert.expect(4);
 
-        var $container = $('#' + outsideContainerId);
+        const $container = $('#' + outsideContainerId);
 
         assert.equal($container.length, 1, 'the item container exists');
         assert.equal($container.children().length, 0, 'the container has no children');
 
         runner = qtiItemRunner('qti', inlineChoiceData)
             .on('render', function() {
-                var $select = $('select.qti-inlineChoiceInteraction', $container);
+                const $select = $('div[role="listbox"].qti-inlineChoiceInteraction', $container);
                 assert.equal(
                     $select.length,
                     1,
                     'the container contains an inlineChoice interaction .qti-inlineChoiceInteraction'
                 );
                 assert.equal(
-                    $container.find('select.qti-inlineChoiceInteraction option[data-identifier]').length,
-                    3,
-                    'the interaction has 3 choices'
+                    $container.find('div[role="listbox"].qti-inlineChoiceInteraction div[role="option"][data-identifier]').length,
+                    4,
+                    'the interaction has 4 choices'
                 );
 
                 ready();
@@ -474,8 +449,8 @@ define([
                 );
 
                 ready();
-        })
-        .init()
-        .render($container);
+            })
+            .init()
+            .render($container);
     });
 });

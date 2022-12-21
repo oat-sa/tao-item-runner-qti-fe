@@ -22,9 +22,15 @@
  */
 import template from 'taoQtiItem/reviewRenderer/tpl/interactions/inlineChoiceInteraction';
 import inlineChoiceInteraction from 'taoQtiItem/qtiCommonRenderer/renderers/interactions/InlineChoiceInteraction';
+import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 
+const render = (interaction , options)=> {
+    inlineChoiceInteraction.render(interaction , options);
+    const $container = containerHelper.get(interaction);
+    $container.select2('disable');
+};
 /**
  * Expose the common renderer for the inline choice interaction
  * @exports qtiCommonRenderer/renderers/interactions/InlineChoiceInteraction
  */
-export default Object.assign({}, inlineChoiceInteraction, {template});
+export default Object.assign({}, inlineChoiceInteraction, {template, render});
