@@ -270,7 +270,7 @@ define([
         const ready = assert.async();
 
         const $container = $('#set-get-response');
-        //here 12 is entered using unicode wide chars
+        //here 12 is entered using unicode wide chars and leading spaces
         const unicodeCharsString = '   １２ ';
         const asciiCharsString = '12';
         const state = { RESPONSE: { response: { base: { string: unicodeCharsString } } } };
