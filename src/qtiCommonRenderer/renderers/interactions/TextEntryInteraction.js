@@ -33,6 +33,12 @@ import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import patternMaskHelper from 'taoQtiItem/qtiCommonRenderer/helpers/patternMask';
 import locale from 'util/locale';
 import tooltip from 'ui/tooltip';
+import loggerFactory from 'core/logger';
+
+/**
+ * Create a logger
+ */
+ const logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/TextEntryInteraction.js');
 
 /**
  * Hide the tooltip for the text input
@@ -200,7 +206,9 @@ function setResponse(interaction, response) {
 
     try {
         responseValue = pciResponse.unserialize(response, interaction);
-    } catch (e) {}
+    } catch (e) {
+        logger.warn(`setResponse error ${e}`);
+    }
 
     if (responseValue && responseValue.length) {
         interaction.getContainer().val(responseValue[0]);
