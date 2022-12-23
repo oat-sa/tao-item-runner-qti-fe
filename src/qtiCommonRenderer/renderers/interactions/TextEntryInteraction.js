@@ -13,14 +13,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2022 Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
 /**
  * @author Sam Sipasseuth <sam@taotesting.com>
  * @author Bertrand Chevrier <bertrand@taotesting.com>
+ * @author Andrey Shaveko <andrey.shaveko@taotesting.com>
  */
+
 import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
