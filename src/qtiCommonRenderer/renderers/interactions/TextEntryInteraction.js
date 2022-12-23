@@ -38,11 +38,11 @@ import tooltip from 'ui/tooltip';
  * Hide the tooltip for the text input
  * @param {jQuery} $input
  */
-var hideTooltip = function hideTooltip($input) {
+function hideTooltip($input) {
     if ($input.data('$tooltip')) {
         $input.data('$tooltip').hide();
     }
-};
+}
 
 /**
  * Create/Show tooltip for the text input
@@ -50,11 +50,11 @@ var hideTooltip = function hideTooltip($input) {
  * @param {String} theme
  * @param {String} message
  */
-var showTooltip = function showTooltip($input, theme, message) {
+function showTooltip($input, theme, message) {
     if ($input.data('$tooltip')) {
         $input.data('$tooltip').updateTitleContent(message);
     } else {
-        var textEntryTooltip = tooltip.create($input, message, {
+        const textEntryTooltip = tooltip.create($input, message, {
             theme: theme,
             trigger: 'manual'
         });
@@ -63,7 +63,7 @@ var showTooltip = function showTooltip($input, theme, message) {
     }
 
     $input.data('$tooltip').show();
-};
+}
 
 /**
  * Init rendering, called after template injected into the DOM
@@ -72,15 +72,13 @@ var showTooltip = function showTooltip($input, theme, message) {
  *
  * @param {object} interaction
  */
-var render = function render(interaction) {
-    var attributes = interaction.getAttributes(),
-        baseType = interaction.getResponseDeclaration().attr('baseType'),
-        $input = interaction.getContainer(),
-        expectedLength,
-        updateMaxCharsTooltip,
-        updatePatternMaskTooltip,
-        patternMask = interaction.attr('patternMask'),
-        maxChars = parseInt(patternMaskHelper.parsePattern(patternMask, 'chars'), 10);
+function render(interaction) {
+    const attributes = interaction.getAttributes();
+    const baseType = interaction.getResponseDeclaration().attr('baseType');
+    const $input = interaction.getContainer();
+    const patternMask = interaction.attr('patternMask');
+    const maxChars = parseInt(patternMaskHelper.parsePattern(patternMask, 'chars'), 10);
+    let expectedLength;
 
     // Setting up baseType
     switch (baseType) {
@@ -108,9 +106,10 @@ var render = function render(interaction) {
     }
 
     if (maxChars) {
-        updateMaxCharsTooltip = function updateMaxCharsTooltip() {
-            var count = $input.val().length;
-            var message, messageType;
+        const updateMaxCharsTooltip = () => {
+            const count = $input.val().length;
+            let message;
+            let messageType;
 
             if (count) {
                 message = __('%d/%d', count, maxChars);
@@ -145,8 +144,8 @@ var render = function render(interaction) {
                 hideTooltip($input);
             });
     } else if (attributes.patternMask) {
-        updatePatternMaskTooltip = function updatePatternMaskTooltip() {
-            var regex = new RegExp(attributes.patternMask);
+        const updatePatternMaskTooltip = () => {
+            const regex = new RegExp(attributes.patternMask);
 
             hideTooltip($input);
 
@@ -176,11 +175,11 @@ var render = function render(interaction) {
             containerHelper.triggerResponseChangeEvent(interaction);
         });
     }
-};
+}
 
-var resetResponse = function resetResponse(interaction) {
+function resetResponse(interaction) {
     interaction.getContainer().val('');
-};
+}
 
 /**
  * Set the response to the rendered interaction.
@@ -196,8 +195,8 @@ var resetResponse = function resetResponse(interaction) {
  * @param {object} interaction
  * @param {object} response
  */
-var setResponse = function setResponse(interaction, response) {
-    var responseValue;
+function setResponse(interaction, response) {
+    let responseValue;
 
     try {
         responseValue = pciResponse.unserialize(response, interaction);
@@ -206,7 +205,7 @@ var setResponse = function setResponse(interaction, response) {
     if (responseValue && responseValue.length) {
         interaction.getContainer().val(responseValue[0]);
     }
-};
+}
 
 /**
  * Return the response of the rendered interaction
@@ -220,13 +219,14 @@ var setResponse = function setResponse(interaction, response) {
  * @param {object} interaction
  * @returns {object}
  */
-var getResponse = function getResponse(interaction) {
-    var ret = { base: {} },
-        value,
-        $input = interaction.getContainer(),
-        attributes = interaction.getAttributes(),
-        baseType = interaction.getResponseDeclaration().attr('baseType'),
-        numericBase = attributes.base || 10;
+function getResponse(interaction) {
+    const ret = { base: {} };
+    const $input = interaction.getContainer();
+    const attributes = interaction.getAttributes();
+    const baseType = interaction.getResponseDeclaration().attr('baseType');
+    const numericBase = attributes.base || 10;
+
+    let value;
 
     if ($input.hasClass('invalid') || (attributes.placeholderText && $input.val() === attributes.placeholderText)) {
         //invalid response or response equals to the placeholder text are considered empty
@@ -244,11 +244,11 @@ var getResponse = function getResponse(interaction) {
     ret.base[baseType] = isNaN(value) && typeof value === 'number' ? '' : value;
 
     return ret;
-};
+}
 
-var destroy = function destroy(interaction) {
+function destroy(interaction) {
     $('input.qti-textEntryInteraction').each(function(index, el) {
-        var $input = $(el);
+        const $input = $(el);
         if ($input.data('$tooltip')) {
             $input.data('$tooltip').dispose();
             $input.removeData('$tooltip');
@@ -264,7 +264,7 @@ var destroy = function destroy(interaction) {
 
     //remove all references to a cache container
     containerHelper.reset(interaction);
-};
+}
 
 /**
  * Set the interaction state. It could be done anytime with any state.
@@ -272,14 +272,14 @@ var destroy = function destroy(interaction) {
  * @param {Object} interaction - the interaction instance
  * @param {Object} state - the interaction state
  */
-var setState = function setState(interaction, state) {
+function setState(interaction, state) {
     if (_.isObject(state)) {
         if (state.response) {
             interaction.resetResponse();
             interaction.setResponse(state.response);
         }
     }
-};
+}
 
 /**
  * Get the interaction state.
@@ -287,15 +287,15 @@ var setState = function setState(interaction, state) {
  * @param {Object} interaction - the interaction instance
  * @returns {Object} the interaction current state
  */
-var getState = function getState(interaction) {
-    var state = {};
-    var response = interaction.getResponse();
+function getState(interaction) {
+    const state = {};
+    const response = interaction.getResponse();
 
     if (response) {
         state.response = response;
     }
     return state;
-};
+}
 
 export default {
     qtiClass: 'textEntryInteraction',
