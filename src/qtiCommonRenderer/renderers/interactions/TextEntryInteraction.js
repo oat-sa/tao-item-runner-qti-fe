@@ -34,11 +34,12 @@ import patternMaskHelper from 'taoQtiItem/qtiCommonRenderer/helpers/patternMask'
 import locale from 'util/locale';
 import tooltip from 'ui/tooltip';
 import loggerFactory from 'core/logger';
+import converter from 'util/converter';
 
 /**
  * Create a logger
  */
- const logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/TextEntryInteraction.js');
+const logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/TextEntryInteraction.js');
 
 /**
  * Hide the tooltip for the text input
@@ -234,18 +235,20 @@ function getResponse(interaction) {
     const baseType = interaction.getResponseDeclaration().attr('baseType');
     const numericBase = attributes.base || 10;
 
+    const inputValue = $input.val();
     let value;
 
-    if ($input.hasClass('invalid') || (attributes.placeholderText && $input.val() === attributes.placeholderText)) {
+    if ($input.hasClass('invalid') || (attributes.placeholderText && inputValue === attributes.placeholderText)) {
         //invalid response or response equals to the placeholder text are considered empty
         value = '';
     } else {
+        const convertedValue = converter.convert(inputValue.trim());
         if (baseType === 'integer') {
-            value = locale.parseInt($input.val(), numericBase);
+            value = locale.parseInt(convertedValue, numericBase);
         } else if (baseType === 'float') {
-            value = locale.parseFloat($input.val());
+            value = locale.parseFloat(convertedValue);
         } else if (baseType === 'string') {
-            value = $input.val();
+            value = convertedValue;
         }
     }
 
