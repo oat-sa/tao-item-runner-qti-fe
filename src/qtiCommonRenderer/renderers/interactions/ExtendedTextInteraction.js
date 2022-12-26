@@ -323,12 +323,12 @@ function getResponse(interaction) {
         values = [];
 
         $container.find('input').each(function (i) {
-            const value = $(this).val();
+            const editorValue = $(this).val();
 
             if (attributes.placeholderText && value === attributes.placeholderText) {
                 values[i] = '';
             } else {
-                const convertedValue = converter.conver(value);
+                const convertedValue = converter.convert(editorValue);
                 if (baseType === 'integer') {
                     values[i] = parseInt(convertedValue, numericBase);
                     values[i] = isNaN(values[i]) ? '' : values[i];
@@ -347,11 +347,11 @@ function getResponse(interaction) {
             value = '';
         } else {
             if (baseType === 'integer') {
-                value = parseInt(_getTextareaValue(interaction), numericBase);
+                value = parseInt(converter.convert(_getTextareaValue(interaction)), numericBase);
             } else if (baseType === 'float') {
-                value = parseFloat(_getTextareaValue(interaction));
+                value = converter.convert(_getTextareaValue(interaction));
             } else if (baseType === 'string') {
-                value = _getTextareaValue(interaction, true);
+                value = converter.convert(_getTextareaValue(interaction, true));
             }
         }
 
