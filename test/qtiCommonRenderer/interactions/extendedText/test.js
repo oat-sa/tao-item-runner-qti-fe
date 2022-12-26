@@ -560,38 +560,6 @@ define([
             .render($container);
     });
 
-    QUnit.test('cnverts ambiguous chars', (assert)=>{
-        var ready = assert.async();
-
-        var $container = $(`#${fixtureContainerId}10`);
-        var response = '   １２ ';
-        const convertedResponse = '   12 ';
-
-        runner = qtiItemRunner('qti', itemDataXhtml)
-            .on('error', function(e) {
-                assert.ok(false, e);
-                ready();
-            })
-            .on('render', function() {
-                var self = this;
-
-                var $interaction = $('.qti-extendedTextInteraction', $container);
-
-                var editor = ckEditor.instances[$interaction.data('editor')];
-
-                editor.setData(response);
-
-                assert.deepEqual(
-                    self.getState(),
-                    { RESPONSE: { response: { base: { string: convertedResponse } } } },
-                    'A response is converted'
-                );
-            })
-            .init()
-            .render($container);
-
-    });
-
     QUnit.test('destroys', function(assert) {
         var ready = assert.async();
         assert.expect(8);
@@ -649,6 +617,39 @@ define([
             .render($container);
     });
 
+    QUnit.test('converts the response', (assert)=>{
+        var ready = assert.async();
+
+        var $container = $(`#${fixtureContainerId}11`);
+        var response = '   １２ ';
+        const convertedResponse = '   12 ';
+
+        runner = qtiItemRunner('qti', itemDataXhtml)
+            .on('error', function(e) {
+                assert.ok(false, e);
+                ready();
+            })
+            .on('render', function() {
+                var self = this;
+
+                var $interaction = $('.qti-extendedTextInteraction', $container);
+
+                var editor = ckEditor.instances[$interaction.data('editor')];
+
+                editor.setData(response);
+
+                assert.deepEqual(
+                    self.getState(),
+                    { RESPONSE: { response: { base: { string: convertedResponse } } } },
+                    'A response is converted'
+                );
+
+                ready();
+            })
+            .init()
+            .render($container);
+
+    });
 
     QUnit.module('Visual Test');
 
