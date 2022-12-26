@@ -34,6 +34,7 @@ import ckEditor from 'ckeditor';
 import ckConfigurator from 'taoQtiItem/qtiCommonRenderer/helpers/ckConfigurator';
 import patternMaskHelper from 'taoQtiItem/qtiCommonRenderer/helpers/patternMask';
 import tooltip from 'ui/tooltip';
+import converter from 'util/converter';
 import loggerFactory from 'core/logger';
 
 /**
@@ -322,19 +323,20 @@ function getResponse(interaction) {
         values = [];
 
         $container.find('input').each(function (i) {
-            const $el = $(this);
+            const value = $(this).val();
 
-            if (attributes.placeholderText && $el.val() === attributes.placeholderText) {
+            if (attributes.placeholderText && value === attributes.placeholderText) {
                 values[i] = '';
             } else {
+                const convertedValue = converter.conver(value);
                 if (baseType === 'integer') {
-                    values[i] = parseInt($el.val(), numericBase);
+                    values[i] = parseInt(convertedValue, numericBase);
                     values[i] = isNaN(values[i]) ? '' : values[i];
                 } else if (baseType === 'float') {
-                    values[i] = parseFloat($el.val());
+                    values[i] = parseFloat(convertedValue);
                     values[i] = isNaN(values[i]) ? '' : values[i];
                 } else if (baseType === 'string') {
-                    values[i] = $el.val();
+                    values[i] = convertedValue;
                 }
             }
         });
