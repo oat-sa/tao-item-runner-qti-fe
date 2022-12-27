@@ -52,7 +52,7 @@
         "@oat-sa/prettier-config": "^0.1.1",
         "@oat-sa/rollup-plugin-wildcard-external": "^0.1.0",
         "@oat-sa/tao-core-libs": "^0.5.1",
-        "@oat-sa/tao-core-sdk": "https://github.com/oat-sa/tao-core-sdk-fe#feature/TR-5014/text-converter",
+        "@oat-sa/tao-core-sdk": "^1.22.0",
         "@oat-sa/tao-core-shared-libs": "^1.4.1",
         "@oat-sa/tao-core-ui": "^1.64.1",
         "@oat-sa/tao-item-runner": "^0.8.1",
