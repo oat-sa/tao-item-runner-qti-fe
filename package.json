@@ -12,7 +12,7 @@
     },
     "scripts": {
         "test": "npx qunit-testrunner",
-        "test:keepAlive": "npx qunit-testrunner --keepalive",
+        "test:keepAlive": "npx qunit-testrunner --keepalive --port 5300",
         "test:cov": "npm run build:cov && npx qunit-testrunner --cov",
         "coverage": "nyc report",
         "coverage:html": "nyc report --reporter=lcov && open-cli coverage/lcov-report/index.html",
@@ -52,7 +52,7 @@
         "@oat-sa/prettier-config": "^0.1.1",
         "@oat-sa/rollup-plugin-wildcard-external": "^0.1.0",
         "@oat-sa/tao-core-libs": "^0.5.1",
-        "@oat-sa/tao-core-sdk": "^1.21.1",
+        "@oat-sa/tao-core-sdk": "^1.22.0",
         "@oat-sa/tao-core-shared-libs": "^1.4.1",
         "@oat-sa/tao-core-ui": "^1.64.1",
         "@oat-sa/tao-item-runner": "^0.8.1",
