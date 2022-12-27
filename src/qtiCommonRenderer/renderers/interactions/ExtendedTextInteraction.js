@@ -34,6 +34,7 @@ import ckEditor from 'ckeditor';
 import ckConfigurator from 'taoQtiItem/qtiCommonRenderer/helpers/ckConfigurator';
 import patternMaskHelper from 'taoQtiItem/qtiCommonRenderer/helpers/patternMask';
 import tooltip from 'ui/tooltip';
+import converter from 'util/converter';
 import loggerFactory from 'core/logger';
 
 /**
@@ -322,19 +323,20 @@ function getResponse(interaction) {
         values = [];
 
         $container.find('input').each(function (i) {
-            const $el = $(this);
+            const editorValue = $(this).val();
 
-            if (attributes.placeholderText && $el.val() === attributes.placeholderText) {
+            if (attributes.placeholderText && value === attributes.placeholderText) {
                 values[i] = '';
             } else {
+                const convertedValue = converter.convert(editorValue);
                 if (baseType === 'integer') {
-                    values[i] = parseInt($el.val(), numericBase);
+                    values[i] = parseInt(convertedValue, numericBase);
                     values[i] = isNaN(values[i]) ? '' : values[i];
                 } else if (baseType === 'float') {
-                    values[i] = parseFloat($el.val());
+                    values[i] = parseFloat(convertedValue);
                     values[i] = isNaN(values[i]) ? '' : values[i];
                 } else if (baseType === 'string') {
-                    values[i] = $el.val();
+                    values[i] = convertedValue;
                 }
             }
         });
@@ -345,11 +347,11 @@ function getResponse(interaction) {
             value = '';
         } else {
             if (baseType === 'integer') {
-                value = parseInt(_getTextareaValue(interaction), numericBase);
+                value = parseInt(converter.convert(_getTextareaValue(interaction)), numericBase);
             } else if (baseType === 'float') {
-                value = parseFloat(_getTextareaValue(interaction));
+                value = converter.convert(_getTextareaValue(interaction));
             } else if (baseType === 'string') {
-                value = _getTextareaValue(interaction, true);
+                value = converter.convert(_getTextareaValue(interaction, true));
             }
         }
 
