@@ -96,6 +96,18 @@ export default function defaultPciRenderer(runtime) {
                 status: 'interacting' //only support interacting state currently(TODO: solution, review),
             };
 
+            const responseIdentifier  = interaction.attributes.responseIdentifier;
+            let responseDeclaration;
+            if(responseIdentifier && interaction.rootElement && interaction.rootElement.responses) {
+                interaction.rootElement.responses.keys().forEach(responseKey => {
+                    if(interaction.rootElement.responses[responseKey].attributes.identifier === responseIdentifier) {
+                        responseDeclaration = interaction.rootElement.responses[responseKey].attributes;
+                        config.responseDeclaration = responseDeclaration;
+                    }
+                })
+            }
+
+
             pciConstructor.getInstance(containerHelper.get(interaction).get(0), config, context.state);
 
             return readyPromise.then(instance => {
