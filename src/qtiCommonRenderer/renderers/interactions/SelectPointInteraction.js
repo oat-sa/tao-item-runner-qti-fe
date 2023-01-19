@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2017 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2023 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -35,7 +35,7 @@ import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/in
  * @param {Object} interaction
  * @returns {Array} of points
  */
-var getRawResponse = function getRawResponse(interaction) {
+const getRawResponse = function getRawResponse(interaction) {
     if (interaction && interaction.paper && _.isArray(interaction.paper.points)) {
         return _.map(interaction.paper.points, function(point) {
             return [point.x, point.y];
@@ -49,10 +49,10 @@ var getRawResponse = function getRawResponse(interaction) {
  * @param {Object} interaction
  * @param {Object} point - the x/y point
  */
-var addPoint = function addPoint(interaction, point) {
-    var maxChoices = interaction.attr('maxChoices');
+const addPoint = function addPoint(interaction, point) {
+    const maxChoices = interaction.attr('maxChoices');
 
-    var pointChange = function pointChange() {
+    const pointChange = function pointChange() {
         containerHelper.triggerResponseChangeEvent(interaction);
         instructionMgr.validateInstructions(interaction);
     };
@@ -88,11 +88,11 @@ var addPoint = function addPoint(interaction, point) {
  * Make the image clickable and place targets at the given position.
  * @param {Object} interaction
  */
-var enableSelection = function enableSelection(interaction) {
-    var $container = containerHelper.get(interaction);
-    var $imageBox = $container.find('.main-image-box');
-    var isResponsive = $container.hasClass('responsive');
-    var image = interaction.paper.getById('bg-image-' + interaction.serial);
+const enableSelection = function enableSelection(interaction) {
+    const $container = containerHelper.get(interaction);
+    const $imageBox = $container.find('.main-image-box');
+    const isResponsive = $container.hasClass('responsive');
+    const image = interaction.paper.getById('bg-image-' + interaction.serial);
 
     interaction.paper.isTouch = false;
 
@@ -115,12 +115,12 @@ var enableSelection = function enableSelection(interaction) {
  *
  * @param {Object} interaction
  */
-var render = function render(interaction) {
-    var self = this;
+const render = function render(interaction) {
+    const self = this;
 
     return new Promise(function(resolve) {
-        var $container = containerHelper.get(interaction);
-        var background = interaction.object.attributes;
+        const $container = containerHelper.get(interaction);
+        const background = interaction.object.attributes;
 
         $container.off('resized.qti-widget.resolve').one('resized.qti-widget.resolve', resolve);
 
@@ -164,8 +164,8 @@ var render = function render(interaction) {
  * @param {Object} interaction
  * @param {Object} response
  */
-var setResponse = function(interaction, response) {
-    var responseValues;
+const setResponse = function(interaction, response) {
+    let responseValues;
 
     if (response && interaction.paper) {
         try {
@@ -203,12 +203,12 @@ var setResponse = function(interaction, response) {
  *
  * @param {Object} interaction
  */
-var resetResponse = function resetResponse(interaction) {
+const resetResponse = function resetResponse(interaction) {
     if (interaction && interaction.paper) {
         interaction.paper.points = [];
 
         interaction.paper.forEach(function(element) {
-            var point = element.data('point');
+            const point = element.data('point');
             if (typeof point === 'object') {
                 graphic.trigger(element, 'click');
             }
@@ -228,7 +228,7 @@ var resetResponse = function resetResponse(interaction) {
      * @param {Object} interaction
      * @returns {Object} the response
      */
-var getResponse = function(interaction) {
+const getResponse = function(interaction) {
     return pciResponse.serialize(getRawResponse(interaction), interaction);
 };
 
@@ -236,10 +236,9 @@ var getResponse = function(interaction) {
  * Clean interaction destroy
  * @param {Object} interaction
  */
-var destroy = function destroy(interaction) {
-    var $container;
+const destroy = function destroy(interaction) {
     if (interaction.paper) {
-        $container = containerHelper.get(interaction);
+        const $container = containerHelper.get(interaction);
 
         $(window).off('resize.qti-widget.' + interaction.serial);
         $container.off('resize.qti-widget.' + interaction.serial);
@@ -263,7 +262,7 @@ var destroy = function destroy(interaction) {
  * @param {Object} interaction - the interaction instance
  * @param {Object} state - the interaction state
  */
-var setState = function setState(interaction, state) {
+const setState = function setState(interaction, state) {
     if (_.isObject(state)) {
         if (state.response) {
             interaction.resetResponse();
@@ -278,9 +277,9 @@ var setState = function setState(interaction, state) {
  * @param {Object} interaction - the interaction instance
  * @returns {Object} the interaction current state
  */
-var getState = function getState(interaction) {
-    var state = {};
-    var response = interaction.getResponse();
+const getState = function getState(interaction) {
+    const state = {};
+    const response = interaction.getResponse();
 
     if (response) {
         state.response = response;
