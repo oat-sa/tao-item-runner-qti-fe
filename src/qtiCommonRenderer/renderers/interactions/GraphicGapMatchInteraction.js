@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2019 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2023 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -33,18 +33,18 @@ import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/in
 import interact from 'interact';
 import interactUtils from 'ui/interactUtils';
 
-var isDragAndDropEnabled;
+let isDragAndDropEnabled;
 
 // this represents the state for the active droppable zone
 // we need it only to access the active dropzone in the iFrameFix
 // should be removed when the old test runner is discarded
-var activeDrop = null;
+let activeDrop = null;
 
 /**
- * Global variable to count number of choice usages:
+ * Global constiable to count number of choice usages:
  * @type {object}
  */
-var _choiceUsages = {};
+const _choiceUsages = {};
 
 /**
  * This options enables to support old items created with the wrong
@@ -52,7 +52,7 @@ var _choiceUsages = {};
  *
  * @deprecated
  */
-var isDirectedPairFlipped = module.config().flipDirectedPair;
+const isDirectedPairFlipped = module.config().flipDirectedPair;
 
 /**
  * Check if a shape can accept matches
@@ -60,12 +60,11 @@ var isDirectedPairFlipped = module.config().flipDirectedPair;
  * @param {Raphael.Element} element - the shape
  * @returns {Boolean} true if the element is matchable
  */
-var _isMatchable = function(element) {
-    var matchable = false;
-    var matching, matchMax;
+const _isMatchable = function (element) {
+    let matchable = false;
     if (element) {
-        matchMax = element.data('max') || 0;
-        matching = element.data('matching') || [];
+        const matchMax = element.data('max') || 0;
+        const matching = element.data('matching') || [];
         matchable = matchMax === 0 || matchMax > matching.length;
     }
     return matchable;
@@ -76,12 +75,12 @@ var _isMatchable = function(element) {
  * @private
  * @param {Object} interaction
  */
-var _shapesSelectable = function _shapesSelectable(interaction) {
-    var tooltip = __('Select the area to add an image');
+const _shapesSelectable = function _shapesSelectable(interaction) {
+    const tooltip = __('Select the area to add an image');
 
     //update the shape state
-    _.forEach(interaction.getChoices(), function(choice) {
-        var element = interaction.paper.getById(choice.serial);
+    _.forEach(interaction.getChoices(), function (choice) {
+        const element = interaction.paper.getById(choice.serial);
         if (_isMatchable(element)) {
             element.selectable = true;
             graphic.setStyle(element, 'selectable');
@@ -90,8 +89,8 @@ var _shapesSelectable = function _shapesSelectable(interaction) {
     });
 
     //update the gap images tooltip
-    _.forEach(interaction.gapFillers, function(gapFiller) {
-        gapFiller.forEach(function(element) {
+    _.forEach(interaction.gapFillers, function (gapFiller) {
+        gapFiller.forEach(function (element) {
             graphic.updateTitle(element, tooltip);
         });
     });
@@ -102,9 +101,9 @@ var _shapesSelectable = function _shapesSelectable(interaction) {
  * @private
  * @param {Object} interaction
  */
-var _shapesUnSelectable = function _shapesUnSelectable(interaction) {
-    _.forEach(interaction.getChoices(), function(choice) {
-        var element = interaction.paper.getById(choice.serial);
+const _shapesUnSelectable = function _shapesUnSelectable(interaction) {
+    _.forEach(interaction.getChoices(), function (choice) {
+        const element = interaction.paper.getById(choice.serial);
         if (element) {
             element.selectable = false;
             graphic.setStyle(element, 'basic');
@@ -113,8 +112,8 @@ var _shapesUnSelectable = function _shapesUnSelectable(interaction) {
     });
 
     //update the gap images tooltip
-    _.forEach(interaction.gapFillers, function(gapFiller) {
-        gapFiller.forEach(function(element) {
+    _.forEach(interaction.gapFillers, function (gapFiller) {
+        gapFiller.forEach(function (element) {
             graphic.updateTitle(element, __('Remove'));
         });
     });
@@ -125,12 +124,12 @@ var _shapesUnSelectable = function _shapesUnSelectable(interaction) {
  * @private
  * @param {Object} interaction
  */
-var _paperUnSelect = function _paperUnSelect(interaction) {
-    var $container = containerHelper.get(interaction);
-    var $gapImages = $('ul > li', $container);
-    var bgImage = interaction.paper.getById('bg-image-' + interaction.serial);
+const _paperUnSelect = function _paperUnSelect(interaction) {
+    const $container = containerHelper.get(interaction);
+    const $gapImages = $('ul > li', $container);
+    const bgImage = interaction.paper.getById('bg-image-' + interaction.serial);
     if (bgImage) {
-        interact(bgImage.node).on('tap', function() {
+        interact(bgImage.node).on('tap', function () {
             _shapesUnSelectable(interaction);
             $gapImages.removeClass('active');
         });
@@ -143,11 +142,11 @@ var _paperUnSelect = function _paperUnSelect(interaction) {
  * @param {Object} interaction
  * @param {JQuery Element} $choice
  */
-var _setChoice = function _setChoice(interaction, $choice) {
-    var choiceSerial = $choice.data('serial');
-    var choice = interaction.getGapImg(choiceSerial);
-    var matchMax;
-    var usages;
+const _setChoice = function _setChoice(interaction, $choice) {
+    const choiceSerial = $choice.data('serial');
+    const choice = interaction.getGapImg(choiceSerial);
+    let matchMax;
+    let usages;
 
     if (!_choiceUsages[choiceSerial]) {
         _choiceUsages[choiceSerial] = 0;
@@ -175,8 +174,8 @@ var _setChoice = function _setChoice(interaction, $choice) {
  * @param {Object} interaction
  * @param {JQuery Element} $choice
  */
-var _unsetChoice = function _unsetChoice(interaction, $choice) {
-    var choiceSerial = $choice.data('serial');
+const _unsetChoice = function _unsetChoice(interaction, $choice) {
+    const choiceSerial = $choice.data('serial');
 
     _choiceUsages[choiceSerial]--;
 
@@ -192,15 +191,15 @@ var _unsetChoice = function _unsetChoice(interaction, $choice) {
  * @param {Raphael.Element} element - the selected shape
  * @param {Boolean} [trackResponse = true] - if the selection trigger a response chane
  */
-var _selectShape = function _selectShape(interaction, element, trackResponse) {
-    var $img, $clone, gapFiller, id, bbox, shapeOffset, activeOffset, matching, currentCount;
+const _selectShape = function _selectShape(interaction, element, trackResponse) {
+    let $img, $clone, id, bbox, shapeOffset, activeOffset, matching, currentCount;
 
     //lookup for the active element
-    var $container = containerHelper.get(interaction);
-    var $gapList = $('ul', $container);
-    var $active = $gapList.find('.active:first');
-    var $imageBox = $('.main-image-box', $container);
-    var boxOffset = $imageBox.offset();
+    const $container = containerHelper.get(interaction);
+    const $gapList = $('ul', $container);
+    const $active = $gapList.find('.active:first');
+    const $imageBox = $('.main-image-box', $container);
+    const boxOffset = $imageBox.offset();
 
     if (typeof trackResponse === 'undefined') {
         trackResponse = true;
@@ -244,15 +243,13 @@ var _selectShape = function _selectShape(interaction, element, trackResponse) {
             },
             200,
             function animationEnd() {
-                var gapFillerImage;
-
                 $clone.remove();
 
                 //extract some coords for positioning
                 bbox = element.getBBox();
 
                 //create an image into the paper and move it to the selected shape
-                gapFiller = graphic
+                const gapFiller = graphic
                     .createBorderedImage(interaction.paper, {
                         url: $img.attr('src'),
                         left: bbox.x + 8 * (currentCount - 1),
@@ -266,10 +263,10 @@ var _selectShape = function _selectShape(interaction, element, trackResponse) {
                     .data('identifier', id)
                     .toFront();
 
-                gapFillerImage = gapFiller[2].node;
-                interact(gapFillerImage).on('tap', function(e) {
-                    var target = e.currentTarget;
-                    var rElement = interaction.paper.getById(target.raphaelid);
+                const gapFillerImage = gapFiller[2].node;
+                interact(gapFillerImage).on('tap', function (e) {
+                    const target = e.currentTarget;
+                    const rElement = interaction.paper.getById(target.raphaelid);
 
                     e.preventDefault();
                     e.stopPropagation();
@@ -313,9 +310,9 @@ var _selectShape = function _selectShape(interaction, element, trackResponse) {
  * @param {Object} interaction
  * @param {Object} choice - the hotspot choice to add to the interaction
  */
-var _renderChoice = function _renderChoice(interaction, choice) {
+const _renderChoice = function _renderChoice(interaction, choice) {
     //create the shape
-    var rElement = graphic
+    const rElement = graphic
         .createElement(interaction.paper, choice.attr('shape'), choice.attr('coords'), {
             id: choice.serial,
             title: __('Select an image first'),
@@ -331,20 +328,20 @@ var _renderChoice = function _renderChoice(interaction, choice) {
     if (isDragAndDropEnabled) {
         interact(rElement.node).dropzone({
             overlap: 0.15,
-            ondragenter: function() {
+            ondragenter: function () {
                 if (_isMatchable(rElement)) {
                     graphic.setStyle(rElement, 'hover');
                     activeDrop = rElement.node;
                 }
             },
-            ondrop: function() {
+            ondrop: function () {
                 if (_isMatchable(rElement)) {
                     graphic.setStyle(rElement, 'selectable');
                     handleShapeSelect();
                     activeDrop = null;
                 }
             },
-            ondragleave: function() {
+            ondragleave: function () {
                 if (_isMatchable(rElement)) {
                     graphic.setStyle(rElement, 'selectable');
                     activeDrop = null;
@@ -361,8 +358,8 @@ var _renderChoice = function _renderChoice(interaction, choice) {
     }
 };
 
-var _iFrameDragFix = function _iFrameDragFix(draggableSelector, target) {
-    interactUtils.iFrameDragFixOn(function() {
+const _iFrameDragFix = function _iFrameDragFix(draggableSelector, target) {
+    interactUtils.iFrameDragFixOn(function () {
         if (activeDrop) {
             interact(activeDrop).fire({
                 type: 'drop',
@@ -383,10 +380,10 @@ var _iFrameDragFix = function _iFrameDragFix(draggableSelector, target) {
  * @param {Object} interaction
  * @param {jQueryElement} $gapList - the list than contains the orderers
  */
-var _renderGapList = function _renderGapList(interaction, $gapList) {
-    var gapFillersSelector = $gapList.selector + ' li';
-    var dragOptions;
-    var scaleX, scaleY;
+const _renderGapList = function _renderGapList(interaction, $gapList) {
+    const gapFillersSelector = $gapList.selector + ' li';
+    let dragOptions;
+    let scaleX, scaleY;
 
     interact(gapFillersSelector).on('tap', function onClickGapImg(e) {
         e.stopPropagation();
@@ -405,27 +402,26 @@ var _renderGapList = function _renderGapList(interaction, $gapList) {
             }
         };
 
-        $(gapFillersSelector).each(function(index, gap) {
+        $(gapFillersSelector).each(function (index, gap) {
             interact(gap)
                 .draggable(
                     _.assign({}, dragOptions, {
-                        onstart: function(e) {
-                            var $target = $(e.target);
-                            var scale;
+                        onstart: function (e) {
+                            const $target = $(e.target);
                             _setActiveGapState($target);
                             $target.addClass('dragged');
 
                             _iFrameDragFix(gapFillersSelector, e.target);
-                            scale = interactUtils.calculateScale(e.target);
+                            const scale = interactUtils.calculateScale(e.target);
                             scaleX = scale[0];
                             scaleY = scale[1];
                         },
-                        onmove: function(e) {
+                        onmove: function (e) {
                             interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
                         },
-                        onend: function(e) {
-                            _.defer( () => {
-                                var $target = $(e.target);
+                        onend: function (e) {
+                            _.defer(() => {
+                                const $target = $(e.target);
                                 _setInactiveGapState($target);
                                 $target.removeClass('dragged');
                                 interactUtils.restoreOriginalPosition($target);
@@ -468,13 +464,13 @@ var _renderGapList = function _renderGapList(interaction, $gapList) {
  * @param {object} interaction
  * @return {Promise}
  */
-var render = function render(interaction) {
-    var self = this;
+const render = function render(interaction) {
+    const self = this;
 
-    return new Promise(function(resolve) {
-        var $container = containerHelper.get(interaction);
-        var $gapList = $('ul.source', $container);
-        var background = interaction.object.attributes;
+    return new Promise(function (resolve) {
+        const $container = containerHelper.get(interaction);
+        const $gapList = $('ul.source', $container);
+        const background = interaction.object.attributes;
 
         interaction.gapFillers = [];
 
@@ -495,17 +491,17 @@ var render = function render(interaction) {
             img: self.resolveUrl(background.data),
             imgId: 'bg-image-' + interaction.serial,
             container: $container,
-            resize: function(newSize, factor) {
+            resize: function (newSize, factor) {
                 $gapList.css('max-width', newSize + 'px');
                 if (factor !== 1) {
-                    $gapList.find('img').each(function() {
-                        var $img = $(this);
+                    $gapList.find('img').each(function () {
+                        const $img = $(this);
                         $img.width($img.attr('width') * factor);
                         $img.height($img.attr('height') * factor);
                     });
                 }
             },
-            responsive  : $container.hasClass('responsive')
+            responsive: $container.hasClass('responsive')
         });
 
         //call render choice for each interaction's choices
@@ -525,12 +521,12 @@ var render = function render(interaction) {
  * @param {Object} interaction
  * @returns {Array} of matches
  */
-var _getRawResponse = function _getRawResponse(interaction) {
-    var pairs = [];
-    _.forEach(interaction.getChoices(), function(choice) {
-        var element = interaction.paper.getById(choice.serial);
+const _getRawResponse = function _getRawResponse(interaction) {
+    const pairs = [];
+    _.forEach(interaction.getChoices(), function (choice) {
+        const element = interaction.paper.getById(choice.serial);
         if (element && _.isArray(element.data('matching'))) {
-            _.forEach(element.data('matching'), function(gapImg) {
+            _.forEach(element.data('matching'), function (gapImg) {
                 //backward support of previous order
                 if (isDirectedPairFlipped) {
                     pairs.push([choice.id(), gapImg]);
@@ -557,9 +553,9 @@ var _getRawResponse = function _getRawResponse(interaction) {
  * @param {object} interaction
  * @param {object} response
  */
-var setResponse = function(interaction, response) {
-    var $container = containerHelper.get(interaction);
-    var responseValues;
+const setResponse = function (interaction, response) {
+    const $container = containerHelper.get(interaction);
+    let responseValues;
     if (response && interaction.paper) {
         try {
             responseValues = pciResponse.unserialize(response, interaction);
@@ -568,16 +564,14 @@ var setResponse = function(interaction, response) {
         }
 
         if (_.isArray(responseValues)) {
-            _.forEach(interaction.getChoices(), function(choice) {
-                var element = interaction.paper.getById(choice.serial);
+            _.forEach(interaction.getChoices(), function (choice) {
+                const element = interaction.paper.getById(choice.serial);
                 if (element) {
-                    _.forEach(responseValues, function(pair) {
-                        var responseChoice;
-                        var responseGap;
+                    _.forEach(responseValues, function (pair) {
                         if (pair.length === 2) {
                             //backward support of previous order
-                            responseChoice = isDirectedPairFlipped ? pair[0] : pair[1];
-                            responseGap = isDirectedPairFlipped ? pair[1] : pair[0];
+                            const responseChoice = isDirectedPairFlipped ? pair[0] : pair[1];
+                            const responseGap = isDirectedPairFlipped ? pair[1] : pair[0];
                             if (responseChoice === choice.id()) {
                                 $('[data-identifier="' + responseGap + '"]', $container).addClass('active');
                                 _selectShape(interaction, element, false);
@@ -603,10 +597,10 @@ var setResponse = function(interaction, response) {
  *
  * @param {object} interaction
  */
-var resetResponse = function resetResponse(interaction) {
+const resetResponse = function resetResponse(interaction) {
     _shapesUnSelectable(interaction);
 
-    _.forEach(interaction.gapFillers, function(gapFiller) {
+    _.forEach(interaction.gapFillers, function (gapFiller) {
         interactUtils.tapOn(gapFiller.items[2][0]); // this refers to the gapFiller image
     });
 };
@@ -623,8 +617,8 @@ var resetResponse = function resetResponse(interaction) {
  * @param {object} interaction
  * @returns {object}
  */
-var getResponse = function(interaction) {
-    var raw = _getRawResponse(interaction);
+const getResponse = function (interaction) {
+    const raw = _getRawResponse(interaction);
     return pciResponse.serialize(raw, interaction);
 };
 
@@ -632,10 +626,9 @@ var getResponse = function(interaction) {
  * Clean interaction destroy
  * @param {Object} interaction
  */
-var destroy = function destroy(interaction) {
-    var $container;
+const destroy = function destroy(interaction) {
     if (interaction.paper) {
-        $container = containerHelper.get(interaction);
+        const $container = containerHelper.get(interaction);
 
         $(window).off('resize.qti-widget.' + interaction.serial);
         $container.off('resize.qti-widget.' + interaction.serial);
@@ -643,9 +636,7 @@ var destroy = function destroy(interaction) {
         interaction.paper.clear();
         instructionMgr.removeInstructions(interaction);
 
-        $('.main-image-box', $container)
-            .empty()
-            .removeAttr('style');
+        $('.main-image-box', $container).empty().removeAttr('style');
         $('.image-editor', $container).removeAttr('style');
         $('ul', $container).empty();
 
@@ -662,7 +653,7 @@ var destroy = function destroy(interaction) {
  * @param {Object} interaction - the interaction instance
  * @param {Object} state - the interaction state
  */
-var setState = function setState(interaction, state) {
+const setState = function setState(interaction, state) {
     if (_.isObject(state)) {
         if (state.response) {
             interaction.resetResponse();
@@ -677,9 +668,9 @@ var setState = function setState(interaction, state) {
  * @param {Object} interaction - the interaction instance
  * @returns {Object} the interaction current state
  */
-var getState = function getState(interaction) {
-    var state = {};
-    var response = interaction.getResponse();
+const getState = function getState(interaction) {
+    const state = {};
+    const response = interaction.getResponse();
 
     if (response) {
         state.response = response;
