@@ -504,7 +504,8 @@ var render = function render(interaction) {
                         $img.height($img.attr('height') * factor);
                     });
                 }
-            }
+            },
+            responsive  : $container.hasClass('responsive')
         });
 
         //call render choice for each interaction's choices
