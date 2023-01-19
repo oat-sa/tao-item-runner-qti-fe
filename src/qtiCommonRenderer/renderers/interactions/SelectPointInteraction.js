@@ -130,7 +130,8 @@ var render = function render(interaction) {
             height: background.height,
             img: self.resolveUrl(background.data),
             imgId: 'bg-image-' + interaction.serial,
-            container: $container
+            container: $container,
+            responsive  : $container.hasClass('responsive')
         });
 
         //enable to select the paper to position a target

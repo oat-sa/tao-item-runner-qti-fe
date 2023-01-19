@@ -178,6 +178,7 @@ var GraphicHelper = {
      * @param {Object} options - the paper parameters
      * @param {String} options.img - the url of the background image
      * @param {jQueryElement} [options.container] - the parent of the paper element (got the closest parent by default)
+     * @param {Boolean} [options.responsive] - scale to container
      * @param {Number} [options.width] - the paper width
      * @param {Number} [options.height] - the paper height
      * @param {String} [options.imgId] - an identifier for the image element
@@ -226,20 +227,35 @@ var GraphicHelper = {
          * @private
          */
         function resizePaper(e, givenWidth) {
-            var maxWidth, containerWidth, containerHeight, factor;
+            var diff, maxWidth, containerWidth, containerHeight, factor;
 
             if (e) {
                 e.stopPropagation();
             }
 
+            diff = $editor.outerWidth() - $editor.width() + ($container.outerWidth() - $container.width()) + 1;
             maxWidth = $body.width();
-            containerWidth = $editor.innerWidth();
+            if (options.responsive) {
+                containerWidth = $container.innerWidth();
+            } else {
+                containerWidth = $editor.innerWidth();
+            }
 
-            if (givenWidth > 0 || containerWidth > maxWidth) {
-                if (givenWidth > 0 && givenWidth < maxWidth) {
-                    containerWidth = givenWidth;
-                } else if (containerWidth > maxWidth) {
-                    containerWidth = maxWidth;
+            if (options.responsive && containerWidth > 0 || givenWidth > 0 || containerWidth > maxWidth) {
+                if (options.responsive) {
+                    if (givenWidth < containerWidth && givenWidth < maxWidth) {
+                        containerWidth = givenWidth - diff;
+                    } else if (containerWidth > maxWidth) {
+                        containerWidth = maxWidth - diff;
+                    } else {
+                        containerWidth -= diff;
+                    }
+                } else {
+                    if (givenWidth > 0 && givenWidth < maxWidth) {
+                        containerWidth = givenWidth;
+                    } else if (containerWidth > maxWidth) {
+                        containerWidth = maxWidth;
+                    }
                 }
 
                 factor = containerWidth / imgWidth;

@@ -49,7 +49,8 @@ var render = function render(interaction) {
             width: background.width,
             height: background.height,
             img: self.resolveUrl(background.data),
-            container: $container
+            container: $container,
+            responsive  : $container.hasClass('responsive')
         });
 
         //call render choice for each interaction's choices
