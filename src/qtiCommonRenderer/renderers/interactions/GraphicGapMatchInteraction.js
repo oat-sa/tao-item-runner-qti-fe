@@ -41,7 +41,7 @@ let isDragAndDropEnabled;
 let activeDrop = null;
 
 /**
- * Global constiable to count number of choice usages:
+ * Global variable to count number of choice usages:
  * @type {object}
  */
 const _choiceUsages = {};
