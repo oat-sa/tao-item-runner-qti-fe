@@ -400,9 +400,13 @@ var Loader = Class.extend({
         const attributes = _.defaults(data.attributes || {}, element.attributes || {});
         element.setAttributes(attributes);
 
-        if (element.body && data.body) {
+        let body = data.body;
+        if (!body && data.text && data.qtiClass === 'inlineChoice') {
+            body = {body: data.text, elements: []};
+        }
+        if (element.body && body) {
             if (element.bdy) {
-                this.loadContainer(element.getBody(), data.body);
+                this.loadContainer(element.getBody(), body);
             }
         }
 
