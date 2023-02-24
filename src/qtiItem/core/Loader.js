@@ -402,7 +402,7 @@ var Loader = Class.extend({
 
         let body = data.body;
         if (!body && data.text && data.qtiClass === 'inlineChoice') {
-            body = {body: data.text, elements: []};
+            body = { body: data.text, elements: {} };
         }
         if (element.body && body) {
             if (element.bdy) {
