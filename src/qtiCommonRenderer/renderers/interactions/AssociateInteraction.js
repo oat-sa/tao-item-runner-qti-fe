@@ -306,7 +306,7 @@ const _getRawResponse = function(interaction) {
                 const serial = $(this).data('serial');
                 if (serial) {
                     const choice = interaction.getChoice(serial);
-                    if (!!choice) {
+                    if (choice) {
                         pair.push(choice.id());
                     }
                 }
