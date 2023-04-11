@@ -692,7 +692,7 @@ const render = function(interaction) {
                 .styleCursor(false);
 
             dropOptions = {
-                overlap: 0.15,
+                overlap: 'pointer',
                 ondragenter: function(e) {
                     $(e.target).addClass('dropzone');
                     $(e.relatedTarget).addClass('droppable');
