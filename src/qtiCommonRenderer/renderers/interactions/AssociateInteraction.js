@@ -304,8 +304,11 @@ const _getRawResponse = function(interaction) {
             .find('div')
             .each(function() {
                 const serial = $(this).data('serial');
-                if (serial && !/^qtiobject_/.test(serial) && !/^object_/.test(serial)) {
-                    pair.push(interaction.getChoice(serial).id());
+                if (serial) {
+                    const choice = interaction.getChoice(serial);
+                    if (choice) {
+                        pair.push(choice.id());
+                    }
                 }
             });
         if (pair.length === 2) {
