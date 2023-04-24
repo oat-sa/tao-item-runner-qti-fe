@@ -186,8 +186,13 @@ const _setInstructions = function _setInstructions(interaction) {
 
     const highlightInvalidInput = function highlightInvalidInput($choice) {
         const $input = $choice.find('.real-label > input');
-        const $li = $choice.css('color', '#BA122B');
-        const $icon = $choice.find('.real-label > span').css('color', '#BA122B').addClass('cross error');
+        const $icon = $choice.find('.real-label > span');
+
+        const choiceStyle = $choice.attr('style');
+        const iconStyle = $icon.attr('style');
+        $choice.css('color', '#BA122B');
+        $icon.css('color', '#BA122B').addClass('cross error')
+
         let timeout = interaction.data('__instructionTimeout');
 
         if (timeout) {
@@ -195,9 +200,9 @@ const _setInstructions = function _setInstructions(interaction) {
         }
         timeout = setTimeout(function () {
             $input.prop('checked', false);
-            $li.removeAttr('style');
-            $icon.removeAttr('style').removeClass('cross');
-            $li.toggleClass('user-selected', false);
+            $choice.attr('style', choiceStyle);
+            $icon.attr('style', iconStyle).removeClass('cross');
+            $choice.toggleClass('user-selected', false);
             containerHelper.triggerResponseChangeEvent(interaction);
         }, 150);
         interaction.data('__instructionTimeout', timeout);
@@ -340,7 +345,7 @@ const resetResponse = function resetResponse(interaction) {
  * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10278
  *
  * @param {Object} interaction - the interaction instance
- * @param {0bject} response - the PCI formated response
+ * @param {Object} response - the PCI formatted response
  */
 const setResponse = function setResponse(interaction, response) {
     const $container = containerHelper.get(interaction);
