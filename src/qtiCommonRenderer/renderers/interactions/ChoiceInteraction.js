@@ -340,7 +340,7 @@ const resetResponse = function resetResponse(interaction) {
  * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10278
  *
  * @param {Object} interaction - the interaction instance
- * @param {0bject} response - the PCI formated response
+ * @param {Object} response - the PCI formatted response
  */
 const setResponse = function setResponse(interaction, response) {
     const $container = containerHelper.get(interaction);
