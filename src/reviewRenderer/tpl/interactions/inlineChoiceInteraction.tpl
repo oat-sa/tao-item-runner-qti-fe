@@ -1,4 +1,4 @@
-<span disabled drole="listbox" {{#if attributes.id}}id="{{attributes.id}}"{{/if}} class="qti-interaction qti-inlineInteraction qti-inlineChoiceInteraction{{#if attributes.class}} {{attributes.class}}{{/if}}"
+<span disabled role="listbox" {{#if attributes.id}}id="{{attributes.id}}"{{/if}} class="qti-interaction qti-inlineInteraction qti-inlineChoiceInteraction{{#if attributes.class}} {{attributes.class}}{{/if}}"
         data-serial="{{serial}}"
         data-qti-class="inlineChoiceInteraction"
         data-has-search="false"
