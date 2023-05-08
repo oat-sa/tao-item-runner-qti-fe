@@ -26,6 +26,7 @@
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/math';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import MathJax from 'mathJax';
+import $ from 'jquery';
 
 // Do not wait between rendering each individual math element
 // http://docs.mathjax.org/en/latest/api/hub.html
