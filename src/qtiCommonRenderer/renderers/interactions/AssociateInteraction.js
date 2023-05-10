@@ -738,7 +738,6 @@ const render = function(interaction) {
         renderEmptyPairs(interaction);
 
         sizeAdapter.adaptSize($('.result-area .target, .choice-area .qti-choice', $container));
-
         resolve();
     });
 };

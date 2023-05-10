@@ -26,6 +26,7 @@
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/math';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import MathJax from 'mathJax';
+import $ from 'jquery';
 
 // Do not wait between rendering each individual math element
 // http://docs.mathjax.org/en/latest/api/hub.html
@@ -38,6 +39,12 @@ export default {
     template: tpl,
     getContainer: containerHelper.get,
     render: function render(math) {
+        $('body').on('mathjaxRendered', function (event, reference) {
+            if ($(reference).find('math').length !== 0) {
+                $(reference).closest('.qti-choice').addClass('flexible-choice-width');
+            }
+        });
+
         return new Promise(function (resolve) {
             const $self = containerHelper.get(math);
             if (typeof MathJax !== 'undefined' && MathJax) {
@@ -48,7 +55,10 @@ export default {
                 //defer execution fix some rendering issue in chrome
                 if ($self.length) {
                     MathJax.Hub.Queue(['Typeset', MathJax.Hub, $self[0]]);
-                    MathJax.Hub.Queue(resolve);
+                    MathJax.Hub.Queue(function () {
+                        $('body').trigger('mathjaxRendered', [$self[0]]);
+                        resolve();
+                    });
                 } else {
                     resolve();
                 }
