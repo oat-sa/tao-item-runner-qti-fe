@@ -7,6 +7,15 @@
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
+                    // mock Client Config data:
+                    requirejs.config({
+                        config:{
+                            'util/locale': {
+                                rtl: ['ar-arb']
+                            }
+                        }
+                    });
+
                     require(['taoQtiItem/test/qtiCommonRenderer/interactions/inlineChoice/test'], function() {
                         QUnit.config.reorder = false;
                         QUnit.start();
