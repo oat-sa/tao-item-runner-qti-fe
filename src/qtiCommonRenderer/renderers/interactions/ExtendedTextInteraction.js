@@ -536,7 +536,7 @@ function inputLimiter(interaction) {
                         }
                         if (!left) {
                             const node = range.getPreviousNode();
-                            if (noSpaceNode(node)) {
+                            if (node && noSpaceNode(node)) {
                                 const text = node.getText();
                                 left = getCharBefore(text, text && text.length);
                             } else {
@@ -549,7 +549,7 @@ function inputLimiter(interaction) {
                         }
                         if (!right) {
                             const node = range.getNextNode();
-                            if (noSpaceNode(node)) {
+                            if (node && noSpaceNode(node)) {
                                 right = getCharAfter(node.getText(), 0);
                             } else {
                                 right = ' ';
