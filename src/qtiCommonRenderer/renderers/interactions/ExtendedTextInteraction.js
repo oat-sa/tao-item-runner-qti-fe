@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2022 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2023 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -457,6 +457,40 @@ function inputLimiter(interaction) {
             const getCharBefore = (str, pos) => str && str.substring(Math.max(0, pos - 1), pos);
             const getCharAfter = (str, pos) => str && str.substring(pos, pos + 1);
             const noSpaceNode = node => node.type === ckEditor.NODE_TEXT || (!node.isBlockBoundary() && node.getName() !== 'br');
+            const getPreviousNotEmptyNode = range => {
+                let node = range.getPreviousNode();
+                /**
+                 * The previous node isn't always the right one, because it can be an empty <b> tag for example.
+                 * So we need to get the previous node until we find a non empty one, but we should not go above body.
+                 */
+                while (node && (node.isEmpty ? node.isEmpty() : node.getText() === '')) {
+                    let previousSourceNode = node.getPreviousSourceNode();
+                    let nodeElement = previousSourceNode;
+                    if (previousSourceNode && previousSourceNode.type === ckEditor.NODE_TEXT) {
+                        nodeElement = previousSourceNode.parentNode || previousSourceNode.$.parentNode;
+                    }
+                    if (!nodeElement || !nodeElement.ownerDocument || !nodeElement.ownerDocument.body.contains(nodeElement)) {
+                        return null;
+                    }
+                    node = previousSourceNode;
+                }
+                return node;
+            };
+            const getNextNotEmptyNode = range => {
+                let node = range.getNextNode();
+                while (node && (node.isEmpty ? node.isEmpty() : node.getText() === '')) {
+                    let nextSourceNode = node.getNextSourceNode();
+                    let nodeElement = nextSourceNode;
+                    if (nextSourceNode && nextSourceNode.type === ckEditor.NODE_TEXT) {
+                        nodeElement = nextSourceNode.parentNode || nextSourceNode.$.parentNode;
+                    }
+                    if (!nodeElement || !nodeElement.ownerDocument || !nodeElement.ownerDocument.body.contains(nodeElement)) {
+                        return null;
+                    }
+                    node = nextSourceNode;
+                }
+                return node;
+            };
             const cancelEvent = e => {
                 if (e.cancel) {
                     e.cancel();
@@ -535,8 +569,8 @@ function inputLimiter(interaction) {
                             left = getCharBefore(range.startContainer.getText(), range.startOffset);
                         }
                         if (!left) {
-                            const node = range.getPreviousNode();
-                            if (noSpaceNode(node)) {
+                            const node = getPreviousNotEmptyNode(range);
+                            if (node && noSpaceNode(node)) {
                                 const text = node.getText();
                                 left = getCharBefore(text, text && text.length);
                             } else {
@@ -548,8 +582,8 @@ function inputLimiter(interaction) {
                             right = getCharAfter(range.endContainer.getText(), range.endOffset);
                         }
                         if (!right) {
-                            const node = range.getNextNode();
-                            if (noSpaceNode(node)) {
+                            const node = getNextNotEmptyNode(range);
+                            if (node && noSpaceNode(node)) {
                                 right = getCharAfter(node.getText(), 0);
                             } else {
                                 right = ' ';
