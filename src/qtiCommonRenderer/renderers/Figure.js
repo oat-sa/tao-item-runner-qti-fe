@@ -15,7 +15,7 @@
  *
  * Copyright (c) 2022 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  */
-import _ from 'lodash';
+
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 
@@ -23,27 +23,10 @@ export default {
     qtiClass: 'figure',
     getContainer: containerHelper.get,
     template: tpl,
-    getData: function (elem, data) {
-        let showFigure = false;
-        if (data.attributes.class && ['wrap-left', 'wrap-right'].includes(data.attributes.class)) {
-            showFigure = true;
-        } else {
-            _.some(elem.bdy['elements'], childElement => {
-                if (childElement.serial.includes('figcaption')) {
-                    showFigure = true;
-                    data.attributes.class = 'wrap-left';
-                    elem.attributes.class = 'wrap-left';
-                }
-            });
-        }
-        data.attributes.showFigure = showFigure;
-        elem.attributes.showFigure = showFigure;
-        return data;
-    },
     render: function(figure) {
         const $figure = containerHelper.get(figure);
         const $img = $figure.find('img');
-        if ($img.length && $figure.prop('tagName') === 'FIGURE') {
+        if ($img.length) {
             // move width from image to figure
             $figure.css({ width: $img.attr('width') });
             $img.attr('width', '100%');
