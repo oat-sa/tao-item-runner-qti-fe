@@ -38,11 +38,13 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
             'taoItems/runner': '/node_modules/@oat-sa/tao-item-runner/dist/runner',
             'taoItems/assets': '/node_modules/@oat-sa/tao-item-runner/dist/assets',
             'taoItems/scoring': '/node_modules/@oat-sa/tao-item-runner/dist/scoring',
+            Raphael: '/node_modules/raphael/raphael',
 
             /* LIBS */
-            'lib/simulator': '/lib/simulator',
-            ckeditor: '/lib/ckeditor/ckeditor'
-        /* LIBS END */
+            'lib/simulator': '/node_modules/@oat-sa/tao-core-shared-libs/lib/simulator',
+            ckeditor: '/node_modules/@oat-sa/tao-core-shared-libs/lib/ckeditor/ckeditor',
+            select2: '/node_modules/@oat-sa/tao-core-libs/dist/select2'
+            /* LIBS END */
         }, libPathDefinition),
         shim: {
             'qunit-parameterize': {
@@ -53,9 +55,17 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
             },
             ckeditor: {
                 exports: 'CKEDITOR'
+            },
+            select2 : {
+                deps: ['jquery']
             }
         },
-        waitSeconds: 15
+        waitSeconds: 15,
+        map: {
+            '*': {
+                'raphael': 'Raphael'
+            }
+        }
     });
 
     define('qunitLibs', ['qunit', 'css!qunitStyle']);
@@ -87,4 +97,11 @@ define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(
     }));
     define('taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory', [], () => {});
     define('taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy', [], () => {});
+    define('services/features', function() {
+        return {
+            isVisible: function() {
+                return true;
+            }
+        }
+    });
 });

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-2023 (original work) Open Assessment Technologies SA ;
  */
 
 /**
@@ -27,13 +27,13 @@ import scaleRaphael from 'scale.raphael';
 import gstyle from 'taoQtiItem/qtiCommonRenderer/renderers/graphic-style';
 
 //maps the QTI shapes to Raphael shapes
-var shapeMap = {
+const shapeMap = {
     default: 'rect',
     poly: 'path'
 };
 
 //length constraints to validate coords
-var coordsValidator = {
+const coordsValidator = {
     rect: 4,
     ellipse: 4,
     circle: 3,
@@ -42,7 +42,7 @@ var coordsValidator = {
 };
 
 //transform the coords from the QTI system to Raphael system
-var qti2raphCoordsMapper = {
+const qti2raphCoordsMapper = {
     /**
      * Rectangle coordinate mapper:  from left-x,top-y,right-x-bottom-y to x,y,w,h
      * @param {Array} coords - QTI coords
@@ -67,8 +67,8 @@ var qti2raphCoordsMapper = {
      * @returns {Array} path desc
      */
     poly: function(coords) {
-        var a;
-        var size = coords.length;
+        let a;
+        const size = coords.length;
 
         // autoClose if needed
         if (coords[0] !== coords[size - 2] && coords[1] !== coords[size - 1]) {
@@ -90,7 +90,7 @@ var qti2raphCoordsMapper = {
 };
 
 //transform the coords from a raphael shape to the QTI system
-var raph2qtiCoordsMapper = {
+const raph2qtiCoordsMapper = {
     /**
      * Rectangle coordinate mapper: from x,y,w,h to left-x,top-y,right-x-bottom-y
      * @param {Object} attr - Raphael Element's attributes
@@ -133,8 +133,8 @@ var raph2qtiCoordsMapper = {
      * @returns {Array} raphael coords
      */
     path: function(attr) {
-        var poly = [];
-        var i;
+        const poly = [];
+        let i;
 
         if (_.isArray(attr.path)) {
             for (i = 1; i < attr.path.length; i++) {
@@ -153,7 +153,7 @@ var raph2qtiCoordsMapper = {
  * Graphic interaction helper
  * @exports qtiCommonRenderer/helpers/Graphic
  */
-var GraphicHelper = {
+const GraphicHelper = {
     /**
      * Raw access to the styles
      * @type {Object}
@@ -178,6 +178,7 @@ var GraphicHelper = {
      * @param {Object} options - the paper parameters
      * @param {String} options.img - the url of the background image
      * @param {jQueryElement} [options.container] - the parent of the paper element (got the closest parent by default)
+     * @param {Boolean} [options.responsive] - scale to container
      * @param {Number} [options.width] - the paper width
      * @param {Number} [options.height] - the paper height
      * @param {String} [options.imgId] - an identifier for the image element
@@ -185,18 +186,17 @@ var GraphicHelper = {
      * @returns {Raphael.Paper} the paper
      */
     responsivePaper: function(id, serial, options) {
-        var paper, image;
+        const $container = options.container || $('#' + id).parent();
+        const $editor = $('.image-editor', $container);
+        const $body = $container.closest('.qti-itemBody');
+        const resizer = _.throttle(resizePaper, 10);
 
-        var $container = options.container || $('#' + id).parent();
-        var $editor = $('.image-editor', $container);
-        var $body = $container.closest('.qti-itemBody');
-        var resizer = _.throttle(resizePaper, 10);
+        const imgWidth = options.width || $container.innerWidth();
+        const imgHeight = options.height || $container.innerHeight();
 
-        var imgWidth = options.width || $container.innerWidth();
-        var imgHeight = options.height || $container.innerHeight();
 
-        paper = scaleRaphael(id, imgWidth, imgHeight);
-        image = paper.image(options.img, 0, 0, imgWidth, imgHeight);
+        const paper = scaleRaphael(id, imgWidth, imgHeight);
+        const image = paper.image(options.img, 0, 0, imgWidth, imgHeight);
         image.id = options.imgId || image.id;
         paper.setViewBox(0, 0, imgWidth, imgHeight);
 
@@ -225,27 +225,39 @@ var GraphicHelper = {
          * @private
          */
         function resizePaper(e, givenWidth) {
-            var diff, maxWidth, containerWidth, containerHeight, factor;
+            let containerWidth;
 
             if (e) {
                 e.stopPropagation();
             }
 
-            diff = $editor.outerWidth() - $editor.width() + ($container.outerWidth() - $container.width()) + 1;
-            maxWidth = $body.width();
-            containerWidth = $container.innerWidth();
+            const diff = $editor.outerWidth() - $editor.width() + ($container.outerWidth() - $container.width()) + 1;
+            const maxWidth = $body.width();
+            if (options.responsive) {
+                containerWidth = $container.innerWidth();
+            } else {
+                containerWidth = $editor.innerWidth();
+            }
 
-            if (containerWidth > 0 || givenWidth > 0) {
-                if (givenWidth < containerWidth && givenWidth < maxWidth) {
-                    containerWidth = givenWidth - diff;
-                } else if (containerWidth > maxWidth) {
-                    containerWidth = maxWidth - diff;
+            if (options.responsive && containerWidth > 0 || givenWidth > 0 || containerWidth > maxWidth) {
+                if (options.responsive) {
+                    if (givenWidth < containerWidth && givenWidth < maxWidth) {
+                        containerWidth = givenWidth - diff;
+                    } else if (containerWidth > maxWidth) {
+                        containerWidth = maxWidth - diff;
+                    } else {
+                        containerWidth -= diff;
+                    }
                 } else {
-                    containerWidth -= diff;
+                    if (givenWidth > 0 && givenWidth < maxWidth) {
+                        containerWidth = givenWidth;
+                    } else if (containerWidth > maxWidth) {
+                        containerWidth = maxWidth;
+                    }
                 }
 
-                factor = containerWidth / imgWidth;
-                containerHeight = imgHeight * factor;
+                const factor = containerWidth / imgWidth;
+                const containerHeight = imgHeight * factor;
 
                 if (containerWidth > 0) {
                     paper.changeSize(containerWidth, containerHeight, false, false);
@@ -254,9 +266,8 @@ var GraphicHelper = {
                 if (typeof options.resize === 'function') {
                     options.resize(containerWidth, factor);
                 }
-
-                $container.trigger('resized.qti-widget');
             }
+            $container.trigger('resized.qti-widget');
         }
 
         return paper;
@@ -277,10 +288,10 @@ var GraphicHelper = {
      * @returns {Raphael.Element} the created element
      */
     createElement: function(paper, type, coords, options) {
-        var self = this;
-        var element;
-        var shaper = shapeMap[type] ? paper[shapeMap[type]] : paper[type];
-        var shapeCoords = options.qtiCoords !== false ? self.raphaelCoords(paper, type, coords) : coords;
+        const self = this;
+        let element;
+        const shaper = shapeMap[type] ? paper[shapeMap[type]] : paper[type];
+        const shapeCoords = options.qtiCoords !== false ? self.raphaelCoords(paper, type, coords) : coords;
 
         if (typeof shaper === 'function') {
             element = shaper.apply(paper, shapeCoords);
@@ -342,23 +353,20 @@ var GraphicHelper = {
      * @param {Function} [options.remove] - call once removed
      */
     createTarget: function createTarget(paper, options) {
-        var baseSize, count, factor, half, hover, layer, point, self, tBBox, targetSize, x, y, target;
-
         options = options || {};
 
-        self = this;
-        point = options.point || { x: 0, y: 0 };
-        factor = paper.w !== 0 ? paper.width / paper.w : 1;
-        hover = typeof options.hover === 'undefined' ? true : !!options.hover;
+        const point = options.point || { x: 0, y: 0 };
+        const factor = paper.w !== 0 ? paper.width / paper.w : 1;
+        const hover = typeof options.hover === 'undefined' ? true : !!options.hover;
 
-        baseSize = 18; // this is the base size of the path element to be placed on svg (i.e. the path element crosshair is created to have a size of 18)
-        half = baseSize / 2;
-        x = point.x - half;
-        y = point.y - half;
-        targetSize = factor !== 0 ? 2 / factor : 2;
+        const baseSize = 18; // this is the base size of the path element to be placed on svg (i.e. the path element crosshair is created to have a size of 18)
+        const half = baseSize / 2;
+        const x = point.x - half;
+        const y = point.y - half;
+        const targetSize = factor !== 0 ? 2 / factor : 2;
 
         //create the target from a path
-        target = paper
+        const target = paper
             .path(gstyle.target.path)
             .transform('t' + x + ',' + y + 's' + targetSize)
             .attr(gstyle.target)
@@ -368,7 +376,7 @@ var GraphicHelper = {
         if (options.id) {
             target.id = options.id;
         } else {
-            count = 0;
+            let count = 0;
             paper.forEach(function(element) {
                 if (element.data('target')) {
                     count++;
@@ -377,15 +385,15 @@ var GraphicHelper = {
             target.id = 'target-' + count;
         }
 
-        tBBox = target.getBBox();
+        const tBBox = target.getBBox();
 
         //create an invisible rect over the target to ensure path selection
-        layer = paper
+        const layer = paper
             .rect(tBBox.x, tBBox.y, tBBox.width, tBBox.height)
             .attr(gstyle.layer)
             .click(function() {
-                var id = target.id;
-                var p = this.data('point');
+                const id = target.id;
+                const p = this.data('point');
 
                 if (_.isFunction(options.select)) {
                     options.select(target, p, this);
@@ -400,14 +408,14 @@ var GraphicHelper = {
 
         if (hover) {
             layer.hover(
-                function() {
+                () => {
                     if (!target.flashing) {
-                        self.setStyle(target, 'target-hover');
+                        this.setStyle(target, 'target-hover');
                     }
                 },
-                function() {
+                () => {
                     if (!target.flashing) {
-                        self.setStyle(target, 'target-success');
+                        this.setStyle(target, 'target-success');
                     }
                 }
             );
@@ -432,7 +440,7 @@ var GraphicHelper = {
      * @returns {Array} the arguments array of coordinate to give to the approriate raphael shapre creator
      */
     raphaelCoords: function raphaelCoords(paper, type, coords) {
-        var shapeCoords;
+        let shapeCoords;
 
         if (_.isString(coords)) {
             coords = _.map(coords.split(','), function(coord) {
@@ -465,15 +473,18 @@ var GraphicHelper = {
     /**
      * Get the QTI coordinates from a Raphael Element
      * @param {Raphael.Element} element - the shape to get the coords from
+     * @param {Raphael.Element} paper - the interaction paper
+     * @param {number} width - width of background image
      * @returns {String} the QTI coords
      */
-    qtiCoords: function qtiCoords(element) {
-        var mapper = raph2qtiCoordsMapper[element.type];
-        var result = '';
+    qtiCoords: function qtiCoords(element, paper, width) {
+        const mapper = raph2qtiCoordsMapper[element.type];
+        let result = '';
+        const factor = paper && width ? width / paper.w : 1;
 
         if (_.isFunction(mapper)) {
             result = _.map(mapper.call(raph2qtiCoordsMapper, element.attr()), function(coord) {
-                return _.parseInt(coord);
+                return Math.round(coord * factor);
             }).join(',');
         }
 
@@ -487,8 +498,8 @@ var GraphicHelper = {
      * @param {Raphael.Element} element - used to get the bbox from
      */
     createTouchCircle: function(paper, bbox) {
-        var radius = bbox.width > bbox.height ? bbox.width : bbox.height;
-        var tCircle = paper.circle(bbox.x + bbox.width / 2, bbox.y + bbox.height / 2, radius);
+        const radius = bbox.width > bbox.height ? bbox.width : bbox.height;
+        const tCircle = paper.circle(bbox.x + bbox.width / 2, bbox.y + bbox.height / 2, radius);
 
         tCircle.attr(gstyle['touch-circle']);
 
@@ -510,23 +521,24 @@ var GraphicHelper = {
      * @param {String} [options.id] - the element identifier
      * @param {String} [options.style = 'small-text'] - the style name according to the graphic-style.json keys
      * @param {String} [options.title] - the text tooltip content
+     * @param {String} [options.disableEvents] - ignore events for the node
      * @param {Boolean} [options.hide = false] - if the text starts hidden
      * @returns {Raphael.Element} the created text
      */
     createText: function(paper, options) {
-        var fontSize, scaledFontSize, text;
-        var top = options.top || 0;
-        var left = options.left || 0;
-        var content = options.content || '';
-        var style = options.style || 'small-text';
-        var title = options.title || '';
-        var factor = 1;
+        const top = options.top || 0;
+        const left = options.left || 0;
+        const content = options.content || '';
+        const style = options.style || 'small-text';
+        const title = options.title || '';
+        const disableEvents = options.disableEvents || false;
+        let factor = 1;
 
         if (paper.width && paper.w) {
             factor = paper.width / paper.w;
         }
 
-        text = paper.text(left, top, content).toFront();
+        const text = paper.text(left, top, content).toFront();
         if (options.id) {
             text.id = options.id;
         }
@@ -537,9 +549,13 @@ var GraphicHelper = {
 
         text.attr(gstyle[style]);
 
+        if(disableEvents) {
+            text.node.setAttribute('pointer-events', 'none');
+        }
+
         if (typeof factor !== 'undefined' && factor !== 1) {
-            fontSize = parseInt(text.attr('font-size'), 10);
-            scaledFontSize = Math.floor(fontSize / factor) + 1;
+            const fontSize = parseInt(text.attr('font-size'), 10);
+            const scaledFontSize = Math.floor(fontSize / factor) + 1;
 
             text.attr('font-size', scaledFontSize);
         }
@@ -566,10 +582,9 @@ var GraphicHelper = {
      * @returns {Raphael.Element} the created text
      */
     createShapeText: function(paper, shape, options) {
-        var self = this;
-        var bbox = shape.getBBox();
+        const bbox = shape.getBBox();
 
-        var text = this.createText(
+        const text = this.createText(
             paper,
             _.merge(
                 {
@@ -581,8 +596,8 @@ var GraphicHelper = {
         );
 
         if (options.shapeClick) {
-            text.click(function() {
-                self.trigger(shape, 'click');
+            text.click(() => {
+                this.trigger(shape, 'click');
             });
         }
 
@@ -605,28 +620,28 @@ var GraphicHelper = {
      * @returns {Raphael.Element} the created set, augmented of a move(x,y) method
      */
     createBorderedImage: function(paper, options) {
-        var padding = options.padding >= 0 ? options.padding : 6;
-        var halfPad = padding / 2;
+        const padding = options.padding >= 0 ? options.padding : 6;
+        const halfPad = padding / 2;
 
-        var rx = options.left,
+        const rx = options.left,
             ry = options.top,
             rw = options.width + padding,
             rh = options.height + padding;
 
-        var ix = options.left + halfPad,
+        const ix = options.left + halfPad,
             iy = options.top + halfPad,
             iw = options.width,
             ih = options.height;
 
-        var set = paper.set();
+        const set = paper.set();
 
         //create a rectangle with a padding and a border.
-        var rect = paper
+        const rect = paper
             .rect(rx, ry, rw, rh)
             .attr(options.border ? gstyle['imageset-rect-stroke'] : gstyle['imageset-rect-no-stroke']);
 
         //and an image centered into the rectangle.
-        var image = paper.image(options.url, ix, iy, iw, ih).attr(gstyle['imageset-img']);
+        const image = paper.image(options.url, ix, iy, iw, ih).attr(gstyle['imageset-img']);
 
         if (options.shadow) {
             set.push(
@@ -649,8 +664,8 @@ var GraphicHelper = {
          * @returns {Raphael.Element} the set for chaining
          */
         set.move = function move(x, y, duration) {
-            var animation = raphael.animation({ x: x, y: y }, duration || 400);
-            var elt = rect.animate(animation);
+            const animation = raphael.animation({ x: x, y: y }, duration || 400);
+            const elt = rect.animate(animation);
             image.animateWith(elt, animation, { x: x + halfPad, y: y + halfPad }, duration || 400);
             return set;
         };
@@ -704,12 +719,11 @@ var GraphicHelper = {
      * @param {String} [restorState = 'basic'] - the state to restore the elt into after flash
      */
     highlightError: function(element, restoredState) {
-        var self = this;
         if (element) {
             element.flashing = true;
-            self.updateElementState(element, 'error');
-            _.delay(function() {
-                self.updateElementState(element, restoredState || 'basic');
+            this.updateElementState(element, 'error');
+            _.delay(() => {
+                this.updateElementState(element, restoredState || 'basic');
                 element.flashing = false;
             }, 800);
         }
@@ -722,7 +736,7 @@ var GraphicHelper = {
      *
      */
     trigger: function(element, event) {
-        var evt = _.where(element.events, { name: event });
+        const evt = _.where(element.events, { name: event });
         if (evt.length && evt[0] && typeof evt[0].f === 'function') {
             evt[0].f.apply(element, Array.prototype.slice.call(arguments, 2));
         }
@@ -737,9 +751,9 @@ var GraphicHelper = {
      * @returns {Object} x,y point
      */
     getPoint: function getPoint(event, paper, $container) {
-        var point = this.clickPoint($container, event);
-        var rect = $container.get(0).getBoundingClientRect();
-        var factor = paper.w / rect.width;
+        const point = this.clickPoint($container, event);
+        const rect = $container.get(0).getBoundingClientRect();
+        const factor = paper.w / rect.width;
 
         point.x = Math.round(point.x * factor);
         point.y = Math.round(point.y * factor);
@@ -754,10 +768,10 @@ var GraphicHelper = {
      * @returns {Object} position with top and left
      */
     position: function($container, paper) {
-        var pw = parseInt(paper.w || paper.width, 10);
-        var cw = parseInt($container.width(), 10);
-        var ph = parseInt(paper.w || paper.width, 10);
-        var ch = parseInt($container.height(), 10);
+        const pw = parseInt(paper.w || paper.width, 10);
+        const cw = parseInt($container.width(), 10);
+        const ph = parseInt(paper.w || paper.width, 10);
+        const ch = parseInt($container.height(), 10);
 
         return {
             left: (cw - pw) / 2,
@@ -772,8 +786,8 @@ var GraphicHelper = {
      * @returns {Object} the x,y point
      */
     clickPoint: function($container, event) {
-        var x, y;
-        var offset = $container.offset();
+        let x, y;
+        const offset = $container.offset();
 
         if (event.pageX || event.pageY) {
             x = event.pageX - offset.left;
@@ -783,7 +797,7 @@ var GraphicHelper = {
             y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - offset.top;
         }
 
-        return { x: x, y: y };
+        return { x, y };
     }
 };
 

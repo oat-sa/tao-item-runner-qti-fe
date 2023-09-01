@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -22,6 +22,7 @@
  */
 import $ from 'jquery';
 import _ from 'lodash';
+import __ from 'i18n';
 import context from 'context';
 
 import QtiLoader from 'taoQtiItem/qtiItem/core/Loader';
@@ -29,11 +30,12 @@ import Element from 'taoQtiItem/qtiItem/core/Element';
 import ciRegistry from 'taoQtiItem/portableElementRegistry/ciRegistry';
 import icRegistry from 'taoQtiItem/portableElementRegistry/icRegistry';
 import sideLoadingProviderFactory from 'taoQtiItem/portableElementRegistry/provider/sideLoadingProviderFactory';
-import QtiRenderer from 'taoQtiItem/qtiCommonRenderer/renderers/Renderer';
+import rendererStrategies from 'taoQtiItem/runner/rendererStrategies';
 import picManager from 'taoQtiItem/runner/provider/manager/picManager';
 import userModules from 'taoQtiItem/runner/provider/manager/userModules';
 import modalFeedbackHelper from 'taoQtiItem/qtiItem/helper/modalFeedback';
 import 'taoItems/assets/manager';
+import locale from 'util/locale';
 
 var timeout = (context.timeout > 0 ? context.timeout + 1 : 30) * 1000;
 
@@ -41,26 +43,29 @@ var timeout = (context.timeout > 0 ? context.timeout + 1 : 30) * 1000;
  * @exports taoQtiItem/runner/provider/qti
  */
 var qtiItemRuntimeProvider = {
-    init: function(itemData, done) {
+    init: function (itemData, done) {
         var self = this;
 
         var rendererOptions = _.merge(
             {
                 assetManager: this.assetManager
             },
-            _.pick(this.options, ['themes', 'preload'])
+            _.pick(this.options, ['themes', 'preload', 'view'])
         );
 
-        this._renderer = new QtiRenderer(rendererOptions);
+        const Renderer = rendererStrategies(rendererOptions.view).getRenderer();
+
+        this._renderer = new Renderer(rendererOptions);
+
         this._loader = new QtiLoader();
 
-        this._loader.loadItemData(itemData, function(item) {
+        this._loader.loadItemData(itemData, function (item) {
             if (!item) {
-                return self.trigger('error', 'Unable to load item from the given data.');
+                return self.trigger('error', __('Unable to load item from the given data.'));
             }
 
             self._item = item;
-            self._renderer.load(function() {
+            self._renderer.load(function () {
                 self._item.setRenderer(this);
 
                 done();
@@ -68,7 +73,7 @@ var qtiItemRuntimeProvider = {
         });
     },
 
-    render: function(elt, done, options) {
+    render: function (elt, done, options) {
         var self = this;
 
         options = _.defaults(options || {}, { state: {} });
@@ -77,8 +82,17 @@ var qtiItemRuntimeProvider = {
             try {
                 //render item html
                 elt.innerHTML = this._item.render({});
+
+                // apply RTL layout according to item language
+                const $item = $(elt).find('.qti-item');
+                const $itemBody = $item.find('.qti-itemBody');
+                const itemDir = $itemBody.attr('dir');
+                if (!itemDir) {
+                    const itemLang = $item.attr('lang');
+                    $itemBody.attr('dir', locale.getLanguageDirection(itemLang));
+                }
             } catch (e) {
-                self.trigger('error', 'Error in template rendering : ' + e.message);
+                self.trigger('error', __('Error in template rendering: %s', e.message));
             }
             try {
                 if (options.portableElements) {
@@ -103,29 +117,27 @@ var qtiItemRuntimeProvider = {
                 // postRendering waits for everything to be resolved or one reject
                 Promise.race([
                     Promise.all(this._item.postRender(options)),
-                    new Promise(function(resolve, reject) {
+                    new Promise(function (resolve, reject) {
                         _.delay(
                             reject,
                             timeout,
-                            new Error(
-                                'It seems that there is an error during item loading. The error has been reported. The test will be paused.'
-                            )
+                            new Error(__('It seems that there is an error during item loading. The error has been reported. The test will be paused.'))
                         );
                     })
                 ])
-                    .then(function() {
+                    .then(function () {
                         $(elt)
                             .off('responseChange')
-                            .on('responseChange', function() {
+                            .on('responseChange', function () {
                                 self.trigger('statechange', self.getState());
                                 self.trigger('responsechange', self.getResponses());
                             })
                             .off('endattempt')
-                            .on('endattempt', function(e, responseIdentifier) {
+                            .on('endattempt', function (e, responseIdentifier) {
                                 self.trigger('endattempt', responseIdentifier || e.originalEvent.detail);
                             })
                             .off('themechange')
-                            .on('themechange', function(e, themeName) {
+                            .on('themechange', function (e, themeName) {
                                 var themeLoader = self._renderer.getThemeLoader();
                                 themeName = themeName || e.originalEvent.detail;
                                 if (themeLoader) {
@@ -141,14 +153,17 @@ var qtiItemRuntimeProvider = {
 
                         return userModules.load().then(done);
                     })
-                    .catch(function(renderingError) {
+                    .catch(function (renderingError) {
                         done(); // in case of postRendering issue, we are also done
-                        const error = new Error('Error in post rendering : ' + renderingError instanceof Error ? renderingError.message : renderingError);
+                        const errorMsg = renderingError instanceof Error
+                            ? renderingError.message
+                            : renderingError;
+                        const error = new Error(__('Error in post rendering: %s', errorMsg));
                         error.unrecoverable = true;
                         self.trigger('error', error);
                     });
             } catch (err) {
-                self.trigger('error', 'Error in post rendering : ' + err.message);
+                self.trigger('error', __('Error in post rendering: %s', err.message));
             }
         }
     },
@@ -156,24 +171,19 @@ var qtiItemRuntimeProvider = {
     /**
      * Clean up stuffs
      */
-    clear: function(elt, done) {
+    clear: function (elt, done) {
         var self = this;
 
         if (self._item) {
             Promise.all(
-                this._item.getInteractions().map(function(interaction) {
+                this._item.getInteractions().map(function (interaction) {
                     return interaction.clear();
                 })
             )
-                .then(function() {
+                .then(function () {
                     self._item.clear();
 
-                    $(elt)
-                        .off('responseChange')
-                        .off('endattempt')
-                        .off('themechange')
-                        .off('feedback')
-                        .empty();
+                    $(elt).off('responseChange').off('endattempt').off('themechange').off('feedback').empty();
 
                     if (self._renderer) {
                         self._renderer.unload();
@@ -182,8 +192,8 @@ var qtiItemRuntimeProvider = {
                     self._item = null;
                 })
                 .then(done)
-                .catch(function(err) {
-                    self.trigger('error', 'Something went wrong while destroying an interaction: ' + err.message);
+                .catch(function (err) {
+                    self.trigger('error', __('Something went wrong while destroying an interaction: %s', err.message));
                 });
         } else {
             done();
@@ -198,12 +208,12 @@ var qtiItemRuntimeProvider = {
         var state = {};
         if (this._item) {
             //get the state from interactions
-            _.forEach(this._item.getInteractions(), function(interaction) {
+            _.forEach(this._item.getInteractions(), function (interaction) {
                 state[interaction.attr('responseIdentifier')] = interaction.getState();
             });
 
             //get the state from infoControls
-            _.forEach(this._item.getElements(), function(element) {
+            _.forEach(this._item.getElements(), function (element) {
                 if (Element.isA(element, 'infoControl') && element.attr('id')) {
                     state.pic = state.pic || {};
                     state.pic[element.attr('id')] = element.getState();
@@ -220,7 +230,7 @@ var qtiItemRuntimeProvider = {
     setState: function setState(state) {
         if (this._item && state) {
             //set interaction state
-            _.forEach(this._item.getInteractions(), function(interaction) {
+            _.forEach(this._item.getInteractions(), function (interaction) {
                 var id = interaction.attr('responseIdentifier');
                 if (id && state[id]) {
                     interaction.setState(state[id]);
@@ -229,7 +239,7 @@ var qtiItemRuntimeProvider = {
 
             //set info control state
             if (state.pic) {
-                _.forEach(this._item.getElements(), function(element) {
+                _.forEach(this._item.getElements(), function (element) {
                     if (Element.isA(element, 'infoControl') && state.pic[element.attr('id')]) {
                         element.setState(state.pic[element.attr('id')]);
                     }
@@ -238,12 +248,12 @@ var qtiItemRuntimeProvider = {
         }
     },
 
-    getResponses: function() {
+    getResponses: function () {
         var responses = {};
         if (this._item) {
             _.reduce(
                 this._item.getInteractions(),
-                function(res, interaction) {
+                function (res, interaction) {
                     responses[interaction.attr('responseIdentifier')] = interaction.getResponse();
                     return responses;
                 },
@@ -253,15 +263,15 @@ var qtiItemRuntimeProvider = {
         return responses;
     },
 
-    renderFeedbacks: function(feedbacks, itemSession, done) {
+    renderFeedbacks: function (feedbacks, itemSession, done) {
         var self = this;
 
         var _renderer = self._item.getRenderer();
         var _loader = new QtiLoader(self._item);
 
         // loading feedbacks from response into the current item
-        _loader.loadElements(feedbacks, function(item) {
-            _renderer.load(function() {
+        _loader.loadElements(feedbacks, function (item) {
+            _renderer.load(function () {
                 var renderingQueue = modalFeedbackHelper.getFeedbacks(item, itemSession);
 
                 done(renderingQueue);

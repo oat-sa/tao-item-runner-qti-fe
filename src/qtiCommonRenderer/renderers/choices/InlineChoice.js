@@ -21,16 +21,11 @@
  * @author Sam Sipasseuth <sam@taotesting.com>
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-import _ from 'lodash';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/choices/inlineChoice';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 
 export default {
     qtiClass: 'inlineChoice',
     getContainer: containerHelper.get,
-    template: tpl,
-    getData: function getData(choice, data) {
-        data.body = _.unescape(data.body);
-        return data;
-    }
+    template: tpl
 };

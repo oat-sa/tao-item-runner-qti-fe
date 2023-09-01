@@ -60,4 +60,14 @@ typings/
 # next.js build output
 .next
 
+# IDE
+.vscode
+.idea
+
 dist
+.idea/
+
+# OS
+.DS_Store
+
+eslint_report.json

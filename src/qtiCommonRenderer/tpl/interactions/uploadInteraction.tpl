@@ -3,8 +3,8 @@
 	<div class="instruction-container"></div>
     <div class="file-upload fixed-grid-row lft">
         <div class="progressbar"></div>
-        <span class="btn-info small col-4"></span>
-        <span class="file-name placeholder col-8 truncate"></span>
+        <span class="btn-info small col-4">{{__ 'Browse...'}}</span>
+        <span class="file-name placeholder col-8 truncate">{{__ "No file selected"}}</span>
         <input type="file" {{#if accept}}accept="{{accept}}"{{/if}}/>
     </div>
     <div class="file-upload-preview lft visible-file-upload-preview runtime-visible-file-upload-preview">

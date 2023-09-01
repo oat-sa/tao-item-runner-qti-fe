@@ -25,7 +25,7 @@ import _ from 'lodash';
 //throttle events because of the loop
 var informLoaded = _.throttle(
     function() {
-        $(document).trigger('customcssloaded.styleeditor');
+        $(document).trigger('customcssloaded.styleeditor',[{}]);
     },
     10,
     { leading: false }
@@ -58,6 +58,14 @@ var attach = function attach(stylesheets) {
 
             //we need to set the href after the link is appended to the head (for our dear IE)
             $link.removeAttr('href').attr('href', href);
+
+            if (stylesheet.attr('onload')) {
+                $link[0].onload = stylesheet.attr('onload');
+            }
+
+            if (stylesheet.attr('onerror')) {
+                $link[0].onerror = stylesheet.attr('onerror');
+            }
 
             $link.one('load', informLoaded).appendTo($head);
         }

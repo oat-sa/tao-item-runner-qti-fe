@@ -2,15 +2,25 @@
     <div class="pseudo-label-box">
         <label class="real-label">
             {{#if unique}}
-            <input type="radio" name="response-{{interaction.serial}}" value="{{attributes.identifier}}" tabindex="1">
+            <input
+                type="radio"
+                name="response-{{interaction.serial}}"
+                value="{{attributes.identifier}}"
+                tabindex="1"
+            >
             <span class="icon-radio"></span>
             {{else}}
-            <input type="checkbox" name="response-{{interaction.serial}}" value="{{attributes.identifier}}" tabindex="1">
+            <input
+                type="checkbox"
+                name="response-{{interaction.serial}}"
+                value="{{attributes.identifier}}"
+                tabindex="1"
+            >
             <span class="icon-checkbox"></span>
             {{/if}}
         </label>
         <div class="label-box">
-            <div class="label-content clear" contenteditable="false">
+            <div class="label-content clear" contenteditable="false" id="choice-{{interaction.serial}}-{{attributes.identifier}}">
                 {{{body}}}
                 <svg class="overlay-answer-eliminator">
                     <line x1="0" y1="100%" x2="100%" y2="0"/>
@@ -19,7 +29,9 @@
             </div>
         </div>
     </div>
+    {{#if allowElimination}}
     <label data-eliminable="container" data-label="{{__ "Eliminate"}}">
         <span data-eliminable="trigger" class="icon-checkbox"></span>
     </label>
+    {{/if}}
 </li>

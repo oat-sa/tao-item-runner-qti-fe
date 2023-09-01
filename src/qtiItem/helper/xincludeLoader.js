@@ -4,28 +4,31 @@ import simpleParser from 'taoQtiItem/qtiItem/helper/simpleParser';
 import Loader from 'taoQtiItem/qtiItem/core/Loader';
 
 function load(xinclude, baseUrl, callback) {
-    var href = xinclude.attr('href');
+    const href = xinclude.attr('href');
     if (href && baseUrl) {
-        //require xml :
-        require(['text!' + baseUrl + href], function(stimulusXml) {
-            var $wrapper = $('<div>').html(stimulusXml);
-            var $sampleXMLrootNode = $wrapper.children();
-            var $stimulus = $('<include>').append($sampleXMLrootNode);
-            var mathNs = 'm'; //for 'http://www.w3.org/1998/Math/MathML'
-            var data = simpleParser.parse($stimulus, {
+        const fileUrl = `text!${baseUrl}${href}`;
+        // reset the previous definition of the XML, to receive updated passage
+        require.undef(fileUrl);
+        // require xml
+        require([fileUrl], function (stimulusXml) {
+            const $wrapper = $.parseXML(stimulusXml);
+            const $sampleXMLrootNode = $wrapper.children;
+            const $stimulus = $('<include>').append($sampleXMLrootNode);
+            const mathNs = 'm'; //for 'http://www.w3.org/1998/Math/MathML'
+            const data = simpleParser.parse($stimulus, {
                 ns: {
                     math: mathNs
                 }
             });
 
-            new Loader().loadElement(xinclude, data, function() {
+            new Loader().loadElement(xinclude, data, function () {
                 if (_.isFunction(callback)) {
-                    var loadedClasses = this.getLoadedClasses();
+                    const loadedClasses = this.getLoadedClasses();
                     loadedClasses.push('_container'); //the _container class is always required
                     callback(xinclude, data, loadedClasses);
                 }
             });
-        }, function(err) {
+        }, function () {
             //in case the file does not exist
             callback(xinclude, false, []);
         });
@@ -33,5 +36,5 @@ function load(xinclude, baseUrl, callback) {
 }
 
 export default {
-    load: load
+    load
 };

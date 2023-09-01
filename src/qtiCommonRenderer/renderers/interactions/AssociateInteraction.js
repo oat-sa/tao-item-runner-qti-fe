@@ -24,6 +24,7 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
+import hider from 'ui/hider';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/associateInteraction';
 import pairTpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/associateInteraction.pair';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
@@ -33,21 +34,21 @@ import sizeAdapter from 'taoQtiItem/qtiCommonRenderer/helpers/sizeAdapter';
 import interact from 'interact';
 import interactUtils from 'ui/interactUtils';
 
-var setChoice = function(interaction, $choice, $target) {
-    var $container = containerHelper.get(interaction);
-    var choiceSerial = $choice.data('serial');
-    var usage = $choice.data('usage') || 0;
-    var choice = interaction.getChoice(choiceSerial);
+const setChoice = function(interaction, $choice, $target) {
+    const $container = containerHelper.get(interaction);
+    const choiceSerial = $choice.data('serial');
+    const choice = interaction.getChoice(choiceSerial);
+    let usage = $choice.data('usage') || 0;
 
     if (!choiceSerial) {
-        throw 'empty choice serial';
+        throw new Error('empty choice serial');
     }
 
     //to track number of times a choice is used in a pair
     usage++;
     $choice.data('usage', usage);
 
-    var _setChoice = function() {
+    const _setChoice = function() {
         $target
             .data('serial', choiceSerial)
             .html($choice.html())
@@ -59,19 +60,19 @@ var setChoice = function(interaction, $choice, $target) {
     };
 
     if ($target.siblings('div').hasClass('filled')) {
-        var $resultArea = $('.result-area', $container),
-            $pair = $target.parent(),
-            thisPairSerial = [$target.siblings('div').data('serial'), choiceSerial],
-            $otherRepeatedPair = $();
+        const $resultArea = $('.result-area', $container);
+        const $pair = $target.parent();
+        const thisPairSerial = [$target.siblings('div').data('serial'), choiceSerial];
+        let $otherRepeatedPair = $();
 
         //check if it is not a repeating association!
         $resultArea
             .children()
             .not($pair)
             .each(function() {
-                var $otherPair = $(this).children('.filled');
+                let $otherPair = $(this).children('.filled');
                 if ($otherPair.length === 2) {
-                    var otherPairSerial = [$($otherPair[0]).data('serial'), $($otherPair[1]).data('serial')];
+                    let otherPairSerial = [$($otherPair[0]).data('serial'), $($otherPair[1]).data('serial')];
                     if (_.intersection(thisPairSerial, otherPairSerial).length === 2) {
                         $otherRepeatedPair = $otherPair;
                         return false;
@@ -99,7 +100,7 @@ var setChoice = function(interaction, $choice, $target) {
                 if (!$resultArea.children('.incomplete-pair').length) {
                     $resultArea.append(pairTpl({ empty: true }));
                     $resultArea.children('.incomplete-pair').fadeIn(600, function() {
-                        $(this).show();
+                        hider.show(this);
                     });
                 }
             }
@@ -122,16 +123,16 @@ var setChoice = function(interaction, $choice, $target) {
     }
 };
 
-var unsetChoice = function(interaction, $filledChoice, animate, triggerChange) {
-    var $container = containerHelper.get(interaction);
-    var choiceSerial = $filledChoice.data('serial');
-    var $choice = $container.find('.choice-area [data-serial=' + choiceSerial + ']');
-    var usage = $choice.data('usage') || 0;
-    var $parent = $filledChoice.parent();
-    var $sibling = $container.find(
+const unsetChoice = function(interaction, $filledChoice, animate, triggerChange) {
+    const $container = containerHelper.get(interaction);
+    const choiceSerial = $filledChoice.data('serial');
+    const $choice = $container.find('.choice-area [data-serial=' + choiceSerial + ']');
+    const $parent = $filledChoice.parent();
+    const $sibling = $container.find(
         '.choice-area [data-serial=' + $filledChoice.siblings('.target').data('serial') + ']'
     );
-    var isNumberOfMaxAssociationsZero = parseInt(interaction.attr('maxAssociations')) === 0;
+    const isNumberOfMaxAssociationsZero = parseInt(interaction.attr('maxAssociations')) === 0;
+    let usage = $choice.data('usage') || 0;
 
     //decrease the  use for this choice
     usage--;
@@ -175,27 +176,27 @@ var unsetChoice = function(interaction, $filledChoice, animate, triggerChange) {
     }
 };
 
-var getChoice = function(interaction, identifier) {
-    var $container = containerHelper.get(interaction);
+const getChoice = function(interaction, identifier) {
+    const $container = containerHelper.get(interaction);
 
     //warning: do not use selector data-identifier=identifier because data-identifier may change dynamically
-    var choice = interaction.getChoiceByIdentifier(identifier);
+    const choice = interaction.getChoiceByIdentifier(identifier);
     if (!choice) {
         throw new Error('cannot find a choice with the identifier : ' + identifier);
     }
     return $('.choice-area [data-serial=' + choice.getSerial() + ']', $container);
 };
 
-var renderEmptyPairs = function(interaction) {
-    var $container = containerHelper.get(interaction);
-    var max = parseInt(interaction.attr('maxAssociations'));
-    var $resultArea = $('.result-area', $container);
+const renderEmptyPairs = function(interaction) {
+    const $container = containerHelper.get(interaction);
+    const max = parseInt(interaction.attr('maxAssociations'));
+    const $resultArea = $('.result-area', $container);
 
     if (interaction.responseMappingMode || max === 0) {
         $resultArea.append(pairTpl({ empty: true }));
-        $resultArea.children('.incomplete-pair').show();
+        hider.show($resultArea.children('.incomplete-pair'));
     } else {
-        for (var i = 0; i < max; i++) {
+        for (let i = 0; i < max; i++) {
             $resultArea.append(pairTpl());
         }
     }
@@ -206,12 +207,12 @@ var renderEmptyPairs = function(interaction) {
  * @param {jQuery} $scrollContainer
  * @returns {scrollObserver}
  */
-var scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
-    var currentDraggable = null;
-    var beforeY = 0;
-    var beforeX = 0;
-    var afterY = 0;
-    var afterX = 0;
+const scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
+    let currentDraggable = null;
+    let beforeY = 0;
+    let beforeX = 0;
+    let afterY = 0;
+    let afterX = 0;
 
     // reset the scroll observer context
     function resetScrollObserver() {
@@ -224,7 +225,8 @@ var scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
 
     // keep the position of the dragged element accurate with the scroll position
     function onScrollCb() {
-        var x, y;
+        let x;
+        let y;
         if (currentDraggable) {
             beforeY = afterY;
             beforeX = afterX;
@@ -251,8 +253,8 @@ var scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
 
     // find the scroll container within the parents if any
     $scrollContainer.parents().each(function findScrollContainer() {
-        var $el = $(this);
-        var ovf = $el.css('overflow');
+        const $el = $(this);
+        const ovf = $el.css('overflow');
         if (ovf !== 'hidden' && ovf !== 'visible') {
             $scrollContainer = $el;
             return false;
@@ -293,7 +295,53 @@ var scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
         }
     };
 };
+const _getRawResponse = function(interaction) {
+    const response = [];
+    const $container = containerHelper.get(interaction);
+    $('.result-area>li', $container).each(function() {
+        const pair = [];
+        $(this)
+            .find('div')
+            .each(function() {
+                const serial = $(this).data('serial');
+                if (serial) {
+                    const choice = interaction.getChoice(serial);
+                    if (choice) {
+                        pair.push(choice.id());
+                    }
+                }
+            });
+        if (pair.length === 2) {
+            response.push(pair);
+        }
+    });
+    return response;
+};
+const _setInstructions = function(interaction) {
+    const min = parseInt(interaction.attr('minAssociations'), 10);
+    const max = parseInt(interaction.attr('maxAssociations'), 10);
 
+    //infinite association:
+    if (min === 0) {
+        if (max === 0) {
+            instructionMgr.appendInstruction(interaction, __('You may make as many association pairs as you want.'));
+        }
+    } else {
+        if (max === 0) {
+            instructionMgr.appendInstruction(interaction, __('The maximum number of association is unlimited.'));
+        }
+        //the max value is implicit since the appropriate number of empty pairs have already been created
+        let msg = __('You need to make') + ' ';
+        msg += min > 1 ? __('at least') + ' ' + min + ' ' + __('association pairs') : __('one association pair');
+        instructionMgr.appendInstruction(interaction, msg, function() {
+            if (_getRawResponse(interaction).length >= min) {
+                this.setLevel('success');
+            } else {
+                this.reset();
+            }
+        });
+    }
+};
 /**
  * Init rendering, called after template injected into the DOM
  * All options are listed in the QTI v2.1 information model:
@@ -301,29 +349,29 @@ var scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
  *
  * @param {object} interaction
  */
-var render = function(interaction) {
-    var self = this;
+const render = function(interaction) {
+    const self = this;
 
-    return new Promise(function(resolve, reject) {
-        var $container = containerHelper.get(interaction);
-        var $choiceArea = $container.find('.choice-area');
-        var $resultArea = $container.find('.result-area');
+    return new Promise(function(resolve) {
+        const $container = containerHelper.get(interaction);
+        const $choiceArea = $container.find('.choice-area');
+        const $resultArea = $container.find('.result-area');
 
-        var $activeChoice = null;
-        var scrollObserver = null;
+        let $activeChoice = null;
+        let scrollObserver = null;
 
-        var isDragAndDropEnabled;
-        var dragOptions;
-        var dropOptions;
-        var scaleX, scaleY;
+        let isDragAndDropEnabled;
+        let dragOptions;
+        let dropOptions;
+        let scaleX, scaleY;
 
-        var $bin = $('<span>', { class: 'icon-undo remove-choice', title: __('remove') });
+        let $bin = $('<span>', { class: 'icon-undo remove-choice', title: __('remove') });
 
-        var choiceSelector = $choiceArea.selector + ' >li';
-        var resultSelector = $resultArea.selector + ' >li>div';
-        var binSelector = $container.selector + ' .remove-choice';
+        let choiceSelector = $choiceArea.selector + ' >li';
+        let resultSelector = $resultArea.selector + ' >li>div';
+        let binSelector = $container.selector + ' .remove-choice';
 
-        var _getChoice = function(serial) {
+        let _getChoice = function(serial) {
             return $choiceArea.find('[data-serial=' + serial + ']');
         };
 
@@ -333,14 +381,14 @@ var render = function(interaction) {
          * @param $target
          * @private
          */
-        var _setChoice = function($choice, $target) {
+        const _setChoice = function($choice, $target) {
             setChoice(interaction, $choice, $target);
             sizeAdapter.adaptSize(
                 $('.result-area .target, .choice-area .qti-choice', containerHelper.get(interaction))
             );
         };
 
-        var _resetSelection = function() {
+        const _resetSelection = function() {
             if ($activeChoice) {
                 $resultArea.find('.remove-choice').remove();
                 $activeChoice.removeClass('active');
@@ -349,22 +397,28 @@ var render = function(interaction) {
             }
         };
 
-        var _unsetChoice = function($choice) {
+        const _unsetChoice = function($choice) {
             unsetChoice(interaction, $choice, true);
             sizeAdapter.adaptSize(
                 $('.result-area .target, .choice-area .qti-choice', containerHelper.get(interaction))
             );
         };
 
-        var _isInsertionMode = function() {
+        const _isInsertionMode = function() {
             return $activeChoice && $activeChoice.data('identifier');
         };
 
-        var _isModeEditing = function() {
+        const _isModeEditing = function() {
             return $activeChoice && !$activeChoice.data('identifier');
         };
+        const _activateChoice = function($choice) {
+            _resetSelection();
+            $activeChoice = $choice;
+            $choice.addClass('active');
+            $resultArea.find('>li>.target').addClass('empty');
+        };
 
-        var _handleChoiceActivate = function($target) {
+        const _handleChoiceActivate = function($target) {
             if ($target.hasClass('deactivated')) {
                 return;
             }
@@ -384,16 +438,29 @@ var render = function(interaction) {
                 }
             }
         };
+        const _activateResult = function($target) {
+            const targetSerial = $target.data('serial');
 
-        var _activateChoice = function($choice) {
-            _resetSelection();
-            $activeChoice = $choice;
-            $choice.addClass('active');
-            $resultArea.find('>li>.target').addClass('empty');
+            $activeChoice = $target;
+            $activeChoice.addClass('active');
+
+            $resultArea
+                .find('>li>.target')
+                .filter(function() {
+                    return $(this).data('serial') !== targetSerial;
+                })
+                .addClass('empty');
+
+            $choiceArea
+                .find('>li:not(.deactivated)')
+                .filter(function() {
+                    return $(this).data('serial') !== targetSerial;
+                })
+                .addClass('empty');
         };
 
-        var _handleResultActivate = function($target) {
-            var choiceSerial,
+        const _handleResultActivate = function($target) {
+            let choiceSerial,
                 targetSerial = $target.data('serial');
 
             if (_isInsertionMode()) {
@@ -441,27 +508,6 @@ var render = function(interaction) {
             }
         };
 
-        var _activateResult = function($target) {
-            var targetSerial = $target.data('serial');
-
-            $activeChoice = $target;
-            $activeChoice.addClass('active');
-
-            $resultArea
-                .find('>li>.target')
-                .filter(function() {
-                    return $(this).data('serial') !== targetSerial;
-                })
-                .addClass('empty');
-
-            $choiceArea
-                .find('>li:not(.deactivated)')
-                .filter(function() {
-                    return $(this).data('serial') !== targetSerial;
-                })
-                .addClass('empty');
-        };
-
         // Point & click handlers
 
         interact($container.selector).on('tap', function(e) {
@@ -478,7 +524,7 @@ var render = function(interaction) {
         });
 
         interact($choiceArea.selector + ' >li').on('tap', function(e) {
-            var $target = $(e.currentTarget);
+            const $target = $(e.currentTarget);
 
             //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
             if ($target.closest('.qti-item').hasClass('prevent-click-handler')) {
@@ -491,7 +537,7 @@ var render = function(interaction) {
         });
 
         interact($resultArea.selector + ' >li>div').on('tap', function(e) {
-            var $target = $(e.currentTarget);
+            const $target = $(e.currentTarget);
 
             //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
             if ($target.closest('.qti-item').hasClass('prevent-click-handler')) {
@@ -531,7 +577,7 @@ var render = function(interaction) {
 
         function _iFrameDragFix(draggableSelector, target) {
             interactUtils.iFrameDragFixOn(function() {
-                var $activeDrop = $(resultSelector + '.dropzone');
+                let $activeDrop = $(resultSelector + '.dropzone');
                 if ($activeDrop.length) {
                     interact(resultSelector).fire({
                         type: 'drop',
@@ -574,8 +620,8 @@ var render = function(interaction) {
                     _.defaults(
                         {
                             onstart: function(e) {
-                                var $target = $(e.target);
-                                var scale;
+                                let $target = $(e.target);
+                                let scale;
                                 $target.addClass('dragged');
                                 _activateChoice($target);
                                 _iFrameDragFix(choiceSelector + ':not(.deactivated)', e.target);
@@ -589,7 +635,7 @@ var render = function(interaction) {
                                 interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
                             },
                             onend: function(e) {
-                                var $target = $(e.target);
+                                let $target = $(e.target);
                                 $target.removeClass('dragged');
                                 // The reason of placing delay here is that there was timing conflict between "draggable" and "drag-zone" elements.
                                 _.delay(function(){
@@ -612,8 +658,8 @@ var render = function(interaction) {
                     _.defaults(
                         {
                             onstart: function(e) {
-                                var $target = $(e.target);
-                                var scale;
+                                let $target = $(e.target);
+                                let scale;
                                 $target.addClass('dragged');
                                 _resetSelection();
                                 _activateResult($target);
@@ -628,7 +674,7 @@ var render = function(interaction) {
                                 interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
                             },
                             onend: function(e) {
-                                var $target = $(e.target);
+                                let $target = $(e.target);
                                 $target.removeClass('dragged');
 
                                 interactUtils.restoreOriginalPosition($target);
@@ -649,7 +695,7 @@ var render = function(interaction) {
                 .styleCursor(false);
 
             dropOptions = {
-                overlap: 0.15,
+                overlap: 'pointer',
                 ondragenter: function(e) {
                     $(e.target).addClass('dropzone');
                     $(e.relatedTarget).addClass('droppable');
@@ -692,39 +738,12 @@ var render = function(interaction) {
         renderEmptyPairs(interaction);
 
         sizeAdapter.adaptSize($('.result-area .target, .choice-area .qti-choice', $container));
-
         resolve();
     });
 };
 
-var _setInstructions = function(interaction) {
-    var min = parseInt(interaction.attr('minAssociations'), 10),
-        max = parseInt(interaction.attr('maxAssociations'), 10);
-
-    //infinite association:
-    if (min === 0) {
-        if (max === 0) {
-            instructionMgr.appendInstruction(interaction, __('You may make as many association pairs as you want.'));
-        }
-    } else {
-        if (max === 0) {
-            instructionMgr.appendInstruction(interaction, __('The maximum number of association is unlimited.'));
-        }
-        //the max value is implicit since the appropriate number of empty pairs have already been created
-        var msg = __('You need to make') + ' ';
-        msg += min > 1 ? __('at least') + ' ' + min + ' ' + __('association pairs') : __('one association pair');
-        instructionMgr.appendInstruction(interaction, msg, function() {
-            if (_getRawResponse(interaction).length >= min) {
-                this.setLevel('success');
-            } else {
-                this.reset();
-            }
-        });
-    }
-};
-
-var resetResponse = function(interaction) {
-    var $container = containerHelper.get(interaction);
+const resetResponse = function(interaction) {
+    const $container = containerHelper.get(interaction);
 
     //destroy selected choice:
     $container.find('.result-area .active').each(function() {
@@ -739,16 +758,16 @@ var resetResponse = function(interaction) {
     instructionMgr.validateInstructions(interaction);
 };
 
-var _setPairs = function(interaction, pairs) {
-    var $container = containerHelper.get(interaction);
-    var addedPairs = 0;
-    var $emptyPair = $('.result-area>li:first', $container);
+const _setPairs = function(interaction, pairs) {
+    const $container = containerHelper.get(interaction);
+    let addedPairs = 0;
+    let $emptyPair = $('.result-area>li:first', $container);
     if (pairs && interaction.getResponseDeclaration().attr('cardinality') === 'single' && pairs.length) {
         pairs = [pairs];
     }
     _.each(pairs, function(pair) {
         if ($emptyPair.length) {
-            var $divs = $emptyPair.children('div');
+            let $divs = $emptyPair.children('div');
             setChoice(interaction, getChoice(interaction, pair[0]), $($divs[0]));
             setChoice(interaction, getChoice(interaction, pair[1]), $($divs[1]));
             addedPairs++;
@@ -774,28 +793,8 @@ var _setPairs = function(interaction, pairs) {
  * @param {object} interaction
  * @param {object} response
  */
-var setResponse = function(interaction, response) {
+const setResponse = function(interaction, response) {
     _setPairs(interaction, pciResponse.unserialize(response, interaction));
-};
-
-var _getRawResponse = function(interaction) {
-    var response = [];
-    var $container = containerHelper.get(interaction);
-    $('.result-area>li', $container).each(function() {
-        var pair = [];
-        $(this)
-            .find('div')
-            .each(function() {
-                var serial = $(this).data('serial');
-                if (serial) {
-                    pair.push(interaction.getChoice(serial).id());
-                }
-            });
-        if (pair.length === 2) {
-            response.push(pair);
-        }
-    });
-    return response;
 };
 
 /**
@@ -810,7 +809,7 @@ var _getRawResponse = function(interaction) {
  * @param {object} interaction
  * @returns {object}
  */
-var getResponse = function(interaction) {
+const getResponse = function(interaction) {
     return pciResponse.serialize(_getRawResponse(interaction), interaction);
 };
 
@@ -818,8 +817,8 @@ var getResponse = function(interaction) {
  * Destroy the interaction by leaving the DOM exactly in the same state it was before loading the interaction.
  * @param {Object} interaction - the interaction
  */
-var destroy = function(interaction) {
-    var $container = containerHelper.get(interaction);
+const destroy = function(interaction) {
+    const $container = containerHelper.get(interaction);
 
     //remove event
     interact($container.selector).unset();
@@ -842,8 +841,8 @@ var destroy = function(interaction) {
  * @param {Object} interaction - the interaction instance
  * @param {Object} state - the interaction state
  */
-var setState = function setState(interaction, state) {
-    var $container;
+const setState = function setState(interaction, state) {
+    let $container;
 
     if (_.isObject(state)) {
         if (state.response) {
@@ -857,8 +856,8 @@ var setState = function setState(interaction, state) {
 
             $('.choice-area .qti-choice', $container)
                 .sort(function(a, b) {
-                    var aIndex = _.indexOf(state.order, $(a).data('identifier'));
-                    var bIndex = _.indexOf(state.order, $(b).data('identifier'));
+                    let aIndex = _.indexOf(state.order, $(a).data('identifier'));
+                    let bIndex = _.indexOf(state.order, $(b).data('identifier'));
                     if (aIndex > bIndex) {
                         return 1;
                     }
@@ -879,10 +878,10 @@ var setState = function setState(interaction, state) {
  * @param {Object} interaction - the interaction instance
  * @returns {Object} the interaction current state
  */
-var getState = function getState(interaction) {
-    var $container;
-    var state = {};
-    var response = interaction.getResponse();
+const getState = function getState(interaction) {
+    let $container;
+    let state = {};
+    let response = interaction.getResponse();
 
     if (response) {
         state.response = response;
