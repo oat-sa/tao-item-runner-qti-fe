@@ -71,7 +71,7 @@
         "nyc": "^15.1.0",
         "open-cli": "^7.2.0",
         "popper.js": "^1.16.1",
-        "postcss-scss": "^2.0.0",
+        "postcss-scss": "^4.0.9",
         "prettier": "^2.8.8",
         "promise-limit": "^2.7.0",
         "qunit": "^2.19.4",
