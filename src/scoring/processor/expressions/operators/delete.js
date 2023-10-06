@@ -32,12 +32,24 @@ import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
  * @exports taoQtiItem/scoring/processor/expressions/operators/delete
  */
 var deleteProcessor = {
-
     constraints: {
         minOperand: 2,
         maxOperand: 2,
         cardinality: ['multiple', 'single', 'ordered'],
-        baseType: ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'file', 'uri', 'intOrIdentifier', 'duration']
+        baseType: [
+            'identifier',
+            'boolean',
+            'integer',
+            'float',
+            'string',
+            'point',
+            'pair',
+            'directedPair',
+            'file',
+            'uri',
+            'intOrIdentifier',
+            'duration'
+        ]
     },
 
     operands: [],
@@ -45,8 +57,7 @@ var deleteProcessor = {
     /**
      * @returns {?ProcessingValue} a single boolean
      */
-    process: function() {
-
+    process: function () {
         var result = {};
         var op1, op2;
 
@@ -59,7 +70,10 @@ var deleteProcessor = {
             return null;
         }
 
-        if (this.operands[0].cardinality !== 'single' || !_.contains(['multiple', 'ordered'], this.operands[1].cardinality)) {
+        if (
+            this.operands[0].cardinality !== 'single' ||
+            !['multiple', 'ordered'].includes(this.operands[1].cardinality)
+        ) {
             errorHandler.throw('scoring', new Error('operands must be of the specific cardinality'));
             return null;
         }
@@ -67,7 +81,7 @@ var deleteProcessor = {
         op1 = this.preProcessor.parseVariable(this.operands[0]);
         op2 = this.preProcessor.parseVariable(this.operands[1]);
 
-        result.value = _.reject(op2.value, function(e) {
+        result.value = _.reject(op2.value, function (e) {
             return op1.value === e;
         });
 
@@ -76,8 +90,6 @@ var deleteProcessor = {
 
         return result;
     }
-
 };
 
 export default deleteProcessor;
-

@@ -82,16 +82,16 @@ var getInteractionsDisplayInfo = function getInteractionsDisplayInfo(item) {
     var interactionOrder = 0;
 
     //extract all interaction related information needed to display their
-    _.forEach(item.getComposingElements(), function(element) {
+    _.forEach(item.getComposingElements(), function (element) {
         if (element.is('interaction')) {
             interactionsDisplayInfo.push(extractDisplayInfo(element));
         }
     });
 
     //sort interactionsDisplayInfo on the item level
-    $itemContainer.find('.qti-interaction').each(function() {
+    $itemContainer.find('.qti-interaction').each(function () {
         var self = this;
-        _.forEach(interactionsDisplayInfo, function(_interactionInfo) {
+        _.forEach(interactionsDisplayInfo, function (_interactionInfo) {
             if (_interactionInfo.interactionContainer[0] === self) {
                 _interactionInfo.order = interactionOrder;
                 return false;
@@ -118,7 +118,7 @@ var getFeedbacks = function getFeedbacks(item, itemSession) {
     var interactionsDisplayInfo = getInteractionsDisplayInfo(item);
     var renderingQueue = [];
 
-    _.forEach(item.modalFeedbacks, function(feedback) {
+    _.forEach(item.modalFeedbacks, function (feedback) {
         var feedbackIds, message, $container, comparedOutcome, _currentMessageGroupId, interactionInfo;
         var outcomeIdentifier = feedback.attr('outcomeIdentifier');
         var order = -1;
@@ -127,7 +127,7 @@ var getFeedbacks = function getFeedbacks(item, itemSession) {
         if (itemSession[outcomeIdentifier]) {
             //is the feedback in the list of feedbacks to be displayed ?
             feedbackIds = pci.getRawValues(itemSession[outcomeIdentifier]);
-            if (!_.contains(feedbackIds, feedback.id())) {
+            if (!feedbackIds.includes(feedback.id())) {
                 return true; //continue with next feedback
             }
 
@@ -148,7 +148,7 @@ var getFeedbacks = function getFeedbacks(item, itemSession) {
                 messages[_currentMessageGroupId] = [];
             }
 
-            if (_.contains(messages[_currentMessageGroupId], message)) {
+            if (messages[_currentMessageGroupId].includes(message)) {
                 return true; //continue
             } else {
                 messages[_currentMessageGroupId].push(message);

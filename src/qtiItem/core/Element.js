@@ -34,7 +34,7 @@ var Element = Class.extend({
     qtiClass: '',
     serial: '',
     rootElement: null,
-    init: function(serial, attributes) {
+    init: function (serial, attributes) {
         //init own attributes
         this.attributes = {};
 
@@ -70,16 +70,16 @@ var Element = Class.extend({
             this.initObject();
         }
     },
-    is: function(qtiClass) {
+    is: function (qtiClass) {
         return qtiClass === this.qtiClass;
     },
-    placeholder: function() {
+    placeholder: function () {
         return '{{' + this.serial + '}}';
     },
-    getSerial: function() {
+    getSerial: function () {
         return this.serial;
     },
-    getUsedIdentifiers: function() {
+    getUsedIdentifiers: function () {
         var usedIds = {};
         var elts = this.getComposingElements();
         for (var i in elts) {
@@ -99,16 +99,16 @@ var Element = Class.extend({
      */
     getUsedIds: function getUsedIds() {
         var usedIds = [];
-        _.forEach(this.getComposingElements(), function(elt) {
+        _.forEach(this.getComposingElements(), function (elt) {
             var id = elt.attr('id');
-            if (id && !_.contains(usedIds, id)) {
+            if (id && !usedIds.includes(id)) {
                 usedIds.push(id);
             }
         });
         return usedIds;
     },
 
-    attr: function(name, value) {
+    attr: function (name, value) {
         if (name) {
             if (value !== undefined) {
                 this.attributes[name] = value;
@@ -128,7 +128,7 @@ var Element = Class.extend({
         }
         return this;
     },
-    data: function(name, value) {
+    data: function (name, value) {
         if (name) {
             if (value !== undefined) {
                 this.metaData[name] = value;
@@ -149,24 +149,24 @@ var Element = Class.extend({
         }
         return this;
     },
-    removeData: function(name) {
+    removeData: function (name) {
         delete this.metaData[name];
         return this;
     },
-    removeAttr: function(name) {
+    removeAttr: function (name) {
         return this.removeAttributes(name);
     },
-    setAttributes: function(attributes) {
+    setAttributes: function (attributes) {
         if (!_.isPlainObject(attributes)) {
             logger.warn('attributes should be a plain object');
         }
         this.attributes = attributes;
         return this;
     },
-    getAttributes: function() {
+    getAttributes: function () {
         return _.clone(this.attributes);
     },
-    removeAttributes: function(attrNames) {
+    removeAttributes: function (attrNames) {
         if (typeof attrNames === 'string') {
             attrNames = [attrNames];
         }
@@ -175,7 +175,7 @@ var Element = Class.extend({
         }
         return this;
     },
-    getComposingElements: function() {
+    getComposingElements: function () {
         var elts = {};
         function append(element) {
             elts[element.getSerial()] = element; //pass individual object by ref, instead of the whole list(object)
@@ -187,11 +187,11 @@ var Element = Class.extend({
         if (typeof this.initObject === 'function') {
             append(this.getObject());
         }
-        _.each(this.metaData, function(v) {
+        _.each(this.metaData, function (v) {
             if (Element.isA(v, '_container')) {
                 append(v);
             } else if (_.isArray(v)) {
-                _.each(v, function(v) {
+                _.each(v, function (v) {
                     if (Element.isA(v, '_container')) {
                         append(v);
                     }
@@ -200,17 +200,17 @@ var Element = Class.extend({
         });
         return elts;
     },
-    getUsedClasses: function() {
+    getUsedClasses: function () {
         var ret = [this.qtiClass],
             composingElts = this.getComposingElements();
 
-        _.each(composingElts, function(elt) {
+        _.each(composingElts, function (elt) {
             ret.push(elt.qtiClass);
         });
 
         return _.uniq(ret);
     },
-    find: function(serial) {
+    find: function (serial) {
         var found = null;
         var object, body;
 
@@ -232,7 +232,7 @@ var Element = Class.extend({
 
         return found;
     },
-    parent: function() {
+    parent: function () {
         var item = this.getRootElement();
         if (item) {
             var found = item.find(this.getSerial());
@@ -245,11 +245,11 @@ var Element = Class.extend({
     /**
      * @deprecated - use setRootElement() instead
      */
-    setRelatedItem: function(item) {
+    setRelatedItem: function (item) {
         logger.warn('Deprecated use of setRelatedItem()');
         this.setRootElement(item);
     },
-    setRootElement: function(item) {
+    setRootElement: function (item) {
         var composingElts, i;
 
         if (Element.isA(item, 'assessmentItem')) {
@@ -263,18 +263,18 @@ var Element = Class.extend({
     /**
      * @deprecated - use getRootElement() instead
      */
-    getRelatedItem: function() {
+    getRelatedItem: function () {
         logger.warn('Deprecated use of getRelatedItem()');
         return this.getRootElement();
     },
-    getRootElement: function() {
+    getRootElement: function () {
         var ret = null;
         if (Element.isA(this.rootElement, 'assessmentItem')) {
             ret = this.rootElement;
         }
         return ret;
     },
-    setRenderer: function(renderer) {
+    setRenderer: function (renderer) {
         if (renderer && renderer.isRenderer) {
             this.renderer = renderer;
             var elts = this.getComposingElements();
@@ -285,7 +285,7 @@ var Element = Class.extend({
             throw 'invalid qti rendering engine';
         }
     },
-    getRenderer: function() {
+    getRenderer: function () {
         return this.renderer;
     },
     /**
@@ -333,7 +333,7 @@ var Element = Class.extend({
 
         return rendering;
     },
-    postRender: function(data, altClassName, renderer) {
+    postRender: function (data, altClassName, renderer) {
         var postRenderers = [];
         var _renderer = renderer || this.getRenderer();
 
@@ -350,7 +350,7 @@ var Element = Class.extend({
 
         return _.compact(postRenderers);
     },
-    getContainer: function($scope, subclass) {
+    getContainer: function ($scope, subclass) {
         var renderer = this.getRenderer();
         if (renderer) {
             return renderer.getContainer(this, $scope, subclass);
@@ -358,7 +358,7 @@ var Element = Class.extend({
             throw 'getContainer: no renderer found for the element ' + this.qtiClass + ':' + this.serial;
         }
     },
-    toArray: function() {
+    toArray: function () {
         var arr = {
             serial: this.serial,
             type: this.qtiClass,
@@ -374,20 +374,20 @@ var Element = Class.extend({
 
         return arr;
     },
-    isEmpty: function() {
+    isEmpty: function () {
         //tells whether the element should be considered empty or not, from the rendering point of view
         return false;
     },
-    addClass: function(className) {
+    addClass: function (className) {
         var clazz = this.attr('class') || '';
         if (!_containClass(clazz, className)) {
             this.attr('class', clazz + (clazz.length ? ' ' : '') + className);
         }
     },
-    hasClass: function(className) {
+    hasClass: function (className) {
         return _containClass(this.attr('class'), className);
     },
-    removeClass: function(className) {
+    removeClass: function (className) {
         var clazz = this.attr('class') || '';
         if (clazz) {
             var regex = new RegExp('(?:^|\\s)' + className + '(?:\\s|$)');
@@ -407,7 +407,7 @@ var Element = Class.extend({
      * @param {String} className
      * @param {Boolean} [state]
      */
-    toggleClass: function(className, state) {
+    toggleClass: function (className, state) {
         if (typeof state === 'boolean') {
             return state ? this.addClass(className) : this.removeClass(className);
         }
@@ -417,29 +417,29 @@ var Element = Class.extend({
         }
         return this.addClass(className);
     },
-    isset: function() {
+    isset: function () {
         return Element.issetElement(this.serial);
     },
-    unset: function() {
+    unset: function () {
         return Element.unsetElement(this.serial);
     }
 });
 
-var _containClass = function(allClassStr, className) {
+var _containClass = function (allClassStr, className) {
     var regex = new RegExp('(?:^|\\s)' + className + '(?:\\s|$)', '');
     return allClassStr && regex.test(allClassStr);
 };
 
 //helpers
-Element.isA = function(qtiElement, qtiClass) {
+Element.isA = function (qtiElement, qtiClass) {
     return qtiElement instanceof Element && qtiElement.is(qtiClass);
 };
 
-Element.getElementBySerial = function(serial) {
+Element.getElementBySerial = function (serial) {
     return _instances[serial];
 };
 
-Element.issetElement = function(serial) {
+Element.issetElement = function (serial) {
     return !!_instances[serial];
 };
 
@@ -448,12 +448,12 @@ Element.issetElement = function(serial) {
  * @param {String} serial - the element serial
  * @returns {Boolean} true if unset
  */
-Element.unsetElement = function(serial) {
+Element.unsetElement = function (serial) {
     var element = Element.getElementBySerial(serial);
 
     if (element) {
         var composingElements = element.getComposingElements();
-        _.each(composingElements, function(elt) {
+        _.each(composingElements, function (elt) {
             delete _instances[elt.serial];
         });
         delete _instances[element.serial];

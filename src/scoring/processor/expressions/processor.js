@@ -53,7 +53,6 @@ var processors = {};
  * @throws {Error} by trying to use an unregistered processor
  */
 var expressionProcessor = function expressionProcessor(expression, state, operands) {
-
     var name = expression.qtiClass;
     var processor = processors.expression[name] || processors.operator[name];
 
@@ -90,8 +89,8 @@ var expressionProcessor = function expressionProcessor(expression, state, operan
  *
  */
 expressionProcessor.types = {
-    EXPRESSION: "expression",
-    OPERATOR: "operator"
+    EXPRESSION: 'expression',
+    OPERATOR: 'operator'
 };
 
 /**
@@ -102,15 +101,17 @@ expressionProcessor.types = {
  * @throws {TypeError} when a parameter isn't valid
  */
 expressionProcessor.register = function register(name, type, processor) {
-
-    if (!_.contains(this.types, type)) {
+    if (!this.types.includes(type)) {
         return errorHandler.throw('scoring', new TypeError(type + ' is not a valid expression type'));
     }
     if (_.isEmpty(name)) {
         return errorHandler.throw('scoring', new TypeError('Please give a valid name to your processor'));
     }
     if (!_.isPlainObject(processor) || !_.isFunction(processor.process)) {
-        return errorHandler.throw('scoring', new TypeError('The processor must be an object that contains a process method.'));
+        return errorHandler.throw(
+            'scoring',
+            new TypeError('The processor must be an object that contains a process method.')
+        );
     }
 
     processors[type] = processors[type] || {};

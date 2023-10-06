@@ -180,14 +180,14 @@ const _shapesSelectable = function _shapesSelectable(interaction, active) {
 
     //update the shape state
     _.forEach(choices, function (choice) {
-        if (!_.contains(assocs, choice.id())) {
+        if (!assocs.includes(choice.id())) {
             const element = interaction.paper.getById(choice.serial);
             const assocsElement = element.data('assocs') || [];
             if (
                 !element.active &&
                 element.id !== active.id &&
                 _isMatchable(element, active) &&
-                !_.contains(assocsElement, activeChoice.id())
+                !assocsElement.includes(activeChoice.id())
             ) {
                 element.selectable = true;
                 graphic.updateElementState(element, 'selectable');

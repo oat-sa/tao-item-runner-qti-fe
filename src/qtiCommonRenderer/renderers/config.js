@@ -16,7 +16,6 @@
  * Copyright (c) 2014 (original work) Open Assessment Technologies SA;
  */
 
-import _ from 'lodash';
 import context from 'context';
 import themes from 'ui/themes';
 import assetManagerFactory from 'taoItems/assets/manager';
@@ -36,7 +35,7 @@ var assetManager = assetManagerFactory(
                 if (
                     itemThemes &&
                     url.path &&
-                    (url.path === itemThemes.base || _.contains(_.pluck(itemThemes.available, 'path'), url.path))
+                    (url.path === itemThemes.base || itemThemes.available.map(val => val.path).includes(url.path))
                 ) {
                     return context.root_url + url.toString();
                 }

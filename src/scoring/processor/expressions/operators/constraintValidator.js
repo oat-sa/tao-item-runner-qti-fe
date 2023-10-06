@@ -29,14 +29,12 @@ import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
  * @exports taoQtiItem/scoring/processor/expressions/operators/constraintValidator
  */
 var validator = {
-
     /**
      * @param {OperatorProcessor} processor
      * @param {Array} [operands] - the operands for an operator processor
      * @returns {Boolean}
      */
     validate: function validate(processor, operands) {
-
         var size = 0;
         var name = processor.name;
 
@@ -44,34 +42,49 @@ var validator = {
         var maxOperand = processor.constraints.maxOperand;
 
         var hasWrongType = function hasWrongType(operand) {
-            return !_.isNull(operand) && !_.contains(processor.constraints.baseType, operand.baseType);
+            return !_.isNull(operand) && !processor.constraints.baseType.includes(operand.baseType);
         };
 
         var hasWrongCardinality = function hasWrongCardinality(operand) {
-            return !_.isNull(operand) && !_.contains(processor.constraints.cardinality, operand.cardinality);
-
+            return !_.isNull(operand) && !processor.constraints.cardinality.includes(operand.cardinality);
         };
 
         if (!_.isArray(operands)) {
-            return errorHandler.throw('scoring', new TypeError('Processor ' + name + ' requires operands to be an array : ' + (typeof operands) + ' given'));
+            return errorHandler.throw(
+                'scoring',
+                new TypeError('Processor ' + name + ' requires operands to be an array : ' + typeof operands + ' given')
+            );
         }
         size = _.size(operands);
 
         if (minOperand > 0 && size < minOperand) {
-            return errorHandler.throw('scoring', new TypeError('Processor ' + name + ' requires at least ' + minOperand + ' operands, ' + size + ' given'));
+            return errorHandler.throw(
+                'scoring',
+                new TypeError(
+                    'Processor ' + name + ' requires at least ' + minOperand + ' operands, ' + size + ' given'
+                )
+            );
         }
         if (maxOperand > -1 && size > maxOperand) {
-            return errorHandler.throw('scoring', new TypeError('Processor ' + name + ' requires maximum ' + maxOperand + ' operands, ' + size + ' given'));
+            return errorHandler.throw(
+                'scoring',
+                new TypeError('Processor ' + name + ' requires maximum ' + maxOperand + ' operands, ' + size + ' given')
+            );
         }
         if (_.some(operands, hasWrongType)) {
-            return errorHandler.throw('scoring', new TypeError('An operand given to processor ' + name + ' has an unexpected baseType'));
+            return errorHandler.throw(
+                'scoring',
+                new TypeError('An operand given to processor ' + name + ' has an unexpected baseType')
+            );
         }
         if (_.some(operands, hasWrongCardinality)) {
-            return errorHandler.throw('scoring', new TypeError('An operand given to processor ' + name + ' has an unexpected cardinality'));
+            return errorHandler.throw(
+                'scoring',
+                new TypeError('An operand given to processor ' + name + ' has an unexpected cardinality')
+            );
         }
         return true;
     }
-
 };
 
 export default validator.validate;

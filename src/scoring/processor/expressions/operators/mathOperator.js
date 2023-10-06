@@ -64,7 +64,6 @@ var functions = {
  * @exports taoQtiItem/scoring/processor/expressions/operators/mathOperator
  */
 var mathOperatorProcessor = {
-
     accuracy: 0.00000000000001,
 
     constraints: {
@@ -80,8 +79,7 @@ var mathOperatorProcessor = {
      * Process the mathOperator of the operands.
      * @returns {?ProcessingValue} the and or null
      */
-    process: function() {
-
+    process: function () {
         var result = {
             cardinality: 'single',
             baseType: 'float'
@@ -96,7 +94,7 @@ var mathOperatorProcessor = {
 
         name = this.expression.attributes.name;
 
-        if (!_.contains(Object.keys(functions), name)) {
+        if (!Object.keys(functions).includes(name)) {
             return null;
         }
 
@@ -135,7 +133,7 @@ function atan2(arg) {
  * @returns {Function}
  */
 function reciprocalFactory(trigonometric) {
-    return function(operands) {
+    return function (operands) {
         var trig = trigonometric(operands);
 
         if (close(trig, 0, mathOperatorProcessor.accuracy)) {
@@ -151,8 +149,7 @@ function reciprocalFactory(trigonometric) {
  * @returns {Function}
  */
 function inversedFactory(trigonometric) {
-    return function(operand) {
-
+    return function (operand) {
         if (Math.abs(operand) < 1) {
             return null;
         }
@@ -255,7 +252,7 @@ function toRadians(operand) {
  * @returns {boolean}
  */
 function close(actual, expected, maxDifference) {
-    return ((actual === expected) ? 0 : Math.abs(actual - expected)) <= maxDifference;
+    return (actual === expected ? 0 : Math.abs(actual - expected)) <= maxDifference;
 }
 
 export default mathOperatorProcessor;
