@@ -454,7 +454,7 @@ function inputLimiter(interaction) {
             let isComposing = false;
             let hasCompositionJustEnded = false;
 
-            const acceptKeyCode = keyCode => ignoreKeyCodes.includes(keyCode);
+            const acceptKeyCode = keyCode => ignoreKeyCodes?.includes(keyCode);
             const emptyOrSpace = txt => (txt && txt.trim() === '') || /\^s*$/.test(txt);
             const hasSpace = txt => /\s+/.test(txt);
             const getCharBefore = (str, pos) => str && str.substring(Math.max(0, pos - 1), pos);

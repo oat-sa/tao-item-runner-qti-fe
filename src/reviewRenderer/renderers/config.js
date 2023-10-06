@@ -37,7 +37,7 @@ const assetManager = assetManagerFactory(
                 if (
                     itemThemes &&
                     url.path &&
-                    (url.path === itemThemes.base || itemThemes.available.map(val => val.path).includes(url.path))
+                    (url.path === itemThemes.base || itemThemes.available?.map(val => val.path).includes(url.path))
                 ) {
                     return context.root_url + url.toString();
                 }
