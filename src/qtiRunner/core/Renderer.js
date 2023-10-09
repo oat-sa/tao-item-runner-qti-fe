@@ -36,7 +36,7 @@ import Handlebars from 'handlebars';
 //but anyway we should deprecate the practice to invoke
 //directly Handlebars at runtimej
 let hb = Handlebars;
-if(typeof hb.compile !== 'function'){
+if (typeof hb.compile !== 'function') {
     hb = require('handlebars');
 }
 
@@ -125,7 +125,7 @@ const _defaults = {
     shuffleChoices: true
 };
 
-const _isValidRenderer = function(renderer) {
+const _isValidRenderer = function (renderer) {
     let valid = true;
 
     if (typeof renderer !== 'object') {
@@ -178,7 +178,7 @@ function getDocumentBaseUrl() {
  * @param {preRenderDecorator} [options.decorators.before] - to set up a pre decorator
  * @param {postRenderDecorator} [options.decorators.after] - to set up a post decorator
  */
-const Renderer = function(options) {
+const Renderer = function (options) {
     /**
      * Store the registered renderer location
      */
@@ -202,7 +202,7 @@ const Renderer = function(options) {
      * Get the actual renderer of the give qti class or subclass:
      * e.g. simplceChoice, simpleChoice.choiceInteraction, simpleChoice.orderInteraction
      */
-    const _getClassRenderer = function(qtiClass) {
+    const _getClassRenderer = function (qtiClass) {
         let ret = null;
         if (_renderers[qtiClass]) {
             ret = _renderers[qtiClass];
@@ -243,7 +243,7 @@ const Renderer = function(options) {
      * @param {*} value - the option vallue
      * @returns {Renderer} for chaining
      */
-    this.setOption = function(key, value) {
+    this.setOption = function (key, value) {
         if (typeof key === 'string') {
             options[key] = value;
         }
@@ -255,7 +255,7 @@ const Renderer = function(options) {
      * @param {Object} opts - the options
      * @returns {Renderer} for chaining
      */
-    this.setOptions = function(opts) {
+    this.setOptions = function (opts) {
         options = _.extend(options, opts);
         return this;
     };
@@ -265,7 +265,7 @@ const Renderer = function(options) {
      * @param {String} key - the name of the option
      * @returns {*|null} the option vallue
      */
-    this.getOption = function(key) {
+    this.getOption = function (key) {
         if (typeof key === 'string' && options[key]) {
             return options[key];
         }
@@ -306,7 +306,7 @@ const Renderer = function(options) {
      * @returns {String} the template results
      * @throws {Error} if the renderer is not set or has no template bound
      */
-    this.renderTpl = function(element, data, qtiSubclass) {
+    this.renderTpl = function (element, data, qtiSubclass) {
         let res;
         let ret = '';
         const qtiClass = qtiSubclass || element.qtiClass;
@@ -350,7 +350,7 @@ const Renderer = function(options) {
         return ret;
     };
 
-    this.getData = function(element, data, qtiSubclass) {
+    this.getData = function (element, data, qtiSubclass) {
         let ret = data;
         const qtiClass = qtiSubclass || element.qtiClass;
         const renderer = _getClassRenderer(qtiClass);
@@ -364,11 +364,11 @@ const Renderer = function(options) {
         return ret;
     };
 
-    this.renderDirect = function(tpl, data) {
+    this.renderDirect = function (tpl, data) {
         return hb.compile(tpl)(data);
     };
 
-    this.getContainer = function(qtiElement, $scope, qtiSubclass) {
+    this.getContainer = function (qtiElement, $scope, qtiSubclass) {
         let ret = null;
         const qtiClass = qtiSubclass || qtiElement.qtiClass;
         const renderer = _getClassRenderer(qtiClass);
@@ -381,7 +381,7 @@ const Renderer = function(options) {
         return ret;
     };
 
-    this.postRender = function(qtiElement, data, qtiSubclass) {
+    this.postRender = function (qtiElement, data, qtiSubclass) {
         const qtiClass = qtiSubclass || qtiElement.qtiClass;
         const renderer = _getClassRenderer(qtiClass);
 
@@ -390,7 +390,7 @@ const Renderer = function(options) {
         }
     };
 
-    this.setResponse = function(qtiInteraction, response, qtiSubclass) {
+    this.setResponse = function (qtiInteraction, response, qtiSubclass) {
         let ret = false;
         const qtiClass = qtiSubclass || qtiInteraction.qtiClass;
         const renderer = _getClassRenderer(qtiClass);
@@ -409,7 +409,7 @@ const Renderer = function(options) {
         return ret;
     };
 
-    this.getResponse = function(qtiInteraction, qtiSubclass) {
+    this.getResponse = function (qtiInteraction, qtiSubclass) {
         let ret = false;
         const qtiClass = qtiSubclass || qtiInteraction.qtiClass;
         const renderer = _getClassRenderer(qtiClass);
@@ -424,7 +424,7 @@ const Renderer = function(options) {
         return ret;
     };
 
-    this.resetResponse = function(qtiInteraction, qtiSubclass) {
+    this.resetResponse = function (qtiInteraction, qtiSubclass) {
         let ret = false;
         const qtiClass = qtiSubclass || qtiInteraction.qtiClass;
         const renderer = _getClassRenderer(qtiClass);
@@ -449,7 +449,7 @@ const Renderer = function(options) {
      *
      * @throws {Error} if no renderer is registered
      */
-    this.getState = function(qtiInteraction, qtiSubclass) {
+    this.getState = function (qtiInteraction, qtiSubclass) {
         let ret = false;
         const qtiClass = qtiSubclass || qtiInteraction.qtiClass;
         const renderer = _getClassRenderer(qtiClass);
@@ -476,7 +476,7 @@ const Renderer = function(options) {
      *
      * @throws {Error} if no renderer is found
      */
-    this.setState = function(qtiInteraction, state, qtiSubclass) {
+    this.setState = function (qtiInteraction, state, qtiSubclass) {
         const qtiClass = qtiSubclass || qtiInteraction.qtiClass;
         const renderer = _getClassRenderer(qtiClass);
 
@@ -498,7 +498,7 @@ const Renderer = function(options) {
      *
      * @throws {Error} if no renderer is found
      */
-    this.destroy = function(qtiInteraction, qtiSubclass) {
+    this.destroy = function (qtiInteraction, qtiSubclass) {
         let ret = false;
         const qtiClass = qtiSubclass || qtiInteraction.qtiClass;
         const renderer = _getClassRenderer(qtiClass);
@@ -513,15 +513,15 @@ const Renderer = function(options) {
         return ret;
     };
 
-    this.getLoadedRenderers = function() {
+    this.getLoadedRenderers = function () {
         return _renderers;
     };
 
-    this.register = function(renderersLocations) {
+    this.register = function (renderersLocations) {
         _.extend(_locations, renderersLocations);
     };
 
-    this.load = function(callback, requiredClasses) {
+    this.load = function (callback, requiredClasses) {
         const self = this;
         let required = [];
 
@@ -532,7 +532,7 @@ const Renderer = function(options) {
         if (options.themes) {
             //resolve themes paths
             options.themes.base = this.resolveUrl(options.themes.base);
-            _.forEach(options.themes.available, function(theme, index) {
+            _.forEach(options.themes.available, function (theme, index) {
                 options.themes.available[index].path = self.resolveUrl(theme.path);
             });
             this.themeLoader = themeLoader(options.themes).load(options.preload);
@@ -544,18 +544,18 @@ const Renderer = function(options) {
                 requiredClasses = _.intersection(requiredClasses, _renderableClasses);
 
                 //add dependencies
-                _.each(requiredClasses, function(reqClass) {
+                _.each(requiredClasses, function (reqClass) {
                     const deps = _dependencies[reqClass];
                     if (deps) {
                         requiredClasses = _.union(requiredClasses, deps);
                     }
                 });
 
-                _.forEach(requiredClasses, function(qtiClass) {
+                _.forEach(requiredClasses, function (qtiClass) {
                     let requiredSubClasses;
                     if (_renderableSubclasses[qtiClass]) {
                         requiredSubClasses = _.intersection(requiredClasses, _renderableSubclasses[qtiClass]);
-                        _.each(requiredSubClasses, function(subclass) {
+                        _.each(requiredSubClasses, function (subclass) {
                             if (
                                 !registerRendererClass(qtiClass + '.' + subclass, required) &&
                                 !registerRendererClass(qtiClass, required)
@@ -582,15 +582,14 @@ const Renderer = function(options) {
             required = _.values(_locations);
         }
 
-        moduleLoader([], ()=> true)
-            .addList( required.map( module => ({ module, category: 'qti'}) ) )
+        moduleLoader([], () => true)
+            .addList(required.map(module => ({ module, category: 'qti' })))
             .load()
-            .then( loaded => {
-                loaded.forEach( clazz => {
+            .then(loaded => {
+                loaded.forEach(clazz => {
                     if (_isValidRenderer(clazz)) {
                         _renderers[clazz.qtiClass] = clazz;
                     }
-
                 });
                 if (typeof callback === 'function') {
                     callback.call(self, _renderers);
@@ -617,12 +616,11 @@ const Renderer = function(options) {
      * @param {Array} choices - the shuffled choices
      * @param {String} identificationType -
      */
-    this.setShuffledChoices = function(interaction, choices, identificationType) {
+    this.setShuffledChoices = function (interaction, choices, identificationType) {
         if (Element.isA(interaction, 'interaction')) {
-            this.shuffledChoices[interaction.getSerial()] = _.pluck(
-                interactionHelper.findChoices(interaction, choices, identificationType),
-                'serial'
-            );
+            this.shuffledChoices[interaction.getSerial()] = interactionHelper
+                .findChoices(interaction, choices, identificationType)
+                ?.map(val => val.serial);
         }
     };
 
@@ -634,7 +632,7 @@ const Renderer = function(options) {
      * @param {String} returnedType - the choice type
      * @returns {Array} the choices
      */
-    this.getShuffledChoices = function(interaction, reshuffle, returnedType) {
+    this.getShuffledChoices = function (interaction, reshuffle, returnedType) {
         let choices = [];
         let serial, i;
 
@@ -647,25 +645,27 @@ const Renderer = function(options) {
                     this.shuffledChoices[serial] = [];
                     for (i = 0; i < 2; i++) {
                         choices[i] = interactionHelper.shuffleChoices(interaction.getChoices(i));
-                        this.shuffledChoices[serial][i] = _.pluck(choices[i], 'serial');
+                        this.shuffledChoices[serial][i] = choices[i].map(val => val.serial);
                     }
                 } else {
                     choices = interactionHelper.shuffleChoices(interaction.getChoices());
-                    this.shuffledChoices[serial] = _.pluck(choices, 'serial');
+                    this.shuffledChoices[serial] = choices.map(val => {
+                        val.serial;
+                    });
                 }
 
                 //otherwise get the choices from the serials
             } else {
                 if (Element.isA(interaction, 'matchInteraction')) {
-                    _.forEach(choices, function(choice, index) {
+                    _.forEach(choices, function (choice, index) {
                         if (index < 2) {
-                            _.forEach(this.shuffledChoices[serial][i], function(choiceSerial) {
+                            _.forEach(this.shuffledChoices[serial][i], function (choiceSerial) {
                                 choice.push(interaction.getChoice(choiceSerial));
                             });
                         }
                     });
                 } else {
-                    _.forEach(this.shuffledChoices[serial], function(choiceSerial) {
+                    _.forEach(this.shuffledChoices[serial], function (choiceSerial) {
                         choices.push(interaction.getChoice(choiceSerial));
                     });
                 }
@@ -683,11 +683,11 @@ const Renderer = function(options) {
         return [];
     };
 
-    this.getRenderers = function() {
+    this.getRenderers = function () {
         return _renderers;
     };
 
-    this.getLocations = function() {
+    this.getLocations = function () {
         return _locations;
     };
 
@@ -708,7 +708,7 @@ const Renderer = function(options) {
     /**
      * @deprecated in favor of resolveUrl
      */
-    this.getAbsoluteUrl = function(relUrl) {
+    this.getAbsoluteUrl = function (relUrl) {
         //let until method is removed
         console.warn('DEPRECATED used getAbsoluteUrl with ', arguments);
 
@@ -725,7 +725,7 @@ const Renderer = function(options) {
             const runtimeLocations = this.getOption('runtimeLocations');
 
             if (runtimeLocations && _.size(runtimeLocations)) {
-                _.forIn(runtimeLocations, function(runtimeLocation, typeIdentifier) {
+                _.forIn(runtimeLocations, function (runtimeLocation, typeIdentifier) {
                     if (relUrl.indexOf(typeIdentifier) === 0) {
                         absUrl = relUrl.replace(typeIdentifier, runtimeLocation);
                         return false; //break
@@ -768,8 +768,8 @@ export default {
      * @param {String} [name] - the new renderer name
      * @param {Object} [defaultOptions] - the renderer options
      */
-    build: function(renderersLocations, name, defaultOptions) {
-        const NewRenderer = function() {
+    build: function (renderersLocations, name, defaultOptions) {
+        const NewRenderer = function () {
             const options = _.isPlainObject(arguments[0]) ? arguments[0] : {};
 
             Renderer.apply(this);

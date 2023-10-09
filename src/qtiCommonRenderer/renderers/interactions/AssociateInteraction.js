@@ -34,7 +34,7 @@ import sizeAdapter from 'taoQtiItem/qtiCommonRenderer/helpers/sizeAdapter';
 import interact from 'interact';
 import interactUtils from 'ui/interactUtils';
 
-const setChoice = function(interaction, $choice, $target) {
+const setChoice = function (interaction, $choice, $target) {
     const $container = containerHelper.get(interaction);
     const choiceSerial = $choice.data('serial');
     const choice = interaction.getChoice(choiceSerial);
@@ -48,11 +48,8 @@ const setChoice = function(interaction, $choice, $target) {
     usage++;
     $choice.data('usage', usage);
 
-    const _setChoice = function() {
-        $target
-            .data('serial', choiceSerial)
-            .html($choice.html())
-            .addClass('filled');
+    const _setChoice = function () {
+        $target.data('serial', choiceSerial).html($choice.html()).addClass('filled');
 
         if (!interaction.responseMappingMode && choice.attr('matchMax') && usage >= choice.attr('matchMax')) {
             $choice.addClass('deactivated');
@@ -69,7 +66,7 @@ const setChoice = function(interaction, $choice, $target) {
         $resultArea
             .children()
             .not($pair)
-            .each(function() {
+            .each(function () {
                 let $otherPair = $(this).children('.filled');
                 if ($otherPair.length === 2) {
                     let otherPairSerial = [$($otherPair[0]).data('serial'), $($otherPair[1]).data('serial')];
@@ -99,7 +96,7 @@ const setChoice = function(interaction, $choice, $target) {
                 //append new pair option?
                 if (!$resultArea.children('.incomplete-pair').length) {
                     $resultArea.append(pairTpl({ empty: true }));
-                    $resultArea.children('.incomplete-pair').fadeIn(600, function() {
+                    $resultArea.children('.incomplete-pair').fadeIn(600, function () {
                         hider.show(this);
                     });
                 }
@@ -113,7 +110,7 @@ const setChoice = function(interaction, $choice, $target) {
                 color: 'orange',
                 border: '1px solid orange'
             });
-            setTimeout(function() {
+            setTimeout(function () {
                 $otherRepeatedPair.removeAttr('style');
                 $target.empty().css({ color: '', border: '' });
             }, 2000);
@@ -123,7 +120,7 @@ const setChoice = function(interaction, $choice, $target) {
     }
 };
 
-const unsetChoice = function(interaction, $filledChoice, animate, triggerChange) {
+const unsetChoice = function (interaction, $filledChoice, animate, triggerChange) {
     const $container = containerHelper.get(interaction);
     const choiceSerial = $filledChoice.data('serial');
     const $choice = $container.find('.choice-area [data-serial=' + choiceSerial + ']');
@@ -139,10 +136,7 @@ const unsetChoice = function(interaction, $filledChoice, animate, triggerChange)
 
     $choice.data('usage', usage).removeClass('deactivated');
 
-    $filledChoice
-        .removeClass('filled')
-        .removeData('serial')
-        .empty();
+    $filledChoice.removeClass('filled').removeData('serial').empty();
 
     if (!interaction.swapping) {
         if (triggerChange !== false) {
@@ -161,11 +155,14 @@ const unsetChoice = function(interaction, $filledChoice, animate, triggerChange)
         }
 
         //completely empty pair:
-        if (!$choice.siblings('div').hasClass('filled') && (isNumberOfMaxAssociationsZero || interaction.responseMappingMode)) {
+        if (
+            !$choice.siblings('div').hasClass('filled') &&
+            (isNumberOfMaxAssociationsZero || interaction.responseMappingMode)
+        ) {
             //shall we remove it?
             if (!$parent.hasClass('incomplete-pair')) {
                 if (animate) {
-                    $parent.addClass('removing').fadeOut(500, function() {
+                    $parent.addClass('removing').fadeOut(500, function () {
                         $(this).remove();
                     });
                 } else {
@@ -176,7 +173,7 @@ const unsetChoice = function(interaction, $filledChoice, animate, triggerChange)
     }
 };
 
-const getChoice = function(interaction, identifier) {
+const getChoice = function (interaction, identifier) {
     const $container = containerHelper.get(interaction);
 
     //warning: do not use selector data-identifier=identifier because data-identifier may change dynamically
@@ -187,7 +184,7 @@ const getChoice = function(interaction, identifier) {
     return $('.choice-area [data-serial=' + choice.getSerial() + ']', $container);
 };
 
-const renderEmptyPairs = function(interaction) {
+const renderEmptyPairs = function (interaction) {
     const $container = containerHelper.get(interaction);
     const max = parseInt(interaction.attr('maxAssociations'));
     const $resultArea = $('.result-area', $container);
@@ -231,10 +228,8 @@ const scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
             beforeY = afterY;
             beforeX = afterX;
 
-            if (afterY === 0 && beforeY === 0)
-                beforeY = this.scrollTop;
-            if (afterX === 0 && beforeX === 0)
-                beforeX = this.scrollLeft;
+            if (afterY === 0 && beforeY === 0) beforeY = this.scrollTop;
+            if (afterX === 0 && beforeX === 0) beforeX = this.scrollLeft;
 
             afterY = this.scrollTop;
             afterX = this.scrollLeft;
@@ -243,7 +238,8 @@ const scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
             x = (parseInt(currentDraggable.getAttribute('data-x'), 10) || 0) + (afterX - beforeX);
 
             // translate the element
-            currentDraggable.style.webkitTransform = currentDraggable.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+            currentDraggable.style.webkitTransform = currentDraggable.style.transform =
+                'translate(' + x + 'px, ' + y + 'px)';
 
             // update the position attributes
             currentDraggable.setAttribute('data-x', x);
@@ -295,14 +291,14 @@ const scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
         }
     };
 };
-const _getRawResponse = function(interaction) {
+const _getRawResponse = function (interaction) {
     const response = [];
     const $container = containerHelper.get(interaction);
-    $('.result-area>li', $container).each(function() {
+    $('.result-area>li', $container).each(function () {
         const pair = [];
         $(this)
             .find('div')
-            .each(function() {
+            .each(function () {
                 const serial = $(this).data('serial');
                 if (serial) {
                     const choice = interaction.getChoice(serial);
@@ -317,7 +313,7 @@ const _getRawResponse = function(interaction) {
     });
     return response;
 };
-const _setInstructions = function(interaction) {
+const _setInstructions = function (interaction) {
     const min = parseInt(interaction.attr('minAssociations'), 10);
     const max = parseInt(interaction.attr('maxAssociations'), 10);
 
@@ -333,7 +329,7 @@ const _setInstructions = function(interaction) {
         //the max value is implicit since the appropriate number of empty pairs have already been created
         let msg = __('You need to make') + ' ';
         msg += min > 1 ? __('at least') + ' ' + min + ' ' + __('association pairs') : __('one association pair');
-        instructionMgr.appendInstruction(interaction, msg, function() {
+        instructionMgr.appendInstruction(interaction, msg, function () {
             if (_getRawResponse(interaction).length >= min) {
                 this.setLevel('success');
             } else {
@@ -349,10 +345,10 @@ const _setInstructions = function(interaction) {
  *
  * @param {object} interaction
  */
-const render = function(interaction) {
+const render = function (interaction) {
     const self = this;
 
-    return new Promise(function(resolve) {
+    return new Promise(function (resolve) {
         const $container = containerHelper.get(interaction);
         const $choiceArea = $container.find('.choice-area');
         const $resultArea = $container.find('.result-area');
@@ -371,7 +367,7 @@ const render = function(interaction) {
         let resultSelector = $resultArea.selector + ' >li>div';
         let binSelector = $container.selector + ' .remove-choice';
 
-        let _getChoice = function(serial) {
+        let _getChoice = function (serial) {
             return $choiceArea.find('[data-serial=' + serial + ']');
         };
 
@@ -381,14 +377,14 @@ const render = function(interaction) {
          * @param $target
          * @private
          */
-        const _setChoice = function($choice, $target) {
+        const _setChoice = function ($choice, $target) {
             setChoice(interaction, $choice, $target);
             sizeAdapter.adaptSize(
                 $('.result-area .target, .choice-area .qti-choice', containerHelper.get(interaction))
             );
         };
 
-        const _resetSelection = function() {
+        const _resetSelection = function () {
             if ($activeChoice) {
                 $resultArea.find('.remove-choice').remove();
                 $activeChoice.removeClass('active');
@@ -397,28 +393,28 @@ const render = function(interaction) {
             }
         };
 
-        const _unsetChoice = function($choice) {
+        const _unsetChoice = function ($choice) {
             unsetChoice(interaction, $choice, true);
             sizeAdapter.adaptSize(
                 $('.result-area .target, .choice-area .qti-choice', containerHelper.get(interaction))
             );
         };
 
-        const _isInsertionMode = function() {
+        const _isInsertionMode = function () {
             return $activeChoice && $activeChoice.data('identifier');
         };
 
-        const _isModeEditing = function() {
+        const _isModeEditing = function () {
             return $activeChoice && !$activeChoice.data('identifier');
         };
-        const _activateChoice = function($choice) {
+        const _activateChoice = function ($choice) {
             _resetSelection();
             $activeChoice = $choice;
             $choice.addClass('active');
             $resultArea.find('>li>.target').addClass('empty');
         };
 
-        const _handleChoiceActivate = function($target) {
+        const _handleChoiceActivate = function ($target) {
             if ($target.hasClass('deactivated')) {
                 return;
             }
@@ -438,7 +434,7 @@ const render = function(interaction) {
                 }
             }
         };
-        const _activateResult = function($target) {
+        const _activateResult = function ($target) {
             const targetSerial = $target.data('serial');
 
             $activeChoice = $target;
@@ -446,20 +442,20 @@ const render = function(interaction) {
 
             $resultArea
                 .find('>li>.target')
-                .filter(function() {
+                .filter(function () {
                     return $(this).data('serial') !== targetSerial;
                 })
                 .addClass('empty');
 
             $choiceArea
                 .find('>li:not(.deactivated)')
-                .filter(function() {
+                .filter(function () {
                     return $(this).data('serial') !== targetSerial;
                 })
                 .addClass('empty');
         };
 
-        const _handleResultActivate = function($target) {
+        const _handleResultActivate = function ($target) {
             let choiceSerial,
                 targetSerial = $target.data('serial');
 
@@ -510,20 +506,16 @@ const render = function(interaction) {
 
         // Point & click handlers
 
-        interact($container.selector).on('tap', function(e) {
+        interact($container.selector).on('tap', function (e) {
             //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
-            if (
-                $(e.currentTarget)
-                    .closest('.qti-item')
-                    .hasClass('prevent-click-handler')
-            ) {
+            if ($(e.currentTarget).closest('.qti-item').hasClass('prevent-click-handler')) {
                 return;
             }
 
             _resetSelection();
         });
 
-        interact($choiceArea.selector + ' >li').on('tap', function(e) {
+        interact($choiceArea.selector + ' >li').on('tap', function (e) {
             const $target = $(e.currentTarget);
 
             //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
@@ -536,7 +528,7 @@ const render = function(interaction) {
             e.preventDefault();
         });
 
-        interact($resultArea.selector + ' >li>div').on('tap', function(e) {
+        interact($resultArea.selector + ' >li>div').on('tap', function (e) {
             const $target = $(e.currentTarget);
 
             //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
@@ -549,13 +541,9 @@ const render = function(interaction) {
             e.preventDefault();
         });
 
-        interact(binSelector).on('tap', function(e) {
+        interact(binSelector).on('tap', function (e) {
             //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
-            if (
-                $(e.currentTarget)
-                    .closest('.qti-item')
-                    .hasClass('prevent-click-handler')
-            ) {
+            if ($(e.currentTarget).closest('.qti-item').hasClass('prevent-click-handler')) {
                 return;
             }
 
@@ -576,7 +564,7 @@ const render = function(interaction) {
         }
 
         function _iFrameDragFix(draggableSelector, target) {
-            interactUtils.iFrameDragFixOn(function() {
+            interactUtils.iFrameDragFixOn(function () {
                 let $activeDrop = $(resultSelector + '.dropzone');
                 if ($activeDrop.length) {
                     interact(resultSelector).fire({
@@ -619,7 +607,7 @@ const render = function(interaction) {
                 .draggable(
                     _.defaults(
                         {
-                            onstart: function(e) {
+                            onstart: function (e) {
                                 let $target = $(e.target);
                                 let scale;
                                 $target.addClass('dragged');
@@ -631,14 +619,14 @@ const render = function(interaction) {
 
                                 scrollObserver.start($activeChoice);
                             },
-                            onmove: function(e) {
+                            onmove: function (e) {
                                 interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
                             },
-                            onend: function(e) {
+                            onend: function (e) {
                                 let $target = $(e.target);
                                 $target.removeClass('dragged');
                                 // The reason of placing delay here is that there was timing conflict between "draggable" and "drag-zone" elements.
-                                _.delay(function(){
+                                _.delay(function () {
                                     _resetSelection();
                                 });
                                 interactUtils.restoreOriginalPosition($target);
@@ -657,7 +645,7 @@ const render = function(interaction) {
                 .draggable(
                     _.defaults(
                         {
-                            onstart: function(e) {
+                            onstart: function (e) {
                                 let $target = $(e.target);
                                 let scale;
                                 $target.addClass('dragged');
@@ -670,10 +658,10 @@ const render = function(interaction) {
 
                                 scrollObserver.start($activeChoice);
                             },
-                            onmove: function(e) {
+                            onmove: function (e) {
                                 interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
                             },
-                            onend: function(e) {
+                            onend: function (e) {
                                 let $target = $(e.target);
                                 $target.removeClass('dragged');
 
@@ -696,11 +684,11 @@ const render = function(interaction) {
 
             dropOptions = {
                 overlap: 'pointer',
-                ondragenter: function(e) {
+                ondragenter: function (e) {
                     $(e.target).addClass('dropzone');
                     $(e.relatedTarget).addClass('droppable');
                 },
-                ondragleave: function(e) {
+                ondragleave: function (e) {
                     $(e.target).removeClass('dropzone');
                     $(e.relatedTarget).removeClass('droppable');
                 }
@@ -710,7 +698,7 @@ const render = function(interaction) {
             interact(resultSelector).dropzone(
                 _.defaults(
                     {
-                        ondrop: function(e) {
+                        ondrop: function (e) {
                             this.ondragleave(e);
                             _handleResultActivate($(e.target));
                         }
@@ -723,7 +711,7 @@ const render = function(interaction) {
             interact(choiceSelector + '.empty').dropzone(
                 _.defaults(
                     {
-                        ondrop: function(e) {
+                        ondrop: function (e) {
                             this.ondragleave(e);
                             _handleChoiceActivate($(e.target));
                         }
@@ -742,15 +730,15 @@ const render = function(interaction) {
     });
 };
 
-const resetResponse = function(interaction) {
+const resetResponse = function (interaction) {
     const $container = containerHelper.get(interaction);
 
     //destroy selected choice:
-    $container.find('.result-area .active').each(function() {
+    $container.find('.result-area .active').each(function () {
         interactUtils.tapOn(this);
     });
 
-    $('.result-area>li>div', $container).each(function() {
+    $('.result-area>li>div', $container).each(function () {
         unsetChoice(interaction, $(this), false, false);
     });
 
@@ -758,14 +746,14 @@ const resetResponse = function(interaction) {
     instructionMgr.validateInstructions(interaction);
 };
 
-const _setPairs = function(interaction, pairs) {
+const _setPairs = function (interaction, pairs) {
     const $container = containerHelper.get(interaction);
     let addedPairs = 0;
     let $emptyPair = $('.result-area>li:first', $container);
     if (pairs && interaction.getResponseDeclaration().attr('cardinality') === 'single' && pairs.length) {
         pairs = [pairs];
     }
-    _.each(pairs, function(pair) {
+    _.each(pairs, function (pair) {
         if ($emptyPair.length) {
             let $divs = $emptyPair.children('div');
             setChoice(interaction, getChoice(interaction, pair[0]), $($divs[0]));
@@ -793,7 +781,7 @@ const _setPairs = function(interaction, pairs) {
  * @param {object} interaction
  * @param {object} response
  */
-const setResponse = function(interaction, response) {
+const setResponse = function (interaction, response) {
     _setPairs(interaction, pciResponse.unserialize(response, interaction));
 };
 
@@ -809,7 +797,7 @@ const setResponse = function(interaction, response) {
  * @param {object} interaction
  * @returns {object}
  */
-const getResponse = function(interaction) {
+const getResponse = function (interaction) {
     return pciResponse.serialize(_getRawResponse(interaction), interaction);
 };
 
@@ -817,7 +805,7 @@ const getResponse = function(interaction) {
  * Destroy the interaction by leaving the DOM exactly in the same state it was before loading the interaction.
  * @param {Object} interaction - the interaction
  */
-const destroy = function(interaction) {
+const destroy = function (interaction) {
     const $container = containerHelper.get(interaction);
 
     //remove event
@@ -843,7 +831,6 @@ const destroy = function(interaction) {
  */
 const setState = function setState(interaction, state) {
     let $container;
-
     if (_.isObject(state)) {
         if (state.response) {
             interaction.resetResponse();
@@ -855,7 +842,7 @@ const setState = function setState(interaction, state) {
             $container = containerHelper.get(interaction);
 
             $('.choice-area .qti-choice', $container)
-                .sort(function(a, b) {
+                .sort(function (a, b) {
                     let aIndex = _.indexOf(state.order, $(a).data('identifier'));
                     let bIndex = _.indexOf(state.order, $(b).data('identifier'));
                     if (aIndex > bIndex) {
@@ -892,7 +879,7 @@ const getState = function getState(interaction) {
         $container = containerHelper.get(interaction);
 
         state.order = [];
-        $('.choice-area .qti-choice', $container).each(function() {
+        $('.choice-area .qti-choice', $container).each(function () {
             state.order.push($(this).data('identifier'));
         });
     }
