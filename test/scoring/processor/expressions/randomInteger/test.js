@@ -115,6 +115,6 @@ define([
         };
         randomIntegerProcessor.preProcessor = preProcessorFactory({});
         const result = randomIntegerProcessor.process();
-        assert.ok(data.expectedRange?.includes(result.value), `The value ${result.value} is in the range`);
+        assert.ok(data.expectedRange.includes(result.value), `The value ${result.value} is in the range`);
     });
 });

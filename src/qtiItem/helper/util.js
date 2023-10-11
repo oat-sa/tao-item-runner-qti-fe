@@ -55,7 +55,7 @@ var util = {
         do {
             exists = false;
             id = prefix + suffix;
-            if (usedIds?.includes(id)) {
+            if (usedIds && usedIds.includes(id)) {
                 exists = true;
                 suffix = '_' + i;
                 i++;

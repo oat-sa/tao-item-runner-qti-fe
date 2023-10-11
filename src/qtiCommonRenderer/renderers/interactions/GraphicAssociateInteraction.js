@@ -180,7 +180,7 @@ const _shapesSelectable = function _shapesSelectable(interaction, active) {
 
     //update the shape state
     _.forEach(choices, function (choice) {
-        if (!assocs?.includes(choice.id())) {
+        if (!assocs.includes(choice.id())) {
             const element = interaction.paper.getById(choice.serial);
             const assocsElement = element.data('assocs') || [];
             if (

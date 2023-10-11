@@ -127,7 +127,7 @@ var getFeedbacks = function getFeedbacks(item, itemSession) {
         if (itemSession[outcomeIdentifier]) {
             //is the feedback in the list of feedbacks to be displayed ?
             feedbackIds = pci.getRawValues(itemSession[outcomeIdentifier]);
-            if (!feedbackIds?.includes(feedback.id())) {
+            if (!feedbackIds.includes(feedback.id())) {
                 return true; //continue with next feedback
             }
 
@@ -148,7 +148,7 @@ var getFeedbacks = function getFeedbacks(item, itemSession) {
                 messages[_currentMessageGroupId] = [];
             }
 
-            if (messages[_currentMessageGroupId]?.includes(message)) {
+            if (messages[_currentMessageGroupId] && messages[_currentMessageGroupId].includes(message)) {
                 return true; //continue
             } else {
                 messages[_currentMessageGroupId].push(message);

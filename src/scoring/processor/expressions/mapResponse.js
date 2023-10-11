@@ -101,13 +101,13 @@ var mapResponseProcessor = {
                         found = _.find(variable.value, mapEntry.mapKey);
                         return found && found.length > 0;
                     }
-                    return variable.value?.includes(mapEntry.mapKey);
+                    return variable.value && variable.value.includes(mapEntry.mapKey);
                 })
                 .reduce(function (sum, mapEntry) {
                     return sum + parseFloat(mapEntry.mapValue);
                 }, 0);
 
-            if (mapResult !== undefined) {
+            if (typeof mapResult !== 'undefined') {
                 result.value = mapResult;
             }
         }

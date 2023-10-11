@@ -620,7 +620,7 @@ const Renderer = function (options) {
         if (Element.isA(interaction, 'interaction')) {
             this.shuffledChoices[interaction.getSerial()] = interactionHelper
                 .findChoices(interaction, choices, identificationType)
-                ?.map(val => val.serial);
+                .map(val => val.serial);
         }
     };
 
