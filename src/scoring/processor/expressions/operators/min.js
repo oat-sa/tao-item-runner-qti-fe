@@ -62,7 +62,7 @@ var minProcessor = {
             return null;
         }
 
-        result.value = castedOperands.min().value();
+        result.value = castedOperands.min();
 
         return result;
     }
