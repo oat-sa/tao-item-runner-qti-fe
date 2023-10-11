@@ -1,9 +1,8 @@
-define(['taoQtiItem/scoring/processor/expressions/engine'], function(expressionEngineFactory) {
-
+define(['taoQtiItem/scoring/processor/expressions/engine'], function (expressionEngineFactory) {
     QUnit.module('API');
 
-    QUnit.test('factory', function(assert) {
-        var ready = assert.async();
+    QUnit.test('factory', function (assert) {
+        const ready = assert.async();
         assert.expect(1);
 
         assert.ok(typeof expressionEngineFactory === 'function', 'the engine expose a factory');
@@ -11,11 +10,11 @@ define(['taoQtiItem/scoring/processor/expressions/engine'], function(expressionE
         ready();
     });
 
-    QUnit.test('engine', function(assert) {
-        var ready = assert.async();
+    QUnit.test('engine', function (assert) {
+        const ready = assert.async();
         assert.expect(2);
 
-        var engine = expressionEngineFactory();
+        const engine = expressionEngineFactory();
 
         assert.ok(typeof engine === 'object', 'the engine is an object');
         assert.ok(typeof engine.execute === 'function', 'the engine exposes a execute function');
@@ -25,34 +24,37 @@ define(['taoQtiItem/scoring/processor/expressions/engine'], function(expressionE
 
     QUnit.module('Parse 1 level tree');
 
-    QUnit.test('2 operands sum expression', function(assert) {
-        var ready = assert.async();
+    QUnit.test('2 operands sum expression', function (assert) {
+        const ready = assert.async();
         assert.expect(1);
 
-        var expression = {
+        const expression = {
             qtiClass: 'sum',
-            expressions: [{
-                qtiClass: 'baseValue',
-                attributes: {
-                    baseType: 'integer'
+            expressions: [
+                {
+                    qtiClass: 'baseValue',
+                    attributes: {
+                        baseType: 'integer'
+                    },
+                    value: '3'
                 },
-                value: '3'
-            }, {
-                qtiClass: 'baseValue',
-                attributes: {
-                    baseType: 'integer'
-                },
-                value: '7'
-            }]
+                {
+                    qtiClass: 'baseValue',
+                    attributes: {
+                        baseType: 'integer'
+                    },
+                    value: '7'
+                }
+            ]
         };
 
-        var expectedResult = {
+        const expectedResult = {
             cardinality: 'single',
             baseType: 'integer',
             value: 10
         };
 
-        var engine = expressionEngineFactory();
+        const engine = expressionEngineFactory();
 
         assert.deepEqual(engine.execute(expression), expectedResult, 'the engine compute the right result');
 
@@ -61,60 +63,69 @@ define(['taoQtiItem/scoring/processor/expressions/engine'], function(expressionE
 
     QUnit.module('Parse 2 levels tree');
 
-    QUnit.test('2 operands sum expression', function(assert) {
-        var ready = assert.async();
+    QUnit.test('2 operands sum expression', function (assert) {
+        const ready = assert.async();
         assert.expect(1);
 
-        var expression = {
+        const expression = {
             qtiClass: 'subtract',
-            expressions: [{
-                qtiClass: 'sum',
-                expressions: [{
-                    qtiClass: 'baseValue',
-                    attributes: {
-                        baseType: 'integer'
-                    },
-                    value: '3'
-                }, {
-                    qtiClass: 'baseValue',
-                    attributes: {
-                        baseType: 'integer'
-                    },
-                    value: '7'
-                }, {
-                    qtiClass: 'baseValue',
-                    attributes: {
-                        baseType: 'integer'
-                    },
-                    value: '5'
-                }]
-            }, {
-                qtiClass: 'product',
-                expressions: [{
-                    qtiClass: 'baseValue',
-                    attributes: {
-                        baseType: 'integer'
-                    },
-                    value: '2'
-                }, {
-                    qtiClass: 'baseValue',
-                    attributes: {
-                        baseType: 'integer'
-                    },
-                    value: '5'
-                }]
-            }]
+            expressions: [
+                {
+                    qtiClass: 'sum',
+                    expressions: [
+                        {
+                            qtiClass: 'baseValue',
+                            attributes: {
+                                baseType: 'integer'
+                            },
+                            value: '3'
+                        },
+                        {
+                            qtiClass: 'baseValue',
+                            attributes: {
+                                baseType: 'integer'
+                            },
+                            value: '7'
+                        },
+                        {
+                            qtiClass: 'baseValue',
+                            attributes: {
+                                baseType: 'integer'
+                            },
+                            value: '5'
+                        }
+                    ]
+                },
+                {
+                    qtiClass: 'product',
+                    expressions: [
+                        {
+                            qtiClass: 'baseValue',
+                            attributes: {
+                                baseType: 'integer'
+                            },
+                            value: '2'
+                        },
+                        {
+                            qtiClass: 'baseValue',
+                            attributes: {
+                                baseType: 'integer'
+                            },
+                            value: '5'
+                        }
+                    ]
+                }
+            ]
         };
 
-        var expectedResult = {
+        const expectedResult = {
             cardinality: 'single',
             baseType: 'integer',
             value: 5
         };
-        var engine = expressionEngineFactory();
+        const engine = expressionEngineFactory();
         assert.deepEqual(engine.execute(expression), expectedResult, 'the engine compute the right result');
 
         ready();
     });
 });
-
