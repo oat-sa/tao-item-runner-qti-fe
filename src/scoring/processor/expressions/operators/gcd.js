@@ -30,7 +30,6 @@ import _ from 'lodash';
  * @exports taoQtiItem/scoring/processor/expressions/operators/gcd
  */
 var gcdProcessor = {
-
     constraints: {
         minOperand: 1,
         gcdOperand: -1,
@@ -40,8 +39,7 @@ var gcdProcessor = {
 
     operands: [],
 
-    process: function() {
-
+    process: function () {
         var result = {
             cardinality: 'single',
             baseType: 'integer'
@@ -60,7 +58,7 @@ var gcdProcessor = {
             return null;
         }
 
-        if (castedOperands.max().value() === 0 && castedOperands.min().value() === 0) {
+        if (Math.max([...castedOperands]) === 0 && Math.min([...castedOperands]) === 0) {
             result.value = 0;
             return result;
         }
@@ -85,7 +83,7 @@ function gcd(numbers) {
     for (i = 1; i < n; i++) {
         y = Math.abs(numbers[i]);
         while (x && y) {
-            x > y ? x %= y : y %= x;
+            x > y ? (x %= y) : (y %= x);
         }
         x += y;
     }
