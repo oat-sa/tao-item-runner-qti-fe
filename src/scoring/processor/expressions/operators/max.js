@@ -62,7 +62,7 @@ var maxProcessor = {
             return null;
         }
 
-        result.value = Math.max(...castedOperands);
+        result.value = castedOperands.max().value();
 
         return result;
     }
