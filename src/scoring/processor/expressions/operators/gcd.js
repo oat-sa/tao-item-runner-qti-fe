@@ -58,7 +58,7 @@ var gcdProcessor = {
             return null;
         }
 
-        if (Math.max([...castedOperands]) === 0 && Math.min([...castedOperands]) === 0) {
+        if (castedOperands.max() === 0 && castedOperands.min() === 0) {
             result.value = 0;
             return result;
         }
