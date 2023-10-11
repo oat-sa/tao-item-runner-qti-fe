@@ -93,13 +93,11 @@ var mapResponseProcessor = {
             //get the entries that matches and sum their values
             mapResult = _(mapEntries)
                 .filter(function (mapEntry) {
-                    var found;
                     if (variable.baseType === 'string' && mapEntry.attributes.caseSensitive === false) {
-                        return _.invoke(variable.value, 'toLowerCase').includes(mapEntry.mapKey.toLowerCase());
+                        return variable.value.map(val => val.toLowerCase()).includes(mapEntry.mapKey.toLowerCase());
                     }
                     if (_.isArray(mapEntry.mapKey)) {
-                        found = _.find(variable.value, mapEntry.mapKey);
-                        return found && found.length > 0;
+                        return variable.value.find(val => val.join(' ') === mapEntry.mapKey.join(' '));
                     }
                     return variable.value && variable.value.includes(mapEntry.mapKey);
                 })
