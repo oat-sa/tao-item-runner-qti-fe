@@ -101,7 +101,7 @@ expressionProcessor.types = {
  * @throws {TypeError} when a parameter isn't valid
  */
 expressionProcessor.register = function register(name, type, processor) {
-    if (!this.types[type]) {
+    if (!Object.values(this.types).includes(type)) {
         return errorHandler.throw('scoring', new TypeError(type + ' is not a valid expression type'));
     }
     if (_.isEmpty(name)) {
