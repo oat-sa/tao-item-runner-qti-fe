@@ -48,7 +48,7 @@ const qti2raphCoordsMapper = {
      * @param {Array} coords - QTI coords
      * @returns {Array} raphael coords
      */
-    rect: function(coords) {
+    rect: function (coords) {
         return [coords[0], coords[1], coords[2] - coords[0], coords[3] - coords[1]];
     },
 
@@ -57,7 +57,7 @@ const qti2raphCoordsMapper = {
      * @param {Raphael.Paper} paper - the paper
      * @returns {Array} raphael coords
      */
-    default: function(paper) {
+    default: function (paper) {
         return [0, 0, paper.width, paper.height];
     },
 
@@ -66,7 +66,7 @@ const qti2raphCoordsMapper = {
      * @param {Array} coords - QTI coords
      * @returns {Array} path desc
      */
-    poly: function(coords) {
+    poly: function (coords) {
         let a;
         const size = coords.length;
 
@@ -96,7 +96,7 @@ const raph2qtiCoordsMapper = {
      * @param {Object} attr - Raphael Element's attributes
      * @returns {Array} qti based coords
      */
-    rect: function(attr) {
+    rect: function (attr) {
         return [attr.x, attr.y, attr.x + attr.width, attr.y + attr.height];
     },
 
@@ -105,7 +105,7 @@ const raph2qtiCoordsMapper = {
      * @param {Object} attr - Raphael Element's attributes
      * @returns {Array} qti based coords
      */
-    circle: function(attr) {
+    circle: function (attr) {
         return [attr.cx, attr.cy, attr.r];
     },
 
@@ -114,7 +114,7 @@ const raph2qtiCoordsMapper = {
      * @param {Object} attr - Raphael Element's attributes
      * @returns {Array} qti based coords
      */
-    ellipse: function(attr) {
+    ellipse: function (attr) {
         return [attr.cx, attr.cy, attr.rx, attr.ry];
     },
 
@@ -123,7 +123,7 @@ const raph2qtiCoordsMapper = {
      * @param {Object} attr - Raphael Element's attributes
      * @returns {Array} qti based coords
      */
-    default: function(attr) {
+    default: function (attr) {
         return this.rect(attr);
     },
 
@@ -132,7 +132,7 @@ const raph2qtiCoordsMapper = {
      * @param {Raphael.Paper} paper - the paper
      * @returns {Array} raphael coords
      */
-    path: function(attr) {
+    path: function (attr) {
         const poly = [];
         let i;
 
@@ -165,7 +165,7 @@ const GraphicHelper = {
      * @param {Raphael.Element} element - the element to change the state
      * @param {String} state - the name of the state (from states) to switch to
      */
-    setStyle: function(element, name) {
+    setStyle: function (element, name) {
         if (element && gstyle[name]) {
             element.attr(gstyle[name]);
         }
@@ -185,7 +185,7 @@ const GraphicHelper = {
      * @param {Function} [options.done] - executed once the image is loaded
      * @returns {Raphael.Paper} the paper
      */
-    responsivePaper: function(id, serial, options) {
+    responsivePaper: function (id, serial, options) {
         const $container = options.container || $('#' + id).parent();
         const $editor = $('.image-editor', $container);
         const $body = $container.closest('.qti-itemBody');
@@ -193,7 +193,6 @@ const GraphicHelper = {
 
         const imgWidth = options.width || $container.innerWidth();
         const imgHeight = options.height || $container.innerHeight();
-
 
         const paper = scaleRaphael(id, imgWidth, imgHeight);
         const image = paper.image(options.img, 0, 0, imgWidth, imgHeight);
@@ -203,9 +202,7 @@ const GraphicHelper = {
         resizer();
 
         //retry to resize once the SVG is loaded
-        $(image.node)
-            .attr('externalResourcesRequired', 'true')
-            .on('load', resizer);
+        $(image.node).attr('externalResourcesRequired', 'true').on('load', resizer);
 
         if (raphael.type === 'SVG') {
             // TODO: move listeners somewhere they can be easily turned off
@@ -239,7 +236,7 @@ const GraphicHelper = {
                 containerWidth = $editor.innerWidth();
             }
 
-            if (options.responsive && containerWidth > 0 || givenWidth > 0 || containerWidth > maxWidth) {
+            if ((options.responsive && containerWidth > 0) || givenWidth > 0 || containerWidth > maxWidth) {
                 if (options.responsive) {
                     if (givenWidth < containerWidth && givenWidth < maxWidth) {
                         containerWidth = givenWidth - diff;
@@ -287,7 +284,7 @@ const GraphicHelper = {
      * @param {Boolean} [options.qtiCoords = true] - if the coords are in QTI format
      * @returns {Raphael.Element} the created element
      */
-    createElement: function(paper, type, coords, options) {
+    createElement: function (paper, type, coords, options) {
         const self = this;
         let element;
         const shaper = shapeMap[type] ? paper[shapeMap[type]] : paper[type];
@@ -311,12 +308,12 @@ const GraphicHelper = {
 
                 if (options.hover !== false) {
                     element.hover(
-                        function() {
+                        function () {
                             if (!element.flashing) {
                                 self.updateElementState(this, 'hover');
                             }
                         },
-                        function() {
+                        function () {
                             if (!element.flashing) {
                                 self.updateElementState(
                                     this,
@@ -328,7 +325,7 @@ const GraphicHelper = {
                 }
 
                 if (options.touchEffect !== false) {
-                    element.touchstart(function() {
+                    element.touchstart(function () {
                         self.createTouchCircle(paper, element.getBBox());
                     });
                 }
@@ -377,7 +374,7 @@ const GraphicHelper = {
             target.id = options.id;
         } else {
             let count = 0;
-            paper.forEach(function(element) {
+            paper.forEach(function (element) {
                 if (element.data('target')) {
                     count++;
                 }
@@ -391,7 +388,7 @@ const GraphicHelper = {
         const layer = paper
             .rect(tBBox.x, tBBox.y, tBBox.width, tBBox.height)
             .attr(gstyle.layer)
-            .click(function() {
+            .click(function () {
                 const id = target.id;
                 const p = this.data('point');
 
@@ -443,7 +440,7 @@ const GraphicHelper = {
         let shapeCoords;
 
         if (_.isString(coords)) {
-            coords = _.map(coords.split(','), function(coord) {
+            coords = _.map(coords.split(','), function (coord) {
                 return parseInt(coord, 10);
             });
         }
@@ -483,7 +480,7 @@ const GraphicHelper = {
         const factor = paper && width ? width / paper.w : 1;
 
         if (_.isFunction(mapper)) {
-            result = _.map(mapper.call(raph2qtiCoordsMapper, element.attr()), function(coord) {
+            result = _.map(mapper.call(raph2qtiCoordsMapper, element.attr()), function (coord) {
                 return Math.round(coord * factor);
             }).join(',');
         }
@@ -497,14 +494,14 @@ const GraphicHelper = {
      * @param {Raphael.Paper} paper - the paper
      * @param {Raphael.Element} element - used to get the bbox from
      */
-    createTouchCircle: function(paper, bbox) {
+    createTouchCircle: function (paper, bbox) {
         const radius = bbox.width > bbox.height ? bbox.width : bbox.height;
         const tCircle = paper.circle(bbox.x + bbox.width / 2, bbox.y + bbox.height / 2, radius);
 
         tCircle.attr(gstyle['touch-circle']);
 
-        _.defer(function() {
-            tCircle.animate({ r: radius + 5, opacity: 0.7 }, 300, function() {
+        _.defer(function () {
+            tCircle.animate({ r: radius + 5, opacity: 0.7 }, 300, function () {
                 tCircle.remove();
             });
         });
@@ -525,7 +522,7 @@ const GraphicHelper = {
      * @param {Boolean} [options.hide = false] - if the text starts hidden
      * @returns {Raphael.Element} the created text
      */
-    createText: function(paper, options) {
+    createText: function (paper, options) {
         const top = options.top || 0;
         const left = options.left || 0;
         const content = options.content || '';
@@ -549,7 +546,7 @@ const GraphicHelper = {
 
         text.attr(gstyle[style]);
 
-        if(disableEvents) {
+        if (disableEvents) {
             text.node.setAttribute('pointer-events', 'none');
         }
 
@@ -581,7 +578,7 @@ const GraphicHelper = {
      * @param {Boolean} [options.shapeClick = false] - clicking the text delegates to the shape
      * @returns {Raphael.Element} the created text
      */
-    createShapeText: function(paper, shape, options) {
+    createShapeText: function (paper, shape, options) {
         const bbox = shape.getBBox();
 
         const text = this.createText(
@@ -619,7 +616,7 @@ const GraphicHelper = {
      * @param {Boolean} [options.shadow = false] - add a shadow back the image
      * @returns {Raphael.Element} the created set, augmented of a move(x,y) method
      */
-    createBorderedImage: function(paper, options) {
+    createBorderedImage: function (paper, options) {
         const padding = options.padding >= 0 ? options.padding : 6;
         const halfPad = padding / 2;
 
@@ -679,9 +676,9 @@ const GraphicHelper = {
      * @param {String} state - the name of the state (from states) to switch to
      * @param {String} [title] - a title linked to this step
      */
-    updateElementState: function(element, state, title) {
+    updateElementState: function (element, state, title) {
         if (element && element.animate) {
-            element.animate(gstyle[state], 200, 'linear', function() {
+            element.animate(gstyle[state], 200, 'linear', function () {
                 element.attr(gstyle[state]); //for attr that don't animate
 
                 //preven issue in firefox 37
@@ -699,10 +696,10 @@ const GraphicHelper = {
      * @param {Raphael.Element} element - the element to update the title
      * @param {String} [title] - the new title
      */
-    updateTitle: function(element, title) {
+    updateTitle: function (element, title) {
         if (element && element.node) {
             //removes all remaining titles nodes
-            _.forEach(element.node.children, function(child) {
+            _.forEach(element.node.children, function (child) {
                 if (child.nodeName.toLowerCase() === 'title') {
                     element.node.removeChild(child);
                 }
@@ -718,7 +715,7 @@ const GraphicHelper = {
      * @param {Raphael.Element} element - the element to hightlight
      * @param {String} [restorState = 'basic'] - the state to restore the elt into after flash
      */
-    highlightError: function(element, restoredState) {
+    highlightError: function (element, restoredState) {
         if (element) {
             element.flashing = true;
             this.updateElementState(element, 'error');
@@ -735,8 +732,8 @@ const GraphicHelper = {
      * @param {String} event - the event name
      *
      */
-    trigger: function(element, event) {
-        const evt = _.where(element.events, { name: event });
+    trigger: function (element, event) {
+        const evt = element.events.filter(el => typeof el.name !== 'undefined' && el.name === event);
         if (evt.length && evt[0] && typeof evt[0].f === 'function') {
             evt[0].f.apply(element, Array.prototype.slice.call(arguments, 2));
         }
@@ -767,7 +764,7 @@ const GraphicHelper = {
      * @param {Raphael.Paper} paper - the interaction paper
      * @returns {Object} position with top and left
      */
-    position: function($container, paper) {
+    position: function ($container, paper) {
         const pw = parseInt(paper.w || paper.width, 10);
         const cw = parseInt($container.width(), 10);
         const ph = parseInt(paper.w || paper.width, 10);
@@ -785,7 +782,7 @@ const GraphicHelper = {
      * @param {MouseEvent} event - the event triggered by the click
      * @returns {Object} the x,y point
      */
-    clickPoint: function($container, event) {
+    clickPoint: function ($container, event) {
         let x, y;
         const offset = $container.offset();
 
