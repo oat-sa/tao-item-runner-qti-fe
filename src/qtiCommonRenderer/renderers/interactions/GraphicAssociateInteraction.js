@@ -96,7 +96,7 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
         .path(graphic._style.close.path)
         .attr(graphic._style.close)
         .transform('T' + (midPath.x - 9) + ',' + (midPath.y - 9))
-        .attr('title', _('Click again to remove'))
+        .attr('title', __('Click again to remove'))
         .toBack();
 
     //the path is below the shapes
