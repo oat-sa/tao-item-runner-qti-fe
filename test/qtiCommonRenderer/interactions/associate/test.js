@@ -19,7 +19,7 @@ define([
         }
     });
 
-    QUnit.test('renders correclty', function (assert) {
+    QUnit.test('renders correctly', function (assert) {
         var ready = assert.async();
         var $container = $(`#${fixtureContainerId}`);
 
