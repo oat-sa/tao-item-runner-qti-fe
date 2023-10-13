@@ -147,7 +147,7 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
 
     //remove set handler
     function removeSet() {
-        vset.forEach(vset.remove());
+        vset.forEach(item => item.remove());
         interaction._vsets = _.without(interaction._vsets, vset);
         if (typeof onRemove === 'function') {
             onRemove();
