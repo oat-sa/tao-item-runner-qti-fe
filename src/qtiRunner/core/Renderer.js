@@ -649,9 +649,7 @@ const Renderer = function (options) {
                     }
                 } else {
                     choices = interactionHelper.shuffleChoices(interaction.getChoices());
-                    this.shuffledChoices[serial] = choices.map(val => {
-                        val.serial;
-                    });
+                    this.shuffledChoices[serial] = choices.map(val => val.serial);
                 }
 
                 //otherwise get the choices from the serials
