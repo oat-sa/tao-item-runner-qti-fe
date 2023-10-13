@@ -187,7 +187,7 @@ var Element = Class.extend({
         if (typeof this.initObject === 'function') {
             append(this.getObject());
         }
-        _.each(this.metaData, function (v) {
+        _.forEach(this.metaData, function (v) {
             if (Element.isA(v, '_container')) {
                 append(v);
             } else if (_.isArray(v)) {
