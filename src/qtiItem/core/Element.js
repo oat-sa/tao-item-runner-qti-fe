@@ -191,7 +191,7 @@ var Element = Class.extend({
             if (Element.isA(v, '_container')) {
                 append(v);
             } else if (_.isArray(v)) {
-                _.each(v, function (v) {
+                _.forEach(v, function (v) {
                     if (Element.isA(v, '_container')) {
                         append(v);
                     }
