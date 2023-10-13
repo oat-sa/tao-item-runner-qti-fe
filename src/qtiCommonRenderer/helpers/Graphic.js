@@ -733,7 +733,7 @@ const GraphicHelper = {
      *
      */
     trigger: function (element, event) {
-        const evt = element.events.filter(el => typeof el.name !== 'undefined' && el.name === event);
+        const evt = element.events.filter(el => el.name === event);
         if (evt.length && evt[0] && typeof evt[0].f === 'function') {
             evt[0].f.apply(element, Array.prototype.slice.call(arguments, 2));
         }
