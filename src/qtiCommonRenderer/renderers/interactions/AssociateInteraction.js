@@ -239,7 +239,7 @@ const scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
 
             // translate the element
             currentDraggable.style.webkitTransform = currentDraggable.style.transform =
-                'translate(' + x + 'px, ' + y + 'px)';
+                `translate(${x}px, ${y}px)`;
 
             // update the position attributes
             currentDraggable.setAttribute('data-x', x);
