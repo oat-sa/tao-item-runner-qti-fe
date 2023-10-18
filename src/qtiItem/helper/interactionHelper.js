@@ -4,11 +4,11 @@
 import _ from 'lodash';
 import Element from 'taoQtiItem/qtiItem/core/Element';
 export default {
-    convertChoices: function(choices, outputType) {
+    convertChoices: function (choices, outputType) {
         var ret = [],
             _this = this;
 
-        _.each(choices, function(c) {
+        _.forEach(choices, function (c) {
             if (Element.isA(c, 'choice')) {
                 switch (outputType) {
                     case 'serial':
@@ -27,11 +27,11 @@ export default {
 
         return ret;
     },
-    findChoices: function(interaction, choices, inputType) {
+    findChoices: function (interaction, choices, inputType) {
         var ret = [],
             _this = this;
 
-        _.each(choices, function(c) {
+        _.forEach(choices, function (c) {
             var choice;
             if (_.isString(c)) {
                 if (inputType === 'serial') {
@@ -56,7 +56,7 @@ export default {
 
         return ret;
     },
-    shuffleChoices: function(choices) {
+    shuffleChoices: function (choices) {
         var r = [], //returned array
             f = {}, //fixed choices array
             j = 0;
@@ -89,7 +89,7 @@ export default {
 
         return r;
     },
-    serialToIdentifier: function(interaction, choiceSerial) {
+    serialToIdentifier: function (interaction, choiceSerial) {
         var choice = interaction.getChoice(choiceSerial);
         if (choice) {
             return choice.id();

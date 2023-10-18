@@ -122,10 +122,10 @@ var util = {
         }
 
         if (_.isArray(collectionNames)) {
-            _.each(collectionNames, function (collectionName) {
+            _.forEach(collectionNames, function (collectionName) {
                 //get collection to search in (resolving case like interaction.choices.0
                 var collection = element;
-                _.each(collectionName.split('.'), function (nameToken) {
+                _.forEach(collectionName.split('.'), function (nameToken) {
                     collection = collection[nameToken];
                 });
                 var elt = collection[searchedSerial];
@@ -136,7 +136,7 @@ var util = {
                 }
 
                 //search inside each elements:
-                _.each(collection, function (elt) {
+                _.forEach(collection, function (elt) {
                     if (_.isFunction(elt.find)) {
                         found = elt.find(searchedSerial);
                         if (found) {

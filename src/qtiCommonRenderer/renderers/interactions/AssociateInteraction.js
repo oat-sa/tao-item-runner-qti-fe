@@ -238,8 +238,7 @@ const scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
             x = (parseInt(currentDraggable.getAttribute('data-x'), 10) || 0) + (afterX - beforeX);
 
             // translate the element
-            currentDraggable.style.webkitTransform = currentDraggable.style.transform =
-                `translate(${x}px, ${y}px)`;
+            currentDraggable.style.webkitTransform = currentDraggable.style.transform = `translate(${x}px, ${y}px)`;
 
             // update the position attributes
             currentDraggable.setAttribute('data-x', x);
@@ -753,7 +752,7 @@ const _setPairs = function (interaction, pairs) {
     if (pairs && interaction.getResponseDeclaration().attr('cardinality') === 'single' && pairs.length) {
         pairs = [pairs];
     }
-    _.each(pairs, function (pair) {
+    _.forEach(pairs, function (pair) {
         if ($emptyPair.length) {
             let $divs = $emptyPair.children('div');
             setChoice(interaction, getChoice(interaction, pair[0]), $($divs[0]));

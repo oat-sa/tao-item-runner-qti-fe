@@ -204,7 +204,7 @@ var Element = Class.extend({
         var ret = [this.qtiClass],
             composingElts = this.getComposingElements();
 
-        _.each(composingElts, function (elt) {
+        _.forEach(composingElts, function (elt) {
             ret.push(elt.qtiClass);
         });
 
@@ -453,7 +453,7 @@ Element.unsetElement = function (serial) {
 
     if (element) {
         var composingElements = element.getComposingElements();
-        _.each(composingElements, function (elt) {
+        _.forEach(composingElements, function (elt) {
             delete _instances[elt.serial];
         });
         delete _instances[element.serial];

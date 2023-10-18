@@ -38,7 +38,7 @@ function showFeedbacks(item, loader, renderer, itemSession, onCloseCallback, onS
         feedbacksToBeDisplayed = [];
 
     //find which modal feedbacks should be displayed according to the current item session:
-    _.each(item.modalFeedbacks, function(feedback) {
+    _.forEach(item.modalFeedbacks, function (feedback) {
         var feedbackIds, message;
         var outcomeIdentifier = feedback.attr('outcomeIdentifier');
 
@@ -60,21 +60,21 @@ function showFeedbacks(item, loader, renderer, itemSession, onCloseCallback, onS
         var callstack = [];
 
         //iterate from the right because the modal popup will pile up.
-        _.eachRight(feedbacksToBeDisplayed, function(feedback) {
+        _.forEachRight(feedbacksToBeDisplayed, function (feedback) {
             //the end callback should be executed to the last displayed modal, which is the last displayed one
             var endCallback;
             if (callstack.length === 0) {
-                endCallback = function() {
+                endCallback = function () {
                     onCloseCallback();
                 };
             }
 
-            callstack.push(function(cb) {
+            callstack.push(function (cb) {
                 renderModalFeedback(
                     feedback,
                     loader,
                     renderer,
-                    function() {
+                    function () {
                         cb(null);
                     },
                     endCallback
@@ -82,7 +82,7 @@ function showFeedbacks(item, loader, renderer, itemSession, onCloseCallback, onS
             });
         });
 
-        async.series(callstack, function() {
+        async.series(callstack, function () {
             //all modal are ready and displayed
             if (_.isFunction(onShowCallback)) {
                 onShowCallback();
@@ -108,7 +108,7 @@ function renderModalFeedback(feedback, loader, renderer, renderedCallback, close
 
     if (feedback.is('modalFeedback')) {
         //load (potential) new qti classes used in the modal feedback (e.g. math, img)
-        renderer.load(function() {
+        renderer.load(function () {
             $feedback = $feedbackBox.find('#' + feedback.getSerial());
             if (!$feedback.length) {
                 //render the modal feedback

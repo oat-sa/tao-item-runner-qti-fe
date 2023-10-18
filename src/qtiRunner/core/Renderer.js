@@ -544,7 +544,7 @@ const Renderer = function (options) {
                 requiredClasses = _.intersection(requiredClasses, _renderableClasses);
 
                 //add dependencies
-                _.each(requiredClasses, function (reqClass) {
+                _.forEach(requiredClasses, function (reqClass) {
                     const deps = _dependencies[reqClass];
                     if (deps) {
                         requiredClasses = _.union(requiredClasses, deps);
@@ -555,7 +555,7 @@ const Renderer = function (options) {
                     let requiredSubClasses;
                     if (_renderableSubclasses[qtiClass]) {
                         requiredSubClasses = _.intersection(requiredClasses, _renderableSubclasses[qtiClass]);
-                        _.each(requiredSubClasses, function (subclass) {
+                        _.forEach(requiredSubClasses, function (subclass) {
                             if (
                                 !registerRendererClass(qtiClass + '.' + subclass, required) &&
                                 !registerRendererClass(qtiClass, required)

@@ -23,7 +23,7 @@ var SimpleFeedbackRule = Element.extend({
     qtiClass: '_simpleFeedbackRule',
     serial: '',
     rootElement: null,
-    init: function(serial, feedbackOutcome, feedbackThen, feedbackElse) {
+    init: function (serial, feedbackOutcome, feedbackThen, feedbackElse) {
         this._super(serial, {});
 
         this.condition = 'correct';
@@ -42,7 +42,7 @@ var SimpleFeedbackRule = Element.extend({
             this.feedbackElse = null;
         }
     },
-    setCondition: function(comparedOutcome, condition, comparedValue) {
+    setCondition: function (comparedOutcome, condition, comparedValue) {
         var _comparedValues = [];
         if (Element.isA(comparedOutcome, 'variableDeclaration')) {
             switch (condition) {
@@ -77,11 +77,11 @@ var SimpleFeedbackRule = Element.extend({
                         var choices = _.values(comparedOutcome.getInteraction().getChoices());
                         this.comparedOutcome = comparedOutcome;
                         this.condition = condition;
-                        _.each(comparedValue, function(v) {
+                        _.forEach(comparedValue, function (v) {
                             if (v instanceof Element) {
                                 _comparedValues.push(v);
                             } else if (_.isString(v)) {
-                                _.each(choices, function(c) {
+                                _.forEach(choices, function (c) {
                                     if (c.attr('identifier') === v) {
                                         _comparedValues.push(c);
                                         return false; //break
@@ -104,14 +104,14 @@ var SimpleFeedbackRule = Element.extend({
 
         return this;
     },
-    setFeedbackElse: function(feedback) {
+    setFeedbackElse: function (feedback) {
         if (Element.isA(feedback, 'feedback')) {
             this.feedbackElse = feedback;
         }
     },
-    toArray: function() {
+    toArray: function () {
         var val = this.comparedValue;
-        var _toString = function(v) {
+        var _toString = function (v) {
             if (val instanceof Element) {
                 return val.attr('identifier');
             } else {

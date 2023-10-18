@@ -47,7 +47,7 @@ function showFeedbacks(item, loader, renderer, itemSession, onCloseCallback, onS
     var $itemBody = $itemContainer.children('.qti-itemBody');
     var firstFeedback;
 
-    _.each(item.modalFeedbacks, function(feedback) {
+    _.forEach(item.modalFeedbacks, function (feedback) {
         var feedbackIds, message, $container, comparedOutcome, _currentMessageGroupId, interactionInfo;
         var outcomeIdentifier = feedback.attr('outcomeIdentifier');
         var order = -1;
@@ -98,20 +98,20 @@ function showFeedbacks(item, loader, renderer, itemSession, onCloseCallback, onS
         clearModalFeedbacks($itemContainer);
 
         //process rendering queue
-        _.each(renderingQueue, function(renderingToken) {
+        _.forEach(renderingQueue, function (renderingToken) {
             renderModalFeedback(
                 renderingToken.feedback,
                 loader,
                 renderer,
                 renderingToken.$container,
                 $itemContainer,
-                function(renderingData) {
+                function (renderingData) {
                     // keep the first feedback to force focus on it if needed
                     if (!firstFeedback) {
                         firstFeedback = $(renderingData.dom);
                     }
 
-                    $('img', renderingData.dom).on('load', function() {
+                    $('img', renderingData.dom).on('load', function () {
                         iframeNotifier.parent('itemcontentchange');
                     });
 
@@ -233,7 +233,7 @@ function getInteractionsDisplayInfo(item) {
     var interactionOrder = 0;
 
     //extract all interction related information needed to display their
-    _.each(item.getComposingElements(), function(element) {
+    _.forEach(item.getComposingElements(), function (element) {
         var responseIdentifier;
         if (element.is('interaction')) {
             responseIdentifier = element.attr('responseIdentifier');
@@ -242,9 +242,9 @@ function getInteractionsDisplayInfo(item) {
     });
 
     //sort interactionsDisplayInfo on the item level
-    $itemContainer.find('.qti-interaction').each(function() {
+    $itemContainer.find('.qti-interaction').each(function () {
         var interactionContainer = this;
-        _.each(interactionsDisplayInfo, function(_interactionInfo) {
+        _.forEach(interactionsDisplayInfo, function (_interactionInfo) {
             if (_interactionInfo.interactionContainer[0] === interactionContainer) {
                 _interactionInfo.order = interactionOrder;
                 return false;
@@ -280,7 +280,7 @@ function clearModalFeedbacks($itemContainer) {
  */
 function renderModalFeedback(feedback, loader, renderer, $container, $itemContainer, renderedCallback) {
     //load (potential) new qti classes used in the modal feedback (e.g. math, img)
-    renderer.load(function() {
+    renderer.load(function () {
         //render the modal feedback
         var $modalFeedback = $(
             feedback.render({
@@ -300,17 +300,17 @@ function renderModalFeedback(feedback, loader, renderer, $container, $itemContai
         // postRendering waits for everything to be resolved or one reject
         Promise.race([
             Promise.all(
-                _.map(feedback.getComposingElements(), function(elt) {
+                _.map(feedback.getComposingElements(), function (elt) {
                     //render also internal elements, such as math or img
                     return elt.postRender({}, '', renderer).pop();
                 })
             ),
-            new Promise(function(resolve, reject) {
+            new Promise(function (resolve, reject) {
                 _.delay(reject, timeout, new Error('Post rendering ran out of time.'));
             })
         ])
             .then(done)
-            .catch(function(err) {
+            .catch(function (err) {
                 //in case of postRendering issue, we are also done
                 done();
                 throw new Error('Error in post rendering : ' + err);
@@ -369,9 +369,9 @@ function initControlToggle(
     toggleButtonTemplate,
     callback
 ) {
-    var $ok = $(toggleButtonTemplate()).click(function() {
+    var $ok = $(toggleButtonTemplate()).click(function () {
         //end feedback mode, hide feedbacks
-        _.each(renderedFeebacks, function(fb) {
+        _.forEach(renderedFeebacks, function (fb) {
             fb.dom.hide();
         });
 
@@ -396,7 +396,7 @@ function initControlToggle(
  */
 function cover(interactionContainers) {
     var $cover = $('<div class="interaction-cover modal-bg">');
-    _.each(interactionContainers, function($interaction) {
+    _.forEach(interactionContainers, function ($interaction) {
         $interaction.append($cover);
     });
 }
@@ -407,7 +407,7 @@ function cover(interactionContainers) {
  * @param {Array} interactionContainers
  */
 function uncover(interactionContainers) {
-    _.each(interactionContainers, function($interaction) {
+    _.forEach(interactionContainers, function ($interaction) {
         $interaction.find('.interaction-cover').remove();
     });
 }
