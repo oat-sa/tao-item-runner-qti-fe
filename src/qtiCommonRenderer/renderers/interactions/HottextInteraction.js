@@ -32,10 +32,10 @@ import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
  * 'pseudo-label' is technically a div that behaves like a label.
  * This allows the usage of block elements inside the fake label
  */
-var pseudoLabel = function(interaction) {
+var pseudoLabel = function (interaction) {
     var $container = containerHelper.get(interaction);
 
-    var setChoice = function($choice, interaction) {
+    var setChoice = function ($choice, interaction) {
         var $inupt = $choice.find('input');
 
         if ($inupt.prop('checked') || $inupt.hasClass('disabled')) {
@@ -52,7 +52,7 @@ var pseudoLabel = function(interaction) {
         instructionMgr.validateInstructions(interaction, { choice: $choice });
     };
 
-    $('.hottext', $container).on('click', function(e) {
+    $('.hottext', $container).on('click', function (e) {
         e.preventDefault();
         setChoice($(this), interaction);
     });
@@ -65,7 +65,7 @@ var pseudoLabel = function(interaction) {
  *
  * @param {object} interaction
  */
-var render = function(interaction) {
+var render = function (interaction) {
     pseudoLabel(interaction);
 
     //set up the constraints instructions
@@ -73,14 +73,14 @@ var render = function(interaction) {
         min: interaction.attr('minChoices'),
         max: interaction.attr('maxChoices'),
         getResponse: _getRawResponse,
-        onError: function(data) {
+        onError: function (data) {
             var $input, $choice, $icon;
             if (data.choice && data.choice.length) {
                 $choice = data.choice.addClass('error');
                 $input = $choice.find('input');
                 $icon = $choice.find(' > label > span').addClass('error cross');
 
-                setTimeout(function() {
+                setTimeout(function () {
                     $input.prop('checked', false);
                     $choice.removeClass('error');
                     $icon.removeClass('error cross');
@@ -90,7 +90,7 @@ var render = function(interaction) {
     });
 };
 
-var resetResponse = function(interaction) {
+var resetResponse = function (interaction) {
     var $container = containerHelper.get(interaction);
     $('input', $container).prop('checked', false);
 };
@@ -107,11 +107,11 @@ var resetResponse = function(interaction) {
  * @param {object} interaction
  * @param {object} response
  */
-var setResponse = function(interaction, response) {
+var setResponse = function (interaction, response) {
     var $container = containerHelper.get(interaction);
 
     try {
-        _.each(pciResponse.unserialize(response, interaction), function(identifier) {
+        _.forEach(pciResponse.unserialize(response, interaction), function (identifier) {
             $container.find('input[value="' + identifier + '"]').prop('checked', true);
         });
         instructionMgr.validateInstructions(interaction);
@@ -120,10 +120,10 @@ var setResponse = function(interaction, response) {
     }
 };
 
-var _getRawResponse = function(interaction) {
+var _getRawResponse = function (interaction) {
     var values = [];
     var $container = containerHelper.get(interaction);
-    $('input:checked', $container).each(function() {
+    $('input:checked', $container).each(function () {
         values.push($(this).val());
     });
     return values;
@@ -141,7 +141,7 @@ var _getRawResponse = function(interaction) {
  * @param {object} interaction
  * @returns {object}
  */
-var getResponse = function(interaction) {
+var getResponse = function (interaction) {
     return pciResponse.serialize(_getRawResponse(interaction), interaction);
 };
 

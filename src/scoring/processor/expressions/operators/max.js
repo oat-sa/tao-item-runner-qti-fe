@@ -25,7 +25,6 @@
 import _ from 'lodash';
 
 var maxProcessor = {
-
     constraints: {
         minOperand: 1,
         maxOperand: -1,
@@ -35,8 +34,7 @@ var maxProcessor = {
 
     operands: [],
 
-    process: function() {
-
+    process: function () {
         var result = {
             cardinality: 'single',
             baseType: 'integer'
@@ -49,9 +47,11 @@ var maxProcessor = {
         }
 
         //if at least one operand is a float , the result is a float
-        if (_.some(this.operands, {
+        if (
+            _.some(this.operands, {
                 baseType: 'float'
-            })) {
+            })
+        ) {
             result.baseType = 'float';
         }
 
@@ -62,7 +62,7 @@ var maxProcessor = {
             return null;
         }
 
-        result.value = castedOperands.max().value();
+        result.value = castedOperands.max();
 
         return result;
     }

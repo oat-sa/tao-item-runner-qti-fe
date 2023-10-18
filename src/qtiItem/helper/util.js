@@ -55,7 +55,7 @@ var util = {
         do {
             exists = false;
             id = prefix + suffix;
-            if (_.contains(usedIds, id)) {
+            if (usedIds && usedIds.includes(id)) {
                 exists = true;
                 suffix = '_' + i;
                 i++;
@@ -122,10 +122,10 @@ var util = {
         }
 
         if (_.isArray(collectionNames)) {
-            _.each(collectionNames, function(collectionName) {
+            _.forEach(collectionNames, function (collectionName) {
                 //get collection to search in (resolving case like interaction.choices.0
                 var collection = element;
-                _.each(collectionName.split('.'), function(nameToken) {
+                _.forEach(collectionName.split('.'), function (nameToken) {
                     collection = collection[nameToken];
                 });
                 var elt = collection[searchedSerial];
@@ -136,7 +136,7 @@ var util = {
                 }
 
                 //search inside each elements:
-                _.each(collection, function(elt) {
+                _.forEach(collection, function (elt) {
                     if (_.isFunction(elt.find)) {
                         found = elt.find(searchedSerial);
                         if (found) {
@@ -157,7 +157,7 @@ var util = {
     },
     addMarkupNamespace: function addMarkupNamespace(markup, ns) {
         if (ns) {
-            markup = markup.replace(/<(\/)?([a-z:]+)(\s?)([^><]*)>/g, function($0, $1, $2, $3, $4) {
+            markup = markup.replace(/<(\/)?([a-z:]+)(\s?)([^><]*)>/g, function ($0, $1, $2, $3, $4) {
                 if ($2.indexOf(':') > 0) {
                     return $0;
                 }
@@ -174,7 +174,7 @@ var util = {
     },
     getMarkupUsedNamespaces: function getMarkupUsedNamespaces(markup) {
         var namespaces = [];
-        markup.replace(/<(\/)?(\w*):([^>]*)>/g, function(original, slash, ns, node) {
+        markup.replace(/<(\/)?(\w*):([^>]*)>/g, function (original, slash, ns, node) {
             namespaces.push(ns);
             return '<' + slash + node + '>';
         });

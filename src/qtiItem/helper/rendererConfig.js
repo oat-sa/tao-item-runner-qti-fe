@@ -3,7 +3,7 @@ import $ from 'jquery';
 
 var rendererConfigHelper = {};
 
-rendererConfigHelper.getOptionsFromArguments = function(args) {
+rendererConfigHelper.getOptionsFromArguments = function (args) {
     var options = {
         data: {},
         placeholder: null,
@@ -11,7 +11,7 @@ rendererConfigHelper.getOptionsFromArguments = function(args) {
         renderer: null
     };
 
-    _.each(args, function(arg) {
+    _.forEach(args, function (arg) {
         if (arg) {
             if (arg.isRenderer) {
                 options.renderer = arg;

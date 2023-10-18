@@ -18,40 +18,40 @@
 import _ from 'lodash';
 
 var _formatters = {
-    boolean: function(value) {
+    boolean: function (value) {
         return value ? 'true' : 'false';
     },
-    integer: function(value) {
+    integer: function (value) {
         return value;
     },
-    float: function(value) {
+    float: function (value) {
         return value;
     },
-    string: function(value) {
+    string: function (value) {
         return value === '' ? 'NULL' : '"' + value + '"';
     },
-    point: function(value) {
+    point: function (value) {
         return '[' + value[0] + ', ' + value[1] + ']';
     },
-    pair: function(value) {
+    pair: function (value) {
         return '[' + value[0] + ', ' + value[1] + ']';
     },
-    directedPair: function(value) {
+    directedPair: function (value) {
         return '[' + value[0] + ', ' + value[1] + ']';
     },
-    duration: function(value) {
+    duration: function (value) {
         return value;
     },
-    file: function(value) {
+    file: function (value) {
         return 'binary data';
     },
-    uri: function(value) {
+    uri: function (value) {
         return value;
     },
-    intOrIdentifier: function(value) {
+    intOrIdentifier: function (value) {
         return value;
     },
-    identifier: function(value) {
+    identifier: function (value) {
         return value;
     }
 };
@@ -70,7 +70,7 @@ function printBase(value, withType) {
     withType = typeof withType !== 'undefined' ? withType : true;
 
     if (base) {
-        _.forIn(_formatters, function(formatter, baseType) {
+        _.forIn(_formatters, function (formatter, baseType) {
             if (base[baseType] !== undefined) {
                 print += withType ? '(' + baseType + ') ' : '';
                 print += formatter(base[baseType]);
@@ -97,13 +97,13 @@ function printList(value, withType) {
     withType = typeof withType !== 'undefined' ? withType : true;
 
     if (list) {
-        _.forIn(_formatters, function(formatter, baseType) {
+        _.forIn(_formatters, function (formatter, baseType) {
             if (list[baseType] !== undefined) {
                 print += withType ? '(' + baseType + ') ' : '';
 
                 print += '[';
 
-                _.each(list[baseType], function(value) {
+                _.forEach(list[baseType], function (value) {
                     print += formatter(value) + ', ';
                 });
 

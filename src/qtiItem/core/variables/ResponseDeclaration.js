@@ -21,7 +21,7 @@ import _ from 'lodash';
 
 var ResponseDeclaration = VariableDeclaration.extend({
     qtiClass: 'responseDeclaration',
-    init: function(serial, attributes) {
+    init: function (serial, attributes) {
         this._super(serial, attributes);
 
         //MATCH_CORRECT, MAP_RESPONSE, MAP_RESPONSE_POINT
@@ -37,31 +37,31 @@ var ResponseDeclaration = VariableDeclaration.extend({
         //tao internal usage:
         this.feedbackRules = {};
     },
-    getFeedbackRules: function() {
+    getFeedbackRules: function () {
         return _.values(this.feedbackRules);
     },
-    getComposingElements: function() {
+    getComposingElements: function () {
         var elts = this._super();
         elts = _.extend(elts, this.feedbackRules);
         return elts;
     },
-    toArray: function() {
+    toArray: function () {
         var arr = this._super();
         arr.howMatch = this.template;
         arr.correctResponses = this.correctResponse;
         arr.mapping = this.mapEntries;
         arr.mappingAttributes = this.mappingAttributes;
-        arr.feedbackRules = _.map(this.feedbackRules, function(rule) {
+        arr.feedbackRules = _.map(this.feedbackRules, function (rule) {
             return rule.toArray();
         });
         return arr;
     },
-    getInteraction: function() {
+    getInteraction: function () {
         var interaction = null;
         var responseId = this.id();
         var item = this.getRootElement();
         var interactions = item.getInteractions();
-        _.each(interactions, function(i) {
+        _.forEach(interactions, function (i) {
             if (i.attributes.responseIdentifier === responseId) {
                 interaction = i;
                 return false; //break
@@ -69,7 +69,7 @@ var ResponseDeclaration = VariableDeclaration.extend({
         });
         return interaction;
     },
-    isCardinality: function(cardinalities) {
+    isCardinality: function (cardinalities) {
         var comparison;
         if (_.isArray(cardinalities)) {
             comparison = cardinalities;

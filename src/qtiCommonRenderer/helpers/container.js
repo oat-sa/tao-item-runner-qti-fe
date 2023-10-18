@@ -29,14 +29,14 @@ let _$containerContext = $();
  * @param {QtiElement} element
  * @returns {String} the selector
  */
-const _getSelector = function(element) {
+const _getSelector = function (element) {
     const serial = element.getSerial();
-    let selector = `[data-serial=${  serial  }]`;
+    let selector = `[data-serial=${serial}]`;
 
     if (Element.isA(element, 'choice')) {
-        selector = `.qti-choice${  selector}`;
+        selector = `.qti-choice${selector}`;
     } else if (Element.isA(element, 'interaction')) {
-        selector = `.qti-interaction${  selector}`;
+        selector = `.qti-interaction${selector}`;
     }
 
     return selector;
@@ -60,7 +60,7 @@ const containerHelper = {
      * @returns {jQueryElement}
      */
     getContext() {
-        return  _$containerContext;
+        return _$containerContext;
     },
 
     /**
@@ -139,7 +139,7 @@ const containerHelper = {
      * @param {jQueryElement} $container
      */
     targetBlank($container) {
-        $container.on('click', 'a', function(e) {
+        $container.on('click', 'a', function (e) {
             e.preventDefault();
             const href = $(this).attr('href');
             if (href && href.match(/^http/i)) {
