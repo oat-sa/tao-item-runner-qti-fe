@@ -134,7 +134,10 @@ const render = function (interaction) {
         choiceSelector = `${$choiceArea.selector} >li:not(.deactivated)`,
         resultSelector = `${$resultArea.selector} >li`,
         $dragContainer = $container.find('.drag-container'),
-        orientation = (interaction.attr('orientation') && orientationSelectionEnabled) ? interaction.attr('orientation') : 'vertical';
+        orientation =
+            interaction.attr('orientation') && orientationSelectionEnabled
+                ? interaction.attr('orientation')
+                : 'vertical';
 
     let $activeChoice = null,
         scaleX,
@@ -556,7 +559,7 @@ const setResponse = function (interaction, response) {
         resetResponse(interaction);
     } else {
         try {
-            _.each(pciResponse.unserialize(response, interaction), function (identifier) {
+            _.forEach(pciResponse.unserialize(response, interaction), function (identifier) {
                 $resultArea.append($choiceArea.find(`[data-identifier="${identifier}"]`));
             });
         } catch (e) {

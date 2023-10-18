@@ -33,19 +33,13 @@ import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
  * @exports taoQtiItem/scoring/processor/expressions/mapResponse
  */
 var mapResponseProcessor = {
-
     /**
      * Process the expression
      * @returns {ProcessingValue} the value from the expression
      */
-    process: function() {
-
+    process: function () {
         var self = this;
-        var mapEntries,
-            mapResult,
-            defaultValue,
-            lowerBound,
-            upperBound;
+        var mapEntries, mapResult, defaultValue, lowerBound, upperBound;
         var identifier = this.expression.attributes.identifier;
         var variable = this.state[identifier];
         var result = {
@@ -58,14 +52,17 @@ var mapResponseProcessor = {
         }
 
         if (variable === null || typeof variable.mapping === 'undefined' || variable.mapping.qtiClass !== 'mapping') {
-            return errorHandler.throw('scoring', new Error('The variable ' + identifier + ' has no mapping, how can I execute a mapResponse on it?'));
+            return errorHandler.throw(
+                'scoring',
+                new Error('The variable ' + identifier + ' has no mapping, how can I execute a mapResponse on it?')
+            );
         }
 
         //cast the variable value
         variable = this.preProcessor.parseVariable(variable);
 
         //cast each map value
-        mapEntries = _.map(variable.mapping.mapEntries, function(mapEntry) {
+        mapEntries = _.map(variable.mapping.mapEntries, function (mapEntry) {
             mapEntry.mapKey = self.preProcessor.parseValue(mapEntry.mapKey, variable.baseType, 'single');
             return mapEntry;
         });
@@ -81,39 +78,34 @@ var mapResponseProcessor = {
 
         //resolve the mapping
         if (variable.cardinality === 'single') {
-
             //find the map entry that matches with the value
-            mapResult = _.find(mapEntries, function(mapEntry) {
+            mapResult = _.find(mapEntries, function (mapEntry) {
                 if (variable.baseType === 'string' && mapEntry.attributes.caseSensitive === false) {
                     return _.isEqual(mapEntry.mapKey.toLowerCase(), variable.value.toLowerCase());
                 }
                 return _.isEqual(mapEntry.mapKey, variable.value);
             });
 
-            if (mapResult !== undefined) {
+            if (typeof mapResult !== 'undefined') {
                 result.value = parseFloat(mapResult.mapValue);
             }
-
         } else if (variable.cardinality === 'multiple' || variable.cardinality === 'ordered') {
-
             //get the entries that matches and sum their values
             mapResult = _(mapEntries)
-                .filter(function(mapEntry) {
-                    var found;
+                .filter(function (mapEntry) {
                     if (variable.baseType === 'string' && mapEntry.attributes.caseSensitive === false) {
-                        return _.contains(_.invoke(variable.value, 'toLowerCase'), mapEntry.mapKey.toLowerCase());
+                        return variable.value.map(val => val.toLowerCase()).includes(mapEntry.mapKey.toLowerCase());
                     }
                     if (_.isArray(mapEntry.mapKey)) {
-                        found = _.find(variable.value, mapEntry.mapKey);
-                        return found && found.length > 0;
+                        return variable.value.find(val => val.join(' ') === mapEntry.mapKey.join(' '));
                     }
-                    return _.contains(variable.value, mapEntry.mapKey);
+                    return variable.value && variable.value.includes(mapEntry.mapKey);
                 })
-                .reduce(function(sum, mapEntry) {
+                .reduce(function (sum, mapEntry) {
                     return sum + parseFloat(mapEntry.mapValue);
                 }, 0);
 
-            if (mapResult !== undefined) {
+            if (typeof mapResult !== 'undefined') {
                 result.value = mapResult;
             }
         }

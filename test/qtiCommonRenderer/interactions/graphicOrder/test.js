@@ -3,7 +3,7 @@ define([
     'taoQtiItem/runner/qtiItemRunner',
     'core/mouseEvent',
     'ui/interactUtils',
-    'json!taoQtiItem/test/qtiCommonRenderer/interactions/GraphicOrder/sample.json'
+    'json!taoQtiItem/test/qtiCommonRenderer/interactions/graphicOrder/sample.json'
 ], function($, qtiItemRunner, triggerMouseEvent, interactUtils, graphicOrderData) {
     'use strict';
     var runner;

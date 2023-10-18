@@ -142,7 +142,7 @@ function parseFigure($elt, elt, options) {
         elements: {}
     };
 
-    const $parsedFigure= parseContainer($elt, options);
+    const $parsedFigure = parseContainer($elt, options);
     elt.body.body = $parsedFigure.body;
     elt.body.elements = $parsedFigure.elements;
     const $figcaption = $elt.find(_getElementSelector('figcaption', options.ns.figcaption));
@@ -222,7 +222,7 @@ function parseContainer($container, options) {
         }
     });
 
-    _.each(_parsableElements, function (qtiClass) {
+    _.forEach(_parsableElements, function (qtiClass) {
         $container.find(qtiClass).each(function () {
             const $qtiElement = $(this);
             const element = buildElement($qtiElement, options);

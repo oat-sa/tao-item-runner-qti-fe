@@ -43,10 +43,10 @@ var instructionManager = {
      * @param {QtiElement} element - a QTI element like an interaction or a choice
      * @param {Object} [data] - any data to give to the instructions
      */
-    validateInstructions: function(element, data) {
+    validateInstructions: function (element, data) {
         var serial = element.getSerial();
         if (_instructions[serial]) {
-            _.each(_instructions[serial], function(instruction) {
+            _.forEach(_instructions[serial], function (instruction) {
                 instruction.validate(data || {});
             });
         }
@@ -59,7 +59,7 @@ var instructionManager = {
      * @param {Function} validateCallback - how to validate the instruction
      * @returns {Instruction} the created instruction
      */
-    appendInstruction: function(element, message, validateCallback) {
+    appendInstruction: function (element, message, validateCallback) {
         var serial = element.getSerial(),
             instruction = new Instruction(element, message, validateCallback);
 
@@ -77,22 +77,19 @@ var instructionManager = {
      * Remove instructions from an element
      * @param {QtiElement} element - a QTI element like an interaction or a choice
      */
-    removeInstructions: function(element) {
+    removeInstructions: function (element) {
         _instructions[element.getSerial()] = {};
-        containerHelper
-            .get(element)
-            .find('.instruction-container')
-            .empty();
+        containerHelper.get(element).find('.instruction-container').empty();
     },
 
     /**
      * Reset the instructions states for an element (but keeps configuration)
      * @param {Object} element - the qti object, ie. interaction, choice, etc.
      */
-    resetInstructions: function(element) {
+    resetInstructions: function (element) {
         var serial = element.getSerial();
         if (_instructions[serial]) {
-            _.each(_instructions[serial], function(instruction) {
+            _.forEach(_instructions[serial], function (instruction) {
                 instruction.reset();
             });
         }
@@ -108,7 +105,7 @@ var instructionManager = {
      * @param {Function} options.getResponse - a ref to a function that get the raw response (array) from the interaction in parameter
      * @param {Function} [options.onError] - called by once an error occurs with validateInstruction data in parameters
      */
-    minMaxChoiceInstructions: function(interaction, options) {
+    minMaxChoiceInstructions: function (interaction, options) {
         var self = this,
             min = options.min || 0,
             max = options.max || 0,
@@ -131,7 +128,7 @@ var instructionManager = {
                         ? __('You must select exactly %d choice', max)
                         : __('You must select exactly %d choices', max);
 
-                self.appendInstruction(interaction, msg, function(data) {
+                self.appendInstruction(interaction, msg, function (data) {
                     if (getResponse(interaction).length >= max) {
                         this.setLevel('success');
                         if (this.checkState('fulfilled')) {
@@ -139,10 +136,10 @@ var instructionManager = {
                                 level: 'warning',
                                 message: __('Maximum choices reached'),
                                 timeout: 2000,
-                                start: function() {
+                                start: function () {
                                     onError(data);
                                 },
-                                stop: function() {
+                                stop: function () {
                                     this.update({ level: 'success', message: msg });
                                 }
                             });
@@ -157,7 +154,7 @@ var instructionManager = {
                     max <= 1
                         ? __('You can select maximum %d choice', max)
                         : __('You can select maximum %d choices', max);
-                self.appendInstruction(interaction, msg, function(data) {
+                self.appendInstruction(interaction, msg, function (data) {
                     if (getResponse(interaction).length >= max) {
                         this.setLevel('success');
                         this.setMessage(__('Maximum choices reached'));
@@ -165,10 +162,10 @@ var instructionManager = {
                             this.update({
                                 level: 'warning',
                                 timeout: 2000,
-                                start: function() {
+                                start: function () {
                                     onError(data);
                                 },
-                                stop: function() {
+                                stop: function () {
                                     this.setLevel('info');
                                 }
                             });
@@ -187,7 +184,7 @@ var instructionManager = {
                 min <= 1
                     ? __('You must select at least %d choice', min)
                     : __('You must select at least %d choices', min);
-            self.appendInstruction(interaction, msg, function() {
+            self.appendInstruction(interaction, msg, function () {
                 if (getResponse(interaction).length >= min) {
                     this.setLevel('success');
                 } else {
@@ -204,7 +201,7 @@ var instructionManager = {
      * @param {String} message - the message to give to display
      * @param {String} [level = 'info'] - the notification level in info, success, error or warning
      */
-    appendNotification: function(element, message, level) {
+    appendNotification: function (element, message, level) {
         level = level || 'info';
 
         if (Instruction.isValidLevel(level)) {
@@ -218,7 +215,7 @@ var instructionManager = {
             );
 
             var $notif = $container.find('.item-notification:first');
-            var _remove = function() {
+            var _remove = function () {
                 $notif.fadeOut();
             };
 
@@ -233,11 +230,8 @@ var instructionManager = {
      * Removes all the displayed notifications
      * @deprecated in favor of instructions
      */
-    removeNotifications: function(element) {
-        containerHelper
-            .get(element)
-            .find('.item-notification')
-            .remove();
+    removeNotifications: function (element) {
+        containerHelper.get(element).find('.item-notification').remove();
     }
 };
 export default instructionManager;

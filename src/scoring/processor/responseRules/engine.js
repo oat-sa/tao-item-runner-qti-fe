@@ -37,16 +37,14 @@ var supportedRules = _.keys(rules);
  * @returns {Object} the rule engine that expose an execute method
  */
 var ruleEngineFactory = function ruleEngineFactory(state) {
-
     return {
-
         /**
          * Check if rule is supported by the engine
          * @param {string} rule
          * @returns {Boolean}
          */
         isRuleSupported: function isRuleSupported(rule) {
-            return _.contains(supportedRules, rule.qtiClass);
+            return supportedRules.includes(rule.qtiClass);
         },
 
         /**
@@ -54,22 +52,18 @@ var ruleEngineFactory = function ruleEngineFactory(state) {
          * @param {Array<Object>} rules - the rules to process
          * @returns {Object} the modified state (it may not be necessary as the ref is modified)
          */
-        execute: function(rules) {
+        execute: function (rules) {
             if (rules) {
                 if (!_.isArray(rules)) {
                     rules = [rules];
                 }
 
                 _.forEach(rules, function processRule(rule) {
-
-                    var currentRule,
-                        currentProcessor,
-                        processResult;
+                    var currentRule, currentProcessor, processResult;
                     var trail = [rule];
 
                     //TODO remove the limit and add a timeout
                     while (trail.length > 0) {
-
                         currentRule = trail.pop();
 
                         //process response rule
@@ -94,7 +88,7 @@ var ruleEngineFactory = function ruleEngineFactory(state) {
 };
 
 //register rules processors
-_.forEach(rules, function(rule, name) {
+_.forEach(rules, function (rule, name) {
     processorFactory.register(name, rule);
 });
 

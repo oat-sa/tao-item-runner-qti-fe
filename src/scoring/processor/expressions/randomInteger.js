@@ -32,17 +32,18 @@ import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
  * @exports taoQtiItem/scoring/processor/expressions/randomInteger
  */
 var randomIntegerProcessor = {
-
     /**
      * Process the expression
      * @returns {ProcessingValue} the value from the expression
      */
-    process: function() {
-
+    process: function () {
         var range;
         var min = this.preProcessor.parseValue(this.expression.attributes.min, 'integerOrVariableRef');
         var max = this.preProcessor.parseValue(this.expression.attributes.max, 'integerOrVariableRef');
-        var step = typeof this.expression.attributes.step !== 'undefined' ? this.preProcessor.parseValue(this.expression.attributes.step, 'integerOrVariableRef') : 1;
+        var step =
+            typeof this.expression.attributes.step !== 'undefined'
+                ? this.preProcessor.parseValue(this.expression.attributes.step, 'integerOrVariableRef')
+                : 1;
 
         var result = {
             cardinality: 'single',
@@ -54,11 +55,17 @@ var randomIntegerProcessor = {
             min = 0;
         }
         if (_.isNaN(max) || !_.isFinite(max)) {
-            return errorHandler.throw('scoring', new Error('The max value of a randomInteger expresssion should be a finite integer.'));
+            return errorHandler.throw(
+                'scoring',
+                new Error('The max value of a randomInteger expresssion should be a finite integer.')
+            );
         }
 
         if (min > max) {
-            return errorHandler.throw('scoring', new Error('Come on! How am I supposed to generate a random number from a negative range : min > max'));
+            return errorHandler.throw(
+                'scoring',
+                new Error('Come on! How am I supposed to generate a random number from a negative range : min > max')
+            );
         }
 
         if (_.isNaN(step) || !_.isFinite(step)) {
@@ -68,7 +75,7 @@ var randomIntegerProcessor = {
         //get the random value
         if (step !== 1) {
             range = _.range(min, max, step);
-            if (!_.contains(range, max)) {
+            if (!range.includes(max)) {
                 range.push(max);
             }
             result.value = _.sample(range);

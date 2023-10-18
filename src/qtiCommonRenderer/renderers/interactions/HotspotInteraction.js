@@ -142,7 +142,7 @@ const setResponse = function (interaction, response) {
 
         if (_.isArray(responseValues)) {
             _.forEach(interaction.getChoices(), function (choice) {
-                if (_.contains(responseValues, choice.attributes.identifier)) {
+                if (responseValues.includes(choice.attributes.identifier)) {
                     const rElement = interaction.paper.getById(choice.serial);
                     if (rElement) {
                         rElement.active = true;

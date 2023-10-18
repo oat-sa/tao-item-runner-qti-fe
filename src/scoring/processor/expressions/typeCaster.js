@@ -81,9 +81,9 @@ function toString(value) {
  */
 function toDirectedPair(value) {
     if (_.isString(value) && value.indexOf(' ') > -1) {
-        return _.first(value.split(' '), 2);
+        return value.split(' ').slice(0, 2);
     }
-    return _.first(_.toArray(value), 2);
+    return _.toArray(value).slice(0, 2);
 }
 
 /**
@@ -164,7 +164,7 @@ function toStringOrVariableRef(value, state) {
  */
 function toPoint(value) {
     if (_.isString(value) && value.indexOf(' ') > -1) {
-        value = _.first(value.split(' '), 2);
+        value = value.split(' ').slice(0, 2);
     }
     if (_.isArray(value)) {
         return _.map(value, toInt);

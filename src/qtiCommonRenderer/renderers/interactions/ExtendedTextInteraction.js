@@ -42,8 +42,12 @@ import loggerFactory from 'core/logger';
  */
 const logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/ExtendedTextInteraction.js');
 
-const hideXhtmlConstraints = !features.isVisible('taoQtiItem/creator/interaction/extendedText/property/xhtmlConstraints');
-const hideXhtmlRecommendations = !features.isVisible('taoQtiItem/creator/interaction/extendedText/property/xhtmlRecommendations');
+const hideXhtmlConstraints = !features.isVisible(
+    'taoQtiItem/creator/interaction/extendedText/property/xhtmlConstraints'
+);
+const hideXhtmlRecommendations = !features.isVisible(
+    'taoQtiItem/creator/interaction/extendedText/property/xhtmlRecommendations'
+);
 
 /**
  * Init rendering, called after template injected into the DOM
@@ -88,12 +92,11 @@ function render(interaction) {
                 $el.attr('placeholder', placeholderText);
             }
             if (_getFormat(interaction) === 'xhtml') {
-
-                if(hideXhtmlConstraints && hideXhtmlRecommendations) {
+                if (hideXhtmlConstraints && hideXhtmlRecommendations) {
                     $container.find('.text-counter').hide();
                 }
 
-                if(hideXhtmlConstraints) {
+                if (hideXhtmlConstraints) {
                     limiter.enabled = false;
                 }
 
@@ -451,12 +454,13 @@ function inputLimiter(interaction) {
             let isComposing = false;
             let hasCompositionJustEnded = false;
 
-            const acceptKeyCode = keyCode => _.contains(ignoreKeyCodes, keyCode);
-            const emptyOrSpace = txt => txt && txt.trim() === '' || /\^s*$/.test(txt);
+            const acceptKeyCode = keyCode => ignoreKeyCodes.includes(keyCode);
+            const emptyOrSpace = txt => (txt && txt.trim() === '') || /\^s*$/.test(txt);
             const hasSpace = txt => /\s+/.test(txt);
             const getCharBefore = (str, pos) => str && str.substring(Math.max(0, pos - 1), pos);
             const getCharAfter = (str, pos) => str && str.substring(pos, pos + 1);
-            const noSpaceNode = node => node.type === ckEditor.NODE_TEXT || (!node.isBlockBoundary() && node.getName() !== 'br');
+            const noSpaceNode = node =>
+                node.type === ckEditor.NODE_TEXT || (!node.isBlockBoundary() && node.getName() !== 'br');
             const getPreviousNotEmptyNode = range => {
                 let node = range.getPreviousNode();
                 /**
@@ -469,7 +473,11 @@ function inputLimiter(interaction) {
                     if (previousSourceNode && previousSourceNode.type === ckEditor.NODE_TEXT) {
                         nodeElement = previousSourceNode.parentNode || previousSourceNode.$.parentNode;
                     }
-                    if (!nodeElement || !nodeElement.ownerDocument || !nodeElement.ownerDocument.body.contains(nodeElement)) {
+                    if (
+                        !nodeElement ||
+                        !nodeElement.ownerDocument ||
+                        !nodeElement.ownerDocument.body.contains(nodeElement)
+                    ) {
                         return null;
                     }
                     node = previousSourceNode;
@@ -484,7 +492,11 @@ function inputLimiter(interaction) {
                     if (nextSourceNode && nextSourceNode.type === ckEditor.NODE_TEXT) {
                         nodeElement = nextSourceNode.parentNode || nextSourceNode.$.parentNode;
                     }
-                    if (!nodeElement || !nodeElement.ownerDocument || !nodeElement.ownerDocument.body.contains(nodeElement)) {
+                    if (
+                        !nodeElement ||
+                        !nodeElement.ownerDocument ||
+                        !nodeElement.ownerDocument.body.contains(nodeElement)
+                    ) {
                         return null;
                     }
                     node = nextSourceNode;
@@ -606,8 +618,17 @@ function inputLimiter(interaction) {
                     //   AND the selection is empty,
                     //   AND the keystroke is not from the list of accepted codes,
                     //   AND the keystroke is not a space
-                    if ((!emptyOrSpace(left) && !emptyOrSpace(right) && !hasSpace(middle) && _.contains(spaceKeyCodes, keyCode)) ||
-                        (emptyOrSpace(left) && emptyOrSpace(right) && !middle && !acceptKeyCode(keyCode) && keyCode !== 32)) {
+                    if (
+                        (!emptyOrSpace(left) &&
+                            !emptyOrSpace(right) &&
+                            !hasSpace(middle) &&
+                            spaceKeyCodes.includes(keyCode)) ||
+                        (emptyOrSpace(left) &&
+                            emptyOrSpace(right) &&
+                            !middle &&
+                            !acceptKeyCode(keyCode) &&
+                            keyCode !== 32)
+                    ) {
                         return cancelEvent(e);
                     }
                 }
@@ -904,7 +925,7 @@ function _stripTags(str) {
  */
 function _getFormat(interaction) {
     const format = interaction.attr('format');
-    if (_.contains(['plain', 'xhtml', 'preformatted'], format)) {
+    if (['plain', 'xhtml', 'preformatted'].includes(format)) {
         return format;
     }
     return 'plain';

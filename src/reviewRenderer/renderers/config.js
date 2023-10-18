@@ -37,7 +37,8 @@ const assetManager = assetManagerFactory(
                 if (
                     itemThemes &&
                     url.path &&
-                    (url.path === itemThemes.base || _.contains(_.pluck(itemThemes.available, 'path'), url.path))
+                    (url.path === itemThemes.base ||
+                        (itemThemes.available && itemThemes.available.map(val => val.path).includes(url.path)))
                 ) {
                     return context.root_url + url.toString();
                 }
@@ -112,7 +113,7 @@ const locations = {
     'simpleAssociableChoice.associateInteraction':
         'taoQtiItem/qtiCommonRenderer/renderers/choices/SimpleAssociableChoice.AssociateInteraction',
     gapImg: 'taoQtiItem/qtiCommonRenderer/renderers/choices/GapImg',
-    endAttemptInteraction: 'taoQtiItem/qtiCommonRenderer/renderers/interactions/EndAttemptInteraction',
+    endAttemptInteraction: 'taoQtiItem/qtiCommonRenderer/renderers/interactions/EndAttemptInteraction'
 };
 
 export default {

@@ -47,7 +47,7 @@ var qtiPciCardinalities = {
 var stateToPci = function stateToPci(state) {
     var pciState = {};
 
-    _.forEach(state, function(variable, identifier) {
+    _.forEach(state, function (variable, identifier) {
         var pciCardinality = qtiPciCardinalities[variable.cardinality];
         var baseType = variable.baseType;
         if (pciCardinality) {
@@ -93,15 +93,14 @@ var stateToPci = function stateToPci(state) {
  */
 var pciRecordToVariable = function pciRecordToVariable(record) {
     var variableObject = {};
-    _.forEach(record, function(value) {
+    _.forEach(record, function (value) {
         var ret = {};
         var valueObject;
         if (value) {
-
             valueObject = value.base || value.list || null;
 
             if (valueObject) {
-                _.forOwn(valueObject, function(actualValue, baseType) {
+                _.forOwn(valueObject, function (actualValue, baseType) {
                     var cardinality = value.base ? 'single' : 'multiple';
                     ret = {
                         cardinality: cardinality,
@@ -132,7 +131,7 @@ var reFormatMapping = function reFormatMapping(response) {
             qtiClass: 'mapping',
             attributes: response.mappingAttributes
         };
-        mapping.mapEntries = _.map(response.mapping, function(value, key) {
+        mapping.mapEntries = _.map(response.mapping, function (value, key) {
             return {
                 qtiClass: 'mapEntry',
                 mapKey: key,
@@ -148,10 +147,13 @@ var reFormatMapping = function reFormatMapping(response) {
             qtiClass: 'areaMapping',
             attributes: response.mappingAttributes
         };
-        mapping.mapEntries = _.map(response.areaMapping, function(entry) {
-            return _.extend({
-                qtiClass: 'areaMapEntry'
-            }, entry);
+        mapping.mapEntries = _.map(response.areaMapping, function (entry) {
+            return _.extend(
+                {
+                    qtiClass: 'areaMapEntry'
+                },
+                entry
+            );
         });
     }
 
@@ -167,11 +169,10 @@ var reFormatMapping = function reFormatMapping(response) {
  * @throws {Error} when variable aren't declared correctly
  */
 var stateBuilder = function stateBuilder(responses, itemData) {
-
     var state = {};
 
     //load responses variables
-    _.forEach(itemData.responses, function(response) {
+    _.forEach(itemData.responses, function (response) {
         var responseValue;
         var identifier = response.attributes.identifier;
         var cardinality = response.attributes.cardinality;
@@ -180,7 +181,10 @@ var stateBuilder = function stateBuilder(responses, itemData) {
 
         if (state[identifier]) {
             //throw an error
-            return errorHandler.throw('scoring', new Error('Variable collision : the state already contains the response variable ' + identifier));
+            return errorHandler.throw(
+                'scoring',
+                new Error('Variable collision : the state already contains the response variable ' + identifier)
+            );
         }
 
         //load the declaration
@@ -192,7 +196,10 @@ var stateBuilder = function stateBuilder(responses, itemData) {
         };
 
         //support both old an new mapping format
-        if (response.mapping && (response.mapping.qtiClass === 'mapping' || response.mapping.qtiClass === 'areaMapping')) {
+        if (
+            response.mapping &&
+            (response.mapping.qtiClass === 'mapping' || response.mapping.qtiClass === 'areaMapping')
+        ) {
             state[identifier].mapping = response.mapping;
         } else {
             state[identifier].mapping = reFormatMapping(response);
@@ -205,7 +212,8 @@ var stateBuilder = function stateBuilder(responses, itemData) {
                 //is record cardinality
                 state[identifier].value = pciRecordToVariable(responseValue);
             } else if (_.isObject(responseValue)) {
-                state[identifier].value = (typeof responseValue[baseType] !== 'undefined') ? responseValue[baseType] : null;
+                state[identifier].value =
+                    typeof responseValue[baseType] !== 'undefined' ? responseValue[baseType] : null;
             } else {
                 state[identifier].value = null;
             }
@@ -213,17 +221,19 @@ var stateBuilder = function stateBuilder(responses, itemData) {
     });
 
     //load outcomes variables
-    _.forEach(itemData.outcomes, function(outcome) {
+    _.forEach(itemData.outcomes, function (outcome) {
         var identifier = outcome.attributes.identifier;
         var outcomeVariable;
         if (state[identifier]) {
             //throw an error
-            return errorHandler.throw('scoring', new Error('Variable collision : the state already contains the outcome variable ' + identifier));
+            return errorHandler.throw(
+                'scoring',
+                new Error('Variable collision : the state already contains the outcome variable ' + identifier)
+            );
         }
         outcomeVariable = {
             cardinality: outcome.attributes.cardinality,
-            baseType: outcome.attributes.baseType,
-
+            baseType: outcome.attributes.baseType
         };
         if (typeof outcome.defaultValue !== 'undefined') {
             outcomeVariable.defaultValue = outcome.defaultValue;
@@ -260,12 +270,12 @@ var loadCustomOperators = function loadCustomOperators(rules, done) {
                     return errorHandler.throw('scoring', new Error('Class must be specified for custom operator'));
                 }
             } else {
-                return _.each(e, getCustomOperatorsClasses);
+                return _.forEach(e, getCustomOperatorsClasses);
             }
         }
     };
 
-    _.each(supportedRules, getCustomOperatorsClasses);
+    _.forEach(supportedRules, getCustomOperatorsClasses);
 
     if (classes.length) {
         window.require(classes, done);
@@ -280,7 +290,6 @@ var loadCustomOperators = function loadCustomOperators(rules, done) {
  * @exports taoQtiItem/scoring/provider/qti
  */
 var qtiScoringProvider = {
-
     /**
      * Process the score from the response.
      *
@@ -306,7 +315,6 @@ var qtiScoringProvider = {
 
         //let's start
         if (itemData.responseProcessing) {
-
             loadCustomOperators(itemData.responseProcessing.responseRules, function executeEngine() {
                 //create a ruleEngine for the given state
 
@@ -316,12 +324,10 @@ var qtiScoringProvider = {
                 ruleEngine.execute(itemData.responseProcessing.responseRules);
                 done(stateToPci(state), state);
             });
-
         } else {
             errorHandler.throw('scoring', new Error('The item ' + itemData.identifier + ' has not responseProcessing'));
             done(stateToPci(state), state);
         }
-
     }
 };
 
