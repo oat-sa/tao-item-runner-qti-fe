@@ -38,13 +38,12 @@ var operators = _.keys(operatorProcessors);
  * @returns {Object} the expression engine
  */
 var expressionEngineFactory = function expressionEngineFactory(state) {
-
     var trail = [];
     var marker = [];
     var operands = [];
 
     var isMarked = function isMarked(expression) {
-        return _.contains(marker, expression);
+        return marker.includes(expression);
     };
 
     var mark = function mark(expression) {
@@ -52,38 +51,37 @@ var expressionEngineFactory = function expressionEngineFactory(state) {
     };
 
     var isOperator = function isOperator(expression) {
-        return _.contains(operators, expression.qtiClass);
+        return operators.includes(expression.qtiClass);
     };
 
     var pushSubExpressions = function pushSubExpressions(expression) {
-        _.forEach(expression.expressions, function(subExpression) {
+        _.forEach(expression.expressions, function (subExpression) {
             trail.push(subExpression);
         });
     };
 
     var popOperands = function popOperands(expression) {
-        var r = _.reduce(expression.expressions, function(result) {
-            if (operands.length) {
-                result.push(_.clone(operands.pop()));
-            }
-            return result;
-        }, []);
+        var r = _.reduce(
+            expression.expressions,
+            function (result) {
+                if (operands.length) {
+                    result.push(_.clone(operands.pop()));
+                }
+                return result;
+            },
+            []
+        );
         return r;
     };
 
     return {
-
         /**
          * Execute the engine on the given expression tree
          * @param {Object} expression - the expression to process
          * @returns {?ProcessingValue} the result of the expression evaluation in the form of a variable
          */
-        execute: function(expression) {
-
-            var currentExpression,
-                currentProcessor,
-
-                result;
+        execute: function (expression) {
+            var currentExpression, currentProcessor, result;
 
             var baseExpression = expression.qtiClass;
 
@@ -91,30 +89,24 @@ var expressionEngineFactory = function expressionEngineFactory(state) {
 
             //TODO remove the limit and add a timeout
             while (trail.length > 0) {
-
                 currentExpression = trail.pop();
                 currentProcessor = null;
 
                 if (!isMarked(currentExpression) && isOperator(currentExpression)) {
-
                     mark(currentExpression);
 
                     trail.push(currentExpression);
 
                     //reverse push sub expressions
                     pushSubExpressions(currentExpression);
-
                 } else if (isMarked(currentExpression)) {
-
                     // Operator, second pass. Process it.
                     currentProcessor = processorFactory(currentExpression, state, popOperands(currentExpression));
                     result = currentProcessor.process();
 
                     //add the result to the operand stack
                     operands.push(result);
-
                 } else {
-
                     // Simple expression, process it.
                     currentProcessor = processorFactory(currentExpression, state);
                     result = currentProcessor.process();
@@ -129,11 +121,11 @@ var expressionEngineFactory = function expressionEngineFactory(state) {
 };
 
 //register all processors
-_.forEach(expressionProcessors, function(expressionProcessor, nameWithSuffix) {
+_.forEach(expressionProcessors, function (expressionProcessor, nameWithSuffix) {
     const name = nameWithSuffix.replace(/Processor$/, '');
     processorFactory.register(name, processorFactory.types.EXPRESSION, expressionProcessor);
 });
-_.forEach(operatorProcessors, function(operatorProcessor, name) {
+_.forEach(operatorProcessors, function (operatorProcessor, name) {
     processorFactory.register(name, processorFactory.types.OPERATOR, operatorProcessor);
 });
 

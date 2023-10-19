@@ -22,7 +22,7 @@ import rendererConfig from 'taoQtiItem/qtiItem/helper/rendererConfig';
 
 var Container = Element.extend({
     qtiClass: '_container',
-    init: function(body) {
+    init: function (body) {
         this._super(); //generate serial, attributes array always empty
         if (body && typeof body !== 'string') {
             throw 'the body of a container must be a string';
@@ -30,7 +30,7 @@ var Container = Element.extend({
         this.bdy = body || '';
         this.elements = {};
     },
-    body: function(body) {
+    body: function (body) {
         if (typeof body === 'undefined') {
             return this.bdy;
         } else {
@@ -46,7 +46,7 @@ var Container = Element.extend({
             }
         }
     },
-    setElements: function(elements, body) {
+    setElements: function (elements, body) {
         var returnValue = false;
 
         for (var i in elements) {
@@ -75,10 +75,10 @@ var Container = Element.extend({
 
         return returnValue;
     },
-    setElement: function(element, body) {
+    setElement: function (element, body) {
         return this.setElements([element], body);
     },
-    removeElement: function(element) {
+    removeElement: function (element) {
         var serial = '';
         if (typeof element === 'string') {
             serial = element;
@@ -89,7 +89,7 @@ var Container = Element.extend({
         this.body(this.body().replace('{{' + serial + '}}', ''));
         return this;
     },
-    getElements: function(qtiClass) {
+    getElements: function (qtiClass) {
         var elts = {};
         if (typeof qtiClass === 'string') {
             for (var serial in this.elements) {
@@ -102,10 +102,10 @@ var Container = Element.extend({
         }
         return elts;
     },
-    getElement: function(serial) {
+    getElement: function (serial) {
         return this.elements[serial] ? this.elements[serial] : null;
     },
-    getComposingElements: function() {
+    getComposingElements: function () {
         var elements = this.getElements();
         var elts = {};
         for (var serial in elements) {
@@ -114,7 +114,7 @@ var Container = Element.extend({
         }
         return elts;
     },
-    render: function() {
+    render: function () {
         var args = rendererConfig.getOptionsFromArguments(arguments),
             renderer = args.renderer || this.getRenderer(),
             elementsData = [],
@@ -148,14 +148,14 @@ var Container = Element.extend({
             throw 'invalid qti renderer for qti container';
         }
     },
-    postRender: function(data, altClassName, renderer) {
+    postRender: function (data, altClassName, renderer) {
         renderer = renderer || this.getRenderer();
 
         var res = _(this.elements)
-            .filter(function(elt) {
+            .filter(function (elt) {
                 return typeof elt.postRender === 'function';
             })
-            .map(function(elt) {
+            .map(function (elt) {
                 return elt.postRender(data, '', renderer);
             })
             .flatten(true)
@@ -163,7 +163,7 @@ var Container = Element.extend({
             .concat(this._super(data, altClassName, renderer));
         return res;
     },
-    toArray: function() {
+    toArray: function () {
         var arr = {
             serial: this.serial,
             body: this.bdy,
@@ -176,13 +176,13 @@ var Container = Element.extend({
 
         return arr;
     },
-    find: function(serial, parent) {
+    find: function (serial, parent) {
         var found = null;
 
         if (this.elements[serial]) {
             found = { parent: parent || this, element: this.elements[serial], location: 'body' };
         } else {
-            _.each(this.elements, function(elt) {
+            _.forEach(this.elements, function (elt) {
                 found = elt.find(serial);
                 if (found) {
                     return false; //break loop
@@ -192,7 +192,7 @@ var Container = Element.extend({
 
         return found;
     },
-    isEmpty: function() {
+    isEmpty: function () {
         return !this.bdy;
     }
 });

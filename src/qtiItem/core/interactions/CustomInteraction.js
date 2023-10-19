@@ -12,7 +12,7 @@ var CustomInteraction = Interaction.extend({
     nsUriFragment: 'portableCustomInteraction',
     defaultMarkupNsName: 'html5',
     defaultMarkupNsUri: 'html5',
-    init: function(serial, attributes) {
+    init: function (serial, attributes) {
         this._super(serial, attributes);
 
         this.typeIdentifier = '';
@@ -27,10 +27,10 @@ var CustomInteraction = Interaction.extend({
 
         this.pciReadyCallbacks = [];
     },
-    is: function(qtiClass) {
+    is: function (qtiClass) {
         return qtiClass === 'customInteraction' || this._super(qtiClass);
     },
-    render: function() {
+    render: function () {
         var args = rendererConfig.getOptionsFromArguments(arguments),
             renderer = args.renderer || this.getRenderer(),
             defaultData = {
@@ -46,13 +46,13 @@ var CustomInteraction = Interaction.extend({
 
         return this._super(_.merge(defaultData, args.data), args.placeholder, args.subclass, renderer);
     },
-    toArray: function() {
+    toArray: function () {
         var arr = this._super();
         arr.markup = this.markup;
         arr.properties = this.properties;
         return arr;
     },
-    getMarkupNamespace: function() {
+    getMarkupNamespace: function () {
         if (this.markupNs && this.markupNs.name && this.markupNs.uri) {
             return _.clone(this.markupNs);
         } else {
@@ -69,13 +69,13 @@ var CustomInteraction = Interaction.extend({
 
         return {};
     },
-    setMarkupNamespace: function(name, uri) {
+    setMarkupNamespace: function (name, uri) {
         this.markupNs = {
             name: name,
             uri: uri
         };
     },
-    onPciReady: function(callback) {
+    onPciReady: function (callback) {
         this.pciReadyCallbacks.push(callback);
 
         if (this.data('pci')) {
@@ -83,12 +83,12 @@ var CustomInteraction = Interaction.extend({
             this.triggerPciReady();
         }
     },
-    triggerPciReady: function() {
+    triggerPciReady: function () {
         var _this = this,
             pci = this.data('pci');
 
         if (pci) {
-            _.each(this.pciReadyCallbacks, function(fn) {
+            _.forEach(this.pciReadyCallbacks, function (fn) {
                 fn.call(_this, pci);
             });
 
@@ -101,8 +101,8 @@ var CustomInteraction = Interaction.extend({
             throw 'cannot trigger pci ready when no pci is actually attached to the interaction';
         }
     },
-    onPci: function(event, callback) {
-        this.onPciReady(function(pci) {
+    onPci: function (event, callback) {
+        this.onPciReady(function (pci) {
             if (_.isFunction(pci.on)) {
                 pci.on(event, callback);
             } else {
@@ -111,8 +111,8 @@ var CustomInteraction = Interaction.extend({
         });
         return this;
     },
-    offPci: function(event) {
-        this.onPciReady(function(pci) {
+    offPci: function (event) {
+        this.onPciReady(function (pci) {
             if (_.isFunction(pci.off)) {
                 pci.off(event);
             } else {
@@ -121,8 +121,8 @@ var CustomInteraction = Interaction.extend({
         });
         return this;
     },
-    triggerPci: function(event, args) {
-        this.onPciReady(function(pci) {
+    triggerPci: function (event, args) {
+        this.onPciReady(function (pci) {
             if (_.isFunction(pci.off)) {
                 pci.trigger(event, args);
             } else {

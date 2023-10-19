@@ -7,12 +7,12 @@ define([
     'taoQtiItem/qtiCommonRenderer/helpers/container',
     'taoQtiItem/qtiRunner/modalFeedback/inlineRenderer',
     'json!taoQtiItem/test/samples/json/inlineModalFeedback.json'
-], function($, _, Element, QtiLoader, QtiRenderer, containerHelper, inlineRenderer, itemData) {
+], function ($, _, Element, QtiLoader, QtiRenderer, containerHelper, inlineRenderer, itemData) {
     var containerId = '#item-container';
     var item;
 
     QUnit.module('Modal Feedback rendering', {
-        afterEach: function(assert) {
+        afterEach: function (assert) {
             if (item instanceof Element) {
                 item.unset();
                 containerHelper.clear();
@@ -117,14 +117,14 @@ define([
         }
     ];
 
-    QUnit.cases.init(testCases).test('renders an item', function(testCase, assert) {
+    QUnit.cases.init(testCases).test('renders an item', function (testCase, assert) {
         var ready = assert.async();
 
         var renderer = new QtiRenderer({ baseUrl: './' });
 
-        new QtiLoader().loadItemData(itemData, function(_item) {
+        new QtiLoader().loadItemData(itemData, function (_item) {
             var loader = this;
-            renderer.load(function() {
+            renderer.load(function () {
                 var result, $result, count;
 
                 item = _item;
@@ -154,7 +154,7 @@ define([
 
                 //Render in dom
                 $(containerId).append($result);
-                count = inlineRenderer.showFeedbacks(item, loader, renderer, testCase.itemSession, _.noop, function() {
+                count = inlineRenderer.showFeedbacks(item, loader, renderer, testCase.itemSession, _.noop, function () {
                     var feedbacks;
 
                     ready();
@@ -178,7 +178,7 @@ define([
                     feedbacks = testCase.feedbacks.choice.concat(testCase.feedbacks.order, testCase.feedbacks.inline);
                     assert.equal(feedbacks.length, count, 'number of feedbacks matches');
 
-                    _.each(feedbacks, function(fb) {
+                    _.forEach(feedbacks, function (fb) {
                         var $feedback = $result.find('[data-identifier=' + fb.identifier + ']');
                         assert.equal($feedback.length, 1, 'found feedback dom element for ' + fb.identifier);
                         if (fb.style) {
@@ -198,14 +198,7 @@ define([
                             assert.equal($feedback.children('.qti-title').length, 0, 'no title');
                         }
                         assert.equal($feedback.find('.modal-body').length, 1, 'feedback body found');
-                        assert.equal(
-                            $feedback
-                                .find('.modal-body')
-                                .text()
-                                .trim(),
-                            fb.text,
-                            'feedback body found'
-                        );
+                        assert.equal($feedback.find('.modal-body').text().trim(), fb.text, 'feedback body found');
                     });
                 });
             }, loader.getLoadedClasses());

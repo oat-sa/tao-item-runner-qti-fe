@@ -4,7 +4,7 @@ import _ from 'lodash';
 function EventMgr() {
     var events = {};
 
-    this.get = function(event) {
+    this.get = function (event) {
         if (event && events[event]) {
             return _.clone(events[event]);
         } else {
@@ -12,7 +12,7 @@ function EventMgr() {
         }
     };
 
-    this.on = function(event, callback) {
+    this.on = function (event, callback) {
         var tokens = event.split('.');
         if (tokens[0]) {
             var name = tokens.shift();
@@ -24,15 +24,15 @@ function EventMgr() {
         }
     };
 
-    this.off = function(event) {
+    this.off = function (event) {
         if (event && events[event]) {
             events[event] = [];
         }
     };
 
-    this.trigger = function(event, data) {
+    this.trigger = function (event, data) {
         if (events[event]) {
-            _.each(events[event], function(e) {
+            _.forEach(events[event], function (e) {
                 //@todo check ns:
                 e.callback.apply(
                     {

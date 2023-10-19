@@ -51,7 +51,7 @@ export default {
         if (scoreOutcome && item.responseProcessing && item.responseProcessing.processingType === 'templateDriven') {
             normalMaximum = _.reduce(
                 item.getInteractions(),
-                function(acc, interaction) {
+                function (acc, interaction) {
                     var interactionMaxScore = interaction.getNormalMaximum();
                     if (_.isNumber(interactionMaxScore)) {
                         return gamp.add(acc, interactionMaxScore);
@@ -85,7 +85,7 @@ export default {
         if (scoreOutcome && item.responseProcessing && item.responseProcessing.processingType === 'templateDriven') {
             maxScore = _.reduce(
                 item.getInteractions(),
-                function(acc, interaction) {
+                function (acc, interaction) {
                     var interactionMaxScore = interaction.getNormalMaximum();
                     if (_.isNumber(interactionMaxScore)) {
                         return gamp.add(acc, interactionMaxScore);
@@ -97,12 +97,12 @@ export default {
                 0
             );
 
-            customOutcomes = _(item.getOutcomes()).filter(function(outcome) {
+            customOutcomes = _(item.getOutcomes()).filter(function (outcome) {
                 return outcome.id() !== 'SCORE' && outcome.id() !== 'MAXSCORE';
             });
 
             if (customOutcomes.size()) {
-                maxScore = customOutcomes.reduce(function(acc, outcome) {
+                maxScore = customOutcomes.reduce(function (acc, outcome) {
                     return gamp.add(acc, parseFloat(outcome.attr('normalMaximum') || 0));
                 }, maxScore);
             }
@@ -124,9 +124,9 @@ export default {
             }
 
             //handle special case when MAXSCORE is set up manually for some interaction like ExtendedText
-            if(hasInvalidInteraction && maxScoreOutcome) {
-                if(maxScoreOutcome.attributes && maxScoreOutcome.attributes.externalScored) {
-                    if(_.isUndefined(maxScoreOutcome.defaultValue)) {
+            if (hasInvalidInteraction && maxScoreOutcome) {
+                if (maxScoreOutcome.attributes && maxScoreOutcome.attributes.externalScored) {
+                    if (_.isUndefined(maxScoreOutcome.defaultValue)) {
                         maxScoreOutcome.setDefaultValue(1);
                     }
                 } else {
@@ -143,7 +143,7 @@ export default {
      */
     getMatchMaxOrderedChoices: function getMatchMaxOrderedChoices(choiceCollection) {
         return _(choiceCollection)
-            .map(function(choice) {
+            .map(function (choice) {
                 var matchMax = parseInt(choice.attr('matchMax'), 10);
                 if (_.isNaN(matchMax)) {
                     matchMax = 0;
@@ -213,36 +213,38 @@ export default {
 
             //sort the score map entries by the score
             scoreMaps = _.values(responseDeclaration.mapEntries);
+
             sortedMapEntries = _(scoreMaps)
-                .map(function(v) {
+                .map(function (v) {
                     return parseFloat(v);
                 })
                 .sortBy()
                 .reverse()
-                .first(totalAnswerableResponse);
+                .valueOf()
+                .slice(0, totalAnswerableResponse);
 
             //if there is not enough map defined, compared to the minChoice constraint, fill in the rest of required choices with the default map
-            missingMapsCount = minChoice - sortedMapEntries.size();
-            _.times(missingMapsCount, function() {
+            missingMapsCount = minChoice - sortedMapEntries.length;
+            _.times(missingMapsCount, function () {
                 sortedMapEntries.push(mapDefault);
             });
 
             //if the map default is positive, the optimal strategy involves using as much mapDefault as possible
             if (mapDefault && mapDefault > 0) {
                 if (maxChoice) {
-                    missingMapsCount = maxChoice - sortedMapEntries.size();
+                    missingMapsCount = maxChoice - sortedMapEntries.length;
                 } else {
-                    missingMapsCount = _.size(interaction.getChoices()) - sortedMapEntries.size();
+                    missingMapsCount = _.size(interaction.getChoices()) - sortedMapEntries.length;
                 }
                 if (missingMapsCount > 0) {
-                    _.times(missingMapsCount, function() {
+                    _.times(missingMapsCount, function () {
                         sortedMapEntries.push(mapDefault);
                     });
                 }
             }
 
             //calculate the maximum reachable score by choice map
-            max = sortedMapEntries.reduce(function(acc, v) {
+            max = sortedMapEntries.reduce(function (acc, v) {
                 var score = v;
                 if (score < 0 && requiredChoiceCount <= 0) {
                     //if the score is negative check if we have the choice not to pick it
@@ -282,7 +284,8 @@ export default {
         if (template === 'MATCH_CORRECT') {
             if (
                 (_.isArray(responseDeclaration.correctResponse) &&
-                    (maxChoice && responseDeclaration.correctResponse.length > maxChoice)) ||
+                    maxChoice &&
+                    responseDeclaration.correctResponse.length > maxChoice) ||
                 (minChoice && responseDeclaration.correctResponse.length < minChoice)
             ) {
                 //max choice does not enable selecting the correct responses
@@ -345,7 +348,7 @@ export default {
 
                 //get the list of choices used in map entries
                 choicesIdentifiers = [];
-                _.forEach(responseDeclaration.correctResponse, function(pair) {
+                _.forEach(responseDeclaration.correctResponse, function (pair) {
                     var choices;
                     if (!_.isString(pair)) {
                         return;
@@ -358,7 +361,7 @@ export default {
                 });
 
                 //check if the choices usage are possible within the constraint defined in the interaction
-                _.forEach(_.countBy(choicesIdentifiers), function(count, identifier) {
+                _.forEach(_.countBy(choicesIdentifiers), function (count, identifier) {
                     var matchMax;
                     var choice = interaction.getChoiceByIdentifier(identifier);
                     if (!choice) {
@@ -384,7 +387,7 @@ export default {
 
             allPossibleMapEntries = _.clone(responseDeclaration.mapEntries);
             if (mapDefault && mapDefault > 0) {
-                _.forEachRight(options.possiblePairs, function(pair) {
+                _.forEachRight(options.possiblePairs, function (pair) {
                     if (!pairExists(allPossibleMapEntries, pair)) {
                         allPossibleMapEntries[pair[0] + ' ' + pair[1]] = mapDefault;
                     }
@@ -393,7 +396,7 @@ export default {
 
             //get the sorted list of mapentries ordered by the score
             sortedMapEntries = _(allPossibleMapEntries)
-                .map(function(score, pair) {
+                .map(function (score, pair) {
                     return {
                         score: parseFloat(score),
                         pair: pair
@@ -401,7 +404,7 @@ export default {
                 })
                 .sortBy('score')
                 .reverse()
-                .filter(function(mapEntry) {
+                .filter(function (mapEntry) {
                     var pair = mapEntry.pair;
                     var choices, choiceId, choice, _usedChoices;
 
@@ -457,7 +460,8 @@ export default {
                         return false;
                     }
                 })
-                .first(totalAnswerableResponse);
+                .valueOf()
+                .slice(0, totalAnswerableResponse);
 
             //infinite score => no normalMaximum should be generated for it
             if (infiniteScoringPair) {
@@ -465,7 +469,7 @@ export default {
             }
 
             //reduce the ordered list of map entries to calculate the max score
-            max = sortedMapEntries.reduce(function(acc, v) {
+            max = sortedMapEntries.reduce(function (acc, v) {
                 var score = v.score;
                 if (v.score < 0 && requiredAssoc <= 0) {
                     //if the score is negative check if we have the choice not to pick it
@@ -506,7 +510,7 @@ export default {
             allPossibleMapEntries;
         var getMatchMaxOrderedChoices = function getMatchMaxOrderedChoices(choiceCollection) {
             return _(choiceCollection)
-                .map(function(choice) {
+                .map(function (choice) {
                     return {
                         matchMax: choice.attr('matchMax') === 0 ? Infinity : choice.attr('matchMax') || 0,
                         id: choice.id()
@@ -522,8 +526,8 @@ export default {
             var matchSet1 = getMatchMaxOrderedChoices(gapMatchInteraction.getChoices());
             var matchSet2 = getMatchMaxOrderedChoices(gapMatchInteraction.getGaps());
 
-            _.forEach(matchSet1, function(choice1) {
-                _.forEach(matchSet2, function(choice2) {
+            _.forEach(matchSet1, function (choice1) {
+                _.forEach(matchSet2, function (choice2) {
                     pairs.push([choice1.id, choice2.id]);
                 });
             });
@@ -542,7 +546,7 @@ export default {
                 max = 1; //is possible until proven otherwise
                 group1 = [];
                 group2 = [];
-                _.forEach(responseDeclaration.correctResponse, function(pair) {
+                _.forEach(responseDeclaration.correctResponse, function (pair) {
                     var choices;
                     if (!_.isString(pair)) {
                         return;
@@ -554,7 +558,7 @@ export default {
                     }
                 });
 
-                _.forEach(_.countBy(group1), function(count, identifier) {
+                _.forEach(_.countBy(group1), function (count, identifier) {
                     var choice = interaction.getChoiceByIdentifier(identifier);
                     var matchMax = parseInt(choice.attr('matchMax'), 10);
                     if (matchMax && matchMax < count) {
@@ -563,7 +567,7 @@ export default {
                     }
                 });
 
-                _.forEach(_.countBy(group2), function(count) {
+                _.forEach(_.countBy(group2), function (count) {
                     var matchMax = 1; //match max for a gap is always 1
                     if (matchMax && matchMax < count) {
                         max = 0;
@@ -584,7 +588,7 @@ export default {
 
             allPossibleMapEntries = _.clone(responseDeclaration.mapEntries);
             if (mapDefault && mapDefault > 0) {
-                _.forEachRight(calculatePossiblePairs(interaction), function(pair) {
+                _.forEachRight(calculatePossiblePairs(interaction), function (pair) {
                     if (!pairExists(allPossibleMapEntries, pair)) {
                         allPossibleMapEntries[pair[0] + ' ' + pair[1]] = mapDefault;
                     }
@@ -592,7 +596,7 @@ export default {
             }
 
             max = _(allPossibleMapEntries)
-                .map(function(score, pair) {
+                .map(function (score, pair) {
                     return {
                         score: parseFloat(score),
                         pair: pair
@@ -600,7 +604,7 @@ export default {
                 })
                 .sortBy('score')
                 .reverse()
-                .filter(function(mapEntry) {
+                .filter(function (mapEntry) {
                     var pair = mapEntry.pair;
                     var _usedChoices = _.cloneDeep(usedChoices);
                     var choices, choiceId, gapId, choice;
@@ -650,8 +654,9 @@ export default {
                         return false;
                     }
                 })
-                .first(totalAnswerableResponse)
-                .reduce(function(acc, v) {
+                .valueOf()
+                .slice(0, totalAnswerableResponse)
+                .reduce(function (acc, v) {
                     var score = v.score;
                     if (score >= 0) {
                         return acc + score;
@@ -696,13 +701,14 @@ export default {
             totalAnswerableResponse = maxChoice === 0 ? Infinity : maxChoice;
 
             max = _(responseDeclaration.mapEntries)
-                .map(function(v) {
+                .map(function (v) {
                     return parseFloat(v.mappedValue);
                 })
                 .sortBy()
                 .reverse()
-                .first(totalAnswerableResponse)
-                .reduce(function(acc, v) {
+                .valueOf()
+                .slice(0, totalAnswerableResponse)
+                .reduce(function (acc, v) {
                     if (v >= 0) {
                         return acc + v;
                     } else if (skippableWrongResponse > 0) {
@@ -751,7 +757,7 @@ export default {
             //calculate the maximum reachable score by choice map
             scoreMaps = _.values(responseDeclaration.mapEntries);
             max = _(scoreMaps)
-                .map(function(v) {
+                .map(function (v) {
                     return parseFloat(v);
                 })
                 .max();
@@ -810,12 +816,12 @@ export default {
 
             //calculate the maximum reachable score by choice map
             scoreMaps = _.values(
-                _.filter(responseDeclaration.mapEntries, function(score, key) {
+                _.filter(responseDeclaration.mapEntries, function (score, key) {
                     return isPossibleResponse(key);
                 })
             );
             max = _(scoreMaps)
-                .map(function(v) {
+                .map(function (v) {
                     return parseFloat(v);
                 })
                 .max();
@@ -841,10 +847,7 @@ export default {
         const template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
         let max;
         if (template === 'MATCH_CORRECT') {
-            if (
-                Array.isArray(responseDeclaration.correctResponse) &&
-                (responseDeclaration.correctResponse.length)
-            ) {
+            if (Array.isArray(responseDeclaration.correctResponse) && responseDeclaration.correctResponse.length) {
                 max = 1;
             } else {
                 max = 0;
@@ -855,10 +858,9 @@ export default {
                 return 0;
             }
 
-            const values = _.values(responseDeclaration.mapEntries)
-                .map(function(v) {
-                    return parseFloat(v);
-                });
+            const values = _.values(responseDeclaration.mapEntries).map(function (v) {
+                return parseFloat(v);
+            });
             max = _.max(values);
 
             //compare the calculated maximum with the mapping upperbound

@@ -99,7 +99,7 @@ const render = interaction => {
  */
 const _getFormat = interaction => {
     const format = interaction.attr('format');
-    if (_.contains(['plain', 'xhtml', 'preformatted'], format)) {
+    if (['plain', 'xhtml', 'preformatted'].includes(format)) {
         return format;
     }
     return 'plain';

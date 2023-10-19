@@ -32,12 +32,23 @@ import errorHandler from 'taoQtiItem/scoring/processor/errorHandler';
  * @exports taoQtiItem/scoring/processor/expressions/operators/contains
  */
 var containsProcessor = {
-
     constraints: {
         minOperand: 2,
         maxOperand: 2,
         cardinality: ['multiple', 'ordered'],
-        baseType: ['identifier', 'boolean', 'integer', 'float', 'string', 'point', 'pair', 'directedPair', 'file', 'uri', 'intOrIdentifier']
+        baseType: [
+            'identifier',
+            'boolean',
+            'integer',
+            'float',
+            'string',
+            'point',
+            'pair',
+            'directedPair',
+            'file',
+            'uri',
+            'intOrIdentifier'
+        ]
     },
 
     operands: [],
@@ -45,8 +56,7 @@ var containsProcessor = {
     /**
      * @returns {?ProcessingValue} a single boolean
      */
-    process: function() {
-
+    process: function () {
         var result = {
             cardinality: 'single',
             baseType: 'boolean'
@@ -70,7 +80,7 @@ var containsProcessor = {
         op1 = _.flatten(this.preProcessor.parseVariable(this.operands[0]).value).join();
         op2 = _.flatten(this.preProcessor.parseVariable(this.operands[1]).value).join();
 
-        result.value = _.contains(op1, op2);
+        result.value = op1.includes(op2);
 
         return result;
     }

@@ -96,7 +96,7 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
         .path(graphic._style.close.path)
         .attr(graphic._style.close)
         .transform('T' + (midPath.x - 9) + ',' + (midPath.y - 9))
-        .attr('title', _('Click again to remove'))
+        .attr('title', __('Click again to remove'))
         .toBack();
 
     //the path is below the shapes
@@ -108,7 +108,9 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     interaction._vsets.push(vset);
 
     //to identify the element of the set outside the context
-    _.invoke(vset, 'data', 'assoc-path', true);
+    vset.forEach(el => {
+        el.data('assoc-path', true);
+    });
 
     //enable to select the path by clicking the invisible layer
     layer.click(function selectLigne() {
@@ -145,7 +147,7 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
 
     //remove set handler
     function removeSet() {
-        _.invoke(vset, 'remove');
+        vset.forEach(item => item.remove());
         interaction._vsets = _.without(interaction._vsets, vset);
         if (typeof onRemove === 'function') {
             onRemove();
@@ -180,14 +182,14 @@ const _shapesSelectable = function _shapesSelectable(interaction, active) {
 
     //update the shape state
     _.forEach(choices, function (choice) {
-        if (!_.contains(assocs, choice.id())) {
+        if (!assocs.includes(choice.id())) {
             const element = interaction.paper.getById(choice.serial);
             const assocsElement = element.data('assocs') || [];
             if (
                 !element.active &&
                 element.id !== active.id &&
                 _isMatchable(element, active) &&
-                !_.contains(assocsElement, activeChoice.id())
+                !assocsElement.includes(activeChoice.id())
             ) {
                 element.selectable = true;
                 graphic.updateElementState(element, 'selectable');
@@ -424,7 +426,6 @@ const setResponse = function (interaction, response) {
  */
 const resetResponse = function resetResponse(interaction) {
     const toRemove = [];
-
     //reset response and state bound to shapes
     _.forEach(interaction.getChoices(), function (choice) {
         const element = interaction.paper.getById(choice.serial);
@@ -445,7 +446,7 @@ const resetResponse = function resetResponse(interaction) {
             }
         });
     }
-    _.invoke(toRemove, 'remove');
+    toRemove.forEach(el => el.remove());
 };
 
 /**

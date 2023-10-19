@@ -4,19 +4,19 @@ import rendererConfig from 'taoQtiItem/qtiItem/helper/rendererConfig';
 import util from 'taoQtiItem/qtiItem/helper/util';
 
 var QtiInteraction = Element.extend({
-    init: function(serial, attributes) {
+    init: function (serial, attributes) {
         this._super(serial, attributes);
         this.choices = {};
     },
-    is: function(qtiClass) {
+    is: function (qtiClass) {
         return qtiClass === 'interaction' || this._super(qtiClass);
     },
-    addChoice: function(choice) {
+    addChoice: function (choice) {
         choice.setRootElement(this.getRootElement() || null);
         this.choices[choice.getSerial()] = choice;
         return this;
     },
-    getChoices: function() {
+    getChoices: function () {
         var choices = {};
         for (var i in this.choices) {
             //prevent passing the whole array by ref
@@ -24,14 +24,14 @@ var QtiInteraction = Element.extend({
         }
         return choices;
     },
-    getChoice: function(serial) {
+    getChoice: function (serial) {
         var ret = null;
         if (this.choices[serial]) {
             ret = this.choices[serial];
         }
         return ret;
     },
-    getChoiceByIdentifier: function(identifier) {
+    getChoiceByIdentifier: function (identifier) {
         for (var i in this.choices) {
             if (this.choices[i].id() === identifier) {
                 return this.choices[i];
@@ -39,7 +39,7 @@ var QtiInteraction = Element.extend({
         }
         return null;
     },
-    getComposingElements: function() {
+    getComposingElements: function () {
         var elts = this._super();
         //recursive to choices:
         for (var serial in this.choices) {
@@ -50,14 +50,14 @@ var QtiInteraction = Element.extend({
         }
         return elts;
     },
-    find: function(serial) {
+    find: function (serial) {
         var found = this._super(serial);
         if (!found) {
             found = util.findInCollection(this, 'choices', serial);
         }
         return found;
     },
-    getResponseDeclaration: function() {
+    getResponseDeclaration: function () {
         var response = null;
         var responseId = this.attr('responseIdentifier');
         if (responseId) {
@@ -74,11 +74,11 @@ var QtiInteraction = Element.extend({
      * Render the interaction to the view.
      * The optional argument "subClass" allows distinguishing customInteraction: e.g. customInteraction.matrix, customInteraction.likertScale ...
      */
-    render: function() {
+    render: function () {
         var args = rendererConfig.getOptionsFromArguments(arguments),
             renderer = args.renderer || this.getRenderer(),
             defaultData = {
-                _type: this.qtiClass.replace(/([A-Z])/g, function($1) {
+                _type: this.qtiClass.replace(/([A-Z])/g, function ($1) {
                     return '_' + $1.toLowerCase();
                 }),
                 choices: [],
@@ -95,7 +95,7 @@ var QtiInteraction = Element.extend({
                 : this.getChoices();
         var interactionData = { interaction: { serial: this.serial, attributes: this.attributes } };
         var _this = this;
-        _.each(choices, function(choice) {
+        _.forEach(choices, function (choice) {
             if (Element.isA(choice, 'choice')) {
                 try {
                     var renderedChoice = choice.render(
@@ -115,21 +115,21 @@ var QtiInteraction = Element.extend({
 
         return this._super(_.merge(defaultData, args.data), args.placeholder, tplName, renderer);
     },
-    postRender: function(data, altClassName, renderer) {
+    postRender: function (data, altClassName, renderer) {
         var self = this;
         renderer = renderer || this.getRenderer();
 
         return _(this.getChoices())
-            .filter(function(elt) {
+            .filter(function (elt) {
                 return Element.isA(elt, 'choice');
             })
-            .map(function(choice) {
+            .map(function (choice) {
                 return choice.postRender({}, choice.qtiClass + '.' + self.qtiClass, renderer);
             })
             .value()
             .concat(this._super(data, altClassName, renderer));
     },
-    setResponse: function(values) {
+    setResponse: function (values) {
         var ret = null;
         var renderer = this.getRenderer();
         if (renderer) {
@@ -139,7 +139,7 @@ var QtiInteraction = Element.extend({
         }
         return ret;
     },
-    getResponse: function() {
+    getResponse: function () {
         var ret = null;
         var renderer = this.getRenderer();
         if (renderer) {
@@ -149,7 +149,7 @@ var QtiInteraction = Element.extend({
         }
         return ret;
     },
-    resetResponse: function() {
+    resetResponse: function () {
         var ret = null;
         var renderer = this.getRenderer();
         if (renderer) {
@@ -167,7 +167,7 @@ var QtiInteraction = Element.extend({
      * @returns {Object} the interaction's state
      * @throws {Error} if no renderer is found
      */
-    getState: function() {
+    getState: function () {
         var ret = null;
         var renderer = this.getRenderer();
         if (renderer) {
@@ -187,7 +187,7 @@ var QtiInteraction = Element.extend({
      * @param {Object} state - the interaction's state
      * @throws {Error} if no renderer is found
      */
-    setState: function(state) {
+    setState: function (state) {
         var renderer = this.getRenderer();
         if (renderer) {
             if (_.isFunction(renderer.setState)) {
@@ -205,14 +205,14 @@ var QtiInteraction = Element.extend({
      * @throws {Error} if no renderer is found
      * @returns {Promise?} the interaction destroy step can be async and can return an optional Promise
      */
-    clear: function() {
+    clear: function () {
         var renderer = this.getRenderer();
         if (renderer && _.isFunction(renderer.destroy)) {
             return renderer.destroy(this);
         }
     },
 
-    toArray: function() {
+    toArray: function () {
         var arr = this._super();
         arr.choices = {};
         for (var serial in this.choices) {
