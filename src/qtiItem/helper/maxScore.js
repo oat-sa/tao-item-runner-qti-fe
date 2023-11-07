@@ -261,6 +261,9 @@ export default {
         } else if (template === 'MAP_RESPONSE_POINT') {
             //map point response processing does not work on choice based interaction
             max = 0;
+        } else if (template === 'NONE') {
+            //get the normalMaximum from SCORE outcome
+            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
         }
         return max;
     },
