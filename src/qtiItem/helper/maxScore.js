@@ -82,29 +82,33 @@ export default {
             maxScoreOutcome;
 
         //try setting the computed normal maximum only if the processing type is known, i.e. 'templateDriven'
+        const externalScoredValues = ['human', 'externalMachine'];
         if (scoreOutcome && item.responseProcessing && item.responseProcessing.processingType === 'templateDriven') {
-            maxScore = _.reduce(
-                item.getInteractions(),
-                function (acc, interaction) {
-                    var interactionMaxScore = interaction.getNormalMaximum();
-                    if (_.isNumber(interactionMaxScore)) {
-                        return gamp.add(acc, interactionMaxScore);
-                    } else {
-                        hasInvalidInteraction = true;
-                        return acc;
-                    }
-                },
-                0
-            );
+            if (externalScoredValues.includes(scoreOutcome.attr('externalScored'))) {
+                maxScore = scoreOutcome.attr('normalMaximum') || 0;
+            } else {
+                maxScore = _.reduce(
+                    item.getInteractions(),
+                    function (acc, interaction) {
+                        var interactionMaxScore = interaction.getNormalMaximum();
+                        if (_.isNumber(interactionMaxScore)) {
+                            return gamp.add(acc, interactionMaxScore);
+                        } else {
+                            hasInvalidInteraction = true;
+                            return acc;
+                        }
+                    },
+                    0
+                );
+                customOutcomes = _(item.getOutcomes()).filter(function (outcome) {
+                    return outcome.id() !== 'SCORE' && outcome.id() !== 'MAXSCORE';
+                });
 
-            customOutcomes = _(item.getOutcomes()).filter(function (outcome) {
-                return outcome.id() !== 'SCORE' && outcome.id() !== 'MAXSCORE';
-            });
-
-            if (customOutcomes.size()) {
-                maxScore = customOutcomes.reduce(function (acc, outcome) {
-                    return gamp.add(acc, parseFloat(outcome.attr('normalMaximum') || 0));
-                }, maxScore);
+                if (customOutcomes.size()) {
+                    maxScore = customOutcomes.reduce(function (acc, outcome) {
+                        return gamp.add(acc, parseFloat(outcome.attr('normalMaximum') || 0));
+                    }, maxScore);
+                }
             }
 
             maxScoreOutcome = item.getOutcomeDeclaration('MAXSCORE');
@@ -491,7 +495,7 @@ export default {
             }
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = 0;
-        }  else if (template === 'NONE') {
+        } else if (template === 'NONE') {
             //get the normalMaximum from SCORE outcome because we don't have any choices selected
             max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
         }
@@ -685,7 +689,7 @@ export default {
             }
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = false;
-        }  else if (template === 'NONE') {
+        } else if (template === 'NONE') {
             //get the normalMaximum from SCORE outcome because we don't have any choices selected
             max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
         }
