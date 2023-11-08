@@ -63,7 +63,8 @@ define([
     'json!taoQtiItem/test/qtiItem/maxScore/data/gapmatch-map-matchmax.json',
     'json!taoQtiItem/test/qtiItem/maxScore/data/graphic-gap-infinite.json',
     'json!taoQtiItem/test/qtiItem/maxScore/data/graphic-associate-matchmax.json',
-    'json!taoQtiItem/test/qtiItem/maxScore/data/response-none.json'
+    'json!taoQtiItem/test/qtiItem/maxScore/data/response-none.json',
+    'json!taoQtiItem/test/qtiItem/maxScore/data/external-scored.json'
 ], function(
     _,
     Element,
@@ -112,7 +113,8 @@ define([
     dataGapMatchMapMatchmax,
     dataGapMatchInfinite,
     dataGraphicAssocMatchmax,
-    dataResponseNone
+    dataResponseNone,
+    dataResponseExternalScored
 ) {
     'use strict';
 
@@ -406,6 +408,7 @@ define([
             maxScore: 5
         },
         { title: 'response - none', data: dataResponseNone, expectedMaximum: 5, maxScore: 5 },
+        { title: 'external scored', data: dataResponseExternalScored, expectedMaximum: 6, maxScore: 6 }
     ];
 
     QUnit.cases.init(cases).test('setNormalMaximum', function(settings, assert) {
