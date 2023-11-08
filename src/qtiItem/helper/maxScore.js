@@ -262,7 +262,7 @@ export default {
             //map point response processing does not work on choice based interaction
             max = 0;
         } else if (template === 'NONE') {
-            //get the normalMaximum from SCORE outcome
+            //get the normalMaximum from SCORE outcome because we don't have any choices selected
             max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
         }
         return max;
