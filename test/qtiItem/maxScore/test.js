@@ -62,7 +62,8 @@ define([
     'json!taoQtiItem/test/qtiItem/maxScore/data/gapmatch-matchmax.json',
     'json!taoQtiItem/test/qtiItem/maxScore/data/gapmatch-map-matchmax.json',
     'json!taoQtiItem/test/qtiItem/maxScore/data/graphic-gap-infinite.json',
-    'json!taoQtiItem/test/qtiItem/maxScore/data/graphic-associate-matchmax.json'
+    'json!taoQtiItem/test/qtiItem/maxScore/data/graphic-associate-matchmax.json',
+    'json!taoQtiItem/test/qtiItem/maxScore/data/response-none.json'
 ], function(
     _,
     Element,
@@ -110,7 +111,8 @@ define([
     dataGapMatchMatchmax,
     dataGapMatchMapMatchmax,
     dataGapMatchInfinite,
-    dataGraphicAssocMatchmax
+    dataGraphicAssocMatchmax,
+    dataResponseNone
 ) {
     'use strict';
 
@@ -402,7 +404,8 @@ define([
             data: dataGraphicAssocMatchmax,
             expectedMaximum: 5,
             maxScore: 5
-        }
+        },
+        { title: 'response - none', data: dataResponseNone, expectedMaximum: 5, maxScore: 5 },
     ];
 
     QUnit.cases.init(cases).test('setNormalMaximum', function(settings, assert) {
@@ -422,7 +425,12 @@ define([
             assert.ok(Element.isA(item, 'assessmentItem'), 'item loaded');
 
             outcomeScore = item.getOutcomeDeclaration('SCORE');
-            assert.ok(_.isUndefined(outcomeScore.attr('normalMaximum')), 'normalMaximum initially undefined');
+
+            if (outcomeScore.getAttributes()['externalScored']) {
+                assert.ok(outcomeScore.attr('normalMaximum'), 'normalMaximum defined');
+            } else {
+                assert.ok(_.isUndefined(outcomeScore.attr('normalMaximum')), 'normalMaximum initially undefined');
+            }
 
             maxScore.setNormalMaximum(item);
             assert.equal(
