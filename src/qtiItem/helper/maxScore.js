@@ -84,11 +84,12 @@ export default {
         //try setting the computed normal maximum only if the processing type is known, i.e. 'templateDriven'
         const externalScoredValues = ['human', 'externalMachine'];
         if (scoreOutcome && item.responseProcessing && item.responseProcessing.processingType === 'templateDriven') {
+            const interactions = item.getInteractions();
             if (externalScoredValues.includes(scoreOutcome.attr('externalScored'))) {
                 maxScore = scoreOutcome.attr('normalMaximum') || 0;
             } else {
                 maxScore = _.reduce(
-                    item.getInteractions(),
+                    interactions,
                     function (acc, interaction) {
                         var interactionMaxScore = interaction.getNormalMaximum();
                         if (_.isNumber(interactionMaxScore)) {
@@ -136,6 +137,18 @@ export default {
                 } else {
                     item.removeOutcome('MAXSCORE');
                 }
+            }
+
+            const isAllResponseProcessingRulesNone = !interactions.some(interaction => {
+                const responseDeclaration = interaction.getResponseDeclaration();
+                const template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
+                return template !== 'NONE';
+            });
+            // remove MAXSCORE and SCORE outcome variables when all interactions are configured with none response processing rule,
+            // and the externalScored property of the SCORE variable is set to None
+            if (!scoreOutcome.attr('externalScored') && isAllResponseProcessingRulesNone) {
+                item.removeOutcome('MAXSCORE');
+                item.removeOutcome('SCORE');
             }
         }
     },
