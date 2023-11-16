@@ -37,6 +37,7 @@ var pairExists = function pairExists(collection, pair) {
     }
     return collection[pair[0] + ' ' + pair[1]] || collection[pair[1] + ' ' + pair[0]];
 };
+const externalScoredValues = ['human', 'externalMachine'];
 
 export default {
     /**
@@ -48,9 +49,15 @@ export default {
             scoreOutcome = item.getOutcomeDeclaration('SCORE');
 
         //try setting the computed normal maximum only if the processing type is known, i.e. 'templateDriven'
-        if (scoreOutcome && item.responseProcessing && item.responseProcessing.processingType === 'templateDriven') {
+        if (
+            scoreOutcome &&
+            item.responseProcessing &&
+            item.responseProcessing.processingType === 'templateDriven' &&
+            !externalScoredValues.includes(scoreOutcome.attr('externalScored'))
+        ) {
+            const interactions = item.getInteractions();
             normalMaximum = _.reduce(
-                item.getInteractions(),
+                interactions,
                 function (acc, interaction) {
                     var interactionMaxScore = interaction.getNormalMaximum();
                     if (_.isNumber(interactionMaxScore)) {
@@ -82,7 +89,6 @@ export default {
             maxScoreOutcome;
 
         //try setting the computed normal maximum only if the processing type is known, i.e. 'templateDriven'
-        const externalScoredValues = ['human', 'externalMachine'];
         if (scoreOutcome && item.responseProcessing && item.responseProcessing.processingType === 'templateDriven') {
             const interactions = item.getInteractions();
             if (externalScoredValues.includes(scoreOutcome.attr('externalScored'))) {
