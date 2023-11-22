@@ -37,6 +37,7 @@ var pairExists = function pairExists(collection, pair) {
     }
     return collection[pair[0] + ' ' + pair[1]] || collection[pair[1] + ' ' + pair[0]];
 };
+const externalScoredValues = ['human', 'externalMachine'];
 
 export default {
     /**
@@ -48,9 +49,15 @@ export default {
             scoreOutcome = item.getOutcomeDeclaration('SCORE');
 
         //try setting the computed normal maximum only if the processing type is known, i.e. 'templateDriven'
-        if (scoreOutcome && item.responseProcessing && item.responseProcessing.processingType === 'templateDriven') {
+        if (
+            scoreOutcome &&
+            item.responseProcessing &&
+            item.responseProcessing.processingType === 'templateDriven' &&
+            !externalScoredValues.includes(scoreOutcome.attr('externalScored'))
+        ) {
+            const interactions = item.getInteractions();
             normalMaximum = _.reduce(
-                item.getInteractions(),
+                interactions,
                 function (acc, interaction) {
                     var interactionMaxScore = interaction.getNormalMaximum();
                     if (_.isNumber(interactionMaxScore)) {
@@ -83,28 +90,32 @@ export default {
 
         //try setting the computed normal maximum only if the processing type is known, i.e. 'templateDriven'
         if (scoreOutcome && item.responseProcessing && item.responseProcessing.processingType === 'templateDriven') {
-            maxScore = _.reduce(
-                item.getInteractions(),
-                function (acc, interaction) {
-                    var interactionMaxScore = interaction.getNormalMaximum();
-                    if (_.isNumber(interactionMaxScore)) {
-                        return gamp.add(acc, interactionMaxScore);
-                    } else {
-                        hasInvalidInteraction = true;
-                        return acc;
-                    }
-                },
-                0
-            );
+            const interactions = item.getInteractions();
+            if (externalScoredValues.includes(scoreOutcome.attr('externalScored'))) {
+                maxScore = scoreOutcome.attr('normalMaximum') || 0;
+            } else {
+                maxScore = _.reduce(
+                    interactions,
+                    function (acc, interaction) {
+                        var interactionMaxScore = interaction.getNormalMaximum();
+                        if (_.isNumber(interactionMaxScore)) {
+                            return gamp.add(acc, interactionMaxScore);
+                        } else {
+                            hasInvalidInteraction = true;
+                            return acc;
+                        }
+                    },
+                    0
+                );
+                customOutcomes = _(item.getOutcomes()).filter(function (outcome) {
+                    return outcome.id() !== 'SCORE' && outcome.id() !== 'MAXSCORE';
+                });
 
-            customOutcomes = _(item.getOutcomes()).filter(function (outcome) {
-                return outcome.id() !== 'SCORE' && outcome.id() !== 'MAXSCORE';
-            });
-
-            if (customOutcomes.size()) {
-                maxScore = customOutcomes.reduce(function (acc, outcome) {
-                    return gamp.add(acc, parseFloat(outcome.attr('normalMaximum') || 0));
-                }, maxScore);
+                if (customOutcomes.size()) {
+                    maxScore = customOutcomes.reduce(function (acc, outcome) {
+                        return gamp.add(acc, parseFloat(outcome.attr('normalMaximum') || 0));
+                    }, maxScore);
+                }
             }
 
             maxScoreOutcome = item.getOutcomeDeclaration('MAXSCORE');
@@ -132,6 +143,18 @@ export default {
                 } else {
                     item.removeOutcome('MAXSCORE');
                 }
+            }
+
+            const isAllResponseProcessingRulesNone = !interactions.some(interaction => {
+                const responseDeclaration = interaction.getResponseDeclaration();
+                const template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
+                return template !== 'NONE';
+            });
+            // remove MAXSCORE and SCORE outcome variables when all interactions are configured with none response processing rule,
+            // and the externalScored property of the SCORE variable is set to None
+            if (!scoreOutcome.attr('externalScored') && isAllResponseProcessingRulesNone) {
+                item.removeOutcome('MAXSCORE');
+                item.removeOutcome('SCORE');
             }
         }
     },
@@ -261,6 +284,9 @@ export default {
         } else if (template === 'MAP_RESPONSE_POINT') {
             //map point response processing does not work on choice based interaction
             max = 0;
+        } else if (template === 'NONE') {
+            //get the normalMaximum from SCORE outcome because we don't have any choices selected
+            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
         }
         return max;
     },
@@ -302,6 +328,9 @@ export default {
         } else if (template === 'MAP_RESPONSE' || template === 'MAP_RESPONSE_POINT') {
             //map response processing does not work on order based interaction
             max = 0;
+        } else if (template === 'NONE') {
+            //get the normalMaximum from SCORE outcome because we don't have any choices selected
+            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
         }
         return max;
     },
@@ -485,6 +514,9 @@ export default {
             }
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = 0;
+        } else if (template === 'NONE') {
+            //get the normalMaximum from SCORE outcome because we don't have any choices selected
+            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
         }
         return max;
     },
@@ -676,6 +708,9 @@ export default {
             }
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = false;
+        } else if (template === 'NONE') {
+            //get the normalMaximum from SCORE outcome because we don't have any choices selected
+            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
         }
         return max;
     },
@@ -724,6 +759,9 @@ export default {
             if (responseDeclaration.mappingAttributes.upperBound) {
                 max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
             }
+        } else if (template === 'NONE') {
+            //get the normalMaximum from SCORE outcome because we don't have any choices selected
+            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
         }
         return max;
     },
@@ -769,6 +807,9 @@ export default {
             }
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = 0;
+        } else if (template === 'NONE') {
+            //get the normalMaximum from SCORE outcome because we don't have any choices selected
+            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
         }
         return max;
     },
@@ -833,6 +874,9 @@ export default {
             }
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = 0;
+        } else if (template === 'NONE') {
+            //get the normalMaximum from SCORE outcome because we don't have any choices selected
+            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
         }
         return max;
     },
@@ -867,6 +911,9 @@ export default {
             if (responseDeclaration.mappingAttributes.upperBound) {
                 max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
             }
+        } else if (template === 'NONE') {
+            //get the normalMaximum from SCORE outcome because we don't have any choices selected
+            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
         } else {
             max = 0;
         }
