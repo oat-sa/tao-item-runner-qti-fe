@@ -13,17 +13,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2022 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2022-2023 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  */
+import context from 'context';
 import _ from 'lodash';
-import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
+import imageTpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure-image';
+import widgetTpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure-widget';
+
+const DISABLE_FIGURE_WIDGET = context.featureFlags['FEATURE_FLAG_DISABLE_FIGURE_WIDGET'];
 
 export default {
     qtiClass: 'figure',
     getContainer: containerHelper.get,
-    template: tpl,
-    getData: function (elem, data) {
+    template: DISABLE_FIGURE_WIDGET ? imageTpl : widgetTpl,
+    getData(elem, data) {
+        if (DISABLE_FIGURE_WIDGET) {
+            return data;
+        }
+
         let showFigure = false;
         if (data.attributes.class && ['wrap-left', 'wrap-right'].includes(data.attributes.class)) {
             showFigure = true;
@@ -40,10 +48,10 @@ export default {
         elem.attributes.showFigure = showFigure;
         return data;
     },
-    render: function(figure) {
+    render(figure) {
         const $figure = containerHelper.get(figure);
         const $img = $figure.find('img');
-        if ($img.length && $figure.prop('tagName') === 'FIGURE') {
+        if ($img.length && (DISABLE_FIGURE_WIDGET || $figure.prop('tagName') === 'FIGURE')) {
             // move width from image to figure
             $figure.css({ width: $img.attr('width') });
             $img.attr('width', '100%');
