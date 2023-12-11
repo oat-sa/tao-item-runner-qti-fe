@@ -53,7 +53,7 @@
         "@oat-sa/tao-core-libs": "^0.5.3",
         "@oat-sa/tao-core-sdk": "^2.0.1",
         "@oat-sa/tao-core-shared-libs": "^1.4.1",
-        "@oat-sa/tao-core-ui": "https://github.com/oat-sa/tao-core-ui-fe#feature/BSA-391/2.3.0/allow-to-disable-figure-widgets",
+        "@oat-sa/tao-core-ui": "^2.3.0",
         "@oat-sa/tao-item-runner": "^0.8.2",
         "@oat-sa/tao-qunit-testrunner": "^2.0.0",
         "async": "^0.2.10",
