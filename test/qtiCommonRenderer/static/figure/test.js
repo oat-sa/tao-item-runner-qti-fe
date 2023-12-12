@@ -21,16 +21,19 @@
 define([
     'jquery',
     'lodash',
+    'context',
     'taoQtiItem/runner/qtiItemRunner',
     'taoQtiItem/qtiItem/core/Figure',
     'json!taoQtiItem/test/samples/json/static/figure.json'
-], function($, _, qtiItemRunner, Figure, itemData) {
+], function($, _, context, qtiItemRunner, Figure, itemData) {
     'use strict';
 
     let runner;
     const fixtureContainerId = '#item-container';
     const outsideContainerId = '#outside-container';
     const imageSampleUrl = '/test/samples/json/static/tao-logo.png';
+
+    context.featureFlags = {};
 
     QUnit.module('Order Interaction', {
         afterEach: function() {
