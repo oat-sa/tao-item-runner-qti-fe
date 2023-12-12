@@ -245,6 +245,7 @@ function getResponse(interaction) {
         const convertedValue = converter.convert(inputValue.trim());
         if (baseType === 'integer') {
             value = locale.parseInt(convertedValue, numericBase);
+            $input.val(value);
         } else if (baseType === 'float') {
             value = locale.parseFloat(convertedValue);
         } else if (baseType === 'string') {
