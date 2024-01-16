@@ -28,6 +28,7 @@ import _ from 'lodash';
 import __ from 'i18n';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/textEntryInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
+import textEntryConverterHelper from 'taoQtiItem/qtiCreator/helper/textEntryConverterHelper';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import patternMaskHelper from 'taoQtiItem/qtiCommonRenderer/helpers/patternMask';
@@ -178,9 +179,19 @@ function render(interaction) {
                 hideTooltip($input);
             });
     } else {
-        $input.on('keyup.commonRenderer', function() {
-            containerHelper.triggerResponseChangeEvent(interaction);
-        });
+        $input
+            .on('keyup.commonRenderer', function() {
+                containerHelper.triggerResponseChangeEvent(interaction);
+            })
+            .on('blur.commonRenderer', function () {
+                $input.removeClass('invalid');
+                const value = textEntryConverterHelper($input.val(), {...attributes, baseType});
+                $input.val(value);
+                if (value === '') {
+                    $input.addClass('invalid');
+                    showTooltip($input, 'error', __('This is not a valid answer'));
+                }
+            });
     }
 }
 
@@ -233,7 +244,6 @@ function getResponse(interaction) {
     const $input = interaction.getContainer();
     const attributes = interaction.getAttributes();
     const baseType = interaction.getResponseDeclaration().attr('baseType');
-    const numericBase = attributes.base || 10;
 
     const inputValue = $input.val();
     let value;
@@ -242,20 +252,10 @@ function getResponse(interaction) {
         //invalid response or response equals to the placeholder text are considered empty
         value = '';
     } else {
-        const convertedValue = converter.convert(inputValue.trim());
-        if (baseType === 'integer') {
-            value = locale.parseInt(convertedValue, numericBase);
-            // restrict user to input anything except integers
-            $input.val(isNaN(value) ? '' : value);
-        } else if (baseType === 'float') {
-            value = locale.parseFloat(convertedValue);
-        } else if (baseType === 'string') {
-            value = convertedValue;
-        }
+        value = textEntryConverterHelper($input.val(), {...attributes, baseType});
     }
 
     ret.base[baseType] = isNaN(value) && typeof value === 'number' ? '' : value;
-
     return ret;
 }
 
