@@ -187,7 +187,7 @@ function render(interaction) {
                 const value = textEntryConverterHelper($input.val(), {...attributes, baseType});
                 if (value === '') {
                     $input.addClass('invalid');
-                    showTooltip($input, 'error', __('This is not a valid answer'));
+                    showTooltip($input, 'error', __('This is not a valid answer. Expected %s', baseType));
                 }
             });
     }
