@@ -28,7 +28,7 @@ import _ from 'lodash';
 import __ from 'i18n';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/textEntryInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
-import textEntryConverterHelper from 'taoQtiItem/qtiCommonRenderer/helper/textEntryConverterHelper';
+import textEntryConverterHelper from 'taoQtiItem/qtiCommonRenderer/helpers/textEntryConverterHelper';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import patternMaskHelper from 'taoQtiItem/qtiCommonRenderer/helpers/patternMask';
