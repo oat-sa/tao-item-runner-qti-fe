@@ -28,14 +28,12 @@ import _ from 'lodash';
 import __ from 'i18n';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/textEntryInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
-import textEntryConverterHelper from 'taoQtiItem/qtiCreator/helper/textEntryConverterHelper';
+import textEntryConverterHelper from 'taoQtiItem/qtiCommonRenderer/helper/textEntryConverterHelper';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import patternMaskHelper from 'taoQtiItem/qtiCommonRenderer/helpers/patternMask';
-import locale from 'util/locale';
 import tooltip from 'ui/tooltip';
 import loggerFactory from 'core/logger';
-import converter from 'util/converter';
 
 /**
  * Create a logger
@@ -184,9 +182,9 @@ function render(interaction) {
                 containerHelper.triggerResponseChangeEvent(interaction);
             })
             .on('blur.commonRenderer', function () {
+                hideTooltip($input);
                 $input.removeClass('invalid');
                 const value = textEntryConverterHelper($input.val(), {...attributes, baseType});
-                $input.val(value);
                 if (value === '') {
                     $input.addClass('invalid');
                     showTooltip($input, 'error', __('This is not a valid answer'));
