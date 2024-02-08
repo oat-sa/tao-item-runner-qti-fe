@@ -303,7 +303,7 @@ const setResponse = function (interaction, response) {
 
                 //get the choice that match the response
                 const choice = _(interaction.getChoices())
-                    .where({ attributes: { identifier: responseValue } })
+                    .filter({ attributes: { identifier: responseValue } })
                     .first();
                 if (choice) {
                     const element = interaction.paper.getById(choice.serial);
