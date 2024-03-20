@@ -285,8 +285,8 @@ export default {
             //map point response processing does not work on choice based interaction
             max = 0;
         } else if (template === 'NONE') {
-            //get the normalMaximum from SCORE outcome because we don't have any choices selected
-            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
+            // set max to zero
+            max = 0;
         }
         return max;
     },
@@ -329,8 +329,8 @@ export default {
             //map response processing does not work on order based interaction
             max = 0;
         } else if (template === 'NONE') {
-            //get the normalMaximum from SCORE outcome because we don't have any choices selected
-            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
+            // set max to zero
+            max = 0;
         }
         return max;
     },
@@ -515,8 +515,8 @@ export default {
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = 0;
         } else if (template === 'NONE') {
-            //get the normalMaximum from SCORE outcome because we don't have any choices selected
-            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
+            // set max to zero
+            max = 0;
         }
         return max;
     },
@@ -709,8 +709,8 @@ export default {
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = false;
         } else if (template === 'NONE') {
-            //get the normalMaximum from SCORE outcome because we don't have any choices selected
-            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
+            // set max to zero
+            max = 0;
         }
         return max;
     },
@@ -760,8 +760,8 @@ export default {
                 max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
             }
         } else if (template === 'NONE') {
-            //get the normalMaximum from SCORE outcome because we don't have any choices selected
-            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
+            // set max to zero
+            max = 0;
         }
         return max;
     },
@@ -808,8 +808,8 @@ export default {
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = 0;
         } else if (template === 'NONE') {
-            //get the normalMaximum from SCORE outcome because we don't have any choices selected
-            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
+            // set max to zero
+            max = 0;
         }
         return max;
     },
@@ -875,8 +875,8 @@ export default {
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = 0;
         } else if (template === 'NONE') {
-            //get the normalMaximum from SCORE outcome because we don't have any choices selected
-            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
+            // set max to zero
+            max = 0;
         }
         return max;
     },
@@ -912,8 +912,8 @@ export default {
                 max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
             }
         } else if (template === 'NONE') {
-            //get the normalMaximum from SCORE outcome because we don't have any choices selected
-            max = interaction.getRootElement().getOutcomeDeclaration('SCORE').getAttributes().normalMaximum;
+            // set max to zero
+            max = 0;
         } else {
             max = 0;
         }
