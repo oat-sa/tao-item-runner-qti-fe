@@ -83,8 +83,14 @@ function showTooltip($input, theme, message) {
  */
 function validateDecimalInput ($input) {
     const value = $input.val();
+    const thousandsSeparator = locale.getThousandsSeparator();
+    const decimalSeparator = locale.getDecimalSeparator();
     const negativeSigns = '\u002D\u2212\u2010\u8213';
-    const regex = new RegExp(`^$|^[-${negativeSigns}]?\\d{1,3}(,\\d{3})*(\\.\\d+)?$|^[-${negativeSigns}]?\\d+(\\.\\d+)?$|^[-${negativeSigns}]?\\d*\\.$|^[-${negativeSigns}]?\\.\\d+$`);
+
+    const regex = thousandsSeparator
+        ? new RegExp(`^$|^[-${negativeSigns}]?\\d{1,3}(${thousandsSeparator}\\d{3})*(${decimalSeparator}\\d+)?$|^[-${negativeSigns}]?\\d+(${decimalSeparator}\\d+)?$|^[-${negativeSigns}]?\\d*${decimalSeparator}$|^[-${negativeSigns}]?${decimalSeparator}\\d+$`)
+        : new RegExp(`^$|^[-${negativeSigns}]?\\d+(${decimalSeparator}\\d+)?$|^[-${negativeSigns}]?\\d*${decimalSeparator}$|^[-${negativeSigns}]?${decimalSeparator}\\d+$`);
+
     if (!regex.test(value)) {
         $input.addClass('invalid');
         $input.addClass('error');
