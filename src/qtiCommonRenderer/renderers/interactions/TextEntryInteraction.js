@@ -94,7 +94,10 @@ function validateDecimalInput ($input) {
     if (!regex.test(value)) {
         $input.addClass('invalid');
         $input.addClass('error');
-        showTooltip($input, 'error', __('Invalid value, use . (dot) for decimal point and , (comma) for thousands separator.'));
+        const decimalError = thousandsSeparator
+            ? __('Invalid value, use . (dot) for decimal point and , (comma) for thousands separator.')
+            : __('Invalid value, use . (dot) for decimal point.');
+        showTooltip($input, 'error', decimalError);
     } else {
         $input.removeClass('invalid');
         $input.removeClass('error');
