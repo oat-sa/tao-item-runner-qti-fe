@@ -83,7 +83,8 @@ function showTooltip($input, theme, message) {
  */
 function validateDecimalInput ($input) {
     const value = $input.val();
-    const regex = /^$|^-?\d{1,3}(,\d{3})*(\.\d+)?$|^-?\d+(\.\d+)?$|^-?\d*\.$|^-?\.\d+$/;
+    const negativeSigns = '\u002D\u2212\u2010\u8213';
+    const regex = new RegExp(`^$|^[-${negativeSigns}]?\\d{1,3}(,\\d{3})*(\\.\\d+)?$|^[-${negativeSigns}]?\\d+(\\.\\d+)?$|^[-${negativeSigns}]?\\d*\\.$|^[-${negativeSigns}]?\\.\\d+$`);
     if (!regex.test(value)) {
         $input.addClass('invalid');
         $input.addClass('error');
