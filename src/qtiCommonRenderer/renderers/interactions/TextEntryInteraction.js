@@ -86,11 +86,11 @@ function validateDecimalInput ($input) {
     const regex = /^$|^-?\d{1,3}(,\d{3})*(\.\d+)?$|^-?\d+(\.\d+)?$|^-?\d*\.$|^-?\.\d+$/;
     if (!regex.test(value)) {
         $input.addClass('invalid');
-        $input.css('border-color', 'red');
+        $input.addClass('error');
         showTooltip($input, 'error', __('Invalid value, use . (dot) for decimal point and , (comma) for thousands separator.'));
     } else {
         $input.removeClass('invalid');
-        $input.css('border-color', '');
+        $input.removeClass('error');
         hideTooltip($input);
     }
 }
