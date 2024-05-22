@@ -73,6 +73,29 @@ function showTooltip($input, theme, message) {
 }
 
 /**
+ * Validate the input for decimal values.
+ *
+ * This function ensures that the input value is either empty or follows
+ * the rules for decimal numbers. It allows numbers with optional
+ * thousands separators (commas) and a mandatory decimal point (dot).
+ *
+ * @param {jQuery} $input
+ */
+function validateDecimalInput ($input) {
+    const value = $input.val();
+    const regex = /^$|^-?\d{1,3}(,\d{3})*(\.\d+)?$|^-?\d+(\.\d+)?$|^-?\d*\.$|^-?\.\d+$/;
+    if (!regex.test(value)) {
+        $input.addClass('invalid');
+        $input.css('border-color', 'red');
+        showTooltip($input, 'error', __('Invalid value, use . (dot) for decimal point and , (comma) for thousands separator.'));
+    } else {
+        $input.removeClass('invalid');
+        $input.css('border-color', '');
+        hideTooltip($input);
+    }
+}
+
+/**
  * Init rendering, called after template injected into the DOM
  * All options are listed in the QTI v2.1 information model:
  * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10333
@@ -94,6 +117,10 @@ function render(interaction) {
             break;
         case 'float':
             $input.attr('inputmode', 'decimal');
+
+            $input.on('keyup.decimalValidation', () => validateDecimalInput($input))
+                .on('focus.decimalValidation', () => validateDecimalInput($input))
+                .on('blur.decimalValidation', () => hideTooltip($input));
             break;
         default:
             $input.attr('inputmode', 'text');
