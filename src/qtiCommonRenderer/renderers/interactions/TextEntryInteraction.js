@@ -82,14 +82,18 @@ function showTooltip($input, theme, message) {
  * @param {jQuery} $input
  */
 function validateDecimalInput ($input) {
-    const value = $input.val();
+    const value = converter.convert($input.val());
     const thousandsSeparator = locale.getThousandsSeparator();
     const decimalSeparator = locale.getDecimalSeparator();
-    const negativeSigns = '\u002D\u2212\u2010\u8213';
 
-    const regex = thousandsSeparator
-        ? new RegExp(`^$|^[-${negativeSigns}]?\\d{1,3}(${thousandsSeparator}\\d{3})*(${decimalSeparator}\\d+)?$|^[-${negativeSigns}]?\\d+(${decimalSeparator}\\d+)?$|^[-${negativeSigns}]?\\d*${decimalSeparator}$|^[-${negativeSigns}]?${decimalSeparator}\\d+$`)
-        : new RegExp(`^$|^[-${negativeSigns}]?\\d+(${decimalSeparator}\\d+)?$|^[-${negativeSigns}]?\\d*${decimalSeparator}$|^[-${negativeSigns}]?${decimalSeparator}\\d+$`);
+    const escapedThousandsSeparator = thousandsSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escapedDecimalSeparator = decimalSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    const regexPattern = thousandsSeparator
+        ? `^$|^-?\\d{1,3}(${escapedThousandsSeparator}\\d{3})*(${escapedDecimalSeparator}\\d+)?$|^-?\\d+(${escapedDecimalSeparator}\\d+)?$|^-?\\d*${escapedDecimalSeparator}$|^-?${escapedDecimalSeparator}\\d+$`
+        : `^$|^-?\\d+(${escapedDecimalSeparator}\\d+)?$|^-?\\d*${escapedDecimalSeparator}$|^-?${escapedDecimalSeparator}\\d+$`;
+
+    const regex = new RegExp(regexPattern);
 
     if (!regex.test(value)) {
         $input.addClass('invalid');
@@ -128,9 +132,9 @@ function render(interaction) {
         case 'float':
             $input.attr('inputmode', 'decimal');
 
-            $input.on('keyup.decimalValidation', () => validateDecimalInput($input))
-                .on('focus.decimalValidation', () => validateDecimalInput($input))
-                .on('blur.decimalValidation', () => hideTooltip($input));
+            $input.on('keyup.commonRenderer', () => validateDecimalInput($input))
+                .on('focus.commonRenderer', () => validateDecimalInput($input))
+                .on('blur.commonRenderer', () => hideTooltip($input));
             break;
         default:
             $input.attr('inputmode', 'text');
