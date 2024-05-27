@@ -99,8 +99,8 @@ function validateDecimalInput ($input) {
         $input.addClass('invalid');
         $input.addClass('error');
         const decimalError = thousandsSeparator
-            ? __('Invalid value, use . (dot) for decimal point and , (comma) for thousands separator.')
-            : __('Invalid value, use . (dot) for decimal point.');
+            ? __('Invalid value, use %s (dot) for decimal point and %s (comma) for thousands separator.', decimalSeparator, thousandsSeparator)
+            : __('Invalid value, use %s (dot) for decimal point.', decimalSeparator);
         showTooltip($input, 'error', decimalError);
     } else {
         $input.removeClass('invalid');
