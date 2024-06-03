@@ -82,9 +82,15 @@ function showTooltip($input, theme, message) {
  * @param {jQuery} $input
  */
 function validateDecimalInput ($input) {
+    const separatorName = {
+        '.': __('(dot)'),
+        ',': __('(comma)')
+    };
     const value = converter.convert($input.val());
     const thousandsSeparator = locale.getThousandsSeparator();
     const decimalSeparator = locale.getDecimalSeparator();
+    const thousandsSeparatorName = separatorName[thousandsSeparator] ?? '';
+    const decimalSeparatorName = separatorName[decimalSeparator] ?? '';
 
     const escapedThousandsSeparator = thousandsSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const escapedDecimalSeparator = decimalSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -99,8 +105,8 @@ function validateDecimalInput ($input) {
         $input.addClass('invalid');
         $input.addClass('error');
         const decimalError = thousandsSeparator
-            ? __('Invalid value, use %s (dot) for decimal point and %s (comma) for thousands separator.', decimalSeparator, thousandsSeparator)
-            : __('Invalid value, use %s (dot) for decimal point.', decimalSeparator);
+            ? __('Invalid value, use %s %s for decimal point and %s %s for thousands separator.', decimalSeparator, decimalSeparatorName, thousandsSeparator, thousandsSeparatorName)
+            : __('Invalid value, use %s %s for decimal point.', decimalSeparator, decimalSeparatorName);
         showTooltip($input, 'error', decimalError);
     } else {
         $input.removeClass('invalid');
