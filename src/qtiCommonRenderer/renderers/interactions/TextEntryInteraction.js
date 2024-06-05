@@ -84,7 +84,8 @@ function showTooltip($input, theme, message) {
 function validateDecimalInput($input) {
     const separatorName = {
         '.': __('(dot)'),
-        ',': __('(comma)')
+        ',': __('(comma)'),
+        ' ': __('(space)')
     };
     const value = converter.convert($input.val());
     const thousandsSeparator = locale.getThousandsSeparator();
