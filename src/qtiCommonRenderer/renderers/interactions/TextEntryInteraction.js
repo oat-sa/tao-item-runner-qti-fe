@@ -81,7 +81,7 @@ function showTooltip($input, theme, message) {
  *
  * @param {jQuery} $input
  */
-function validateDecimalInput ($input) {
+function validateDecimalInput($input) {
     const separatorName = {
         '.': __('(dot)'),
         ',': __('(comma)')
@@ -89,8 +89,8 @@ function validateDecimalInput ($input) {
     const value = converter.convert($input.val());
     const thousandsSeparator = locale.getThousandsSeparator();
     const decimalSeparator = locale.getDecimalSeparator();
-    const thousandsSeparatorName = separatorName[thousandsSeparator] ?? '';
-    const decimalSeparatorName = separatorName[decimalSeparator] ?? '';
+    const thousandsSeparatorName = separatorName[thousandsSeparator] ? separatorName[thousandsSeparator] : '';
+    const decimalSeparatorName = separatorName[decimalSeparator] ? separatorName[decimalSeparator] : '';
 
     const escapedThousandsSeparator = thousandsSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const escapedDecimalSeparator = decimalSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -105,7 +105,13 @@ function validateDecimalInput ($input) {
         $input.addClass('invalid');
         $input.addClass('error');
         const decimalError = thousandsSeparator
-            ? __('Invalid value, use %s %s for decimal point and %s %s for thousands separator.', decimalSeparator, decimalSeparatorName, thousandsSeparator, thousandsSeparatorName)
+            ? __(
+                  'Invalid value, use %s %s for decimal point and %s %s for thousands separator.',
+                  decimalSeparator,
+                  decimalSeparatorName,
+                  thousandsSeparator,
+                  thousandsSeparatorName
+              )
             : __('Invalid value, use %s %s for decimal point.', decimalSeparator, decimalSeparatorName);
         showTooltip($input, 'error', decimalError);
     } else {
@@ -138,7 +144,8 @@ function render(interaction) {
         case 'float':
             $input.attr('inputmode', 'decimal');
 
-            $input.on('keyup.commonRenderer', () => validateDecimalInput($input))
+            $input
+                .on('keyup.commonRenderer', () => validateDecimalInput($input))
                 .on('focus.commonRenderer', () => validateDecimalInput($input))
                 .on('blur.commonRenderer', () => hideTooltip($input));
             break;
@@ -187,14 +194,14 @@ function render(interaction) {
 
         $input
             .attr('maxlength', maxChars)
-            .on('focus.commonRenderer', function() {
+            .on('focus.commonRenderer', function () {
                 updateMaxCharsTooltip();
             })
-            .on('keyup.commonRenderer', function() {
+            .on('keyup.commonRenderer', function () {
                 updateMaxCharsTooltip();
                 containerHelper.triggerResponseChangeEvent(interaction);
             })
-            .on('blur.commonRenderer', function() {
+            .on('blur.commonRenderer', function () {
                 hideTooltip($input);
             });
     } else if (attributes.patternMask) {
@@ -214,18 +221,18 @@ function render(interaction) {
         };
 
         $input
-            .on('focus.commonRenderer', function() {
+            .on('focus.commonRenderer', function () {
                 updatePatternMaskTooltip();
             })
-            .on('keyup.commonRenderer', function() {
+            .on('keyup.commonRenderer', function () {
                 updatePatternMaskTooltip();
                 containerHelper.triggerResponseChangeEvent(interaction);
             })
-            .on('blur.commonRenderer', function() {
+            .on('blur.commonRenderer', function () {
                 hideTooltip($input);
             });
     } else {
-        $input.on('keyup.commonRenderer', function() {
+        $input.on('keyup.commonRenderer', function () {
             containerHelper.triggerResponseChangeEvent(interaction);
         });
     }
@@ -305,7 +312,7 @@ function getResponse(interaction) {
 }
 
 function destroy(interaction) {
-    $('input.qti-textEntryInteraction').each(function(index, el) {
+    $('input.qti-textEntryInteraction').each(function (index, el) {
         const $input = $(el);
         if ($input.data('$tooltip')) {
             $input.data('$tooltip').dispose();
