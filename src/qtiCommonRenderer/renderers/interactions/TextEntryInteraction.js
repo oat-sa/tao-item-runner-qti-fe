@@ -73,6 +73,56 @@ function showTooltip($input, theme, message) {
 }
 
 /**
+ * Validate the input for decimal values.
+ *
+ * This function ensures that the input value is either empty or follows
+ * the rules for decimal numbers. It allows numbers with optional
+ * thousands separators (commas) and a mandatory decimal point (dot).
+ *
+ * @param {jQuery} $input
+ */
+function validateDecimalInput($input) {
+    const separatorName = {
+        '.': __('(dot)'),
+        ',': __('(comma)'),
+        ' ': __('(space)')
+    };
+    const value = converter.convert($input.val());
+    const thousandsSeparator = locale.getThousandsSeparator();
+    const decimalSeparator = locale.getDecimalSeparator();
+    const thousandsSeparatorName = separatorName[thousandsSeparator] ? separatorName[thousandsSeparator] : '';
+    const decimalSeparatorName = separatorName[decimalSeparator] ? separatorName[decimalSeparator] : '';
+
+    const escapedThousandsSeparator = thousandsSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escapedDecimalSeparator = decimalSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    const regexPattern = thousandsSeparator
+        ? `^$|^-?\\d{1,3}(${escapedThousandsSeparator}\\d{3})*(${escapedDecimalSeparator}\\d+)?$|^-?\\d+(${escapedDecimalSeparator}\\d+)?$|^-?\\d*${escapedDecimalSeparator}$|^-?${escapedDecimalSeparator}\\d+$`
+        : `^$|^-?\\d+(${escapedDecimalSeparator}\\d+)?$|^-?\\d*${escapedDecimalSeparator}$|^-?${escapedDecimalSeparator}\\d+$`;
+
+    const regex = new RegExp(regexPattern);
+
+    if (!regex.test(value)) {
+        $input.addClass('invalid');
+        $input.addClass('error');
+        const decimalError = thousandsSeparator
+            ? __(
+                  'Invalid value, use %s %s for decimal point and %s %s for thousands separator.',
+                  decimalSeparator,
+                  decimalSeparatorName,
+                  thousandsSeparator,
+                  thousandsSeparatorName
+              )
+            : __('Invalid value, use %s %s for decimal point.', decimalSeparator, decimalSeparatorName);
+        showTooltip($input, 'error', decimalError);
+    } else {
+        $input.removeClass('invalid');
+        $input.removeClass('error');
+        hideTooltip($input);
+    }
+}
+
+/**
  * Init rendering, called after template injected into the DOM
  * All options are listed in the QTI v2.1 information model:
  * http://www.imsglobal.org/question/qtiv2p1/imsqti_infov2p1.html#element10333
@@ -94,6 +144,11 @@ function render(interaction) {
             break;
         case 'float':
             $input.attr('inputmode', 'decimal');
+
+            $input
+                .on('keyup.commonRenderer', () => validateDecimalInput($input))
+                .on('focus.commonRenderer', () => validateDecimalInput($input))
+                .on('blur.commonRenderer', () => hideTooltip($input));
             break;
         default:
             $input.attr('inputmode', 'text');
@@ -140,14 +195,14 @@ function render(interaction) {
 
         $input
             .attr('maxlength', maxChars)
-            .on('focus.commonRenderer', function() {
+            .on('focus.commonRenderer', function () {
                 updateMaxCharsTooltip();
             })
-            .on('keyup.commonRenderer', function() {
+            .on('keyup.commonRenderer', function () {
                 updateMaxCharsTooltip();
                 containerHelper.triggerResponseChangeEvent(interaction);
             })
-            .on('blur.commonRenderer', function() {
+            .on('blur.commonRenderer', function () {
                 hideTooltip($input);
             });
     } else if (attributes.patternMask) {
@@ -167,18 +222,18 @@ function render(interaction) {
         };
 
         $input
-            .on('focus.commonRenderer', function() {
+            .on('focus.commonRenderer', function () {
                 updatePatternMaskTooltip();
             })
-            .on('keyup.commonRenderer', function() {
+            .on('keyup.commonRenderer', function () {
                 updatePatternMaskTooltip();
                 containerHelper.triggerResponseChangeEvent(interaction);
             })
-            .on('blur.commonRenderer', function() {
+            .on('blur.commonRenderer', function () {
                 hideTooltip($input);
             });
     } else {
-        $input.on('keyup.commonRenderer', function() {
+        $input.on('keyup.commonRenderer', function () {
             containerHelper.triggerResponseChangeEvent(interaction);
         });
     }
@@ -258,7 +313,7 @@ function getResponse(interaction) {
 }
 
 function destroy(interaction) {
-    $('input.qti-textEntryInteraction').each(function(index, el) {
+    $('input.qti-textEntryInteraction').each(function (index, el) {
         const $input = $(el);
         if ($input.data('$tooltip')) {
             $input.data('$tooltip').dispose();
