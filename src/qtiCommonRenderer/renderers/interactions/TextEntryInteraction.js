@@ -103,7 +103,6 @@ function validateDecimalInput($input) {
     const regex = new RegExp(regexPattern);
 
     if (!regex.test(value)) {
-        $input.addClass('invalid');
         $input.addClass('error');
         const decimalError = thousandsSeparator
             ? __(
@@ -116,7 +115,6 @@ function validateDecimalInput($input) {
             : __('Invalid value, use %s %s for decimal point.', decimalSeparator, decimalSeparatorName);
         showTooltip($input, 'error', decimalError);
     } else {
-        $input.removeClass('invalid');
         $input.removeClass('error');
         hideTooltip($input);
     }
