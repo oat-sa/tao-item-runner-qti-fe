@@ -127,7 +127,10 @@ var Container = Element.extend({
                     //@todo : container rendering merging, to be tested
                     tpl = tpl.replace(elt.placeholder(), elt.render(renderer));
                 } else {
-                    tpl = tpl.replace(elt.placeholder(), '{{{' + serial + '}}}');
+                    tpl = tpl
+                        .replace(elt.placeholder(), serial)
+                        .replace('{', '&lcub;')
+                        .replace(serial, '{{{' + serial + '}}}');
                     elementsData[serial] = elt.render(renderer);
                 }
             } else {
