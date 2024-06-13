@@ -129,7 +129,7 @@ var Container = Element.extend({
                 } else {
                     tpl = tpl
                         .replace(elt.placeholder(), serial)
-                        .replace('{', '&lcub;')
+                        .replace(new RegExp(`{${serial}`), `&lcub;${serial}`)
                         .replace(serial, '{{{' + serial + '}}}');
                     elementsData[serial] = elt.render(renderer);
                 }
