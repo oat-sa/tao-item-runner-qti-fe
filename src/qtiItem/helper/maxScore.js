@@ -154,6 +154,7 @@ export default {
             });
             // remove MAXSCORE and SCORE outcome variables when all interactions are configured with none response processing rule,
             // and the externalScored property of the SCORE variable is set to None
+            // and there are no other outcome variables with externalScored property set to human or externalMachine
             if (!scoreOutcome.attr('externalScored') && isAllResponseProcessingRulesNone && outcomesWithExternalScored.size() === 0) {
                 item.removeOutcome('MAXSCORE');
                 item.removeOutcome('SCORE');
