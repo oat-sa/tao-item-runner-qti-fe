@@ -89,13 +89,13 @@ export default {
 
         if (!scoreOutcome) {
             // add new score outcome if not already defined
-            scoreOutcome = item.createOutcomeDeclaration({
+            scoreOutcome = new OutcomeDeclaration({
                 cardinality: 'single',
                 baseType: 'float',
                 normalMinimum: 0.0,
                 normalMaximum: 0.0
             });
-
+            item.addOutcomeDeclaration(scoreOutcome);
             scoreOutcome.buildIdentifier('SCORE', false);
         }
         const customOutcomes = _(item.getOutcomes()).filter(function (outcome) {
