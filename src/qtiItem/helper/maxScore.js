@@ -87,6 +87,17 @@ export default {
             maxScore,
             maxScoreOutcome;
 
+        if (!scoreOutcome) {
+            // add new score outcome if not already defined
+            scoreOutcome = item.createOutcomeDeclaration({
+                cardinality: 'single',
+                baseType: 'float',
+                normalMinimum: 0.0,
+                normalMaximum: 0.0
+            });
+
+            scoreOutcome.buildIdentifier('SCORE', false);
+        }
         const customOutcomes = _(item.getOutcomes()).filter(function (outcome) {
             return outcome.id() !== 'SCORE' && outcome.id() !== 'MAXSCORE';
         });
