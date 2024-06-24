@@ -44,7 +44,7 @@ export default {
      * Set the normal maximum to the item
      * @param {Object} item - the standard qti item model object
      */
-    setNormalMaximum: function setNormalMaximum(item) {
+    setNormalMaximum(item) {
         var normalMaximum,
             scoreOutcome = item.getOutcomeDeclaration('SCORE');
 
@@ -81,13 +81,26 @@ export default {
      * Set the maximum score of the item
      * @param {Object} item - the standard qti item model object
      */
-    setMaxScore: function setMaxScore(item) {
+    setMaxScore(item) {
         var hasInvalidInteraction = false,
             scoreOutcome = item.getOutcomeDeclaration('SCORE'),
-            customOutcomes,
             maxScore,
             maxScoreOutcome;
 
+        if (!scoreOutcome) {
+            // add new score outcome if not already defined
+            scoreOutcome = new OutcomeDeclaration({
+                cardinality: 'single',
+                baseType: 'float',
+                normalMinimum: 0.0,
+                normalMaximum: 0.0
+            });
+            item.addOutcomeDeclaration(scoreOutcome);
+            scoreOutcome.buildIdentifier('SCORE', false);
+        }
+        const customOutcomes = _(item.getOutcomes()).filter(function (outcome) {
+            return outcome.id() !== 'SCORE' && outcome.id() !== 'MAXSCORE';
+        });
         //try setting the computed normal maximum only if the processing type is known, i.e. 'templateDriven'
         if (scoreOutcome && item.responseProcessing && item.responseProcessing.processingType === 'templateDriven') {
             const interactions = item.getInteractions();
@@ -107,9 +120,6 @@ export default {
                     },
                     0
                 );
-                customOutcomes = _(item.getOutcomes()).filter(function (outcome) {
-                    return outcome.id() !== 'SCORE' && outcome.id() !== 'MAXSCORE';
-                });
 
                 if (customOutcomes.size()) {
                     maxScore = customOutcomes.reduce(function (acc, outcome) {
@@ -150,9 +160,13 @@ export default {
                 const template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
                 return template !== 'NONE';
             });
+            const outcomesWithExternalScored = customOutcomes.filter(outcome => {
+                return externalScoredValues.includes(outcome.attr('externalScored'));
+            });
             // remove MAXSCORE and SCORE outcome variables when all interactions are configured with none response processing rule,
             // and the externalScored property of the SCORE variable is set to None
-            if (!scoreOutcome.attr('externalScored') && isAllResponseProcessingRulesNone) {
+            // and there are no other outcome variables with externalScored property set to human or externalMachine
+            if (!scoreOutcome.attr('externalScored') && isAllResponseProcessingRulesNone && outcomesWithExternalScored.size() === 0) {
                 item.removeOutcome('MAXSCORE');
                 item.removeOutcome('SCORE');
             }
@@ -164,7 +178,7 @@ export default {
      * @param {Array} choiceCollection
      * @returns {Array}
      */
-    getMatchMaxOrderedChoices: function getMatchMaxOrderedChoices(choiceCollection) {
+    getMatchMaxOrderedChoices(choiceCollection) {
         return _(choiceCollection)
             .map(function (choice) {
                 var matchMax = parseInt(choice.attr('matchMax'), 10);
@@ -186,7 +200,7 @@ export default {
      * @param {Object} interaction - a standard interaction model object
      * @returns {Number}
      */
-    choiceInteractionBased: function choiceInteractionBased(interaction, options) {
+    choiceInteractionBased(interaction, options) {
         var responseDeclaration = interaction.getResponseDeclaration();
         var mapDefault = parseFloat(responseDeclaration.mappingAttributes.defaultValue || 0);
         var template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
@@ -296,7 +310,7 @@ export default {
      * @param {Object} interaction - a standard interaction model object
      * @returns {Number}
      */
-    orderInteractionBased: function orderInteractionBased(interaction) {
+    orderInteractionBased(interaction) {
         var minChoice = _ignoreMinChoice ? 0 : parseInt(interaction.attr('minChoices') || 0, 10);
         var maxChoice = parseInt(interaction.attr('maxChoices') || 0, 10);
         var responseDeclaration = interaction.getResponseDeclaration();
@@ -340,7 +354,7 @@ export default {
      * @param {Object} interaction - a standard interaction model object
      * @returns {Number}
      */
-    associateInteractionBased: function associateInteractionBased(interaction, options) {
+    associateInteractionBased(interaction, options) {
         var responseDeclaration = interaction.getResponseDeclaration();
         var template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
         var maxAssoc = parseInt(interaction.attr('maxAssociations') || 0, 10);
@@ -526,7 +540,7 @@ export default {
      * @param {Object} interaction - a standard interaction model object
      * @returns {Number}
      */
-    gapMatchInteractionBased: function gapMatchInteractionBased(interaction) {
+    gapMatchInteractionBased(interaction) {
         var responseDeclaration = interaction.getResponseDeclaration();
         var template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
         var maxAssoc = 0;
@@ -720,7 +734,7 @@ export default {
      * @param {Object} interaction - a standard interaction model object
      * @returns {Number}
      */
-    selectPointInteractionBased: function selectPointInteractionBased(interaction) {
+    selectPointInteractionBased(interaction) {
         var maxChoice = parseInt(interaction.attr('maxChoices'), 10);
         var minChoice = _ignoreMinChoice ? 0 : parseInt(interaction.attr('minChoices'), 10);
         var responseDeclaration = interaction.getResponseDeclaration();
@@ -771,7 +785,7 @@ export default {
      * @param {Object} interaction - a standard interaction model object
      * @returns {Number}
      */
-    sliderInteractionBased: function sliderInteractionBased(interaction) {
+    sliderInteractionBased(interaction) {
         var responseDeclaration = interaction.getResponseDeclaration();
         var template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
         var max, scoreMaps;
@@ -819,7 +833,7 @@ export default {
      * @param {Object} interaction - a standard interaction model object
      * @returns {Number}
      */
-    textEntryInteractionBased: function textEntryInteractionBased(interaction) {
+    textEntryInteractionBased(interaction) {
         var responseDeclaration = interaction.getResponseDeclaration();
         var template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
         var max, scoreMaps;

@@ -65,7 +65,8 @@ define([
     'json!taoQtiItem/test/qtiItem/maxScore/data/graphic-associate-matchmax.json',
     'json!taoQtiItem/test/qtiItem/maxScore/data/response-none.json',
     'json!taoQtiItem/test/qtiItem/maxScore/data/external-scored.json',
-    'json!taoQtiItem/test/qtiItem/maxScore/data/external-scored-none.json'
+    'json!taoQtiItem/test/qtiItem/maxScore/data/external-scored-none.json',
+    'json!taoQtiItem/test/qtiItem/maxScore/data/external-scored-outcome.json'
 ], function(
     _,
     Element,
@@ -117,8 +118,11 @@ define([
     dataResponseNone,
     dataResponseExternalScored,
     dataResponseExternalScoredNone,
+    dataResponseExternalScoredOutcome
 ) {
     'use strict';
+
+    const externalScoredValues = ['human', 'externalMachine'];
 
     var cases = [
         { title: 'single choice correct', data: dataChoiceCorrectMultiple, expectedMaximum: 1, maxScore: 1 },
@@ -412,6 +416,7 @@ define([
         { title: 'response - none', data: dataResponseNone, expectedMaximum: 5, maxScore: 5 },
         { title: 'external scored', data: dataResponseExternalScored, expectedMaximum: 6, maxScore: 6 },
         { title: 'removed MAXSCORE and SCORE', data: dataResponseExternalScoredNone, expectedMaximum: undefined, maxScore: undefined },
+        { title: 'MAXSCORE and SCORE are NOT removed when outcome has external scored', data: dataResponseExternalScoredOutcome, expectedMaximum: 0, maxScore: 1 },
     ];
 
     QUnit.cases.init(cases).test('setNormalMaximum', function(settings, assert) {
@@ -431,11 +436,24 @@ define([
             assert.ok(Element.isA(item, 'assessmentItem'), 'item loaded');
 
             outcomeScore = item.getOutcomeDeclaration('SCORE');
+            const customOutcomes = _(item.getOutcomes()).filter(function (outcome) {
+                return outcome.id() !== 'SCORE' && outcome.id() !== 'MAXSCORE';
+            });
+            const outcomesWithExternalScored = customOutcomes.filter(outcome => {
+                return externalScoredValues.includes(outcome.attr('externalScored'));
+            });
 
-            if (outcomeScore && outcomeScore.getAttributes()['externalScored']) {
-                assert.ok(outcomeScore.attr('normalMaximum'), 'normalMaximum defined');
+
+            if (
+                (outcomeScore && outcomeScore.getAttributes()['externalScored']) ||
+                outcomesWithExternalScored.size() !== 0
+            ) {
+                assert.ok(_.isNumber(outcomeScore.attr('normalMaximum')), 'normalMaximum defined');
             } else {
-                assert.ok(_.isUndefined(outcomeScore && outcomeScore.attr('normalMaximum')), 'normalMaximum initially undefined');
+                assert.ok(
+                    _.isUndefined(outcomeScore && outcomeScore.attr('normalMaximum')),
+                    'normalMaximum initially undefined'
+                );
             }
 
             maxScore.setNormalMaximum(item);
