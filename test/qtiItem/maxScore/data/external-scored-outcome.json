@@ -1,0 +1,207 @@
+{
+    "identifier": "i666ac8acca467202406131223408054",
+    "serial": "item_666ad7e04dbfa162481935",
+    "qtiClass": "assessmentItem",
+    "attributes": {
+        "identifier": "i666ac8acca467202406131223408054",
+        "title": "Item 3",
+        "label": "Item 3",
+        "xml:lang": "en-US",
+        "adaptive": false,
+        "timeDependent": false,
+        "toolName": "TAO",
+        "toolVersion": "2024.06",
+        "class": ""
+    },
+    "body": {
+        "serial": "container_containeritembody_666ad7e04dbbd649916256",
+        "body": "\n    <div class=\"grid-row\">\n      <div class=\"col-12\">\n        {{interaction_hottextinteraction_666ad7e0509e0038016277}}\n      <\/div>\n    <\/div>\n    <div class=\"grid-row\">\n      <div class=\"col-12\">\n        {{interaction_hottextinteraction_666ad7e051230989121581}}\n      <\/div>\n    <\/div>\n  ",
+        "elements": {
+            "interaction_hottextinteraction_666ad7e0509e0038016277": {
+                "serial": "interaction_hottextinteraction_666ad7e0509e0038016277",
+                "qtiClass": "hottextInteraction",
+                "attributes": {
+                    "responseIdentifier": "RESPONSE",
+                    "maxChoices": 0,
+                    "minChoices": 0
+                },
+                "body": {
+                    "serial": "container_containerhottext_666ad7e050d89560168530",
+                    "body": "\n          <p>Lorem ipsum dolor sit amet, consectetur adipisicing ...<\/p>\n        ",
+                    "elements": {},
+                    "attributes": [],
+                    "debug": {
+                        "relatedItem": "item_666ad7e04dbfa162481935"
+                    }
+                },
+                "debug": {
+                    "relatedItem": "item_666ad7e04dbfa162481935"
+                },
+                "prompt": {
+                    "serial": "container_containerstatic_666ad7e050d44698016231",
+                    "body": "",
+                    "elements": {},
+                    "attributes": [],
+                    "debug": {
+                        "relatedItem": "item_666ad7e04dbfa162481935"
+                    }
+                }
+            },
+            "interaction_hottextinteraction_666ad7e051230989121581": {
+                "serial": "interaction_hottextinteraction_666ad7e051230989121581",
+                "qtiClass": "hottextInteraction",
+                "attributes": {
+                    "responseIdentifier": "RESPONSE_1",
+                    "maxChoices": 0,
+                    "minChoices": 0
+                },
+                "body": {
+                    "serial": "container_containerhottext_666ad7e051312229314143",
+                    "body": "\n          <p>Lorem ipsum dolor sit amet, consectetur adipisicing ...<\/p>\n        ",
+                    "elements": {},
+                    "attributes": [],
+                    "debug": {
+                        "relatedItem": "item_666ad7e04dbfa162481935"
+                    }
+                },
+                "debug": {
+                    "relatedItem": "item_666ad7e04dbfa162481935"
+                },
+                "prompt": {
+                    "serial": "container_containerstatic_666ad7e0512d7853841108",
+                    "body": "",
+                    "elements": {},
+                    "attributes": [],
+                    "debug": {
+                        "relatedItem": "item_666ad7e04dbfa162481935"
+                    }
+                }
+            }
+        },
+        "attributes": [],
+        "debug": {
+            "relatedItem": "item_666ad7e04dbfa162481935"
+        }
+    },
+    "debug": {
+        "relatedItem": "item_666ad7e04dbfa162481935"
+    },
+    "namespaces": {
+        "": "http:\/\/www.imsglobal.org\/xsd\/imsqti_v2p2",
+        "m": "http:\/\/www.w3.org\/1998\/Math\/MathML",
+        "xsi": "http:\/\/www.w3.org\/2001\/XMLSchema-instance"
+    },
+    "schemaLocations": {
+        "http:\/\/www.imsglobal.org\/xsd\/imsqti_v2p2": "http:\/\/www.imsglobal.org\/xsd\/qti\/qtiv2p2\/imsqti_v2p2.xsd"
+    },
+    "stylesheets": {},
+    "outcomes": {
+        "outcomedeclaration_666ad7e04ed97862805920": {
+            "identifier": "OUTCOME_1",
+            "serial": "outcomedeclaration_666ad7e04ed97862805920",
+            "qtiClass": "outcomeDeclaration",
+            "attributes": {
+                "identifier": "OUTCOME_1",
+                "cardinality": "single",
+                "baseType": "float",
+                "longInterpretation": "",
+                "externalScored": "human",
+                "normalMaximum": 1,
+                "normalMinimum": 0
+            },
+            "debug": {
+                "relatedItem": "item_666ad7e04dbfa162481935"
+            },
+            "defaultValue": null
+        },
+        "outcomedeclaration_666ad7e04f8bc562427531": {
+            "identifier": "SCORE",
+            "serial": "outcomedeclaration_666ad7e04f8bc562427531",
+            "qtiClass": "outcomeDeclaration",
+            "attributes": {
+                "identifier": "SCORE",
+                "cardinality": "single",
+                "baseType": "float",
+                "longInterpretation": "",
+                "normalMaximum": 0,
+                "normalMinimum": 0
+            },
+            "debug": {
+                "relatedItem": "item_666ad7e04dbfa162481935"
+            },
+            "defaultValue": null
+        },
+        "outcomedeclaration_666ad7e04f8de522536800": {
+            "identifier": "MAXSCORE",
+            "serial": "outcomedeclaration_666ad7e04f8de522536800",
+            "qtiClass": "outcomeDeclaration",
+            "attributes": {
+                "identifier": "MAXSCORE",
+                "cardinality": "single",
+                "baseType": "float"
+            },
+            "debug": {
+                "relatedItem": "item_666ad7e04dbfa162481935"
+            },
+            "defaultValue": "1"
+        }
+    },
+    "responses": {
+        "responsedeclaration_666ad7e04eaa4288513651": {
+            "identifier": "RESPONSE",
+            "serial": "responsedeclaration_666ad7e04eaa4288513651",
+            "qtiClass": "responseDeclaration",
+            "attributes": {
+                "identifier": "RESPONSE",
+                "cardinality": "multiple",
+                "baseType": "identifier"
+            },
+            "debug": {
+                "relatedItem": "item_666ad7e04dbfa162481935"
+            },
+            "defaultValue": [],
+            "mapping": [],
+            "areaMapping": [],
+            "howMatch": "no_response_processing",
+            "correctResponses": [],
+            "mappingAttributes": {
+                "defaultValue": 0
+            },
+            "feedbackRules": {}
+        },
+        "responsedeclaration_666ad7e04ec84171775656": {
+            "identifier": "RESPONSE_1",
+            "serial": "responsedeclaration_666ad7e04ec84171775656",
+            "qtiClass": "responseDeclaration",
+            "attributes": {
+                "identifier": "RESPONSE_1",
+                "cardinality": "multiple",
+                "baseType": "identifier"
+            },
+            "debug": {
+                "relatedItem": "item_666ad7e04dbfa162481935"
+            },
+            "defaultValue": [],
+            "mapping": [],
+            "areaMapping": [],
+            "howMatch": "no_response_processing",
+            "correctResponses": [],
+            "mappingAttributes": {
+                "defaultValue": 0
+            },
+            "feedbackRules": {}
+        }
+    },
+    "feedbacks": {},
+    "responseProcessing": {
+        "serial": "response_templatesdriven_666ad7e051b2d784211813",
+        "qtiClass": "responseProcessing",
+        "attributes": {},
+        "debug": {
+            "relatedItem": "item_666ad7e04dbfa162481935"
+        },
+        "processingType": "templateDriven",
+        "responseRules": []
+    },
+    "apipAccessibility": ""
+}
