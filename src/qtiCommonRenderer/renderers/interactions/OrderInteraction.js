@@ -134,10 +134,17 @@ const render = function (interaction) {
         choiceSelector = `${$choiceArea.selector} >li:not(.deactivated)`,
         resultSelector = `${$resultArea.selector} >li`,
         $dragContainer = $container.find('.drag-container'),
+        isSingleOrder = interaction.attr('order') === 'single',
         orientation =
             interaction.attr('orientation') && orientationSelectionEnabled
                 ? interaction.attr('orientation')
                 : 'vertical';
+
+    if (isSingleOrder) {
+        const $choices = $choiceArea.children('.qti-choice');
+        $container.addClass('test-preview');
+        $resultArea.append($choices);
+    }
 
     let $activeChoice = null,
         scaleX,
