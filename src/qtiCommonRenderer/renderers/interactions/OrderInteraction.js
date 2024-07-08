@@ -101,19 +101,31 @@ const _setInstructions = function (interaction) {
 };
 
 const resetResponse = function (interaction) {
+    const isSingleOrder = interaction.attr('order') === 'single';
     const $container = containerHelper.get(interaction);
     const initialOrder = _.keys(interaction.getChoices());
-    const $choiceArea = $('.choice-area', $container).append($('.result-area>li', $container));
-    const $choices = $choiceArea.children('.qti-choice');
+    const $resultArea = $('.result-area', $container);
+    const $resultItems = $('.result-area>li', $container);
 
     $container.find('.qti-choice.active').each(function deactivateChoice() {
         interactUtils.tapOn(this);
     });
 
-    $choices.detach().sort(function (choice1, choice2) {
-        return _.indexOf(initialOrder, $(choice1).data('serial')) - _.indexOf(initialOrder, $(choice2).data('serial'));
-    });
-    $choiceArea.prepend($choices);
+    if (isSingleOrder) {
+        // if it's a single order interaction, sort the items in result-area in initial order
+        $resultItems.detach().sort(function (item1, item2) {
+            return _.indexOf(initialOrder, $(item1).data('serial')) - _.indexOf(initialOrder, $(item2).data('serial'));
+        });
+        $resultArea.empty();
+        $resultArea.append($resultItems);
+    } else {
+        const $choiceArea = $('.choice-area', $container).append($('.result-area>li', $container));
+        const $choices = $choiceArea.children('.qti-choice');
+        $choices.detach().sort(function (choice1, choice2) {
+            return _.indexOf(initialOrder, $(choice1).data('serial')) - _.indexOf(initialOrder, $(choice2).data('serial'));
+        });
+        $choiceArea.prepend($choices);
+    }
 };
 
 /**
@@ -561,13 +573,20 @@ const setResponse = function (interaction, response) {
     const $container = containerHelper.get(interaction);
     const $choiceArea = $('.choice-area', $container);
     const $resultArea = $('.result-area', $container);
+    const $resultItems = $resultArea.children('li');
+    const isSingleOrder = interaction.attr('order') === 'single';
 
     if (response === null || _.isEmpty(response)) {
         resetResponse(interaction);
     } else {
         try {
+            const detachedItems = $resultItems.detach();
             _.forEach(pciResponse.unserialize(response, interaction), function (identifier) {
-                $resultArea.append($choiceArea.find(`[data-identifier="${identifier}"]`));
+                if (isSingleOrder) {
+                    $resultArea.append(detachedItems.filter(`[data-identifier="${identifier}"]`));
+                } else {
+                    $resultArea.append($choiceArea.find(`[data-identifier="${identifier}"]`));
+                }
             });
         } catch (e) {
             throw new Error(`wrong response format in argument : ${e}`);
