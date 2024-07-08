@@ -573,20 +573,16 @@ const setResponse = function (interaction, response) {
     const $container = containerHelper.get(interaction);
     const $choiceArea = $('.choice-area', $container);
     const $resultArea = $('.result-area', $container);
-    const $resultItems = $resultArea.children('li');
     const isSingleOrder = interaction.attr('order') === 'single';
 
     if (response === null || _.isEmpty(response)) {
         resetResponse(interaction);
     } else {
         try {
-            const detachedItems = $resultItems.detach();
             _.forEach(pciResponse.unserialize(response, interaction), function (identifier) {
-                if (isSingleOrder) {
-                    $resultArea.append(detachedItems.filter(`[data-identifier="${identifier}"]`));
-                } else {
-                    $resultArea.append($choiceArea.find(`[data-identifier="${identifier}"]`));
-                }
+                $resultArea.append(
+                    (isSingleOrder ? $resultArea : $choiceArea).find(`[data-identifier="${identifier}"]`)
+                );
             });
         } catch (e) {
             throw new Error(`wrong response format in argument : ${e}`);
