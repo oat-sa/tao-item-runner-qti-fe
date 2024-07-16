@@ -66,7 +66,8 @@ define([
     'json!taoQtiItem/test/qtiItem/maxScore/data/response-none.json',
     'json!taoQtiItem/test/qtiItem/maxScore/data/external-scored.json',
     'json!taoQtiItem/test/qtiItem/maxScore/data/external-scored-none.json',
-    'json!taoQtiItem/test/qtiItem/maxScore/data/external-scored-outcome.json'
+    'json!taoQtiItem/test/qtiItem/maxScore/data/external-scored-outcome.json',
+    'json!taoQtiItem/test/qtiItem/maxScore/data/no-responses.json'
 ], function(
     _,
     Element,
@@ -118,11 +119,20 @@ define([
     dataResponseNone,
     dataResponseExternalScored,
     dataResponseExternalScoredNone,
-    dataResponseExternalScoredOutcome
+    dataResponseExternalScoredOutcome,
+    dataResponseNoResponses
 ) {
     'use strict';
 
     const externalScoredValues = ['human', 'externalMachine'];
+    const DEFAULT_EXPECT_COUNT = 3;
+
+    function getCustomOutcomes(item) {
+        const customOutcomes = _(item.getOutcomes()).filter(function (outcome) {
+            return outcome.id() !== 'SCORE' && outcome.id() !== 'MAXSCORE';
+        });
+        return customOutcomes;
+    }
 
     var cases = [
         { title: 'single choice correct', data: dataChoiceCorrectMultiple, expectedMaximum: 1, maxScore: 1 },
@@ -415,11 +425,17 @@ define([
         },
         { title: 'response - none', data: dataResponseNone, expectedMaximum: 5, maxScore: 5 },
         { title: 'external scored', data: dataResponseExternalScored, expectedMaximum: 6, maxScore: 6 },
-        { title: 'removed MAXSCORE and SCORE', data: dataResponseExternalScoredNone, expectedMaximum: undefined, maxScore: undefined },
+        { title: 'removed MAXSCORE and SCORE', data: dataResponseExternalScoredNone, expectedMaximum: void 0, maxScore: void 0 },
         { title: 'MAXSCORE and SCORE are NOT removed when outcome has external scored', data: dataResponseExternalScoredOutcome, expectedMaximum: 0, maxScore: 1 },
+        { title: 'Outcome variables are removed when there are no responses in the item', data: dataResponseNoResponses, expectedMaximum: void 0, maxScore: void 0, customOutcomes: 0 },
     ];
 
     QUnit.cases.init(cases).test('setNormalMaximum', function(settings, assert) {
+        const expectCount = [
+            settings.maxScore,
+            settings.expectedMaximum,
+            settings.customOutcomes
+        ].filter(value => !_.isUndefined(value)).length + DEFAULT_EXPECT_COUNT;
         var ready = assert.async();
 
         var loader = new Loader();
@@ -436,10 +452,7 @@ define([
             assert.ok(Element.isA(item, 'assessmentItem'), 'item loaded');
 
             outcomeScore = item.getOutcomeDeclaration('SCORE');
-            const customOutcomes = _(item.getOutcomes()).filter(function (outcome) {
-                return outcome.id() !== 'SCORE' && outcome.id() !== 'MAXSCORE';
-            });
-            const outcomesWithExternalScored = customOutcomes.filter(outcome => {
+            const outcomesWithExternalScored = getCustomOutcomes(item).filter(outcome => {
                 return externalScoredValues.includes(outcome.attr('externalScored'));
             });
 
@@ -467,18 +480,16 @@ define([
 
             maxScore.setMaxScore(item);
             if (!_.isUndefined(settings.maxScore)) {
-                assert.expect(5);
                 outcomeMaxScore = item.getOutcomeDeclaration('MAXSCORE');
                 assert.ok(Element.isA(outcomeMaxScore, 'outcomeDeclaration'), 'MAXSCORE outcome exists');
                 assert.equal(outcomeMaxScore.getDefaultValue(), settings.maxScore);
             } else {
-                if (!_.isUndefined(settings.expectedMaximum)) {
-                    assert.expect(4);
-                } else {
-                    assert.expect(3);
-                }
                 assert.ok(_.isUndefined(item.getOutcomeDeclaration('MAXSCORE')), 'MAXSCORE undefined');
             }
+            if (!_.isUndefined(settings.customOutcomes)) {
+                assert.equal(getCustomOutcomes(item).size(), settings.customOutcomes, 'custom outcomes count');
+            }
+            assert.expect(expectCount);
         });
     });
 });

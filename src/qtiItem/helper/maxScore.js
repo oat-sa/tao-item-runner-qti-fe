@@ -170,6 +170,12 @@ export default {
                 item.removeOutcome('MAXSCORE');
                 item.removeOutcome('SCORE');
             }
+            // remove custom outcomes if all interactions are without responses
+            if (_.isEmpty(item.responses)) {
+                customOutcomes.forEach(outcome => {
+                    item.removeOutcome(outcome.id());
+                });
+            }
         }
     },
 
