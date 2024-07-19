@@ -51,6 +51,34 @@
                 "relatedItem": "item_6695325e7f312981018589"
             },
             "defaultValue": null
+        },
+        "outcomedeclaration_58fdf5897e8ad024055546": {
+            "identifier": "SCORE",
+            "serial": "outcomedeclaration_58fdf5897e8ad024055546",
+            "qtiClass": "outcomeDeclaration",
+            "attributes": {
+                "identifier": "SCORE",
+                "cardinality": "single",
+                "baseType": "float"
+            },
+            "debug": {
+                "relatedItem": "item_6695325e7f312981018589"
+            },
+            "defaultValue": null
+        },
+        "outcomedeclaration_666ad8e04f8de522536800": {
+            "identifier": "MAXSCORE",
+            "serial": "outcomedeclaration_666ad8e04f8de522536800",
+            "qtiClass": "outcomeDeclaration",
+            "attributes": {
+                "identifier": "MAXSCORE",
+                "cardinality": "single",
+                "baseType": "float"
+            },
+            "debug": {
+                "relatedItem": "item_6695325e7f312981018589"
+            },
+            "defaultValue": "1"
         }
     },
     "responses": {},

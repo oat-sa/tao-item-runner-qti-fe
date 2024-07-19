@@ -427,14 +427,14 @@ define([
         { title: 'external scored', data: dataResponseExternalScored, expectedMaximum: 6, maxScore: 6 },
         { title: 'removed MAXSCORE and SCORE', data: dataResponseExternalScoredNone, expectedMaximum: void 0, maxScore: void 0 },
         { title: 'MAXSCORE and SCORE are NOT removed when outcome has external scored', data: dataResponseExternalScoredOutcome, expectedMaximum: 0, maxScore: 1 },
-        { title: 'Outcome variables are removed when there are no responses in the item', data: dataResponseNoResponses, expectedMaximum: void 0, maxScore: void 0, customOutcomes: 0 },
+        { title: 'Outcome variables are removed when there are no responses in the item', data: dataResponseNoResponses, expectedMaximum: void 0, maxScore: void 0, outcomes: 0 },
     ];
 
     QUnit.cases.init(cases).test('setNormalMaximum', function(settings, assert) {
         const expectCount = [
             settings.maxScore,
             settings.expectedMaximum,
-            settings.customOutcomes
+            settings.outcomes
         ].filter(value => !_.isUndefined(value)).length + DEFAULT_EXPECT_COUNT;
         var ready = assert.async();
 
@@ -486,8 +486,8 @@ define([
             } else {
                 assert.ok(_.isUndefined(item.getOutcomeDeclaration('MAXSCORE')), 'MAXSCORE undefined');
             }
-            if (!_.isUndefined(settings.customOutcomes)) {
-                assert.equal(getCustomOutcomes(item).size(), settings.customOutcomes, 'custom outcomes count');
+            if (!_.isUndefined(settings.outcomes)) {
+                assert.equal(_(item.getOutcomes()).size(), settings.outcomes, 'outcomes count');
             }
             assert.expect(expectCount);
         });
