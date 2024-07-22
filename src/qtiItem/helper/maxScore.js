@@ -163,12 +163,25 @@ export default {
             const outcomesWithExternalScored = customOutcomes.filter(outcome => {
                 return externalScoredValues.includes(outcome.attr('externalScored'));
             });
+            const isResponsesEmpty = _.isEmpty(item.responses);
             // remove MAXSCORE and SCORE outcome variables when all interactions are configured with none response processing rule,
             // and the externalScored property of the SCORE variable is set to None
             // and there are no other outcome variables with externalScored property set to human or externalMachine
-            if (!scoreOutcome.attr('externalScored') && isAllResponseProcessingRulesNone && outcomesWithExternalScored.size() === 0) {
+            // or in case all interactions are without responses
+            if (
+                (!scoreOutcome.attr('externalScored') &&
+                    isAllResponseProcessingRulesNone &&
+                    outcomesWithExternalScored.size() === 0) ||
+                isResponsesEmpty
+            ) {
                 item.removeOutcome('MAXSCORE');
                 item.removeOutcome('SCORE');
+            }
+            // remove custom outcomes if all interactions are without responses
+            if (isResponsesEmpty) {
+                customOutcomes.forEach(outcome => {
+                    item.removeOutcome(outcome.id());
+                });
             }
         }
     },
