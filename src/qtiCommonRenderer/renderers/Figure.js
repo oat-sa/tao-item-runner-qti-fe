@@ -20,6 +20,7 @@ import _ from 'lodash';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import imageTpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure-image';
 import widgetTpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure-widget';
+import { FLOAT_LEFT_CLASS, FLOAT_RIGHT_CLASS, CENTER_CLASS } from 'ui/mediaEditor/plugins/mediaAlignment/helper';
 
 const DISABLE_FIGURE_WIDGET = context.featureFlags['FEATURE_FLAG_DISABLE_FIGURE_WIDGET'];
 
@@ -33,7 +34,7 @@ export default {
         }
 
         let showFigure = false;
-        if (data.attributes.class && ['wrap-left', 'wrap-right'].includes(data.attributes.class)) {
+        if (data.attributes.class && [FLOAT_LEFT_CLASS, FLOAT_RIGHT_CLASS, CENTER_CLASS].includes(data.attributes.class)) {
             showFigure = true;
         } else {
             _.some(elem.bdy['elements'], childElement => {
