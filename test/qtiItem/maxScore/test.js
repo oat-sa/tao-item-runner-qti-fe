@@ -423,7 +423,7 @@ define([
             expectedMaximum: 5,
             maxScore: 5
         },
-        { title: 'response - none', data: dataResponseNone, expectedMaximum: 5, maxScore: 5 },
+        { title: 'response - none', data: dataResponseNone, expectedMaximum: 5, maxScore: 6 },
         { title: 'external scored', data: dataResponseExternalScored, expectedMaximum: 6, maxScore: 7 },
         { title: 'removed MAXSCORE and SCORE', data: dataResponseExternalScoredNone, expectedMaximum: void 0, maxScore: void 0 },
         { title: 'MAXSCORE and SCORE are NOT removed when outcome has external scored', data: dataResponseExternalScoredOutcome, expectedMaximum: 0, maxScore: 1 },
