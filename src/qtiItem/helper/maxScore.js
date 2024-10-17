@@ -105,7 +105,7 @@ export default {
         if (scoreOutcome && item.responseProcessing && item.responseProcessing.processingType === 'templateDriven') {
             const interactions = item.getInteractions();
             if (externalScoredValues.includes(scoreOutcome.attr('externalScored'))) {
-                maxScore = scoreOutcome.attr('normalMaximum') || 0;
+                maxScore = scoreOutcome.attr('normalMaximum') + 1 || 1;
             } else {
                 maxScore = _.reduce(
                     interactions,
