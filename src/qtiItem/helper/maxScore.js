@@ -104,11 +104,6 @@ export default {
         //try setting the computed normal maximum only if the processing type is known, i.e. 'templateDriven'
         if (scoreOutcome && item.responseProcessing && item.responseProcessing.processingType === 'templateDriven') {
             const interactions = item.getInteractions();
-            const isAllResponseProcessingRulesNone = !interactions.some(interaction => {
-                const responseDeclaration = interaction.getResponseDeclaration();
-                const template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
-                return template !== 'NONE';
-            });
             maxScore = _.reduce(
                 interactions,
                 function (acc, interaction) {
@@ -158,6 +153,12 @@ export default {
                     item.removeOutcome('MAXSCORE');
                 }
             }
+
+            const isAllResponseProcessingRulesNone = !interactions.some(interaction => {
+                const responseDeclaration = interaction.getResponseDeclaration();
+                const template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
+                return template !== 'NONE';
+            });
 
             const outcomesWithExternalScored = customOutcomes.filter(outcome => {
                 return externalScoredValues.includes(outcome.attr('externalScored'));
