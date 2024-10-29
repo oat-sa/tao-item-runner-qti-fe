@@ -104,23 +104,27 @@ export default {
         //try setting the computed normal maximum only if the processing type is known, i.e. 'templateDriven'
         if (scoreOutcome && item.responseProcessing && item.responseProcessing.processingType === 'templateDriven') {
             const interactions = item.getInteractions();
+            const isAllResponseProcessingRulesNone = !interactions.some(interaction => {
+                const responseDeclaration = interaction.getResponseDeclaration();
+                const template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
+                return template !== 'NONE';
+            });
+            maxScore = _.reduce(
+                interactions,
+                function (acc, interaction) {
+                    var interactionMaxScore = interaction.getNormalMaximum();
+                    if (_.isNumber(interactionMaxScore)) {
+                        return gamp.add(acc, interactionMaxScore);
+                    } else {
+                        hasInvalidInteraction = true;
+                        return acc;
+                    }
+                },
+                0
+            );
             if (externalScoredValues.includes(scoreOutcome.attr('externalScored'))) {
-                maxScore = scoreOutcome.attr('normalMaximum') + 1 || 1;
+                maxScore = maxScore + (scoreOutcome.attr('normalMaximum') || 0);
             } else {
-                maxScore = _.reduce(
-                    interactions,
-                    function (acc, interaction) {
-                        var interactionMaxScore = interaction.getNormalMaximum();
-                        if (_.isNumber(interactionMaxScore)) {
-                            return gamp.add(acc, interactionMaxScore);
-                        } else {
-                            hasInvalidInteraction = true;
-                            return acc;
-                        }
-                    },
-                    0
-                );
-
                 if (customOutcomes.size()) {
                     maxScore = customOutcomes.reduce(function (acc, outcome) {
                         return gamp.add(acc, parseFloat(outcome.attr('normalMaximum') || 0));
@@ -155,11 +159,6 @@ export default {
                 }
             }
 
-            const isAllResponseProcessingRulesNone = !interactions.some(interaction => {
-                const responseDeclaration = interaction.getResponseDeclaration();
-                const template = responseHelper.getTemplateNameFromUri(responseDeclaration.template);
-                return template !== 'NONE';
-            });
             const outcomesWithExternalScored = customOutcomes.filter(outcome => {
                 return externalScoredValues.includes(outcome.attr('externalScored'));
             });
