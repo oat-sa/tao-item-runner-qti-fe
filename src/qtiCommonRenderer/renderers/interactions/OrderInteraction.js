@@ -101,7 +101,7 @@ const _setInstructions = function (interaction) {
 };
 
 const resetResponse = function (interaction) {
-    const isSingleOrder = interaction.attr('order') === 'single';
+    const isSingleOrder = interaction.attr('data-order') === 'single';
     const $container = containerHelper.get(interaction);
     const initialOrder = _.keys(interaction.getChoices());
     const $resultArea = $('.result-area', $container);
@@ -146,7 +146,7 @@ const render = function (interaction) {
         choiceSelector = `${$choiceArea.selector} >li:not(.deactivated)`,
         resultSelector = `${$resultArea.selector} >li`,
         $dragContainer = $container.find('.drag-container'),
-        isSingleOrder = interaction.attr('order') === 'single',
+        isSingleOrder = interaction.attr('data-order') === 'single',
         orientation =
             interaction.attr('orientation') && orientationSelectionEnabled
                 ? interaction.attr('orientation')
@@ -573,7 +573,7 @@ const setResponse = function (interaction, response) {
     const $container = containerHelper.get(interaction);
     const $choiceArea = $('.choice-area', $container);
     const $resultArea = $('.result-area', $container);
-    const isSingleOrder = interaction.attr('order') === 'single';
+    const isSingleOrder = interaction.attr('data-order') === 'single';
 
     if (response === null || _.isEmpty(response)) {
         resetResponse(interaction);
