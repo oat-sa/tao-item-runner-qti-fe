@@ -72,7 +72,14 @@ const render = function (interaction, options) {
         return itemDir;
     };
 
+    const getItemWritingMode = () => {
+        const itemBody = $('.qti-itemBody');
+        const itemWritingMode = itemBody.hasClass('writing-mode-vertical-rl') ? 'vertical-rl' : '';
+        return itemWritingMode;
+    }
+
     const dirClass = getItemDir();
+    const writingMode = getItemWritingMode();
     $container.select2({
         data: $container
             .find(optionSelector)
@@ -91,7 +98,8 @@ const render = function (interaction, options) {
         placeholder: opts.placeholderText,
         minimumResultsForSearch: -1,
         containerCssClass: `${dirClass}`,
-        dropdownCssClass: `qti-inlineChoiceInteraction-dropdown ${dirClass}`
+        dropdownCssClass: `qti-inlineChoiceInteraction-dropdown ${dirClass}`,
+        writingMode
     });
 
     const $el = $container.select2('container');
