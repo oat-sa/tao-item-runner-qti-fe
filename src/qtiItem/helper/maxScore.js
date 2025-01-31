@@ -304,10 +304,7 @@ export default {
                 return gamp.add(acc, score);
             }, 0);
 
-            //compare the calculated maximum with the mapping upperbound
-            if (responseDeclaration.mappingAttributes.upperBound) {
-                max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
-            }
+            max = this.getMaxCutByUpperBound(max, responseDeclaration);
         } else if (template === 'MAP_RESPONSE_POINT') {
             //map point response processing does not work on choice based interaction
             max = 0;
@@ -535,10 +532,7 @@ export default {
                 return gamp.add(acc, score);
             }, 0);
 
-            //compare the calculated maximum with the mapping upperbound
-            if (responseDeclaration.mappingAttributes.upperBound) {
-                max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
-            }
+            max = this.getMaxCutByUpperBound(max, responseDeclaration);
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = 0;
         } else if (template === 'NONE') {
@@ -729,10 +723,7 @@ export default {
 
             //console.log(usedChoices, allPossibleMapEntries, sortedMaps);
 
-            //compare the calculated maximum with the mapping upperbound
-            if (responseDeclaration.mappingAttributes.upperBound) {
-                max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
-            }
+            max = this.getMaxCutByUpperBound(max, responseDeclaration);
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = false;
         } else if (template === 'NONE') {
@@ -782,10 +773,7 @@ export default {
                 }, 0);
             max = parseFloat(max);
 
-            //compare the calculated maximum with the mapping upperbound
-            if (responseDeclaration.mappingAttributes.upperBound) {
-                max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
-            }
+            max = this.getMaxCutByUpperBound(max, responseDeclaration);
         } else if (template === 'NONE') {
             // set max to zero
             max = 0;
@@ -828,10 +816,7 @@ export default {
                 .max();
             max = parseFloat(max);
 
-            //compare the calculated maximum with the mapping upperbound
-            if (responseDeclaration.mappingAttributes.upperBound) {
-                max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
-            }
+            max = this.getMaxCutByUpperBound(max, responseDeclaration);
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = 0;
         } else if (template === 'NONE') {
@@ -895,10 +880,7 @@ export default {
                 .max();
             max = parseFloat(max);
 
-            //compare the calculated maximum with the mapping upperbound
-            if (responseDeclaration.mappingAttributes.upperBound) {
-                max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
-            }
+            max = this.getMaxCutByUpperBound(max, responseDeclaration);
         } else if (template === 'MAP_RESPONSE_POINT') {
             max = 0;
         } else if (template === 'NONE') {
@@ -934,10 +916,7 @@ export default {
             });
             max = _.max(values);
 
-            //compare the calculated maximum with the mapping upperbound
-            if (responseDeclaration.mappingAttributes.upperBound) {
-                max = Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
-            }
+            max = this.getMaxCutByUpperBound(max, responseDeclaration);
         } else if (template === 'NONE') {
             // set max to zero
             max = 0;
@@ -945,5 +924,14 @@ export default {
             max = 0;
         }
         return max;
+    },
+
+    getMaxCutByUpperBound(max, responseDeclaration) {
+        if (!_.has(responseDeclaration, 'mappingAttributes.upperBound')) {
+            return max;
+        }
+
+        //compare the calculated maximum with the mapping upperbound
+        return Math.min(max, parseFloat(responseDeclaration.mappingAttributes.upperBound || 0));
     }
 };
