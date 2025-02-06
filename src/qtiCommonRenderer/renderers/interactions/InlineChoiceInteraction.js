@@ -76,10 +76,12 @@ const render = function (interaction, options) {
         const itemBody = $('.qti-itemBody');
         const itemWritingMode = itemBody.hasClass('writing-mode-vertical-rl') ? 'vertical-rl' : '';
         return itemWritingMode;
-    }
+    };
 
     const dirClass = getItemDir();
     const writingMode = getItemWritingMode();
+    const isVertical = writingMode === 'vertical-rl';
+
     $container.select2({
         data: $container
             .find(optionSelector)
@@ -106,7 +108,9 @@ const render = function (interaction, options) {
 
     if (required) {
         //set up the tooltip plugin for the input
-        choiceTooltip = tooltip.warning($el, __('A choice must be selected'));
+        choiceTooltip = tooltip.warning($el, __('A choice must be selected'), {
+            placement: isVertical ? 'right' : 'top'
+        });
 
         if ($container.val() === '') {
             choiceTooltip.show();
@@ -152,8 +156,6 @@ const _setVal = function (interaction, choiceIdentifier) {
 const resetResponse = function (interaction) {
     _setVal(interaction, _emptyValue);
 };
-
-
 
 /**
  * Set the response to the rendered interaction.
