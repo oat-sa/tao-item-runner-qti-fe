@@ -53,7 +53,7 @@
         "@oat-sa/tao-core-libs": "^1.0.0",
         "@oat-sa/tao-core-sdk": "^3.0.0",
         "@oat-sa/tao-core-shared-libs": "^1.4.1",
-        "@oat-sa/tao-core-ui": "^3.6.0",
+        "@oat-sa/tao-core-ui": "github:oat-sa/tao-core-ui-fe#feature/AUT-4082-add-new-classes-to-list-style",
         "@oat-sa/tao-item-runner": "^1.0.0",
         "@oat-sa/tao-qunit-testrunner": "^2.0.0",
         "async": "^0.2.10",
