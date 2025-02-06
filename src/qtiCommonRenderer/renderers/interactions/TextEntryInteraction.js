@@ -42,6 +42,15 @@ import converter from 'util/converter';
 const logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/TextEntryInteraction.js');
 
 /**
+ * If item has 'vertical-rl' writing mode
+ * @returns {Boolean}
+ */
+const getIsVerticalWritingMode = () => {
+    const itemBody = $('.qti-itemBody');
+    return itemBody.hasClass('writing-mode-vertical-rl');
+};
+
+/**
  * Hide the tooltip for the text input
  * @param {jQuery} $input
  */
@@ -61,10 +70,13 @@ function showTooltip($input, theme, message) {
     if ($input.data('$tooltip')) {
         $input.data('$tooltip').updateTitleContent(message);
     } else {
-        const textEntryTooltip = tooltip.create($input, message, {
+        const isVertical = getIsVerticalWritingMode();
+        let tooltipOptions = {
             theme: theme,
-            trigger: 'manual'
-        });
+            trigger: 'manual',
+            placement: isVertical ? 'right' : 'top'
+        };
+        const textEntryTooltip = tooltip.create($input, message, tooltipOptions);
 
         $input.data('$tooltip', textEntryTooltip);
     }
@@ -156,8 +168,8 @@ function render(interaction) {
     if (attributes.expectedLength) {
         //adding 2 chars to include reasonable padding size
         expectedLength = parseInt(attributes.expectedLength) + 2;
-        $input.css('width', expectedLength + 'ch');
-        $input.css('min-width', expectedLength + 'ch');
+        $input.css('inline-size', expectedLength + 'ch');
+        $input.css('min-inline-size', expectedLength + 'ch');
     }
 
     //checking if there's a placeholder for the input
