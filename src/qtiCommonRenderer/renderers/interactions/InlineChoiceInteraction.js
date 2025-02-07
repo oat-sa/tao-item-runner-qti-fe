@@ -81,6 +81,7 @@ const render = function (interaction, options) {
     const dirClass = getItemDir();
     const writingMode = getItemWritingMode();
     const isVertical = writingMode === 'vertical-rl';
+    const serial = $container.data('serial');
 
     $container.select2({
         data: $container
@@ -111,10 +112,14 @@ const render = function (interaction, options) {
         choiceTooltip = tooltip.warning($el, __('A choice must be selected'), {
             placement: isVertical ? 'right' : 'top'
         });
-
         if ($container.val() === '') {
             choiceTooltip.show();
         }
+        //refresh tooltip position when all styles loaded.
+        $(document).on(`themeapplied.inlineChoiceInteraction-${serial}`, () => {
+            choiceTooltip.hide();
+            choiceTooltip.show();
+        });
     }
 
     $container
@@ -200,9 +205,11 @@ const getResponse = function (interaction) {
  */
 const destroy = function (interaction) {
     const $container = containerHelper.get(interaction);
+    const serial = $container.data('serial');
 
     //remove event
     $(document).off('.commonRenderer');
+    $(document).off(`.inlineChoiceInteraction-${serial}`);
 
     $container.select2('destroy');
 
