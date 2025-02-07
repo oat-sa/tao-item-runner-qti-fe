@@ -57,6 +57,7 @@ const getIsVerticalWritingMode = () => {
 function hideTooltip($input) {
     if ($input.data('$tooltip')) {
         $input.data('$tooltip').hide();
+        $input.data('textentry-tooltip-is-shown', false);
     }
 }
 
@@ -82,6 +83,18 @@ function showTooltip($input, theme, message) {
     }
 
     $input.data('$tooltip').show();
+    $input.data('textentry-tooltip-is-shown', true);
+}
+
+/**
+ * Refresh tooltip position
+ * @param {jQuery} $input
+ */
+function refreshTooltip($input) {
+    if ($input.data('$tooltip') && $input.data('textentry-tooltip-is-shown')) {
+        $input.data('$tooltip').hide();
+        $input.data('$tooltip').show();
+    }
 }
 
 /**
@@ -143,6 +156,7 @@ function render(interaction) {
     const attributes = interaction.getAttributes();
     const baseType = interaction.getResponseDeclaration().attr('baseType');
     const $input = interaction.getContainer();
+    const serial = $input.data('serial');
     const patternMask = interaction.attr('patternMask');
     const maxChars = parseInt(patternMaskHelper.parsePattern(patternMask, 'chars'), 10);
     let expectedLength;
@@ -247,6 +261,11 @@ function render(interaction) {
             containerHelper.triggerResponseChangeEvent(interaction);
         });
     }
+
+    //refresh tooltip position when all styles loaded.
+    $(document).on(`themeapplied.textEntryInteraction-${serial}`, () => {
+        refreshTooltip($input);
+    });
 }
 
 function resetResponse(interaction) {
@@ -323,6 +342,9 @@ function getResponse(interaction) {
 }
 
 function destroy(interaction) {
+    const $interaction = containerHelper.get(interaction);
+    const serial = $interaction.data('serial');
+
     $('input.qti-textEntryInteraction').each(function (index, el) {
         const $input = $(el);
         if ($input.data('$tooltip')) {
@@ -333,7 +355,8 @@ function destroy(interaction) {
 
     //remove event
     $(document).off('.commonRenderer');
-    containerHelper.get(interaction).off('.commonRenderer');
+    $interaction.off('.commonRenderer');
+    $(document).off(`.textEntryInteraction-${serial}`);
 
     //remove instructions
     instructionMgr.removeInstructions(interaction);
