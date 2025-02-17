@@ -79,8 +79,7 @@ const render = function (interaction, options) {
     };
 
     const dirClass = getItemDir();
-    const writingMode = getItemWritingMode();
-    const isVertical = writingMode === 'vertical-rl';
+    const isVerticalRl = containerHelper.isItemWritingModeVerticalRl();
     const serial = $container.data('serial');
 
     $container.select2({
@@ -102,7 +101,7 @@ const render = function (interaction, options) {
         minimumResultsForSearch: -1,
         containerCssClass: `${dirClass}`,
         dropdownCssClass: `qti-inlineChoiceInteraction-dropdown ${dirClass}`,
-        writingMode
+        writingMode: isVerticalRl ? 'vertical-rl' : ''
     });
 
     const $el = $container.select2('container');
@@ -110,7 +109,7 @@ const render = function (interaction, options) {
     if (required) {
         //set up the tooltip plugin for the input
         choiceTooltip = tooltip.warning($el, __('A choice must be selected'), {
-            placement: isVertical ? 'right' : 'top'
+            placement: isVerticalRl ? 'right' : 'top'
         });
         if ($container.val() === '') {
             choiceTooltip.show();

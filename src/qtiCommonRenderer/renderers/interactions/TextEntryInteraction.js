@@ -42,15 +42,6 @@ import converter from 'util/converter';
 const logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/TextEntryInteraction.js');
 
 /**
- * If item has 'vertical-rl' writing mode
- * @returns {Boolean}
- */
-const getIsVerticalWritingMode = () => {
-    const itemBody = $('.qti-itemBody');
-    return itemBody.hasClass('writing-mode-vertical-rl');
-};
-
-/**
  * Hide the tooltip for the text input
  * @param {jQuery} $input
  */
@@ -71,7 +62,7 @@ function showTooltip($input, theme, message) {
     if ($input.data('$tooltip')) {
         $input.data('$tooltip').updateTitleContent(message);
     } else {
-        const isVertical = getIsVerticalWritingMode();
+        const isVertical = containerHelper.isItemWritingModeVerticalRl();
         let tooltipOptions = {
             theme: theme,
             trigger: 'manual',
