@@ -644,6 +644,7 @@ function inputLimiter(interaction) {
                     if (!isCke && charsCount > maxLength) {
                         const textarea = $textarea[0];
                         textarea.value = textarea.value.substring(0, maxLength);
+                        $textarea.trigger('inputlimiter-limited');
                         textarea.focus();
                     }
                     return cancelEvent(e);
@@ -699,6 +700,7 @@ function inputLimiter(interaction) {
                     el.focus();
                     el.selectionStart = start + newValue.length;
                     el.selectionEnd = el.selectionStart;
+                    elements.trigger('inputlimiter-limited');
                 }
 
                 _.defer(() => this.updateCounter());
@@ -716,6 +718,7 @@ function inputLimiter(interaction) {
                 if (_getFormat(interaction) !== 'xhtml' && maxLength !== null) {
                     const currentValue = $textarea[0].value;
                     $textarea[0].value = currentValue.substring(0, maxLength);
+                    $textarea.trigger('inputlimiter-limited');
                 }
                 _.defer(() => this.updateCounter());
                 return e;
@@ -818,6 +821,7 @@ function inputLimiter(interaction) {
  *     - then draw custom cursor at those coordinates.
  * Unsolved issues:
  *   - when user clicks between lines (in a space left by the difference of line-height & font-size), `textarea.selectionStart` is wrong, cursor jumps randomly
+ *   - when user clicks on empty space left in the line, or at empty lines, `textarea.selectionStart` is wrong, cursor jumps randomly
  *   - key-navigation is not intuitive (left/right still jump letters, and up/down - lines, as in horizontal-tb)
  * @param {JQuery} $textarea
  * @param {string} serial
@@ -857,7 +861,7 @@ function _patchSafariVerticalRl($textarea, serial) {
         if (repaintIdx % 2 === 0) {
             $textarea.get(0).style.opacity = '99%';
         } else {
-            $textarea.get(0).style.opacity = '100%';
+            $textarea.get(0).style.opacity = '98%';
         }
         repaintIdx++;
     }
@@ -938,9 +942,22 @@ function _patchSafariVerticalRl($textarea, serial) {
         }
     }
 
+    const debouncedPositionCursor = _.debounce(() => {
+        if (document.activeElement === $textarea.get(0)) {
+            requestAnimationFrame(() => {
+                positionCursor();
+            });
+        }
+    }, 100);
+
     $textarea.on('input', e => {
         forceTextareaRepaint();
         setShadowString(e.target.value);
+        positionCursor();
+    });
+    $textarea.on('inputlimiter-limited', () => {
+        forceTextareaRepaint();
+        setShadowString($textarea.get(0).value);
         positionCursor();
     });
     $textarea.on('selectionchange', e => {
@@ -960,21 +977,12 @@ function _patchSafariVerticalRl($textarea, serial) {
     });
 
     //scroll containers
-    $('.qti-itemBody, .tao-overflow-y').on(`scroll.exendedText-verticalsafari-${serial}`, e => {
-        if (document.activeElement === $textarea.get(0)) {
-            requestAnimationFrame(() => {
-                positionCursor();
-            });
-        }
-    });
-    $(window).on(`resize.exendedText-verticalsafari-${serial}`, () => {
-        if (document.activeElement === $textarea.get(0)) {
-            requestAnimationFrame(() => {
-                positionCursor();
-            });
-        }
-    });
-    $(document).on(`themeapplied.exendedText-verticalsafari-${serial}`, () => {
+    $('.qti-itemBody, .tao-overflow-y').on(`scroll.exttext-verticalsafari-${serial}`, debouncedPositionCursor);
+    //document is scrolled on iPad when keyboard opens
+    $(document).on(`scroll.exttext-verticalsafari-${serial}`, debouncedPositionCursor);
+    $(window).on(`resize.exttext-verticalsafari-${serial}`, debouncedPositionCursor);
+
+    $(document).on(`themeapplied.exttext-verticalsafari-${serial}`, () => {
         syncShadowStyles();
         positionCursor();
     });
@@ -988,9 +996,9 @@ function _patchSafariVerticalRl($textarea, serial) {
             positionCursor();
         },
         destroy: function () {
-            $(document).off(`themeapplied.exendedText-verticalsafari-${serial}`);
-            $(window).off(`resize.exendedText-verticalsafari-${serial}`);
-            $('.qti-itemBody, .tao-overflow-y').off(`scroll.exendedText-verticalsafari-${serial}`);
+            $(document).off(`themeapplied.exttext-verticalsafari-${serial}`);
+            $(window).off(`resize.exttext-verticalsafari-${serial}`);
+            $('.qti-itemBody, .tao-overflow-y').off(`scroll.exttext-verticalsafari-${serial}`);
         }
     };
     return api;
