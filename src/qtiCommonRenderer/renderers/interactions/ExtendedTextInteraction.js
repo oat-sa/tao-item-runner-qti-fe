@@ -835,8 +835,8 @@ function _patchSafariVerticalRl($textarea, serial) {
     $textarea.addClass('hide-caret');
 
     const $shadow = $('<div>', { class: 'shadow-textarea' });
-    const $cursor = $('<div>', { class: 'shadow-caret' });
-    $textarea.after($cursor);
+    const $cursor = $('<div>', { class: 'extendedText-shadow-caret' });
+    $(document.body).append($cursor);
     $textarea.after($('<div>', { class: 'shadow-container' }).append($shadow));
 
     let repaintIdx = 0;
@@ -886,8 +886,11 @@ function _patchSafariVerticalRl($textarea, serial) {
             const shadowRect = $shadow.get(0).getBoundingClientRect();
             const textareaRect = $textarea.get(0).getBoundingClientRect();
             const cursorRect = $cursor.get(0).getBoundingClientRect();
+            const bodyRect = document.body.getBoundingClientRect();
 
-            const cursorTop = textareaRect.top + (shadowLetterRect.top - shadowRect.top);
+            //iPad, when keyboard opened: 'position:fixed' is off because of addressbar height,
+            //  so for cursor use 'position:absolute' from 'body', and 'bodyRect.top' (='-window.scrollY')
+            const cursorTop = textareaRect.top + (shadowLetterRect.top - shadowRect.top) - bodyRect.top;
             const cursorLeft =
                 textareaRect.left -
                 $textarea.get(0).scrollLeft +
@@ -999,6 +1002,7 @@ function _patchSafariVerticalRl($textarea, serial) {
             $(document).off(`themeapplied.exttext-verticalsafari-${serial}`);
             $(window).off(`resize.exttext-verticalsafari-${serial}`);
             $('.qti-itemBody, .tao-overflow-y').off(`scroll.exttext-verticalsafari-${serial}`);
+            $cursor.remove();
         }
     };
     return api;
