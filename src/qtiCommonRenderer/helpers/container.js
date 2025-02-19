@@ -146,6 +146,15 @@ const containerHelper = {
                 window.open(href, '_blank');
             }
         });
+    },
+
+    /**
+     * If item has 'vertical-rl' writing mode
+     * @returns {Boolean}
+     */
+    isItemWritingModeVerticalRl() {
+        const itemBody = $('.qti-itemBody');
+        return itemBody.hasClass('writing-mode-vertical-rl');
     }
 };
 
