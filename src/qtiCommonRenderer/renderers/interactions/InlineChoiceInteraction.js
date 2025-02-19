@@ -72,7 +72,17 @@ const render = function (interaction, options) {
         return itemDir;
     };
 
+    const getItemWritingMode = () => {
+        const itemBody = $('.qti-itemBody');
+        const itemWritingMode = itemBody.hasClass('writing-mode-vertical-rl') ? 'vertical-rl' : '';
+        return itemWritingMode;
+    };
+
     const dirClass = getItemDir();
+    const writingMode = getItemWritingMode();
+    const isVertical = writingMode === 'vertical-rl';
+    const serial = $container.data('serial');
+
     $container.select2({
         data: $container
             .find(optionSelector)
@@ -91,18 +101,25 @@ const render = function (interaction, options) {
         placeholder: opts.placeholderText,
         minimumResultsForSearch: -1,
         containerCssClass: `${dirClass}`,
-        dropdownCssClass: `qti-inlineChoiceInteraction-dropdown ${dirClass}`
+        dropdownCssClass: `qti-inlineChoiceInteraction-dropdown ${dirClass}`,
+        writingMode
     });
 
     const $el = $container.select2('container');
 
     if (required) {
         //set up the tooltip plugin for the input
-        choiceTooltip = tooltip.warning($el, __('A choice must be selected'));
-
+        choiceTooltip = tooltip.warning($el, __('A choice must be selected'), {
+            placement: isVertical ? 'right' : 'top'
+        });
         if ($container.val() === '') {
             choiceTooltip.show();
         }
+        //refresh tooltip position when all styles loaded.
+        $(document).on(`themeapplied.inlineChoiceInteraction-${serial}`, () => {
+            choiceTooltip.hide();
+            choiceTooltip.show();
+        });
     }
 
     $container
@@ -144,8 +161,6 @@ const _setVal = function (interaction, choiceIdentifier) {
 const resetResponse = function (interaction) {
     _setVal(interaction, _emptyValue);
 };
-
-
 
 /**
  * Set the response to the rendered interaction.
@@ -190,9 +205,11 @@ const getResponse = function (interaction) {
  */
 const destroy = function (interaction) {
     const $container = containerHelper.get(interaction);
+    const serial = $container.data('serial');
 
     //remove event
     $(document).off('.commonRenderer');
+    $(document).off(`.inlineChoiceInteraction-${serial}`);
 
     $container.select2('destroy');
 

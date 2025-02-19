@@ -42,12 +42,22 @@ import converter from 'util/converter';
 const logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/TextEntryInteraction.js');
 
 /**
+ * If item has 'vertical-rl' writing mode
+ * @returns {Boolean}
+ */
+const getIsVerticalWritingMode = () => {
+    const itemBody = $('.qti-itemBody');
+    return itemBody.hasClass('writing-mode-vertical-rl');
+};
+
+/**
  * Hide the tooltip for the text input
  * @param {jQuery} $input
  */
 function hideTooltip($input) {
     if ($input.data('$tooltip')) {
         $input.data('$tooltip').hide();
+        $input.data('textentry-tooltip-is-shown', false);
     }
 }
 
@@ -61,15 +71,30 @@ function showTooltip($input, theme, message) {
     if ($input.data('$tooltip')) {
         $input.data('$tooltip').updateTitleContent(message);
     } else {
-        const textEntryTooltip = tooltip.create($input, message, {
+        const isVertical = getIsVerticalWritingMode();
+        let tooltipOptions = {
             theme: theme,
-            trigger: 'manual'
-        });
+            trigger: 'manual',
+            placement: isVertical ? 'right' : 'top'
+        };
+        const textEntryTooltip = tooltip.create($input, message, tooltipOptions);
 
         $input.data('$tooltip', textEntryTooltip);
     }
 
     $input.data('$tooltip').show();
+    $input.data('textentry-tooltip-is-shown', true);
+}
+
+/**
+ * Refresh tooltip position
+ * @param {jQuery} $input
+ */
+function refreshTooltip($input) {
+    if ($input.data('$tooltip') && $input.data('textentry-tooltip-is-shown')) {
+        $input.data('$tooltip').hide();
+        $input.data('$tooltip').show();
+    }
 }
 
 /**
@@ -131,6 +156,7 @@ function render(interaction) {
     const attributes = interaction.getAttributes();
     const baseType = interaction.getResponseDeclaration().attr('baseType');
     const $input = interaction.getContainer();
+    const serial = $input.data('serial');
     const patternMask = interaction.attr('patternMask');
     const maxChars = parseInt(patternMaskHelper.parsePattern(patternMask, 'chars'), 10);
     let expectedLength;
@@ -156,8 +182,8 @@ function render(interaction) {
     if (attributes.expectedLength) {
         //adding 2 chars to include reasonable padding size
         expectedLength = parseInt(attributes.expectedLength) + 2;
-        $input.css('width', expectedLength + 'ch');
-        $input.css('min-width', expectedLength + 'ch');
+        $input.css('inline-size', expectedLength + 'ch');
+        $input.css('min-inline-size', expectedLength + 'ch');
     }
 
     //checking if there's a placeholder for the input
@@ -235,6 +261,11 @@ function render(interaction) {
             containerHelper.triggerResponseChangeEvent(interaction);
         });
     }
+
+    //refresh tooltip position when all styles loaded.
+    $(document).on(`themeapplied.textEntryInteraction-${serial}`, () => {
+        refreshTooltip($input);
+    });
 }
 
 function resetResponse(interaction) {
@@ -311,6 +342,9 @@ function getResponse(interaction) {
 }
 
 function destroy(interaction) {
+    const $interaction = containerHelper.get(interaction);
+    const serial = $interaction.data('serial');
+
     $('input.qti-textEntryInteraction').each(function (index, el) {
         const $input = $(el);
         if ($input.data('$tooltip')) {
@@ -321,7 +355,8 @@ function destroy(interaction) {
 
     //remove event
     $(document).off('.commonRenderer');
-    containerHelper.get(interaction).off('.commonRenderer');
+    $interaction.off('.commonRenderer');
+    $(document).off(`.textEntryInteraction-${serial}`);
 
     //remove instructions
     instructionMgr.removeInstructions(interaction);

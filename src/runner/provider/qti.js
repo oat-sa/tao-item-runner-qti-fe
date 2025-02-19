@@ -91,6 +91,9 @@ var qtiItemRuntimeProvider = {
                     const itemLang = $item.attr('lang');
                     $itemBody.attr('dir', locale.getLanguageDirection(itemLang));
                 }
+                if ($itemBody.hasClass('writing-mode-vertical-rl')) {
+                    document.body.classList.add('item-writing-mode-vertical-rl');
+                }
             } catch (e) {
                 self.trigger('error', __('Error in template rendering: %s', e.message));
             }
@@ -188,6 +191,8 @@ var qtiItemRuntimeProvider = {
                     if (self._renderer) {
                         self._renderer.unload();
                     }
+
+                    document.body.classList.remove('item-writing-mode-vertical-rl');
 
                     self._item = null;
                 })
