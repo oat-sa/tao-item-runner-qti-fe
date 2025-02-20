@@ -134,7 +134,6 @@ function validateDecimalInput($input, { allowMinusOnly = false, withTooltip = tr
 
     if (!regex.test(value)) {
         $input.addClass('error');
-        $input.data('number-parse-error', true);
 
         if (withTooltip) {
             const decimalError = thousandsSeparator
@@ -152,7 +151,6 @@ function validateDecimalInput($input, { allowMinusOnly = false, withTooltip = tr
         }
     } else {
         $input.removeClass('error');
-        $input.removeData('number-parse-error');
         hideTooltip($input);
     }
 }
@@ -167,7 +165,6 @@ function validateIntegerInput($input, { allowMinusOnly = false, withTooltip = tr
     const regex = new RegExp(`^${allowMinusOnly ? '-?' : ''}$|^-?\\d+$`);
     if (!regex.test(value)) {
         $input.addClass('error');
-        $input.data('number-parse-error', true);
         if (withTooltip) {
             showTooltip($input, 'error', __('Invalid value, should be an integer number.'));
         } else {
@@ -175,7 +172,6 @@ function validateIntegerInput($input, { allowMinusOnly = false, withTooltip = tr
         }
     } else {
         $input.removeClass('error');
-        $input.removeData('number-parse-error');
         hideTooltip($input);
     }
 }
@@ -202,44 +198,26 @@ function render(interaction) {
             $input.attr('inputmode', 'numeric');
             $input
                 .on('keyup.commonRenderer', () =>
-                    validateIntegerInput($input, {
-                        allowMinusOnly: true,
-                        withTooltip: true
-                    })
+                    validateIntegerInput($input, { allowMinusOnly: true, withTooltip: true })
                 )
                 .on('focus.commonRenderer', () =>
-                    validateIntegerInput($input, {
-                        allowMinusOnly: false,
-                        withTooltip: true
-                    })
+                    validateIntegerInput($input, { allowMinusOnly: false, withTooltip: true })
                 )
                 .on('blur.commonRenderer', () =>
-                    validateIntegerInput($input, {
-                        allowMinusOnly: false,
-                        withTooltip: false
-                    })
+                    validateIntegerInput($input, { allowMinusOnly: false, withTooltip: false })
                 );
             break;
         case 'float':
             $input.attr('inputmode', 'decimal');
             $input
                 .on('keyup.commonRenderer', () =>
-                    validateDecimalInput($input, {
-                        allowMinusOnly: true,
-                        withTooltip: true
-                    })
+                    validateDecimalInput($input, { allowMinusOnly: true, withTooltip: true })
                 )
                 .on('focus.commonRenderer', () =>
-                    validateDecimalInput($input, {
-                        allowMinusOnly: false,
-                        withTooltip: true
-                    })
+                    validateDecimalInput($input, { allowMinusOnly: false, withTooltip: true })
                 )
                 .on('blur.commonRenderer', () =>
-                    validateDecimalInput($input, {
-                        allowMinusOnly: false,
-                        withTooltip: false
-                    })
+                    validateDecimalInput($input, { allowMinusOnly: false, withTooltip: false })
                 );
             break;
         default:
@@ -465,7 +443,7 @@ function getState(interaction) {
     }
 
     const $input = interaction.getContainer();
-    if ($input.data('number-parse-error')) {
+    if ($input.hasClass('error')) {
         state.validity = { isValid: false };
     }
 
