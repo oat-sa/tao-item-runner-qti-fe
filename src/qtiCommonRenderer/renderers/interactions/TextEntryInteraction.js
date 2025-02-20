@@ -105,8 +105,9 @@ function refreshTooltip($input) {
  * thousands separators (commas) and a mandatory decimal point (dot).
  *
  * @param {jQuery} $input
+ * @param {Object} options - `{ allowMinusOnly: boolean, withTooltip: boolean }`
  */
-function validateDecimalInput($input) {
+function validateDecimalInput($input, { allowMinusOnly = false, withTooltip = true } = {}) {
     const separatorName = {
         '.': __('(dot)'),
         ',': __('(comma)'),
@@ -121,26 +122,60 @@ function validateDecimalInput($input) {
     const escapedThousandsSeparator = thousandsSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const escapedDecimalSeparator = decimalSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-    const regexPattern = thousandsSeparator
-        ? `^$|^-?\\d{1,3}(${escapedThousandsSeparator}\\d{3})*(${escapedDecimalSeparator}\\d+)?$|^-?\\d+(${escapedDecimalSeparator}\\d+)?$|^-?\\d*${escapedDecimalSeparator}$|^-?${escapedDecimalSeparator}\\d+$`
-        : `^$|^-?\\d+(${escapedDecimalSeparator}\\d+)?$|^-?\\d*${escapedDecimalSeparator}$|^-?${escapedDecimalSeparator}\\d+$`;
+    let regexPattern = `^$|^-?\\d+(${escapedDecimalSeparator}\\d+)?$|^-?\\d*${escapedDecimalSeparator}$|^-?${escapedDecimalSeparator}\\d+$`;
+    if (thousandsSeparator) {
+        regexPattern += `|^-?\\d{1,3}(${escapedThousandsSeparator}\\d{3})*(${escapedDecimalSeparator}\\d+)?$`;
+    }
+    if (allowMinusOnly) {
+        regexPattern += '|^-$';
+    }
 
     const regex = new RegExp(regexPattern);
 
     if (!regex.test(value)) {
         $input.addClass('error');
-        const decimalError = thousandsSeparator
-            ? __(
-                  'Invalid value, use %s %s for decimal point and %s %s for thousands separator.',
-                  decimalSeparator,
-                  decimalSeparatorName,
-                  thousandsSeparator,
-                  thousandsSeparatorName
-              )
-            : __('Invalid value, use %s %s for decimal point.', decimalSeparator, decimalSeparatorName);
-        showTooltip($input, 'error', decimalError);
+        $input.data('number-parse-error', true);
+
+        if (withTooltip) {
+            const decimalError = thousandsSeparator
+                ? __(
+                      'Invalid value, use %s %s for decimal point and %s %s for thousands separator.',
+                      decimalSeparator,
+                      decimalSeparatorName,
+                      thousandsSeparator,
+                      thousandsSeparatorName
+                  )
+                : __('Invalid value, use %s %s for decimal point.', decimalSeparator, decimalSeparatorName);
+            showTooltip($input, 'error', decimalError);
+        } else {
+            hideTooltip($input);
+        }
     } else {
         $input.removeClass('error');
+        $input.removeData('number-parse-error');
+        hideTooltip($input);
+    }
+}
+
+/**
+ * Validate the input for integer values.
+ * @param {jQuery} $input
+ * @param {Object} options - `{ allowMinusOnly: boolean, withTooltip: boolean }`
+ */
+function validateIntegerInput($input, { allowMinusOnly = false, withTooltip = true } = {}) {
+    const value = converter.convert($input.val());
+    const regex = new RegExp(`^${allowMinusOnly ? '-?' : ''}$|^-?\\d+$`);
+    if (!regex.test(value)) {
+        $input.addClass('error');
+        $input.data('number-parse-error', true);
+        if (withTooltip) {
+            showTooltip($input, 'error', __('Invalid value, should be an integer number.'));
+        } else {
+            hideTooltip($input);
+        }
+    } else {
+        $input.removeClass('error');
+        $input.removeData('number-parse-error');
         hideTooltip($input);
     }
 }
@@ -165,14 +200,47 @@ function render(interaction) {
     switch (baseType) {
         case 'integer':
             $input.attr('inputmode', 'numeric');
+            $input
+                .on('keyup.commonRenderer', () =>
+                    validateIntegerInput($input, {
+                        allowMinusOnly: true,
+                        withTooltip: true
+                    })
+                )
+                .on('focus.commonRenderer', () =>
+                    validateIntegerInput($input, {
+                        allowMinusOnly: false,
+                        withTooltip: true
+                    })
+                )
+                .on('blur.commonRenderer', () =>
+                    validateIntegerInput($input, {
+                        allowMinusOnly: false,
+                        withTooltip: false
+                    })
+                );
             break;
         case 'float':
             $input.attr('inputmode', 'decimal');
-
             $input
-                .on('keyup.commonRenderer', () => validateDecimalInput($input))
-                .on('focus.commonRenderer', () => validateDecimalInput($input))
-                .on('blur.commonRenderer', () => hideTooltip($input));
+                .on('keyup.commonRenderer', () =>
+                    validateDecimalInput($input, {
+                        allowMinusOnly: true,
+                        withTooltip: true
+                    })
+                )
+                .on('focus.commonRenderer', () =>
+                    validateDecimalInput($input, {
+                        allowMinusOnly: false,
+                        withTooltip: true
+                    })
+                )
+                .on('blur.commonRenderer', () =>
+                    validateDecimalInput($input, {
+                        allowMinusOnly: false,
+                        withTooltip: false
+                    })
+                );
             break;
         default:
             $input.attr('inputmode', 'text');
@@ -238,8 +306,10 @@ function render(interaction) {
             if ($input.val()) {
                 if (regex.test($input.val())) {
                     $input.removeClass('invalid');
+                    $input.removeClass('error');
                 } else {
                     $input.addClass('invalid');
+                    $input.addClass('error');
                     showTooltip($input, 'error', __('This is not a valid answer'));
                 }
             }
@@ -393,6 +463,12 @@ function getState(interaction) {
     if (response) {
         state.response = response;
     }
+
+    const $input = interaction.getContainer();
+    if ($input.data('number-parse-error')) {
+        state.validity = { isValid: false };
+    }
+
     return state;
 }
 
