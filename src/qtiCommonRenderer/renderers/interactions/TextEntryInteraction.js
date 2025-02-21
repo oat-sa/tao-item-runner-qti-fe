@@ -197,7 +197,7 @@ function render(interaction) {
         case 'integer':
             $input.attr('inputmode', 'numeric');
             $input
-                .on('keyup.commonRenderer', () =>
+                .on('input.commonRenderer', () =>
                     validateIntegerInput($input, { allowMinusOnly: true, withTooltip: true })
                 )
                 .on('focus.commonRenderer', () =>
@@ -210,7 +210,7 @@ function render(interaction) {
         case 'float':
             $input.attr('inputmode', 'decimal');
             $input
-                .on('keyup.commonRenderer', () =>
+                .on('input.commonRenderer', () =>
                     validateDecimalInput($input, { allowMinusOnly: true, withTooltip: true })
                 )
                 .on('focus.commonRenderer', () =>
