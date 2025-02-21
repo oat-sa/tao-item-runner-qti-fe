@@ -133,6 +133,7 @@ function validateDecimalInput($input, { allowMinusOnly = false, withTooltip = tr
     const regex = new RegExp(regexPattern);
 
     if (!regex.test(value)) {
+        $input.val($input.data('prev-val') || '');
         $input.addClass('error');
 
         if (withTooltip) {
@@ -150,6 +151,7 @@ function validateDecimalInput($input, { allowMinusOnly = false, withTooltip = tr
             hideTooltip($input);
         }
     } else {
+        $input.data('prev-val', $input.val());
         $input.removeClass('error');
         hideTooltip($input);
     }
@@ -163,14 +165,18 @@ function validateDecimalInput($input, { allowMinusOnly = false, withTooltip = tr
 function validateIntegerInput($input, { allowMinusOnly = false, withTooltip = true } = {}) {
     const value = converter.convert($input.val());
     const regex = new RegExp(`^${allowMinusOnly ? '-?' : ''}$|^-?\\d+$`);
+
     if (!regex.test(value)) {
+        $input.val($input.data('prev-val') || '');
         $input.addClass('error');
+
         if (withTooltip) {
             showTooltip($input, 'error', __('Invalid value, should be an integer number.'));
         } else {
             hideTooltip($input);
         }
     } else {
+        $input.data('prev-val', $input.val());
         $input.removeClass('error');
         hideTooltip($input);
     }
@@ -345,6 +351,11 @@ function setResponse(interaction, response) {
 
     if (responseValue && responseValue.length) {
         interaction.getContainer().val(responseValue[0]);
+
+        const baseType = interaction.getResponseDeclaration().attr('baseType');
+        if (baseType === 'integer' || baseType === 'float') {
+            interaction.getContainer().data('prev-val', responseValue[0]);
+        }
     }
 }
 
