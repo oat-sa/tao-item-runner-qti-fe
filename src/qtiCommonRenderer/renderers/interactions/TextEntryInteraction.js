@@ -134,6 +134,7 @@ function validateDecimalInput($input, { allowMinusOnly = false, withTooltip = tr
 
     if (!regex.test(value)) {
         $input.addClass('error');
+        $input.data('number-parse-error', true);
 
         if (withTooltip) {
             const decimalError = thousandsSeparator
@@ -151,6 +152,7 @@ function validateDecimalInput($input, { allowMinusOnly = false, withTooltip = tr
         }
     } else {
         $input.removeClass('error');
+        $input.removeData('number-parse-error');
         hideTooltip($input);
     }
 }
@@ -163,8 +165,11 @@ function validateDecimalInput($input, { allowMinusOnly = false, withTooltip = tr
 function validateIntegerInput($input, { allowMinusOnly = false, withTooltip = true } = {}) {
     const value = converter.convert($input.val());
     const regex = new RegExp(`^${allowMinusOnly ? '-?' : ''}$|^-?\\d+$`);
+
     if (!regex.test(value)) {
         $input.addClass('error');
+        $input.data('number-parse-error', true);
+
         if (withTooltip) {
             showTooltip($input, 'error', __('Invalid value, should be an integer number.'));
         } else {
@@ -172,6 +177,7 @@ function validateIntegerInput($input, { allowMinusOnly = false, withTooltip = tr
         }
     } else {
         $input.removeClass('error');
+        $input.removeData('number-parse-error');
         hideTooltip($input);
     }
 }
@@ -443,8 +449,8 @@ function getState(interaction) {
     }
 
     const $input = interaction.getContainer();
-    if ($input.hasClass('error')) {
-        state.validity = { isValid: false };
+    if ($input.data('number-parse-error')) {
+        state.validity = { isValid: false, bypassValidateResponses: true };
     }
 
     return state;
