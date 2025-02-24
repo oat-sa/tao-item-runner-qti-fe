@@ -283,10 +283,8 @@ function render(interaction) {
 
             if ($input.val()) {
                 if (regex.test($input.val())) {
-                    $input.removeClass('invalid');
                     $input.removeClass('error');
                 } else {
-                    $input.addClass('invalid');
                     $input.addClass('error');
                     showTooltip($input, 'error', __('This is not a valid answer'));
                 }
@@ -370,7 +368,10 @@ function getResponse(interaction) {
     const inputValue = $input.val();
     let value;
 
-    if ($input.hasClass('invalid') || (attributes.placeholderText && inputValue === attributes.placeholderText)) {
+    if (
+        (attributes.patternMask && $input.hasClass('error')) ||
+        (attributes.placeholderText && inputValue === attributes.placeholderText)
+    ) {
         //invalid response or response equals to the placeholder text are considered empty
         value = '';
     } else {
