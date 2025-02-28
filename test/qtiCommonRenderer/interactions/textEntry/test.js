@@ -9,7 +9,7 @@ define([
     'json!taoQtiItem/test/samples/json/text-entry-inputmode-text.json',
     'json!taoQtiItem/test/samples/json/text-entry-inputmode-integer.json',
     'json!taoQtiItem/test/samples/json/text-entry-inputmode-float.json'
-], function(
+], function (
     $,
     _,
     __,
@@ -26,7 +26,7 @@ define([
     let runner;
 
     QUnit.module('Text Entry Interaction', {
-        afterEach: function() {
+        afterEach: function () {
             if (runner) {
                 runner.clear();
             }
@@ -56,16 +56,18 @@ define([
     }
 
     function renderMatchInteraction($container, state = {}) {
-        return new Promise((resolve, reject) => qtiItemRunner('qti', state)
-            .on('render', function onRenderItem() {
-                resolve(this);
-            })
-            .on('error', reject)
-            .init()
-            .render($container, { state }));
+        return new Promise((resolve, reject) =>
+            qtiItemRunner('qti', state)
+                .on('render', function onRenderItem() {
+                    resolve(this);
+                })
+                .on('error', reject)
+                .init()
+                .render($container, { state })
+        );
     }
 
-    QUnit.test('Lenght constraint', function(assert) {
+    QUnit.test('Lenght constraint', function (assert) {
         const ready = assert.async();
 
         const $container = $('#fixture-length-constraint');
@@ -73,7 +75,7 @@ define([
         assert.equal($container.length, 1, 'the item container exists');
         assert.equal($container.children().length, 0, 'the container has no children');
         runner = qtiItemRunner('qti', textEntryLengthConstrainedData)
-            .on('render', function() {
+            .on('render', function () {
                 const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
 
                 assert.equal(
@@ -113,7 +115,7 @@ define([
             .render($container);
     });
 
-    QUnit.test('Pattern constraint - incorrect', function(assert) {
+    QUnit.test('Pattern constraint - incorrect', function (assert) {
         const ready = assert.async(2);
 
         const $container = $('#pattern-constraint-incorrect');
@@ -122,7 +124,7 @@ define([
         assert.equal($container.children().length, 0, 'the container has no children');
 
         runner = qtiItemRunner('qti', textEntryPatternConstrainedData)
-            .on('render', function() {
+            .on('render', function () {
                 const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
 
                 assert.equal(
@@ -135,7 +137,7 @@ define([
                 $input.keyup();
                 ready();
             })
-            .on('responsechange', function() {
+            .on('responsechange', function () {
                 const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
                 assert.equal(
                     getTooltipContent($input),
@@ -149,7 +151,7 @@ define([
             .render($container);
     });
 
-    QUnit.test('Pattern constraint - correct', function(assert) {
+    QUnit.test('Pattern constraint - correct', function (assert) {
         const ready = assert.async(2);
 
         const $container = $('#pattern-constraint-correct');
@@ -158,7 +160,7 @@ define([
         assert.equal($container.children().length, 0, 'the container has no children');
 
         runner = qtiItemRunner('qti', textEntryPatternConstrainedData)
-            .on('render', function() {
+            .on('render', function () {
                 const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
 
                 assert.equal(
@@ -175,7 +177,7 @@ define([
                 $input.keyup();
                 ready();
             })
-            .on('responsechange', function() {
+            .on('responsechange', function () {
                 const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
                 assert.ok(!hasTooltip($input), 'the error tooltip is hidden in a correct response');
                 ready();
@@ -202,7 +204,7 @@ define([
                 expected: 'decimal'
             }
         ])
-        .test('Pattern constraint - inputmode', function(data, assert) {
+        .test('Pattern constraint - inputmode', function (data, assert) {
             const ready = assert.async();
             const item = _.cloneDeep(data.item);
 
@@ -214,11 +216,7 @@ define([
                 .then(itemRunner => {
                     const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
 
-                    assert.equal(
-                        $input.attr('inputmode'),
-                        data.expected,
-                        data.title
-                    );
+                    assert.equal($input.attr('inputmode'), data.expected, data.title);
 
                     itemRunner.clear();
                 })
@@ -231,7 +229,7 @@ define([
                 .then(ready);
         });
 
-    QUnit.test('set/get response', function(assert) {
+    QUnit.test('set/get response', function (assert) {
         const ready = assert.async();
 
         const $container = $('#set-get-response');
@@ -241,7 +239,7 @@ define([
         assert.equal($container.children().length, 0, 'the container has no children');
 
         runner = qtiItemRunner('qti', textEntryData)
-            .on('render', function() {
+            .on('render', function () {
                 ready();
                 const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
 
@@ -259,14 +257,14 @@ define([
 
                 $input.keyup(); //Trigger the response changed event
             })
-            .on('statechange', function(retrivedState) {
+            .on('statechange', function (retrivedState) {
                 assert.deepEqual(retrivedState, state, 'statechange state is correct');
             })
             .init()
             .render($container);
     });
 
-    QUnit.test('get response converts ambiguous chars', function(assert) {
+    QUnit.test('get response converts ambiguous chars', function (assert) {
         const ready = assert.async();
 
         const $container = $('#set-get-response');
@@ -276,7 +274,7 @@ define([
         const state = { RESPONSE: { response: { base: { string: unicodeCharsString } } } };
 
         runner = qtiItemRunner('qti', textEntryData)
-            .on('render', function() {
+            .on('render', function () {
                 ready();
                 const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
 
@@ -284,18 +282,226 @@ define([
                 assert.equal($input.val(), unicodeCharsString, 'the text input has been correctly set');
                 $input.keyup(); //Trigger the response changed event
             })
-            .on('statechange', function(retrivedState) {
-                assert.equal(retrivedState.RESPONSE.response.base.string, asciiCharsString, 'unicode string got converted');
+            .on('statechange', function (retrivedState) {
+                assert.equal(
+                    retrivedState.RESPONSE.response.base.string,
+                    asciiCharsString,
+                    'unicode string got converted'
+                );
             })
             .init()
             .render($container);
     });
 
+    QUnit.test('baseType integer: input validation, itemState validity', function (assert) {
+        const ready = assert.async();
 
+        const $container = $('#basetype-integer');
+        const itemData = _.cloneDeep(textEntryInputmodeIntegerData);
+        itemData.body.elements.interaction_textentryinteraction_583d7ef9340df566552260.attributes.patternMask = null;
+
+        assert.equal($container.length, 1, 'the item container exists');
+        assert.equal($container.children().length, 0, 'the container has no children');
+
+        function inputFirstCase($input) {
+            //1st case: valid input
+            $input.val('-123');
+            $input.trigger('input');
+            $input.keyup();
+        }
+
+        function responsechangeFirstCase($input, itemRunner) {
+            assert.false(hasTooltip($input), 'the error tooltip is not visible after valid response');
+            assert.false($input.hasClass('error'), 'error class not added for valid response');
+
+            const itemState = itemRunner.getState();
+            const interactionState = itemState && itemState['RESPONSE'];
+            const validity = interactionState && interactionState.validity;
+            assert.notOk(validity && validity.isValid === false, 'if valid, isValid:false is not set in itemState');
+
+            const itemResponses = itemRunner.getResponses();
+            const interactionResponse = itemResponses && itemResponses['RESPONSE'];
+            assert.deepEqual(interactionResponse, { base: { integer: -123 } }, 'if valid, integer response is stored');
+        }
+
+        function inputSecondCase($input) {
+            //2nd case: invalid input, can be truncated to integer
+            $input.val('12.3');
+            $input.trigger('input');
+            $input.keyup();
+        }
+
+        function responsechangeSecondCase($input, itemRunner) {
+            assert.equal(getTooltipContent($input), 'Invalid value, should be an integer number.');
+            assert.ok($input.hasClass('error'), 'error class added for invalid response');
+
+            const itemState = itemRunner.getState();
+            const interactionState = itemState && itemState['RESPONSE'];
+            const validity = interactionState && interactionState.validity;
+            assert.ok(validity && validity.isValid === false, 'if invalid, isValid:false is set in itemState');
+
+            const itemResponses = itemRunner.getResponses();
+            const interactionResponse = itemResponses && itemResponses['RESPONSE'];
+            assert.deepEqual(
+                interactionResponse,
+                { base: { integer: 12 } },
+                'if invalid, still attempts to parse response as integer'
+            );
+        }
+
+        function inputThirdCase($input) {
+            //3nd case: invalid input, can't be truncated to integer
+            $input.val('w123');
+            $input.trigger('input');
+            $input.keyup();
+        }
+
+        function responsechangeThirdCase($input, itemRunner) {
+            const itemResponses = itemRunner.getResponses();
+            const interactionResponse = itemResponses && itemResponses['RESPONSE'];
+            assert.deepEqual(
+                interactionResponse,
+                { base: { integer: '' } },
+                'if invalid, and cannot parse as integer, response is empty'
+            );
+        }
+
+        runner = qtiItemRunner('qti', itemData)
+            .on('render', function () {
+                const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
+                assert.equal($input.length, 1, 'the container contains a text entry interaction');
+
+                this.on('responsechange.test1', function () {
+                    this.off('responsechange.test1');
+                    responsechangeFirstCase($input, this);
+
+                    this.on('responsechange.test2', function () {
+                        this.off('responsechange.test2');
+                        responsechangeSecondCase($input, this);
+
+                        this.on('responsechange.test3', function () {
+                            this.off('responsechange.test3');
+                            responsechangeThirdCase($input, this);
+
+                            ready();
+                        });
+                        inputThirdCase($input);
+                    });
+                    inputSecondCase($input);
+                });
+                inputFirstCase($input);
+            })
+            .init()
+            .render($container);
+    });
+
+    QUnit.test('baseType float: input validation, itemState validity', function (assert) {
+        const ready = assert.async();
+
+        const $container = $('#basetype-float');
+        const itemData = _.cloneDeep(textEntryInputmodeFloatData);
+        itemData.body.elements.interaction_textentryinteraction_583d7ef9340df566552260.attributes.patternMask = null;
+
+        assert.equal($container.length, 1, 'the item container exists');
+        assert.equal($container.children().length, 0, 'the container has no children');
+
+        function inputFirstCase($input) {
+            //1st case: valid input
+            $input.val('-12.3');
+            $input.trigger('input');
+            $input.keyup();
+        }
+
+        function responsechangeFirstCase($input, itemRunner) {
+            assert.false(hasTooltip($input), 'the error tooltip is not visible after valid response');
+
+            const itemState = itemRunner.getState();
+            const interactionState = itemState && itemState['RESPONSE'];
+            const validity = interactionState && interactionState.validity;
+            assert.notOk(validity && validity.isValid === false, 'if valid, isValid:false is not set in itemState');
+
+            const itemResponses = itemRunner.getResponses();
+            const interactionResponse = itemResponses && itemResponses['RESPONSE'];
+            assert.deepEqual(interactionResponse, { base: { float: -12.3 } }, 'if valid, float response is stored');
+        }
+
+        function inputSecondCase($input) {
+            //2nd case: invalid input, can be truncated to integer
+            $input.val('12,3');
+            $input.trigger('input');
+            $input.keyup();
+        }
+
+        function responsechangeSecondCase($input, itemRunner) {
+            assert.equal(
+                getTooltipContent($input),
+                'Invalid value, use %s %s for decimal point.',
+                'the error tooltip is visible after an invalid response'
+            );
+
+            const itemState = itemRunner.getState();
+            const interactionState = itemState && itemState['RESPONSE'];
+            const validity = interactionState && interactionState.validity;
+            assert.ok(validity && validity.isValid === false, 'if invalid, isValid:false is set in itemState');
+
+            const itemResponses = itemRunner.getResponses();
+            const interactionResponse = itemResponses && itemResponses['RESPONSE'];
+            assert.deepEqual(
+                interactionResponse,
+                { base: { float: 12 } },
+                'if invalid, still attempts to parse response as float'
+            );
+        }
+
+        function inputThirdCase($input) {
+            //3nd case: invalid input, can't be truncated to integer
+            $input.val('w12.3');
+            $input.trigger('input');
+            $input.keyup();
+        }
+
+        function responsechangeThirdCase($input, itemRunner) {
+            const itemResponses = itemRunner.getResponses();
+            const interactionResponse = itemResponses && itemResponses['RESPONSE'];
+            assert.deepEqual(
+                interactionResponse,
+                { base: { float: '' } },
+                'if invalid, and cannot parse as float, response is empty'
+            );
+        }
+
+        runner = qtiItemRunner('qti', itemData)
+            .on('render', function () {
+                const $input = $container.find('.qti-interaction.qti-textEntryInteraction');
+                assert.equal($input.length, 1, 'the container contains a text entry interaction');
+
+                this.on('responsechange.test1', function () {
+                    this.off('responsechange.test1');
+                    responsechangeFirstCase($input, this);
+
+                    this.on('responsechange.test2', function () {
+                        this.off('responsechange.test2');
+                        responsechangeSecondCase($input, this);
+
+                        this.on('responsechange.test3', function () {
+                            this.off('responsechange.test3');
+                            responsechangeThirdCase($input, this);
+
+                            ready();
+                        });
+                        inputThirdCase($input);
+                    });
+                    inputSecondCase($input);
+                });
+                inputFirstCase($input);
+            })
+            .init()
+            .render($container);
+    });
 
     QUnit.module('Visual Test');
 
-    QUnit.test('Display and play', function(assert) {
+    QUnit.test('Display and play', function (assert) {
         const ready = assert.async();
         assert.expect(3);
 
@@ -305,7 +511,7 @@ define([
         assert.equal($container.children().length, 0, 'the container has no children');
 
         qtiItemRunner('qti', textEntryLengthConstrainedData)
-            .on('render', function() {
+            .on('render', function () {
                 assert.equal(
                     $container.find('.qti-interaction.qti-textEntryInteraction').length,
                     1,
