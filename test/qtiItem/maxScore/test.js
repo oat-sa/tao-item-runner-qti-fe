@@ -162,7 +162,6 @@ define([
             maxScore: 3,
             changeData: function(data) {
                 data.responses.responsedeclaration_58eb4dfbd4a74001643639.mappingAttributes.defaultValue = 3;
-                data.responses.responsedeclaration_58eb4dfbd4a74001643639.mappingAttributes.upperBound = 0;
                 return data;
             }
         },
@@ -173,7 +172,6 @@ define([
             maxScore: 5,
             changeData: function(data) {
                 data.responses.responsedeclaration_58eb4dfbd4a74001643639.mappingAttributes.defaultValue = 3;
-                data.responses.responsedeclaration_58eb4dfbd4a74001643639.mappingAttributes.upperBound = 0;
                 delete data.responses.responsedeclaration_58eb4dfbd4a74001643639.mapping.choice_3;
                 return data;
             }

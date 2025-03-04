@@ -229,6 +229,29 @@ define([
             .render(container);
     });
 
+    QUnit.test('Item rendering: writing-mode-vertical-rl', function (assert) {
+        var ready = assert.async();
+        var container = document.getElementById(containerId);
+
+        const itemDataVertical = _.cloneDeep(itemData);
+        itemDataVertical.attributes.class = 'writing-mode-vertical-rl';
+
+        assert.expect(2);
+        itemRunner.register('qti', qtiRuntimeProvider);
+
+        runner = itemRunner('qti', itemDataVertical)
+            .on('render', function () {
+                assert.true(document.body.classList.contains('item-writing-mode-vertical-rl'), 'writing-mode class added to body');
+                this.clear();
+            })
+            .on('clear', function () {
+                assert.false(document.body.classList.contains('item-writing-mode-vertical-rl'), 'writing-mode class removed from body');
+                ready();
+            })
+            .init()
+            .render(container);
+    });
+
     QUnit.module('Provider state', {
         afterEach: function (assert) {
             //Reset the provides

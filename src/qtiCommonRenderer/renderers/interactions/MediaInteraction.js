@@ -82,7 +82,7 @@ function render(interaction) {
             // only resize when width in px
             // new version has width in %
             const  currentWidth = media.attr('width');
-            if (interaction.mediaElement && currentWidth && !currentWidth.includes('%')) {
+            if (interaction.mediaElement && currentWidth && !`${currentWidth}`.includes('%')) {
                 const height = $container.find('.media-container').height();
                 const width = $container.find('.media-container').width();
 
