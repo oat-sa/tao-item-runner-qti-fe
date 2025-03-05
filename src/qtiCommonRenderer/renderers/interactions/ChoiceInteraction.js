@@ -126,6 +126,9 @@ const _pseudoLabel = function _pseudoLabel(interaction, $container) {
 
         // if the click has been triggered by a keyboard check, prevent this listener to cancel this check
         if (e.originalEvent && $(e.originalEvent.target).is('input')) {
+            instructionMgr.validateInstructions(interaction, { choice: $choiceBox });
+            containerHelper.triggerResponseChangeEvent(interaction);
+            $(input).focus();
             return;
         }
 
