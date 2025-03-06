@@ -36,6 +36,10 @@ export default {
         if (obj.attr('width')) {
             previewOptions.width = obj.attr('width');
         }
+        if (obj.metaData.metadataUri && obj.metaData.resourceMetadataUrl) {
+            previewOptions.metadata = obj.metaData.metadata;
+            previewOptions.resourceMetadataUrl = obj.metaData.resourceMetadataUrl;
+        }
         if (previewOptions.url && previewOptions.mime) {
             $container.previewer(previewOptions);
         }
