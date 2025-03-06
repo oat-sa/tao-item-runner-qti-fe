@@ -37,7 +37,7 @@ export default {
             previewOptions.width = obj.attr('width');
         }
         if (obj.metaData.metadataUri && obj.metaData.resourceMetadataUrl) {
-            previewOptions.metadata = obj.metaData.metadata;
+            previewOptions.metadataUri = obj.metaData.metadataUri;
             previewOptions.resourceMetadataUrl = obj.metaData.resourceMetadataUrl;
         }
         if (previewOptions.url && previewOptions.mime) {
