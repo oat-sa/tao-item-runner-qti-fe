@@ -37,7 +37,7 @@ export default {
             previewOptions.width = obj.attr('width');
         }
         if (obj.metaData.metadataUri && obj.metaData.resourceMetadataUrl) {
-            previewOptions.transcriptionUri = obj.renderer.resolveTranscription(
+            previewOptions.transcriptionUrl = obj.renderer.resolveTranscription(
                 obj.metaData.resourceMetadataUrl,
                 obj.metaData.metadataUri,
                 obj.attr('data')
