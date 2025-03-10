@@ -703,10 +703,6 @@ const Renderer = function (options) {
         }
     };
 
-    this.resolveTranscription = function resolveTranscription(url, metadataUri, resourceUri) {
-        return options.assetManager.resolveTranscription(url, metadataUri, resourceUri);
-    };
-
     /**
      * @deprecated in favor of resolveUrl
      */
