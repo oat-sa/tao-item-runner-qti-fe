@@ -32,7 +32,7 @@ var BlockInteraction = Interaction.extend({
     },
     postRender: function(data, altClassName, renderer) {
         renderer = renderer || this.getRenderer();
-        return [].concat(this.prompt.postRender({}, '', renderer)).concat(this._super(data, altClassName, renderer));
+        return [].concat(this.prompt.postRender(data, '', renderer)).concat(this._super(data, altClassName, renderer));
     },
     toArray: function() {
         var arr = this._super();

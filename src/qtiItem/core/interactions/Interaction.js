@@ -124,7 +124,7 @@ var QtiInteraction = Element.extend({
                 return Element.isA(elt, 'choice');
             })
             .map(function (choice) {
-                return choice.postRender({}, choice.qtiClass + '.' + self.qtiClass, renderer);
+                return choice.postRender(data, choice.qtiClass + '.' + self.qtiClass, renderer);
             })
             .value()
             .concat(this._super(data, altClassName, renderer));

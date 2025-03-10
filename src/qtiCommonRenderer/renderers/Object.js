@@ -36,6 +36,12 @@ export default {
         if (obj.attr('width')) {
             previewOptions.width = obj.attr('width');
         }
+        if (obj.metaData.metadataUri && obj.metaData.resourceMetadataUrl) {
+            const transcriptionUrl = obj.metaData.resourceMetadataUrl;
+            const metadataUri = encodeURIComponent(obj.metaData.metadataUri);
+            const resourceUri = obj.attr('data').replace('taomedia://mediamanager/', '');
+            previewOptions.transcriptionUrl = `${transcriptionUrl}?metadataUri=${metadataUri}&resourceUri=${resourceUri}`;
+        }
         if (previewOptions.url && previewOptions.mime) {
             $container.previewer(previewOptions);
         }
