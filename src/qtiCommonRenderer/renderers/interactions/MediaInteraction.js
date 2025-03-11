@@ -111,7 +111,7 @@ function render(interaction) {
                     autoStart: !!interaction.attr('autostart') && canBePlayed(),
                     loop: !!interaction.attr('loop'),
                     renderTo: $('.media-container', $container),
-                    transcriptionUrl: interaction.attr('transcriptionUrl')
+                    transcriptionUrl: interaction.object.metaData.transcriptionUrl
                 })
                     .on('render', () => {
                         resize();
