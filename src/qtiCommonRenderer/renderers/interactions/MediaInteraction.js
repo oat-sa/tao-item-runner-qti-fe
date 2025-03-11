@@ -110,7 +110,8 @@ function render(interaction) {
                     volume: 100,
                     autoStart: !!interaction.attr('autostart') && canBePlayed(),
                     loop: !!interaction.attr('loop'),
-                    renderTo: $('.media-container', $container)
+                    renderTo: $('.media-container', $container),
+                    transcriptionUrl: interaction.attr('transcriptionUrl')
                 })
                     .on('render', () => {
                         resize();
