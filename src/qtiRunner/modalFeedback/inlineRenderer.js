@@ -302,7 +302,7 @@ function renderModalFeedback(feedback, loader, renderer, $container, $itemContai
             Promise.all(
                 _.map(feedback.getComposingElements(), function (elt) {
                     //render also internal elements, such as math or img
-                    return elt.postRender({}, '', renderer).pop();
+                    return elt.postRender(data, '', renderer).pop();
                 })
             ),
             new Promise(function (resolve, reject) {
