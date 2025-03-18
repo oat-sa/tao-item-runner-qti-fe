@@ -708,7 +708,10 @@ function inputLimiter(interaction) {
                 // if plain text - then limit input right after composition end event
                 if (_getFormat(interaction) !== 'xhtml' && maxLength !== null) {
                     const currentValue = $textarea[0].value;
-                    $textarea[0].value = currentValue.substring(0, maxLength);
+                    const currentLength= this.getCharsCount();
+                    if (currentLength >= maxLength) {
+                        $textarea[0].value = currentValue.slice(0, maxLength - currentLength);
+                    }
                 }
                 _.defer(() => this.updateCounter());
                 return e;
