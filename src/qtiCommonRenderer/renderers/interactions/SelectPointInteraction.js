@@ -210,6 +210,12 @@ const resetResponse = function resetResponse(interaction) {
         interaction.paper.forEach(function(element) {
             const point = element.data('point');
             if (typeof point === 'object') {
+
+                if(!element.events) {
+                    // fix for error on empty raphael triggers
+                    element.events = [];
+                }
+
                 graphic.trigger(element, 'click');
             }
         });
