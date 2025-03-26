@@ -51,7 +51,7 @@
         "@oat-sa/prettier-config": "^0.1.1",
         "@oat-sa/rollup-plugin-wildcard-external": "^1.0.0",
         "@oat-sa/tao-core-libs": "^1.1.0",
-        "@oat-sa/tao-core-sdk": "^3.0.0",
+        "@oat-sa/tao-core-sdk": "github:oat-sa/tao-core-sdk-fe#fix/AUT-4106/removed-hardcoded-mime-extensions",
         "@oat-sa/tao-core-shared-libs": "^1.4.1",
         "@oat-sa/tao-core-ui": "^3.10.0",
         "@oat-sa/tao-item-runner": "^1.0.0",
