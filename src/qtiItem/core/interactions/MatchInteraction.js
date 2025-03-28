@@ -129,7 +129,7 @@ var MatchInteraction = BlockInteraction.extend({
                         return choice instanceof SimpleAssociableChoice;
                     })
                     .map(function(choice) {
-                        return choice.postRender({}, 'simpleAssociableChoice.matchInteraction', renderer);
+                        return choice.postRender(data, 'simpleAssociableChoice.matchInteraction', renderer);
                     })
                     .value();
             })
