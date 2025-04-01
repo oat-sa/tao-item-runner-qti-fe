@@ -703,13 +703,14 @@ function inputLimiter(interaction) {
             };
 
             const handleCompositionEnd = e => {
+                e.preventDefault();
                 isComposing = false;
                 hasCompositionJustEnded = true;
                 // if plain text - then limit input right after composition end event
                 if (_getFormat(interaction) !== 'xhtml' && maxLength !== null) {
                     const currentValue = $textarea[0].value;
                     const currentLength= this.getCharsCount();
-                    if (currentLength >= maxLength) {
+                    if (currentLength > maxLength) {
                         $textarea[0].value = currentValue.slice(0, maxLength - currentLength);
                     }
                 }
@@ -732,6 +733,7 @@ function inputLimiter(interaction) {
                         const range = this.createRange();
                         if (limiter.getCharsCount() > limiter.maxLength) {
                             const editable = this.editable();
+                            editable.setData('', true);
                             editable.setData(previousSnapshot, true);
                             range.moveToElementEditablePosition(editable, true);
                             editor.getSelection().selectRanges([range]);
@@ -755,7 +757,7 @@ function inputLimiter(interaction) {
                         _.defer(() => this.updateCounter());
                     })
                     .on('compositionstart.commonRenderer', handleCompositionStart)
-                    .on('compositionend.commonRenderer', handleCompositionEnd)
+                    .on('compositionend.commonRenderer blur', handleCompositionEnd)
                     .on('keyup.commonRenderer', patternHandler)
                     .on('keydown.commonRenderer', keyLimitHandler)
                     .on('paste.commonRenderer drop.commonRenderer', nonKeyLimitHandler);
