@@ -723,13 +723,12 @@ function inputLimiter(interaction) {
                 return e;
             };
 
-            if (_getFormat(interaction) === 'xhtml') {
+            if (isCke) {
                 const editor = _getCKEditor(interaction);
 
                 if (maxLength) {
                     let previousSnapshot = editor.getSnapshot();
-
-                    editor.on('key', function () {
+                    const CKEditorKeyLimit = () => {
                         const range = this.createRange();
                         if (limiter.getCharsCount() > limiter.maxLength) {
                             const editable = this.editable();
@@ -737,10 +736,12 @@ function inputLimiter(interaction) {
                             editable.setData(previousSnapshot, true);
                             range.moveToElementEditablePosition(editable, true);
                             editor.getSelection().selectRanges([range]);
-                            return;
+                        } else {
+                            previousSnapshot = editor.getSnapshot();
                         }
-                        previousSnapshot = editor.getSnapshot();
-                    });
+                    };
+                    editor.on('key', CKEditorKeyLimit);
+                    editor.on('blur', CKEditorKeyLimit);
                 }
                 editor.on('key', keyLimitHandler);
                 editor.on('change', evt => {
