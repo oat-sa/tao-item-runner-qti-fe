@@ -728,7 +728,7 @@ function inputLimiter(interaction) {
 
                 if (maxLength) {
                     let previousSnapshot = editor.getSnapshot();
-                    const CKEditorKeyLimit = () => {
+                    const CKEditorKeyLimit = function () {
                         const range = this.createRange();
                         if (limiter.getCharsCount() > limiter.maxLength) {
                             const editable = this.editable();
@@ -741,7 +741,10 @@ function inputLimiter(interaction) {
                         }
                     };
                     editor.on('key', CKEditorKeyLimit);
-                    editor.on('blur', CKEditorKeyLimit);
+                    editor.on('blur', function () {
+                        CKEditorKeyLimit.call(this);
+                        _.defer(() => limiter.updateCounter());
+                    });
                 }
                 editor.on('key', keyLimitHandler);
                 editor.on('change', evt => {
