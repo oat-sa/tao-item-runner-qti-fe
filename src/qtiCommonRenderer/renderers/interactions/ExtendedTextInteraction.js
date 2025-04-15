@@ -739,12 +739,10 @@ function inputLimiter(interaction) {
                         } else {
                             previousSnapshot = editor.getSnapshot();
                         }
+                        _.defer(() => limiter.updateCounter());
                     };
                     editor.on('key', CKEditorKeyLimit);
-                    editor.on('blur', function () {
-                        CKEditorKeyLimit.call(this);
-                        _.defer(() => limiter.updateCounter());
-                    });
+                    editor.on('blur', CKEditorKeyLimit);
                 }
                 editor.on('key', keyLimitHandler);
                 editor.on('change', evt => {
