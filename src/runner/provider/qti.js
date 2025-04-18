@@ -83,13 +83,20 @@ var qtiItemRuntimeProvider = {
                 //render item html
                 elt.innerHTML = this._item.render({});
 
+                //check rtl is set in body attributes of an item
+                const bdyRTL = this._item.bdy && this._item.bdy.attr('dir') === 'rtl';
+
                 // apply RTL layout according to item language
                 const $item = $(elt).find('.qti-item');
                 const $itemBody = $item.find('.qti-itemBody');
                 const itemDir = $itemBody.attr('dir');
                 if (!itemDir) {
-                    const itemLang = $item.attr('lang');
-                    $itemBody.attr('dir', locale.getLanguageDirection(itemLang));
+                    if(bdyRTL) {
+                        $itemBody.attr('dir', 'rtl');
+                    }else{
+                        const itemLang = $item.attr('lang');
+                        $itemBody.attr('dir', locale.getLanguageDirection(itemLang));
+                    }
                 }
                 if ($itemBody.hasClass('writing-mode-vertical-rl')) {
                     document.body.classList.add('item-writing-mode-vertical-rl');
