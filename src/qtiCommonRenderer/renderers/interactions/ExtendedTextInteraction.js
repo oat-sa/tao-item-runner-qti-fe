@@ -741,6 +741,14 @@ function inputLimiter(interaction) {
                         }
                         _.defer(() => limiter.updateCounter());
                     };
+                    editor.on('instanceReady', function () {
+                        const self = this;
+                        const editableElement = editor.editable().$;
+                        editableElement.addEventListener('compositionend', function () {
+                            CKEditorKeyLimit.call(self);
+                            _.defer(() => limiter.updateCounter());
+                        });
+                    });
                     editor.on('key', CKEditorKeyLimit);
                     editor.on('blur', CKEditorKeyLimit);
                 }
