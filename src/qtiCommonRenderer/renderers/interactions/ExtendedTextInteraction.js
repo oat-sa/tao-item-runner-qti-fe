@@ -703,12 +703,16 @@ function inputLimiter(interaction) {
             };
 
             const handleCompositionEnd = e => {
+                e.preventDefault();
                 isComposing = false;
                 hasCompositionJustEnded = true;
                 // if plain text - then limit input right after composition end event
                 if (_getFormat(interaction) !== 'xhtml' && maxLength !== null) {
                     const currentValue = $textarea[0].value;
-                    $textarea[0].value = currentValue.substring(0, maxLength);
+                    const currentLength= this.getCharsCount();
+                    if (currentLength > maxLength) {
+                        $textarea[0].value = currentValue.slice(0, maxLength - currentLength);
+                    }
                 }
                 _.defer(() => this.updateCounter());
                 return e;
@@ -719,23 +723,34 @@ function inputLimiter(interaction) {
                 return e;
             };
 
-            if (_getFormat(interaction) === 'xhtml') {
+            if (isCke) {
                 const editor = _getCKEditor(interaction);
 
                 if (maxLength) {
                     let previousSnapshot = editor.getSnapshot();
-
-                    editor.on('key', function () {
+                    const CKEditorKeyLimit = function () {
                         const range = this.createRange();
                         if (limiter.getCharsCount() > limiter.maxLength) {
                             const editable = this.editable();
+                            editable.setData('', true);
                             editable.setData(previousSnapshot, true);
                             range.moveToElementEditablePosition(editable, true);
                             editor.getSelection().selectRanges([range]);
-                            return;
+                        } else {
+                            previousSnapshot = editor.getSnapshot();
                         }
-                        previousSnapshot = editor.getSnapshot();
+                        _.defer(() => limiter.updateCounter());
+                    };
+                    editor.on('instanceReady', function () {
+                        const self = this;
+                        const editableElement = editor.editable().$;
+                        editableElement.addEventListener('compositionend', function () {
+                            CKEditorKeyLimit.call(self);
+                            _.defer(() => limiter.updateCounter());
+                        });
                     });
+                    editor.on('key', CKEditorKeyLimit);
+                    editor.on('blur', CKEditorKeyLimit);
                 }
                 editor.on('key', keyLimitHandler);
                 editor.on('change', evt => {
@@ -752,7 +767,7 @@ function inputLimiter(interaction) {
                         _.defer(() => this.updateCounter());
                     })
                     .on('compositionstart.commonRenderer', handleCompositionStart)
-                    .on('compositionend.commonRenderer', handleCompositionEnd)
+                    .on('compositionend.commonRenderer blur', handleCompositionEnd)
                     .on('keyup.commonRenderer', patternHandler)
                     .on('keydown.commonRenderer', keyLimitHandler)
                     .on('paste.commonRenderer drop.commonRenderer', nonKeyLimitHandler);
