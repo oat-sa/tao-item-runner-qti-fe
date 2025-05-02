@@ -191,24 +191,28 @@ const _setInstructions = function _setInstructions(interaction) {
         const $input = $choice.find('.real-label > input');
         const $icon = $choice.find('.real-label > span');
 
+        const prevTimeoutData = $choice.data('__instructionTimeout');
+        if (prevTimeoutData) {
+            clearTimeout(prevTimeoutData.timeout);
+            prevTimeoutData.unhighlight();
+        }
+
         const choiceStyle = $choice.attr('style');
         const iconStyle = $icon.attr('style');
-        $choice.css('color', '#BA122B');
-        $icon.css('color', '#BA122B').addClass('cross error')
+        $choice.get(0).style.setProperty('color', '#BA122B', 'important');
+        $icon.css('color', '#BA122B').addClass('cross error');
 
-        let timeout = interaction.data('__instructionTimeout');
-
-        if (timeout) {
-            clearTimeout(timeout);
-        }
-        timeout = setTimeout(function () {
+        const unhighlight = () => {
+            $choice.attr('style', choiceStyle || '');
+            $icon.attr('style', iconStyle || '').removeClass('cross error');
+        };
+        const timeout = setTimeout(() => {
+            unhighlight();
             $input.prop('checked', false);
-            $choice.attr('style', choiceStyle);
-            $icon.attr('style', iconStyle).removeClass('cross');
             $choice.toggleClass('user-selected', false);
             containerHelper.triggerResponseChangeEvent(interaction);
-        }, 150);
-        interaction.data('__instructionTimeout', timeout);
+        }, 250);
+        $choice.data('__instructionTimeout', { timeout, unhighlight });
     };
 
     // if maxChoice = 1, use the radio group behaviour
@@ -274,7 +278,7 @@ const _setInstructions = function _setInstructions(interaction) {
                     }
                 });
                 this.setState('fulfilled');
-            }  else {
+            } else {
                 this.reset();
             }
         });
