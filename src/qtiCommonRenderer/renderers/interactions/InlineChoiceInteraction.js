@@ -76,7 +76,7 @@ const render = function (interaction, options) {
     const dirClass = getItemDir();
 
     const isVertical = getIsItemWritingModeVerticalRl();
-    const writingMode = isVertical ? 'verticalRl' : void 0;
+    const writingMode = isVertical ? 'vertical-rl' : void 0;
     const serial = $container.data('serial');
 
     $container.select2({

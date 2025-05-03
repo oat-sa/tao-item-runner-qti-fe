@@ -21,6 +21,7 @@
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/tooltip';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import tooltip from 'ui/tooltip';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/itemProperties';
 
 export default {
     qtiClass: '_tooltip',
@@ -28,9 +29,11 @@ export default {
     getContainer: containerHelper.get,
     render: function render(tooltipDOM) {
         var $container = containerHelper.get(tooltipDOM);
+        const isVertical = getIsItemWritingModeVerticalRl();
+
         var renderedTooltip = tooltip.create($container, tooltipDOM.content(), {
             theme: 'default',
-            placement: 'top'
+            placement: isVertical ? 'right' : 'top'
         });
 
         if ($container.data('$tooltip')) {
