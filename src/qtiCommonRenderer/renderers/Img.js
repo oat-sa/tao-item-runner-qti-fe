@@ -19,13 +19,21 @@
 import 'ui/waitForMedia';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/img';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/itemProperties';
 
 export default {
     qtiClass: 'img',
     template: tpl,
     getContainer: containerHelper.get,
     render: function render(img, data) {
-        return new Promise(function(resolve, reject) {
+        if (getIsItemWritingModeVerticalRl()) {
+            const $img = containerHelper.get(img);
+            if ($img.attr('width') && $img.attr('width').endsWith('%') && !$img.attr('height')) {
+                $img.attr('height', img.attr('width'));
+                $img.removeAttr('width');
+            }
+        }
+        return new Promise(function (resolve, reject) {
             containerHelper.get(img).waitForMedia(resolve);
         });
     }
