@@ -25,3 +25,27 @@ export const getIsItemWritingModeVerticalRl = () => {
     const itemBody = $('.qti-itemBody');
     return itemBody.hasClass('writing-mode-vertical-rl');
 };
+
+/**
+ * In vertical-writing, it's preferred to show numbers with `text-combine-upright: all` style.
+ * So find numbers in a string, and wrap them in a span with a special class.
+ * For single digits, they can be replaced with "fullwidth digit" unicode symbol.
+ * @param {String|Number} message
+ * @param {Boolean} isWritingModeVerticalRl - if `false`, won't transform `message`
+ * @returns {String} html
+ */
+export const wrapDigitsInCombineUpright = (message, isWritingModeVerticalRl) => {
+    if (!isWritingModeVerticalRl) {
+        return message;
+    }
+    if (typeof message === 'number') {
+        message = message.toString();
+    } else if (typeof message !== 'string') {
+        return message;
+    }
+    const withDigitsWrapped = message.replaceAll(
+        /[0-9]+/g,
+        digits => `<span class="txt-combine-upright-all">${digits}</span>`
+    );
+    return withDigitsWrapped;
+};

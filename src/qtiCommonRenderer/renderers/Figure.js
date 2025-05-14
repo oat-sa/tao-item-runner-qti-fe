@@ -17,7 +17,7 @@
  */
 import context from 'context';
 import _ from 'lodash';
-import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/itemProperties';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import imageTpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure-image';
 import widgetTpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure-widget';
