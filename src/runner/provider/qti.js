@@ -36,7 +36,7 @@ import userModules from 'taoQtiItem/runner/provider/manager/userModules';
 import modalFeedbackHelper from 'taoQtiItem/qtiItem/helper/modalFeedback';
 import 'taoItems/assets/manager';
 import locale from 'util/locale';
-import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/itemProperties';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 import { isSafari } from 'taoQtiItem/qtiCommonRenderer/helpers/userAgent';
 
 var timeout = (context.timeout > 0 ? context.timeout + 1 : 30) * 1000;

@@ -19,7 +19,7 @@
 import 'ui/waitForMedia';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/img';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
-import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/itemProperties';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 
 export default {
     qtiClass: 'img',

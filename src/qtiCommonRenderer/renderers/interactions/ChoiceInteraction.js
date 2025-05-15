@@ -31,6 +31,10 @@ import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import sizeAdapter from 'taoQtiItem/qtiCommonRenderer/helpers/sizeAdapter';
 import adaptSize from 'util/adaptSize';
 import features from 'services/features';
+import {
+    getIsItemWritingModeVerticalRl,
+    wrapDigitsInCombineUpright
+} from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 
 const KEY_CODE_SPACE = 32;
 const KEY_CODE_ENTER = 13;
@@ -186,6 +190,7 @@ const _setInstructions = function _setInstructions(interaction) {
     const max = interaction.attr('maxChoices');
     let msg;
     const choiceCount = _.size(interaction.getChoices());
+    const isVertical = getIsItemWritingModeVerticalRl();
 
     const highlightInvalidInput = function highlightInvalidInput($choice) {
         const $input = $choice.find('.real-label > input');
@@ -221,7 +226,7 @@ const _setInstructions = function _setInstructions(interaction) {
     if (min === 1 && (max === 0 || max === choiceCount || typeof max === 'undefined')) {
         // Multiple Choice: 4.Constraint: Answer required -> minChoices = 1 / maxChoices = 0 -> “You need to select at least 1 choice”
         // Multiple Choice: 5.Constraint: Other constraints -> minChoices = 1 / maxChoices = (N or Disabled)
-        msg = __('You need to select at least 1 choice.');
+        msg = wrapDigitsInCombineUpright(__('You need to select at least 1 choice.'), isVertical);
         instructionMgr.appendInstruction(interaction, msg, function () {
             if (_getRawResponse(interaction).length >= 1) {
                 this.setLevel('success');
@@ -231,7 +236,7 @@ const _setInstructions = function _setInstructions(interaction) {
         });
     } else if (min >= 1 && max >= 2 && min !== max) {
         // Multiple Choice: 5. Constraint: Other constraints -> “You must select from minChoices to maxChoices choices. for the correct answer“
-        msg = __('You need to select from %s to %s choices.', min, max);
+        msg = wrapDigitsInCombineUpright(__('You need to select from %s to %s choices.', min, max), isVertical);
         instructionMgr.appendInstruction(interaction, msg, function (data) {
             if (_getRawResponse(interaction).length >= min && _getRawResponse(interaction).length < max) {
                 this.reset();
@@ -259,7 +264,7 @@ const _setInstructions = function _setInstructions(interaction) {
         });
     } else if (min > 1 && min === max) {
         // Multiple Choice: 5. Constraint: Other constraints -> minChoices ≠ Disabled / maxChoices ≠ Disabled -> “You need to select {minChoices = maxChoices value} choices.“
-        msg = __('You need to select %s choices', min);
+        msg = wrapDigitsInCombineUpright(__('You need to select %s choices', min), isVertical);
         instructionMgr.appendInstruction(interaction, msg, function (data) {
             if (_getRawResponse(interaction).length === min) {
                 this.setLevel('success');
@@ -284,7 +289,7 @@ const _setInstructions = function _setInstructions(interaction) {
         });
     } else if (max > 1 && max < choiceCount && (typeof min === 'undefined' || min === 0)) {
         // Multiple Choice: 5. Constraint: Other constraints -> minChoices = Disabled / maxChoices ≠ Disabled  -> "You can select up to {maxChoices value} choices."
-        msg = __('You can select up to %s choices.', max);
+        msg = wrapDigitsInCombineUpright(__('You can select up to %s choices.', max), isVertical);
         instructionMgr.appendInstruction(interaction, msg, function (data) {
             if (_getRawResponse(interaction).length >= max) {
                 this.setMessage(__('Maximum choices reached'));
@@ -309,7 +314,7 @@ const _setInstructions = function _setInstructions(interaction) {
         });
     } else if (min > 1 && (typeof max === 'undefined' || max === 0)) {
         // Multiple Choice: 5. Constraint: Other constraints -> minChoices ≠ Disabled / maxChoices = Disabled or 0   -> "You need to select at least {minChoices value} choices.""
-        msg = __('You need to select at least %s choices.', min);
+        msg = wrapDigitsInCombineUpright(__('You need to select at least %s choices.', min), isVertical);
         instructionMgr.appendInstruction(interaction, msg, function () {
             if (_getRawResponse(interaction).length >= min) {
                 this.setLevel('success');

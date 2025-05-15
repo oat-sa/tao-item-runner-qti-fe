@@ -21,7 +21,7 @@
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/tooltip';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import tooltip from 'ui/tooltip';
-import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/itemProperties';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 
 export default {
     qtiClass: '_tooltip',
