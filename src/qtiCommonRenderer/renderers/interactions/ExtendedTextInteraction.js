@@ -1002,17 +1002,17 @@ function _patchSafariVerticalRl($textarea, serial) {
         setShadowString($textarea.get(0).value);
         positionCursor();
     });
-    $textarea.on('selectionchange', e => {
+    $textarea.on('selectionchange', () => {
         positionCursor();
     });
-    $textarea.on('focus', e => {
+    $textarea.on('focus', () => {
         syncShadowStyles();
         positionCursor();
     });
-    $textarea.on('blur', e => {
+    $textarea.on('blur', () => {
         showHideCursor(false);
     });
-    $textarea.on('scroll', e => {
+    $textarea.on('scroll', () => {
         requestAnimationFrame(() => {
             positionCursor();
         });
