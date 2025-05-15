@@ -34,7 +34,6 @@ import ckEditor from 'ckeditor';
 import ckConfigurator from 'taoQtiItem/qtiCommonRenderer/helpers/ckConfigurator';
 import patternMaskHelper from 'taoQtiItem/qtiCommonRenderer/helpers/patternMask';
 import { isSafari } from 'taoQtiItem/qtiCommonRenderer/helpers/userAgent';
-import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/itemProperties';
 import tooltip from 'ui/tooltip';
 import converter from 'util/converter';
 import loggerFactory from 'core/logger';
@@ -868,7 +867,7 @@ function inputLimiter(interaction) {
  * @returns {Object|null} if safari & vertical-rl,`{ syncValue: () => void, destroy: () => void }` . Otherwise `null`.
  */
 function _patchSafariVerticalRl($textarea, serial) {
-    if (!getIsItemWritingModeVerticalRl() || !isSafari()) {
+    if (!getIsItemWritingModeVerticalRl() || !isSafari() || !supportsVerticalFormElement()) {
         return null;
     }
 
