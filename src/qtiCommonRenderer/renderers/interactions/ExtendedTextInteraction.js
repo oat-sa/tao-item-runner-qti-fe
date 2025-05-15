@@ -737,11 +737,10 @@ function inputLimiter(interaction) {
             };
 
             const handleCompositionEnd = e => {
-                e.preventDefault();
                 isComposing = false;
                 hasCompositionJustEnded = true;
                 // if plain text - then limit input right after composition end event
-                if (_getFormat(interaction) !== 'xhtml' && maxLength !== null) {
+                if (_getFormat(interaction) !== 'xhtml' && maxLength) {
                     const currentValue = $textarea[0].value;
                     const currentLength = this.getCharsCount();
                     if (currentLength > maxLength) {
@@ -801,7 +800,7 @@ function inputLimiter(interaction) {
                         _.defer(() => this.updateCounter());
                     })
                     .on('compositionstart.commonRenderer', handleCompositionStart)
-                    .on('compositionend.commonRenderer blur', handleCompositionEnd)
+                    .on('compositionend.commonRenderer', handleCompositionEnd)
                     .on('keyup.commonRenderer', patternHandler)
                     .on('keydown.commonRenderer', keyLimitHandler)
                     .on('paste.commonRenderer drop.commonRenderer', nonKeyLimitHandler);
