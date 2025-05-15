@@ -39,7 +39,6 @@ import converter from 'util/converter';
 import loggerFactory from 'core/logger';
 import {
     getIsItemWritingModeVerticalRl,
-    wrapDigitsInCombineUpright,
     supportsVerticalFormElement
 } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 
@@ -424,11 +423,11 @@ function inputLimiter(interaction) {
             if (!maxLength && !maxWords) {
                 patternRegEx = new RegExp(patternMask);
             }
-            $maxLengthCounter.html(wrapDigitsInCombineUpright(maxLength, isVertical));
+            $maxLengthCounter.html(maxLength);
             $maxWordsCounter.text(maxWords);
         }
         if (expectedLength || expectedLines) {
-            $expectedLengthCounter.html(wrapDigitsInCombineUpright($expectedLengthCounter.text(), isVertical));
+            $expectedLengthCounter.html($expectedLengthCounter.text());
         }
     }
 
@@ -835,7 +834,7 @@ function inputLimiter(interaction) {
          * Update the counter element
          */
         updateCounter() {
-            $charsCounter.html(wrapDigitsInCombineUpright(this.getCharsCount(), isVertical));
+            $charsCounter.html(this.getCharsCount());
             $wordsCounter.text(this.getWordsCount());
         },
 
