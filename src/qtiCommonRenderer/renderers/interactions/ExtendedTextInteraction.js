@@ -38,7 +38,8 @@ import converter from 'util/converter';
 import loggerFactory from 'core/logger';
 import {
     getIsItemWritingModeVerticalRl,
-    wrapDigitsInCombineUpright
+    wrapDigitsInCombineUpright,
+    supportsVerticalFormElement
 } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 
 /**
@@ -159,6 +160,14 @@ function render(interaction) {
 
                 $(document).on('themechange.themeloader', themeLoaded);
             } else {
+                const isVertical = getIsItemWritingModeVerticalRl();
+                if (isVertical) {
+                    const textareaSupportsVertical = supportsVerticalFormElement();
+                    if (!textareaSupportsVertical) {
+                        $el.addClass('vertical-unsupported');
+                    }
+                }
+
                 $el.on('keyup.commonRenderer change.commonRenderer', function () {
                     containerHelper.triggerResponseChangeEvent(interaction, {});
                 });

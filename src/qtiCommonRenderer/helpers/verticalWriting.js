@@ -17,6 +17,8 @@
  */
 import $ from 'jquery';
 
+let isVerticalFormElementSupported = null;
+
 /**
  * If item has 'vertical-rl' writing mode
  * @returns {Boolean}
@@ -49,3 +51,24 @@ export const wrapDigitsInCombineUpright = (message, isWritingModeVerticalRl) => 
     );
     return withDigitsWrapped;
 };
+
+/**
+ * Does browser support vertical orientation for form elements:
+ * input, textarea
+ *
+ * NB! Supported everywhere except Safari < 17.4.
+ * Remove this once no longer need old Safari.
+ * @returns {Boolean}
+ */
+export function supportsVerticalFormElement() {
+    if (isVerticalFormElementSupported === null) {
+        const div = document.createElement('div');
+        div.innerHTML =
+            '<div style="writing-mode:vertical-rl;position:absolute;top:0;left:0;opacity:0"><input type="text"></div>';
+        document.body.append(div);
+        const rect = div.querySelector('input').getBoundingClientRect();
+        isVerticalFormElementSupported = rect.width < rect.height;
+        div.remove();
+    }
+    return isVerticalFormElementSupported;
+}
