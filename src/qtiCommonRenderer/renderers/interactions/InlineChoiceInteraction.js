@@ -28,6 +28,7 @@ import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/inlineChoiceInter
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 import tooltip from 'ui/tooltip';
 import 'select2';
 
@@ -72,15 +73,10 @@ const render = function (interaction, options) {
         return itemDir;
     };
 
-    const getItemWritingMode = () => {
-        const itemBody = $('.qti-itemBody');
-        const itemWritingMode = itemBody.hasClass('writing-mode-vertical-rl') ? 'vertical-rl' : '';
-        return itemWritingMode;
-    };
-
     const dirClass = getItemDir();
-    const writingMode = getItemWritingMode();
-    const isVertical = writingMode === 'vertical-rl';
+
+    const isVertical = getIsItemWritingModeVerticalRl();
+    const writingMode = isVertical ? 'vertical-rl' : void 0;
     const serial = $container.data('serial');
 
     $container.select2({

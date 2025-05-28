@@ -36,6 +36,8 @@ import userModules from 'taoQtiItem/runner/provider/manager/userModules';
 import modalFeedbackHelper from 'taoQtiItem/qtiItem/helper/modalFeedback';
 import 'taoItems/assets/manager';
 import locale from 'util/locale';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
+import { isSafari } from 'taoQtiItem/qtiCommonRenderer/helpers/userAgent';
 
 var timeout = (context.timeout > 0 ? context.timeout + 1 : 30) * 1000;
 
@@ -91,15 +93,18 @@ var qtiItemRuntimeProvider = {
                 const $itemBody = $item.find('.qti-itemBody');
                 const itemDir = $itemBody.attr('dir');
                 if (!itemDir) {
-                    if(bdyRTL) {
+                    if (bdyRTL) {
                         $itemBody.attr('dir', 'rtl');
-                    }else{
+                    } else {
                         const itemLang = $item.attr('lang');
                         $itemBody.attr('dir', locale.getLanguageDirection(itemLang));
                     }
                 }
-                if ($itemBody.hasClass('writing-mode-vertical-rl')) {
+                if (getIsItemWritingModeVerticalRl()) {
                     document.body.classList.add('item-writing-mode-vertical-rl');
+                    if (isSafari()) {
+                        $itemBody.attr('data-useragent-browser', 'safari');
+                    }
                 }
             } catch (e) {
                 self.trigger('error', __('Error in template rendering: %s', e.message));
@@ -131,7 +136,11 @@ var qtiItemRuntimeProvider = {
                         _.delay(
                             reject,
                             timeout,
-                            new Error(__('It seems that there is an error during item loading. The error has been reported. The test will be paused.'))
+                            new Error(
+                                __(
+                                    'It seems that there is an error during item loading. The error has been reported. The test will be paused.'
+                                )
+                            )
                         );
                     })
                 ])
@@ -165,9 +174,7 @@ var qtiItemRuntimeProvider = {
                     })
                     .catch(function (renderingError) {
                         done(); // in case of postRendering issue, we are also done
-                        const errorMsg = renderingError instanceof Error
-                            ? renderingError.message
-                            : renderingError;
+                        const errorMsg = renderingError instanceof Error ? renderingError.message : renderingError;
                         const error = new Error(__('Error in post rendering: %s', errorMsg));
                         error.unrecoverable = true;
                         self.trigger('error', error);

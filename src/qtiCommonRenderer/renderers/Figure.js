@@ -17,6 +17,7 @@
  */
 import context from 'context';
 import _ from 'lodash';
+import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import imageTpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure-image';
 import widgetTpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure-widget';
@@ -34,7 +35,10 @@ export default {
         }
 
         let showFigure = false;
-        if (data.attributes.class && [FLOAT_LEFT_CLASS, FLOAT_RIGHT_CLASS, CENTER_CLASS].includes(data.attributes.class)) {
+        if (
+            data.attributes.class &&
+            [FLOAT_LEFT_CLASS, FLOAT_RIGHT_CLASS, CENTER_CLASS].includes(data.attributes.class)
+        ) {
             showFigure = true;
         } else {
             _.some(elem.bdy['elements'], childElement => {
@@ -54,8 +58,18 @@ export default {
         const $img = $figure.find('img');
         if ($img.length && (DISABLE_FIGURE_WIDGET || $figure.prop('tagName') === 'FIGURE')) {
             // move width from image to figure
-            $figure.css({ width: $img.attr('width') });
-            $img.attr('width', '100%');
+            if (
+                getIsItemWritingModeVerticalRl() &&
+                $img.attr('height') &&
+                $img.attr('height').endsWith('%') &&
+                !$img.attr('width')
+            ) {
+                $figure.css({ height: $img.attr('height') });
+                $img.attr('height', '100%');
+            } else {
+                $figure.css({ width: $img.attr('width') });
+                $img.attr('width', '100%');
+            }
         }
     }
 };

@@ -36,6 +36,10 @@ import patternMaskHelper from 'taoQtiItem/qtiCommonRenderer/helpers/patternMask'
 import tooltip from 'ui/tooltip';
 import converter from 'util/converter';
 import loggerFactory from 'core/logger';
+import {
+    getIsItemWritingModeVerticalRl,
+    supportsVerticalFormElement
+} from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 
 /**
  * Create a logger
@@ -155,6 +159,14 @@ function render(interaction) {
 
                 $(document).on('themechange.themeloader', themeLoaded);
             } else {
+                const isVertical = getIsItemWritingModeVerticalRl();
+                if (isVertical) {
+                    const textareaSupportsVertical = supportsVerticalFormElement();
+                    if (!textareaSupportsVertical) {
+                        $el.addClass('vertical-unsupported');
+                    }
+                }
+
                 $el.on('keyup.commonRenderer change.commonRenderer', function () {
                     containerHelper.triggerResponseChangeEvent(interaction, {});
                 });
@@ -375,8 +387,16 @@ function inputLimiter(interaction) {
     const expectedLines = interaction.attr('expectedLines');
     const patternMask = interaction.attr('patternMask');
     const isCke = _getFormat(interaction) === 'xhtml';
+    const isVertical = getIsItemWritingModeVerticalRl();
     let patternRegEx;
-    let $textarea, $charsCounter, $wordsCounter, maxWords, maxLength, $maxLengthCounter, $maxWordsCounter;
+    let $textarea,
+        $charsCounter,
+        $wordsCounter,
+        maxWords,
+        maxLength,
+        $maxLengthCounter,
+        $maxWordsCounter,
+        $expectedLengthCounter;
     let enabled = false;
 
     if (expectedLength || expectedLines || patternMask) {
@@ -386,6 +406,7 @@ function inputLimiter(interaction) {
         $wordsCounter = $('.count-words', $container);
         $maxLengthCounter = $('.count-max-length', $container);
         $maxWordsCounter = $('.count-max-words', $container);
+        $expectedLengthCounter = $('.count-expected-length', $container);
 
         if (patternMask !== '') {
             maxWords = parseInt(patternMaskHelper.parsePattern(patternMask, 'words'), 10);
@@ -395,8 +416,11 @@ function inputLimiter(interaction) {
             if (!maxLength && !maxWords) {
                 patternRegEx = new RegExp(patternMask);
             }
-            $maxLengthCounter.text(maxLength);
+            $maxLengthCounter.html(maxLength);
             $maxWordsCounter.text(maxWords);
+        }
+        if (expectedLength || expectedLines) {
+            $expectedLengthCounter.html($expectedLengthCounter.text());
         }
     }
 
@@ -800,7 +824,7 @@ function inputLimiter(interaction) {
          * Update the counter element
          */
         updateCounter() {
-            $charsCounter.text(this.getCharsCount());
+            $charsCounter.html(this.getCharsCount());
             $wordsCounter.text(this.getWordsCount());
         },
 
