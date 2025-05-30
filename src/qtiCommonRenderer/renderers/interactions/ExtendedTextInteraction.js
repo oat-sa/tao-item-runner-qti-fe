@@ -899,7 +899,7 @@ function _patchSafariVerticalRl($textarea, serial) {
         if (repaintIdx % 2 === 0) {
             $textarea.get(0).style.opacity = '99%';
         } else {
-            $textarea.get(0).style.opacity = '98%';
+            $textarea.get(0).style.opacity = '97%';
         }
         repaintIdx++;
     }
