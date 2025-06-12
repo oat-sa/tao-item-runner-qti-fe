@@ -33,6 +33,7 @@ import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/in
 import ckEditor from 'ckeditor';
 import ckConfigurator from 'taoQtiItem/qtiCommonRenderer/helpers/ckConfigurator';
 import patternMaskHelper from 'taoQtiItem/qtiCommonRenderer/helpers/patternMask';
+import { isSafari } from 'taoQtiItem/qtiCommonRenderer/helpers/userAgent';
 import tooltip from 'ui/tooltip';
 import converter from 'util/converter';
 import loggerFactory from 'core/logger';
@@ -71,6 +72,7 @@ function render(interaction) {
         const limiter = inputLimiter(interaction);
 
         const placeholderText = interaction.attr('placeholderText');
+        const serial = $container.data('serial');
 
         const getItemLanguage = () => {
             let itemLang = $container.closest('.qti-item').attr('lang');
@@ -175,6 +177,8 @@ function render(interaction) {
                     limiter.listenTextInput();
                 }
 
+                interaction.safariVerticalRlPatch = _patchSafariVerticalRl($el, serial);
+
                 resolve();
             }
 
@@ -269,6 +273,9 @@ function resetResponse(interaction) {
         _getCKEditor(interaction).setData('');
     } else {
         containerHelper.get(interaction).find('input, textarea').val('');
+        if (interaction.safariVerticalRlPatch) {
+            interaction.safariVerticalRlPatch.syncValue();
+        }
     }
 }
 
@@ -661,6 +668,7 @@ function inputLimiter(interaction) {
                     if (!isCke && charsCount > maxLength) {
                         const textarea = $textarea[0];
                         textarea.value = textarea.value.substring(0, maxLength);
+                        $textarea.trigger('inputlimiter-limited');
                         textarea.focus();
                     }
                     return cancelEvent(e);
@@ -716,6 +724,7 @@ function inputLimiter(interaction) {
                     el.focus();
                     el.selectionStart = start + newValue.length;
                     el.selectionEnd = el.selectionStart;
+                    elements.trigger('inputlimiter-limited');
                 }
 
                 _.defer(() => this.updateCounter());
@@ -832,6 +841,208 @@ function inputLimiter(interaction) {
     };
 
     return limiter;
+}
+
+/**
+ * In Safari & `writing-mode: vertical-rl`, for *multiline* text:
+ *   - when user is typing, browser doesn't always repaint, so user doesn't see what he's typing.
+ *   - when user clicks (or key-navigates) inside text, cursor is shown in wrong position.
+ *     `textarea.selectionStart/textarea.selectionEnd` are set correctly, just visually cursor is painted in a wrong place.
+ * Create a workaround:
+ *   - force browser to repaint on every typed letter, using a trick
+ *   - hide native cursor, show custom div as a cursor instead
+ *   - position this custom cursor:
+ *     - create a shadow div contianing same text as textarea (<textarea>ab</textarea> -> <shadow><span>a</span><span>b</span></shadow>)
+ *     - shadow div should also have same size, font, and text-wrapping rules.
+ *     - when after click/key-nav browser changes `textarea.selectionStart` to N, use shadow to understand what are the coordinates of the Nth letter of text
+ *     - then draw custom cursor at those coordinates.
+ * Unsolved issues:
+ *   - when user clicks between lines (in a space left by the difference of line-height & font-size), `textarea.selectionStart` is wrong, cursor jumps randomly
+ *   - when user clicks on empty space left in the line, or at empty lines, `textarea.selectionStart` is wrong, cursor jumps randomly
+ *   - key-navigation is not intuitive (left/right still jump letters, and up/down - lines, as in horizontal-tb)
+ * @param {JQuery} $textarea
+ * @param {string} serial
+ * @returns {Object|null} if safari & vertical-rl,`{ syncValue: () => void, destroy: () => void }` . Otherwise `null`.
+ */
+function _patchSafariVerticalRl($textarea, serial) {
+    if (!getIsItemWritingModeVerticalRl() || !isSafari() || !supportsVerticalFormElement()) {
+        return null;
+    }
+
+    $textarea.addClass('hide-caret');
+
+    const $shadow = $('<div>', { class: 'shadow-textarea' });
+    const $cursor = $('<div>', { class: 'extendedText-shadow-caret' });
+    $(document.body).append($cursor);
+    $textarea.after($('<div>', { class: 'shadow-container' }).append($shadow));
+
+    let repaintIdx = 0;
+
+    function setShadowString(str) {
+        const shadowString = [...str, ' ']
+            .map(i => {
+                if (i === '\n') {
+                    return '<br/>';
+                } else if (i === ' ') {
+                    return `<span>&#x20;</span>`;
+                } else {
+                    return `<span>${i}</span>`;
+                }
+            })
+            .join('');
+
+        $shadow.get(0).innerHTML = shadowString;
+    }
+
+    function forceTextareaRepaint() {
+        if (repaintIdx % 2 === 0) {
+            $textarea.get(0).style.opacity = '99%';
+        } else {
+            $textarea.get(0).style.opacity = '97%';
+        }
+        repaintIdx++;
+    }
+
+    function showHideCursor(show) {
+        if (show && ($cursor.get(0).style.display === 'none' || !$cursor.get(0).style.display)) {
+            $cursor.get(0).style.display = 'block';
+        }
+        if (!show && ($cursor.get(0).style.display !== 'none' || !$cursor.get(0).style.display)) {
+            $cursor.get(0).style.display = 'none';
+        }
+    }
+
+    function positionCursor() {
+        const selectionStart = $textarea.get(0).selectionStart;
+        const selectionEnd = $textarea.get(0).selectionEnd;
+        //range selection seems to be painted fine
+        if (selectionStart === selectionEnd && document.activeElement === $textarea.get(0)) {
+            const shadowLetterEl = $shadow.get(0).children[selectionStart];
+
+            const shadowLetterRect = shadowLetterEl.getBoundingClientRect();
+            const shadowRect = $shadow.get(0).getBoundingClientRect();
+            const textareaRect = $textarea.get(0).getBoundingClientRect();
+            const cursorRect = $cursor.get(0).getBoundingClientRect();
+            const bodyRect = document.body.getBoundingClientRect();
+
+            //iPad, when keyboard opened: 'position:fixed' is off because of addressbar height,
+            //  so for cursor use 'position:absolute' from 'body', and 'bodyRect.top' (='-window.scrollY')
+            const cursorTop = textareaRect.top + (shadowLetterRect.top - shadowRect.top) - bodyRect.top;
+            const cursorLeft =
+                textareaRect.left -
+                $textarea.get(0).scrollLeft +
+                (shadowLetterRect.left - shadowRect.left + $shadow.get(0).scrollLeft);
+
+            const cursorTopStyle = `${Math.round(cursorTop)}px`;
+            const cursorLeftStyle = `${Math.round(cursorLeft)}px`;
+            if ($cursor.get(0).style.top !== cursorTopStyle) {
+                $cursor.get(0).style.top = cursorTopStyle;
+            }
+            if ($cursor.get(0).style.left !== cursorLeftStyle) {
+                $cursor.get(0).style.left = cursorLeftStyle;
+            }
+
+            //hide if out of bounds (after scroll for example)
+            if (
+                cursorLeft > textareaRect.left + textareaRect.width ||
+                cursorLeft + cursorRect.width < textareaRect.left
+            ) {
+                showHideCursor(false);
+            } else {
+                showHideCursor(true);
+            }
+        } else {
+            showHideCursor(false);
+        }
+    }
+
+    function syncShadowStyles() {
+        const textareaStyles = getComputedStyle($textarea.get(0));
+        const shadowStyles = getComputedStyle($shadow.get(0));
+        for (const propName of [
+            'width',
+            'height',
+            'padding',
+            'writing-mode',
+            'dir',
+            'line-height',
+            'font-family',
+            'font-size',
+            'word-break',
+            'white-space',
+            'overflow-wrap',
+            'hyphens',
+            'tab-size'
+        ]) {
+            const textareaPropVal = textareaStyles.getPropertyValue(propName);
+            const shadowPropVal = shadowStyles.getPropertyValue(propName);
+            if (textareaPropVal !== shadowPropVal) {
+                $shadow.get(0).style[propName] = textareaPropVal;
+            }
+        }
+    }
+
+    const debouncedPositionCursor = _.debounce(() => {
+        if (document.activeElement === $textarea.get(0)) {
+            requestAnimationFrame(() => {
+                positionCursor();
+            });
+        }
+    }, 100);
+
+    $textarea.on('input', e => {
+        forceTextareaRepaint();
+        setShadowString(e.target.value);
+        positionCursor();
+    });
+    $textarea.on('inputlimiter-limited', () => {
+        forceTextareaRepaint();
+        setShadowString($textarea.get(0).value);
+        positionCursor();
+    });
+    $textarea.on('selectionchange', () => {
+        positionCursor();
+    });
+    $textarea.on('focus', () => {
+        syncShadowStyles();
+        positionCursor();
+    });
+    $textarea.on('blur', () => {
+        showHideCursor(false);
+    });
+    $textarea.on('scroll', () => {
+        requestAnimationFrame(() => {
+            positionCursor();
+        });
+    });
+
+    //scroll containers
+    $('.qti-itemBody, .tao-overflow-y').on(`scroll.exttext-verticalsafari-${serial}`, debouncedPositionCursor);
+    //document is scrolled on iPad when keyboard opens
+    $(document).on(`scroll.exttext-verticalsafari-${serial}`, debouncedPositionCursor);
+    $(window).on(`resize.exttext-verticalsafari-${serial}`, debouncedPositionCursor);
+
+    $(document).on(`themeapplied.exttext-verticalsafari-${serial}`, () => {
+        syncShadowStyles();
+        positionCursor();
+    });
+
+    syncShadowStyles();
+    setShadowString($textarea.get(0).value);
+
+    const api = {
+        syncValue: function () {
+            setShadowString($textarea.get(0).value);
+            positionCursor();
+        },
+        destroy: function () {
+            $(document).off(`themeapplied.exttext-verticalsafari-${serial}`);
+            $(window).off(`resize.exttext-verticalsafari-${serial}`);
+            $('.qti-itemBody, .tao-overflow-y').off(`scroll.exttext-verticalsafari-${serial}`);
+            $cursor.remove();
+        }
+    };
+    return api;
 }
 
 /**
@@ -1026,6 +1237,9 @@ function setText(interaction, text) {
         if (limiter.enabled) {
             limiter.updateCounter();
         }
+        if (interaction.safariVerticalRlPatch) {
+            interaction.safariVerticalRlPatch.syncValue();
+        }
     }
 }
 
@@ -1044,6 +1258,10 @@ function destroy(interaction) {
     //remove event
     $el.off('.commonRenderer');
     $(document).off('.commonRenderer');
+
+    if (interaction.safariVerticalRlPatch) {
+        interaction.safariVerticalRlPatch.destroy();
+    }
 
     //remove instructions
     instructionMgr.removeInstructions(interaction);
