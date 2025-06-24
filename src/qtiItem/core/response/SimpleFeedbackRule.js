@@ -48,6 +48,7 @@ var SimpleFeedbackRule = Element.extend({
             switch (condition) {
                 case 'correct':
                 case 'incorrect':
+                case 'isNull':
                     if (Element.isA(comparedOutcome, 'responseDeclaration')) {
                         this.comparedOutcome = comparedOutcome;
                         this.condition = condition;
