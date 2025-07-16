@@ -438,11 +438,13 @@ const getCustomData = function getCustomData(interaction, data) {
 const destroy = function destroy(interaction) {
     const $container = containerHelper.get(interaction);
 
-    const timeout = interaction.data('__instructionTimeout');
-
-    if (timeout) {
-        clearTimeout(timeout);
-    }
+    $container.find('.choice-area .qti-choice').forEach(function () {
+        const $choice = $(this);
+        const timeout = $choice.data('__instructionTimeout');
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+    });
 
     //remove event
     $container.off('.commonRenderer');
