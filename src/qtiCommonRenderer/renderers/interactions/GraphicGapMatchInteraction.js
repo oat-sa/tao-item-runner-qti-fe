@@ -161,9 +161,9 @@ const _setChoice = function _setChoice(interaction, $choice) {
 
         // note: if matchMax is 0, then test taker is allowed unlimited usage of that choice
         if (matchMax !== 0 && matchMax <= usages) {
-            interact($choice.get(0)).draggable(false);
             $choice.addClass('disabled');
             $choice.removeClass('selectable');
+            $choice.find('img').attr('draggable', 'false'); //prevent native drag of image (Chrome, mouse)
         }
     }
 };
@@ -181,7 +181,7 @@ const _unsetChoice = function _unsetChoice(interaction, $choice) {
 
     $choice.removeClass('disabled');
     $choice.addClass('selectable');
-    interact($choice.get(0)).draggable(true);
+    $choice.find('img').removeAttr('draggable');
 };
 
 /**
@@ -381,6 +381,7 @@ const _iFrameDragFix = function _iFrameDragFix(draggableSelector, target) {
  * @param {jQueryElement} $gapList - the list than contains the orderers
  */
 const _renderGapList = function _renderGapList(interaction, $gapList) {
+    const $container = containerHelper.get(interaction);
     const gapFillersSelector = $gapList.selector + ' li';
     let dragOptions;
     let scaleX, scaleY;
@@ -392,6 +393,9 @@ const _renderGapList = function _renderGapList(interaction, $gapList) {
     });
 
     if (isDragAndDropEnabled) {
+        const touchPatch = interactUtils.touchPatchFactory();
+        interaction.data('touchPatch', touchPatch);
+
         dragOptions = {
             inertia: false,
             autoScroll: true,
@@ -402,36 +406,39 @@ const _renderGapList = function _renderGapList(interaction, $gapList) {
             }
         };
 
-        $(gapFillersSelector).each(function (index, gap) {
-            interact(gap)
-                .draggable(
-                    _.assign({}, dragOptions, {
-                        onstart: function (e) {
-                            const $target = $(e.target);
-                            _setActiveGapState($target);
-                            $target.addClass('dragged');
+        interact(gapFillersSelector + '.selectable')
+            .draggable(
+                _.assign({}, dragOptions, {
+                    onstart: function (e) {
+                        const $target = $(e.target);
+                        _setActiveGapState($target);
+                        $target.addClass('dragged');
 
-                            _iFrameDragFix(gapFillersSelector, e.target);
-                            const scale = interactUtils.calculateScale(e.target);
-                            scaleX = scale[0];
-                            scaleY = scale[1];
-                        },
-                        onmove: function (e) {
-                            interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
-                        },
-                        onend: function (e) {
-                            _.defer(() => {
-                                const $target = $(e.target);
-                                _setInactiveGapState($target);
-                                $target.removeClass('dragged');
-                                interactUtils.restoreOriginalPosition($target);
-                                interactUtils.iFrameDragFixOff();
-                            });
-                        }
-                    })
-                )
-                .styleCursor(false);
-        });
+                        _iFrameDragFix(gapFillersSelector, e.target);
+                        const scale = interactUtils.calculateScale(e.target);
+                        scaleX = scale[0];
+                        scaleY = scale[1];
+
+                        touchPatch.onstart();
+                    },
+                    onmove: function (e) {
+                        interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
+                    },
+                    onend: function (e) {
+                        _.defer(() => {
+                            const $target = $(e.target);
+                            _setInactiveGapState($target);
+                            $target.removeClass('dragged');
+                            interactUtils.restoreOriginalPosition($target);
+                            interactUtils.iFrameDragFixOff();
+
+                            touchPatch.onend();
+                        });
+                    }
+                })
+            )
+            .styleCursor(false)
+            .actionChecker(touchPatch.actionChecker);
     }
 
     function toggleActiveGapState($target) {
@@ -640,6 +647,10 @@ const destroy = function destroy(interaction) {
         $('.image-editor', $container).removeAttr('style');
         $('ul', $container).empty();
 
+        if (interaction.data('touchPatch')) {
+            interaction.data('touchPatch').destroy();
+            interaction.removeData('touchPatch');
+        }
         interact($container.find('ul.source li').selector).unset(); // gapfillers
         interact($container.find('.main-image-box rect').selector).unset(); // choices/hotspot
     }

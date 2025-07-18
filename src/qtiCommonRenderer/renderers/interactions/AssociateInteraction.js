@@ -199,97 +199,6 @@ const renderEmptyPairs = function (interaction) {
     }
 };
 
-/**
- * Builds a scroll observer that will make sure the dragged element keeps an accurate positioning
- * @param {jQuery} $scrollContainer
- * @returns {scrollObserver}
- */
-const scrollObserverFactory = function scrollObserverFactory($scrollContainer) {
-    let currentDraggable = null;
-    let beforeY = 0;
-    let beforeX = 0;
-    let afterY = 0;
-    let afterX = 0;
-
-    // reset the scroll observer context
-    function resetScrollObserver() {
-        currentDraggable = null;
-        beforeY = 0;
-        beforeX = 0;
-        afterY = 0;
-        afterX = 0;
-    }
-
-    // keep the position of the dragged element accurate with the scroll position
-    function onScrollCb() {
-        let x;
-        let y;
-        if (currentDraggable) {
-            beforeY = afterY;
-            beforeX = afterX;
-
-            if (afterY === 0 && beforeY === 0) beforeY = this.scrollTop;
-            if (afterX === 0 && beforeX === 0) beforeX = this.scrollLeft;
-
-            afterY = this.scrollTop;
-            afterX = this.scrollLeft;
-
-            y = (parseInt(currentDraggable.getAttribute('data-y'), 10) || 0) + (afterY - beforeY);
-            x = (parseInt(currentDraggable.getAttribute('data-x'), 10) || 0) + (afterX - beforeX);
-
-            // translate the element
-            currentDraggable.style.webkitTransform = currentDraggable.style.transform = `translate(${x}px, ${y}px)`;
-
-            // update the position attributes
-            currentDraggable.setAttribute('data-x', x);
-            currentDraggable.setAttribute('data-y', y);
-        }
-    }
-
-    // find the scroll container within the parents if any
-    $scrollContainer.parents().each(function findScrollContainer() {
-        const $el = $(this);
-        const ovf = $el.css('overflow');
-        if (ovf !== 'hidden' && ovf !== 'visible') {
-            $scrollContainer = $el;
-            return false;
-        }
-    });
-
-    // make sure the drop zones will follow the scroll
-    interact.dynamicDrop(true);
-
-    /**
-     * @typedef {Object} scrollObserver
-     */
-    return {
-        /**
-         * Gets the scroll container
-         * @returns {jQuery}
-         */
-        getScrollContainer: function getScrollContainer() {
-            return $scrollContainer;
-        },
-
-        /**
-         * Initializes the scroll observer while dragging a choice
-         * @param {HTMLElement|jQuery} draggedElement
-         */
-        start: function start(draggedElement) {
-            resetScrollObserver();
-            currentDraggable = draggedElement instanceof $ ? draggedElement.get(0) : draggedElement;
-            $scrollContainer.on('scroll.scrollObserver', _.throttle(onScrollCb, 50));
-        },
-
-        /**
-         * Tears down the the scroll observer once the dragging is done
-         */
-        stop: function stop() {
-            $scrollContainer.off('.scrollObserver');
-            resetScrollObserver();
-        }
-    };
-};
 const _getRawResponse = function (interaction) {
     const response = [];
     const $container = containerHelper.get(interaction);
@@ -588,7 +497,10 @@ const render = function (interaction) {
         }
 
         if (isDragAndDropEnabled) {
-            scrollObserver = scrollObserverFactory($container);
+            scrollObserver = interactUtils.scrollObserverFactory($container);
+            const touchPatch = interactUtils.touchPatchFactory();
+            interaction.data('touchPatch', touchPatch);
+
             dragOptions = {
                 inertia: false,
                 autoScroll: {
@@ -617,6 +529,7 @@ const render = function (interaction) {
                                 scaleY = scale[1];
 
                                 scrollObserver.start($activeChoice);
+                                touchPatch.onstart();
                             },
                             onmove: function (e) {
                                 interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
@@ -632,12 +545,14 @@ const render = function (interaction) {
                                 interactUtils.iFrameDragFixOff();
 
                                 scrollObserver.stop();
+                                touchPatch.onend();
                             }
                         },
                         dragOptions
                     )
                 )
-                .styleCursor(false);
+                .styleCursor(false)
+                .actionChecker(touchPatch.actionChecker);
 
             // makes results draggables
             interact(resultSelector + '.filled')
@@ -656,6 +571,7 @@ const render = function (interaction) {
                                 scaleY = scale[1];
 
                                 scrollObserver.start($activeChoice);
+                                touchPatch.onstart();
                             },
                             onmove: function (e) {
                                 interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
@@ -674,12 +590,14 @@ const render = function (interaction) {
                                 interactUtils.iFrameDragFixOff();
 
                                 scrollObserver.stop();
+                                touchPatch.onend();
                             }
                         },
                         dragOptions
                     )
                 )
-                .styleCursor(false);
+                .styleCursor(false)
+                .actionChecker(touchPatch.actionChecker);
 
             dropOptions = {
                 overlap: 'pointer',
@@ -808,6 +726,10 @@ const destroy = function (interaction) {
     const $container = containerHelper.get(interaction);
 
     //remove event
+    if (interaction.data('touchPatch')) {
+        interaction.data('touchPatch').destroy();
+        interaction.removeData('touchPatch');
+    }
     interact($container.selector).unset();
     interact($container.find('.choice-area').selector + ' >li').unset();
     interact($container.find('.result-area').selector + ' >li>div').unset();

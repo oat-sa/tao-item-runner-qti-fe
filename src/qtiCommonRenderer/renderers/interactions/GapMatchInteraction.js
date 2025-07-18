@@ -36,7 +36,7 @@ import interactUtils from 'ui/interactUtils';
  */
 var _choiceUsages = {};
 
-var setChoice = function(interaction, $choice, $target) {
+var setChoice = function (interaction, $choice, $target) {
     var choiceSerial = $choice.data('serial'),
         choice = interaction.getChoice(choiceSerial);
 
@@ -45,10 +45,7 @@ var setChoice = function(interaction, $choice, $target) {
     }
     _choiceUsages[choiceSerial]++;
 
-    $target
-        .data('serial', choiceSerial)
-        .html($choice.html())
-        .addClass('filled');
+    $target.data('serial', choiceSerial).html($choice.html()).addClass('filled');
 
     if (
         !interaction.responseMappingMode &&
@@ -61,7 +58,7 @@ var setChoice = function(interaction, $choice, $target) {
     containerHelper.triggerResponseChangeEvent(interaction);
 };
 
-var unsetChoice = function(interaction, $choice) {
+var unsetChoice = function (interaction, $choice) {
     var serial = $choice.data('serial');
     var $container = containerHelper.get(interaction);
 
@@ -72,10 +69,7 @@ var unsetChoice = function(interaction, $choice) {
 
     _choiceUsages[serial]--;
 
-    $choice
-        .removeClass('filled')
-        .removeData('serial')
-        .empty();
+    $choice.removeClass('filled').removeData('serial').empty();
 
     if (!interaction.swapping) {
         //set correct response
@@ -83,12 +77,12 @@ var unsetChoice = function(interaction, $choice) {
     }
 };
 
-var getChoice = function(interaction, identifier) {
+var getChoice = function (interaction, identifier) {
     var $container = containerHelper.get(interaction);
     return $('.choice-area [data-identifier="' + identifier + '"]', $container);
 };
 
-var getGap = function(interaction, identifier) {
+var getGap = function (interaction, identifier) {
     var $container = containerHelper.get(interaction);
     return $('.qti-flow-container [data-identifier="' + identifier + '"]', $container);
 };
@@ -100,7 +94,7 @@ var getGap = function(interaction, identifier) {
  *
  * @param {object} interaction
  */
-var render = function(interaction) {
+var render = function (interaction) {
     var $container = containerHelper.get(interaction);
     var $choiceArea = $container.find('.choice-area');
     var $flowContainer = $container.find('.qti-flow-container');
@@ -119,15 +113,15 @@ var render = function(interaction) {
     var filledGapSelector = gapSelector + '.filled';
     var binSelector = $container.selector + ' .remove-choice';
 
-    var _getChoice = function(serial) {
+    var _getChoice = function (serial) {
         return $choiceArea.find('[data-serial=' + serial + ']');
     };
 
-    var _setChoice = function($choice, $target) {
+    var _setChoice = function ($choice, $target) {
         return setChoice(interaction, $choice, $target);
     };
 
-    var _resetSelection = function() {
+    var _resetSelection = function () {
         if ($activeChoice) {
             $flowContainer.find('.remove-choice').remove();
             $activeChoice.removeClass('deactivated active');
@@ -136,15 +130,15 @@ var render = function(interaction) {
         }
     };
 
-    var _unsetChoice = function($choice) {
+    var _unsetChoice = function ($choice) {
         return unsetChoice(interaction, $choice);
     };
 
-    var _isInsertionMode = function() {
+    var _isInsertionMode = function () {
         return $activeChoice && !$activeChoice.hasClass('filled');
     };
 
-    var _isModeEditing = function() {
+    var _isModeEditing = function () {
         return $activeChoice && $activeChoice.hasClass('filled');
     };
 
@@ -155,7 +149,7 @@ var render = function(interaction) {
     }
 
     function _iFrameDragFix(draggableSelector, target) {
-        interactUtils.iFrameDragFixOn(function() {
+        interactUtils.iFrameDragFixOn(function () {
             if ($activeDrop) {
                 interact(gapSelector).fire({
                     type: 'drop',
@@ -171,6 +165,9 @@ var render = function(interaction) {
     }
 
     if (isDragAndDropEnabled) {
+        const touchPatch = interactUtils.touchPatchFactory();
+        interaction.data('touchPatch', touchPatch);
+
         dragOptions = {
             inertia: false,
             autoScroll: true,
@@ -185,7 +182,7 @@ var render = function(interaction) {
         interact(choiceSelector)
             .draggable(
                 _.assign({}, dragOptions, {
-                    onstart: function(e) {
+                    onstart: function (e) {
                         var $target = $(e.target);
                         var scale;
                         $target.addClass('dragged');
@@ -195,26 +192,31 @@ var render = function(interaction) {
                         scale = interactUtils.calculateScale(e.target);
                         scaleX = scale[0];
                         scaleY = scale[1];
+
+                        touchPatch.onstart();
                     },
-                    onmove: function(e) {
+                    onmove: function (e) {
                         interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
                     },
-                    onend: function(e) {
+                    onend: function (e) {
                         var $target = $(e.target);
                         $target.removeClass('dragged');
 
                         interactUtils.restoreOriginalPosition($target);
                         interactUtils.iFrameDragFixOff();
+
+                        touchPatch.onend();
                     }
                 })
             )
-            .styleCursor(false);
+            .styleCursor(false)
+            .actionChecker(touchPatch.actionChecker);
 
         // makes filled gaps draggables
         interact(filledGapSelector)
             .draggable(
                 _.assign({}, dragOptions, {
-                    onstart: function(e) {
+                    onstart: function (e) {
                         var $target = $(e.target);
                         var scale;
                         $target.addClass('dragged');
@@ -224,11 +226,13 @@ var render = function(interaction) {
                         scale = interactUtils.calculateScale(e.target);
                         scaleX = scale[0];
                         scaleY = scale[1];
+
+                        touchPatch.onstart();
                     },
-                    onmove: function(e) {
+                    onmove: function (e) {
                         interactUtils.moveElement(e.target, e.dx / scaleX, e.dy / scaleY);
                     },
-                    onend: function(e) {
+                    onend: function (e) {
                         var $target = $(e.target);
                         $target.removeClass('dragged');
 
@@ -239,15 +243,18 @@ var render = function(interaction) {
                             _resetSelection();
                         }
                         interactUtils.iFrameDragFixOff();
+
+                        touchPatch.onend();
                     }
                 })
             )
-            .styleCursor(false);
+            .styleCursor(false)
+            .actionChecker(touchPatch.actionChecker);
 
         // makes gaps droppables
         interact(gapSelector).dropzone({
             overlap: 0.05,
-            ondragenter: function(e) {
+            ondragenter: function (e) {
                 var $target = $(e.target),
                     $dragged = $(e.relatedTarget);
 
@@ -255,12 +262,12 @@ var render = function(interaction) {
                 $target.addClass('dropzone');
                 $dragged.addClass('droppable');
             },
-            ondrop: function(e) {
+            ondrop: function (e) {
                 _handleGapSelect($(e.target));
 
                 this.ondragleave(e);
             },
-            ondragleave: function(e) {
+            ondragleave: function (e) {
                 var $target = $(e.target),
                     $dragged = $(e.relatedTarget);
 
@@ -274,24 +281,24 @@ var render = function(interaction) {
 
     // Point & click handlers
 
-    interact($container.selector).on('tap', function(e) {
+    interact($container.selector).on('tap', function (e) {
         e.stopPropagation();
         _resetSelection();
     });
 
-    interact(choiceSelector).on('tap', function(e) {
+    interact(choiceSelector).on('tap', function (e) {
         e.stopPropagation();
         _handleChoiceSelect($(e.currentTarget));
         e.preventDefault();
     });
 
-    interact(gapSelector).on('tap', function(e) {
+    interact(gapSelector).on('tap', function (e) {
         e.stopPropagation();
         _handleGapSelect($(e.currentTarget));
         e.preventDefault();
     });
 
-    interact(binSelector).on('tap', function(e) {
+    interact(binSelector).on('tap', function (e) {
         e.stopPropagation();
         _unsetChoice($activeChoice);
         _resetSelection();
@@ -357,14 +364,14 @@ var render = function(interaction) {
 
             $flowContainer
                 .find('>li>div')
-                .filter(function() {
+                .filter(function () {
                     return $target.data('serial') !== targetSerial;
                 })
                 .addClass('empty');
 
             $choiceArea
                 .find('>li:not(.deactivated)')
-                .filter(function() {
+                .filter(function () {
                     return $target.data('serial') !== targetSerial;
                 })
                 .addClass('empty');
@@ -375,16 +382,16 @@ var render = function(interaction) {
     }
 };
 
-var resetResponse = function(interaction) {
+var resetResponse = function (interaction) {
     var $container = containerHelper.get(interaction);
 
     $('.gapmatch-content.active', $container).removeClass('active');
-    $('.gapmatch-content', $container).each(function() {
+    $('.gapmatch-content', $container).each(function () {
         unsetChoice(interaction, $(this));
     });
 };
 
-var _setPairs = function(interaction, pair) {
+var _setPairs = function (interaction, pair) {
     if (pair && pair.length) {
         setChoice(interaction, getChoice(interaction, pair[0]), getGap(interaction, pair[1]).find('.gapmatch-content'));
     }
@@ -402,20 +409,20 @@ var _setPairs = function(interaction, pair) {
  * @param {object} interaction
  * @param {object} response
  */
-var setResponse = function(interaction, response) {
+var setResponse = function (interaction, response) {
     resetResponse(interaction);
     let pairs = pciResponse.unserialize(response, interaction);
-    if ( _.isArray(pairs) && _.isArray(pairs[0])) {
+    if (_.isArray(pairs) && _.isArray(pairs[0])) {
         _.forEach(pairs, pair => _setPairs(interaction, pair));
     } else {
         _setPairs(interaction, pairs);
     }
 };
 
-var _getRawResponse = function(interaction) {
+var _getRawResponse = function (interaction) {
     var response = [];
     var $container = containerHelper.get(interaction);
-    $('.gapmatch-content', $container).each(function() {
+    $('.gapmatch-content', $container).each(function () {
         var choiceSerial = $(this).data('serial'),
             pair = [];
 
@@ -443,14 +450,18 @@ var _getRawResponse = function(interaction) {
  * @param {object} interaction
  * @returns {object}
  */
-var getResponse = function(interaction) {
+var getResponse = function (interaction) {
     return pciResponse.serialize(_getRawResponse(interaction), interaction);
 };
 
-var destroy = function(interaction) {
+var destroy = function (interaction) {
     var $container = containerHelper.get(interaction);
 
     //remove event
+    if (interaction.data('touchPatch')) {
+        interaction.data('touchPatch').destroy();
+        interaction.removeData('touchPatch');
+    }
     interact($container.selector).unset();
     interact($container.find('.choice-area').selector + ' .qti-choice').unset();
     interact($container.find('.qti-flow-container').selector + ' .gapmatch-content').unset();
@@ -486,7 +497,7 @@ var setState = function setState(interaction, state) {
             $container = containerHelper.get(interaction);
 
             $('.choice-area .qti-choice', $container)
-                .sort(function(a, b) {
+                .sort(function (a, b) {
                     var aIndex = _.indexOf(state.order, $(a).data('identifier'));
                     var bIndex = _.indexOf(state.order, $(b).data('identifier'));
                     if (aIndex > bIndex) {
@@ -523,7 +534,7 @@ var getState = function getState(interaction) {
         $container = containerHelper.get(interaction);
 
         state.order = [];
-        $('.choice-area .qti-choice', $container).each(function() {
+        $('.choice-area .qti-choice', $container).each(function () {
             state.order.push($(this).data('identifier'));
         });
     }
