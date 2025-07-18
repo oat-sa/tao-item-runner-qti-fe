@@ -438,7 +438,7 @@ const getCustomData = function getCustomData(interaction, data) {
 const destroy = function destroy(interaction) {
     const $container = containerHelper.get(interaction);
 
-    $container.find('.choice-area .qti-choice').forEach(function () {
+    $container.find('.choice-area .qti-choice').each(function () {
         const $choice = $(this);
         const timeout = $choice.data('__instructionTimeout');
         if (timeout) {
