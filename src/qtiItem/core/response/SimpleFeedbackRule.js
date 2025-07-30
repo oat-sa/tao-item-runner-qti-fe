@@ -61,6 +61,11 @@ var SimpleFeedbackRule = Element.extend({
                 case 'equal':
                 case 'gte':
                 case 'gt':
+                case 'score.lt':
+                case 'score.lte':
+                case 'score.equal':
+                case 'score.gte':
+                case 'score.gt':
                     if (comparedValue !== null && comparedValue !== undefined) {
                         this.comparedOutcome = comparedOutcome;
                         this.condition = condition;
