@@ -123,7 +123,9 @@ const resetResponse = function (interaction) {
         const $choiceArea = $('.choice-area', $container).append($('.result-area>li', $container));
         const $choices = $choiceArea.children('.qti-choice');
         $choices.detach().sort(function (choice1, choice2) {
-            return _.indexOf(initialOrder, $(choice1).data('serial')) - _.indexOf(initialOrder, $(choice2).data('serial'));
+            return (
+                _.indexOf(initialOrder, $(choice1).data('serial')) - _.indexOf(initialOrder, $(choice2).data('serial'))
+            );
         });
         $choiceArea.prepend($choices);
     }
@@ -346,6 +348,9 @@ const render = function (interaction) {
         $dropzoneElement = $('<li>', { class: 'dropzone qti-choice' });
         $('<div>', { class: 'qti-block' }).appendTo($dropzoneElement);
 
+        const touchPatch = interactUtils.touchPatchFactory();
+        interaction.data('touchPatch', touchPatch);
+
         dragOptions = {
             inertia: false,
             autoScroll: true,
@@ -369,6 +374,8 @@ const render = function (interaction) {
                         scale = interactUtils.calculateScale(e.target);
                         scaleX = scale[0];
                         scaleY = scale[1];
+
+                        touchPatch.onstart();
                     },
                     onmove: function (e) {
                         const $target = $(e.target);
@@ -383,10 +390,13 @@ const render = function (interaction) {
 
                         interactUtils.restoreOriginalPosition($target);
                         interactUtils.iFrameDragFixOff();
+
+                        touchPatch.onend();
                     }
                 })
             )
-            .styleCursor(false);
+            .styleCursor(false)
+            .actionChecker(touchPatch.actionChecker);
 
         // makes result draggables
         interact(resultSelector)
@@ -413,6 +423,8 @@ const render = function (interaction) {
                         scale = interactUtils.calculateScale(e.target);
                         scaleX = scale[0];
                         scaleY = scale[1];
+
+                        touchPatch.onstart();
                     },
                     onmove: function (e) {
                         const $target = $(e.target);
@@ -434,10 +446,13 @@ const render = function (interaction) {
 
                         interactUtils.restoreOriginalPosition($target);
                         interactUtils.iFrameDragFixOff();
+
+                        touchPatch.onend();
                     }
                 })
             )
-            .styleCursor(false);
+            .styleCursor(false)
+            .actionChecker(touchPatch.actionChecker);
 
         // makes result area droppable
         interact($resultArea.selector).dropzone({
@@ -649,6 +664,10 @@ const destroy = function (interaction) {
         '.icon-move-before',
         '.icon-move-after'
     ];
+    if (interaction.data('touchPatch')) {
+        interaction.data('touchPatch').destroy();
+        interaction.removeData('touchPatch');
+    }
     selectors.forEach(function unbindInteractEvents(selector) {
         interact($container.find(selector).selector).unset();
     });
