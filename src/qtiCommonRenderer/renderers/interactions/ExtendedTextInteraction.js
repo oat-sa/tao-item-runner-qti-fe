@@ -863,9 +863,16 @@ function inputLimiter(interaction) {
 
                 $textarea
                     .on('beforeinput.commonRenderer', handleBeforeInput)
-                    .on('input.commonRenderer', () => {
+                    .on('input.commonRenderer', function() {
+                        if (validator) {
+                            const currentValue = $textarea[0].value;
+                            if (!validator.isValid(currentValue)) {
+                                $textarea[0].value = this._truncateToLimit(currentValue, validator);
+                                $textarea.trigger('inputlimiter-limited');
+                            }
+                        }
                         _.defer(() => this.updateCounter());
-                    })
+                    }.bind(this))
                     .on('compositionstart.commonRenderer', handleCompositionStart)
                     .on('compositionend.commonRenderer', handleCompositionEnd)
                     .on('keyup.commonRenderer', patternHandler)
