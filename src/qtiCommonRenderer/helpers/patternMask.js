@@ -108,21 +108,41 @@ var patternMaskHelper = {
      * @private
      */
     _createCharValidator: function(limit) {
+        var self = this;
         return {
             type: 'character',
             limit: limit,
-            validator: function(text) {
+            getLimit: function() {
+                return limit;
+            },
+            getCount: function(text) {
+                return text.replace(/\n/g, '').length;
+            },
+            isValid: function(text) {
                 var normalizedText = text.replace(/\n/g, '');
                 return normalizedText.length <= limit;
             },
-            counter: function(text) {
-                return text.replace(/\n/g, '').length;
-            },
-            blocker: function(currentText, keyCode, isEnterKey) {
+            shouldBlockInput: function(currentText, keyCode, isEnterKey) {
+                // Allow navigation keys regardless of limit
+                if (self._isNavigationKey(keyCode)) {
+                    return false;
+                }
+
                 var normalizedLength = currentText.replace(/\n/g, '').length;
-                return normalizedLength >= limit && (!this._isNavigationKey(keyCode));
-            }.bind(this),
-            limiter: function(currentText, pastedText) {
+
+                // If we're already at or over the limit
+                if (normalizedLength >= limit) {
+                    // Allow Enter key (newlines don't count toward limit)
+                    if (isEnterKey || keyCode === 13) {
+                        return false;
+                    }
+                    // Block all other non-navigation keys
+                    return true;
+                }
+
+                return false;
+            },
+            limitPastedContent: function(currentText, pastedText) {
                 var normalizedCurrentLength = currentText.replace(/\n/g, '').length;
                 var remaining = limit - normalizedCurrentLength;
                 if (remaining <= 0) return '';
@@ -143,6 +163,47 @@ var patternMaskHelper = {
                     }
                 }
                 return truncated;
+            },
+            // Legacy method names for backward compatibility
+            validator: function(text) {
+                var normalizedText = text.replace(/\n/g, '');
+                return normalizedText.length <= limit;
+            },
+            counter: function(text) {
+                return text.replace(/\n/g, '').length;
+            },
+            blocker: function(currentText, keyCode, isEnterKey) {
+                if (self._isNavigationKey(keyCode)) {
+                    return false;
+                }
+
+                var normalizedLength = currentText.replace(/\n/g, '').length;
+
+                if (normalizedLength >= limit) {
+                    return !(isEnterKey || keyCode === 13);
+                }
+
+                return false;
+            },
+            limiter: function(currentText, pastedText) {
+                var normalizedCurrentLength = currentText.replace(/\n/g, '').length;
+                var remaining = limit - normalizedCurrentLength;
+                if (remaining <= 0) return '';
+
+                var normalizedPasted = pastedText.replace(/\n/g, '');
+                if (normalizedPasted.length <= remaining) {
+                    return pastedText;
+                }
+
+                var truncated = '';
+                var normalizedCount = 0;
+                for (var i = 0; i < pastedText.length && normalizedCount < remaining; i++) {
+                    truncated += pastedText[i];
+                    if (pastedText[i] !== '\n') {
+                        normalizedCount++;
+                    }
+                }
+                return truncated;
             }
         };
     },
@@ -152,6 +213,38 @@ var patternMaskHelper = {
         return {
             type: 'word',
             limit: limit,
+            getLimit: function() {
+                return limit;
+            },
+            getCount: function(text) {
+                return self._countWords(text);
+            },
+            isValid: function(text) {
+                return self._countWords(text) <= limit;
+            },
+            shouldBlockInput: function(currentText, keyCode, isEnterKey) {
+                var currentWords = self._countWords(currentText);
+                if (currentWords < limit) return false;
+
+                if (isEnterKey) return true;
+                if (self._isNavigationKey(keyCode)) return false;
+
+                // Allow whitespace characters (space, tab, etc.) but block new words
+                if (keyCode === 32 || keyCode === 9) return false; // space, tab
+
+                // Block only if text ends with whitespace AND we're typing non-whitespace
+                // This prevents starting new words after spaces, but allows continuing after newlines
+                return /[ \t]$/.test(currentText);
+            },
+            limitPastedContent: function(currentText, pastedText) {
+                var currentWords = self._countWords(currentText);
+                var remainingWords = limit - currentWords;
+                if (remainingWords <= 0) return '';
+
+                var pastedWords = self._getWords(pastedText);
+                return pastedWords.slice(0, remainingWords).join(' ');
+            },
+            // Legacy method names for backward compatibility
             validator: function(text) {
                 return self._countWords(text) <= limit;
             },
@@ -165,11 +258,7 @@ var patternMaskHelper = {
                 if (isEnterKey) return true;
                 if (self._isNavigationKey(keyCode)) return false;
 
-                // Allow whitespace characters (space, tab, etc.) but block new words
-                if (keyCode === 32 || keyCode === 9) return false; // space, tab
-
-                // Block only if text ends with whitespace AND we're typing non-whitespace
-                // This prevents starting new words after spaces, but allows continuing after newlines
+                if (keyCode === 32 || keyCode === 9) return false;
                 return /[ \t]$/.test(currentText);
             },
             limiter: function(currentText, pastedText) {
@@ -188,6 +277,16 @@ var patternMaskHelper = {
         return {
             type: 'custom',
             limit: null,
+            getLimit: function() { return null; },
+            getCount: function() { return 0; },
+            isValid: function(text) {
+                return regex ? regex.test(text) : true;
+            },
+            shouldBlockInput: function() { return false; },
+            limitPastedContent: function(currentText, pastedText) {
+                return regex && regex.test(currentText + pastedText) ? pastedText : '';
+            },
+            // Legacy methods
             validator: function(text) {
                 return regex ? regex.test(text) : true;
             },
@@ -203,6 +302,12 @@ var patternMaskHelper = {
         return {
             type: 'none',
             limit: null,
+            getLimit: function() { return null; },
+            getCount: function() { return 0; },
+            isValid: function() { return true; },
+            shouldBlockInput: function() { return false; },
+            limitPastedContent: function(currentText, pastedText) { return pastedText; },
+            // Legacy methods
             validator: function() { return true; },
             counter: function() { return 0; },
             blocker: function() { return false; },
@@ -211,7 +316,7 @@ var patternMaskHelper = {
     },
 
     /**
-     * UTILITIES - Helper functions
+     * Helper functions
      * @private
      */
     _countWords: function(text) {
