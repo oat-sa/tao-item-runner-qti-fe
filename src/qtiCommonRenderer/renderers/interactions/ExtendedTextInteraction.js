@@ -525,7 +525,7 @@ function inputLimiter(interaction) {
                     return;
                 }
 
-                if (patternMask) {
+                if (patternRegEx) {
                     let newValue;
                     if (isCke) {
                         newValue = this.getData();
