@@ -116,10 +116,10 @@ var patternMaskHelper = {
                 return limit;
             },
             getCount: function(text) {
-                return text.replace(/\n/g, '').length;
+                return text.replace(/[\r\n]/g, '').length;
             },
             isValid: function(text) {
-                var normalizedText = text.replace(/\n/g, '');
+                var normalizedText = text.replace(/[\r\n]/g, '');
                 return normalizedText.length <= limit;
             },
             shouldBlockInput: function(currentText, keyCode, isEnterKey) {
@@ -128,7 +128,7 @@ var patternMaskHelper = {
                     return false;
                 }
 
-                var normalizedLength = currentText.replace(/\n/g, '').length;
+                var normalizedLength = currentText.replace(/[\r\n]/g, '').length;
 
                 // If we're already at or over the limit
                 if (normalizedLength >= limit) {
@@ -143,12 +143,12 @@ var patternMaskHelper = {
                 return false;
             },
             limitPastedContent: function(currentText, pastedText) {
-                var normalizedCurrentLength = currentText.replace(/\n/g, '').length;
+                var normalizedCurrentLength = currentText.replace(/[\r\n]/g, '').length;
                 var remaining = limit - normalizedCurrentLength;
                 if (remaining <= 0) return '';
 
                 // Limit pasted content by visible character count (newlines don't count)
-                var normalizedPasted = pastedText.replace(/\n/g, '');
+                var normalizedPasted = pastedText.replace(/[\r\n]/g, '');
                 if (normalizedPasted.length <= remaining) {
                     return pastedText; // Return original with newlines preserved
                 }
@@ -166,18 +166,18 @@ var patternMaskHelper = {
             },
             // Legacy method names for backward compatibility
             validator: function(text) {
-                var normalizedText = text.replace(/\n/g, '');
+                var normalizedText = text.replace(/[\r\n]/g, '');
                 return normalizedText.length <= limit;
             },
             counter: function(text) {
-                return text.replace(/\n/g, '').length;
+                return text.replace(/[\r\n]/g, '').length;
             },
             blocker: function(currentText, keyCode, isEnterKey) {
                 if (self._isNavigationKey(keyCode)) {
                     return false;
                 }
 
-                var normalizedLength = currentText.replace(/\n/g, '').length;
+                var normalizedLength = currentText.replace(/[\r\n]/g, '').length;
 
                 if (normalizedLength >= limit) {
                     return !(isEnterKey || keyCode === 13);
@@ -186,11 +186,11 @@ var patternMaskHelper = {
                 return false;
             },
             limiter: function(currentText, pastedText) {
-                var normalizedCurrentLength = currentText.replace(/\n/g, '').length;
+                var normalizedCurrentLength = currentText.replace(/[\r\n]/g, '').length;
                 var remaining = limit - normalizedCurrentLength;
                 if (remaining <= 0) return '';
 
-                var normalizedPasted = pastedText.replace(/\n/g, '');
+                var normalizedPasted = pastedText.replace(/[\r\n]/g, '');
                 if (normalizedPasted.length <= remaining) {
                     return pastedText;
                 }
@@ -338,7 +338,6 @@ var patternMaskHelper = {
 
         try {
             var cleanPattern = pattern.replace(/^\^/, '').replace(/\$$/, '');
-            cleanPattern = cleanPattern.replace(/\$/g, '\\$').replace(/\^/g, '\\^');
 
             var flags = 'u';
             try {
