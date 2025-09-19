@@ -790,10 +790,10 @@ function inputLimiter(interaction) {
                         }
                     };
                     editor.on('instanceReady', function () {
-                        const self = this;
+                        const editorInstance = this;
                         const editableElement = editor.editable().$;
                         editableElement.addEventListener('compositionend', function () {
-                            CKEditorKeyLimit.call(self);
+                            CKEditorKeyLimit.call(editorInstance);
                             _.defer(() => limiter.updateCounter());
                         });
                     });
@@ -879,7 +879,7 @@ function inputLimiter(interaction) {
             // For patternMask character limits, don't count newlines (Option 3)
             // This matches backend behavior where newlines are removed before validation
             if (patternMask && patternMaskHelper.parsePattern(patternMask, 'chars')) {
-                return value.replace(/\n/g, '').length;
+                return value.replace(/[\r\n]/g, '').length;
             }
 
             // Fallback to original logic for backwards compatibility when no patternMask
@@ -905,11 +905,14 @@ function inputLimiter(interaction) {
                 let count = 0;
                 for (let i = 0; i < currentValue.length && count < limit; i++) {
                     truncated += currentValue[i];
-                    if (currentValue[i] !== '\n') {
+                    if (currentValue[i] !== '\n' && currentValue[i] !== '\r') {
                         count++;
                     }
                 }
                 return truncated;
+            } else if (validator.type === 'word') {
+                const words = currentValue.trim().split(/[\s.,:;?!&#%\/*+=]+/).filter(Boolean);
+                return words.slice(0, limit).join(' ');
             } else {
                 return currentValue.substring(0, limit);
             }
