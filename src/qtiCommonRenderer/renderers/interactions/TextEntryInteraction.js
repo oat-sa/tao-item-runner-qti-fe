@@ -235,6 +235,9 @@ function render(interaction) {
     }
 
     if (maxChars) {
+        let valueBeforeComposition = null;
+        let cursorPositionBeforeComposition = null;
+
         const updateMaxCharsTooltip = () => {
             const count = $input.val().length;
             let message;
@@ -260,6 +263,31 @@ function render(interaction) {
             }
         };
 
+        const handleCompositionStart = function() {
+            // Store the value and cursor position before composition starts
+            valueBeforeComposition = $input[0].value;
+            cursorPositionBeforeComposition = $input[0].selectionStart;
+        };
+
+        const handleCompositionEnd = function() {
+            const currentValue = $input[0].value;
+            const currentLength = currentValue.length;
+
+            // If composition result exceeds the limit, prevent insertion by restoring previous value
+            if (currentLength > maxChars && valueBeforeComposition !== null) {
+                $input[0].value = valueBeforeComposition;
+                // Restore cursor position
+                if (cursorPositionBeforeComposition !== null) {
+                    $input[0].setSelectionRange(cursorPositionBeforeComposition, cursorPositionBeforeComposition);
+                }
+                updateMaxCharsTooltip();
+            }
+
+            // Clear stored values
+            valueBeforeComposition = null;
+            cursorPositionBeforeComposition = null;
+        };
+
         $input
             .attr('maxlength', maxChars)
             .on('focus.commonRenderer', function () {
@@ -271,7 +299,9 @@ function render(interaction) {
             })
             .on('blur.commonRenderer', function () {
                 hideTooltip($input);
-            });
+            })
+            .on('compositionstart.commonRenderer', handleCompositionStart)
+            .on('compositionend.commonRenderer', handleCompositionEnd);
     } else if (attributes.patternMask) {
         const updatePatternMaskTooltip = () => {
             const regex = new RegExp(attributes.patternMask);
