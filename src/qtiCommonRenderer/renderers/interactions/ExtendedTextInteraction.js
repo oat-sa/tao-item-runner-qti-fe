@@ -455,6 +455,8 @@ function inputLimiter(interaction) {
             ];
             let isComposing = false;
             let hasCompositionJustEnded = false;
+            let valueBeforeComposition = null;
+            let cursorPositionBeforeComposition = null;
 
             const acceptKeyCode = keyCode => ignoreKeyCodes.includes(keyCode);
             const emptyOrSpace = txt => (txt && txt.trim() === '') || /\^s*$/.test(txt);
@@ -730,6 +732,13 @@ function inputLimiter(interaction) {
 
             const handleCompositionStart = function(e) {
                 isComposing = true;
+
+                // Store the value and cursor position before composition starts
+                if (_getFormat(interaction) !== 'xhtml') {
+                    valueBeforeComposition = $textarea[0].value;
+                    cursorPositionBeforeComposition = $textarea[0].selectionStart;
+                }
+
                 return e;
             };
 
@@ -738,19 +747,32 @@ function inputLimiter(interaction) {
                 hasCompositionJustEnded = true;
                 if (_getFormat(interaction) !== 'xhtml') {
                     const currentValue = $textarea[0].value;
+                    let shouldRevert = false;
 
+                    // Check if the composition result exceeds the limit
                     if (validator && !validator.isValid(currentValue)) {
-                        $textarea[0].value = this._truncateToLimit(currentValue, validator);
-                        $textarea.trigger('inputlimiter-limited');
-                        _.defer(() => this.updateCounter());
+                        shouldRevert = true;
                     } else if (maxLength) {
                         const currentLength = this.getCharsCount();
                         if (currentLength > maxLength) {
-                            $textarea[0].value = currentValue.slice(0, maxLength);
-                            $textarea.trigger('inputlimiter-limited');
-                            _.defer(() => this.updateCounter());
+                            shouldRevert = true;
                         }
                     }
+
+                    // If the composition would exceed the limit, prevent insertion by restoring previous value
+                    if (shouldRevert && valueBeforeComposition !== null) {
+                        $textarea[0].value = valueBeforeComposition;
+                        // Restore cursor position
+                        if (cursorPositionBeforeComposition !== null) {
+                            $textarea[0].setSelectionRange(cursorPositionBeforeComposition, cursorPositionBeforeComposition);
+                        }
+                        $textarea.trigger('inputlimiter-limited');
+                        _.defer(() => this.updateCounter());
+                    }
+
+                    // Clear stored values
+                    valueBeforeComposition = null;
+                    cursorPositionBeforeComposition = null;
                 }
                 _.defer(() => this.updateCounter());
                 return e;
@@ -869,14 +891,14 @@ function inputLimiter(interaction) {
 
         /**
          * Get the number of characters that are actually written in the response field
-         * Updated to NOT count newlines when patternMask is character-based (Option 3)
+         * Updated to NOT count newlines when patternMask is character-based
          * This matches backend behavior where newlines are removed before validation
          * @returns {Number} number of characters
          */
         getCharsCount() {
             const value = _getTextareaValue(interaction) || '';
 
-            // For patternMask character limits, don't count newlines (Option 3)
+            // For patternMask character limits, don't count newlines
             // This matches backend behavior where newlines are removed before validation
             if (patternMask && patternMaskHelper.parsePattern(patternMask, 'chars')) {
                 return value.replace(/[\r\n]/g, '').length;
