@@ -456,7 +456,8 @@ function inputLimiter(interaction) {
             let isComposing = false;
             let hasCompositionJustEnded = false;
             let valueBeforeComposition = null;
-            let cursorPositionBeforeComposition = null;
+            let selectionStartBeforeComposition = null;
+            let selectionEndBeforeComposition = null;
 
             const acceptKeyCode = keyCode => ignoreKeyCodes.includes(keyCode);
             const emptyOrSpace = txt => (txt && txt.trim() === '') || /\^s*$/.test(txt);
@@ -653,21 +654,29 @@ function inputLimiter(interaction) {
                 } else if (maxLength || maxWords) {
                     const charsCount = maxLength && this.getCharsCount();
                     const wordsCount = maxWords && this.getWordsCount();
+                    const isEnterKey = keyCode === 13 || keyCode === 2228237;
 
-                    if (maxLength && charsCount >= maxLength && !acceptKeyCode(keyCode)) {
-                        return cancelEvent(e);
+                    if (maxLength && charsCount >= maxLength && !acceptKeyCode(keyCode) && !isEnterKey) {
+                        // Check if user has selected text that would be replaced
+                        let hasSelection = false;
+
+                        if (isCke) {
+                            const editor = _getCKEditor(interaction);
+                            const selection = editor.getSelection();
+                            const selectedText = selection ? selection.getSelectedText() : '';
+                            hasSelection = selectedText && selectedText.length > 0;
+                        } else {
+                            hasSelection = $textarea[0].selectionStart !== $textarea[0].selectionEnd;
+                        }
+
+                        if (!hasSelection) {
+                            return cancelEvent(e);
+                        }
                     }
 
                     if (maxWords && wordsCount >= maxWords && !acceptKeyCode(keyCode)) {
                         return cancelEvent(e);
                     }
-                } else if (maxLength && charsCount >= maxLength && !acceptKeyCode(keyCode)) {
-                    if (!isCke && charsCount > maxLength) {
-                        const textarea = $textarea[0];
-                        textarea.value = textarea.value.substring(0, maxLength);
-                        textarea.focus();
-                    }
-                    return cancelEvent(e);
                 }
 
                 _.defer(() => this.updateCounter());
@@ -731,14 +740,39 @@ function inputLimiter(interaction) {
             };
 
             const handleCompositionStart = function(e) {
-                isComposing = true;
-
-                // Store the value and cursor position before composition starts
+                // Check if we should block composition entirely
                 if (_getFormat(interaction) !== 'xhtml') {
-                    valueBeforeComposition = $textarea[0].value;
-                    cursorPositionBeforeComposition = $textarea[0].selectionStart;
+                    const currentValue = $textarea[0].value;
+                    const selectionStart = $textarea[0].selectionStart;
+                    const selectionEnd = $textarea[0].selectionEnd;
+                    const hasSelection = selectionEnd > selectionStart;
+
+                    let shouldBlock = false;
+                    if (validator) {
+                        if (!validator.isValid(currentValue) && !hasSelection) {
+                            shouldBlock = true;
+                        }
+                    } else if (maxLength) {
+                        const currentLength = currentValue.replace(/[\r\n]/g, '').length;
+                        if (currentLength >= maxLength && !hasSelection) {
+                            shouldBlock = true;
+                        }
+                    }
+
+                    // If we should block, prevent the composition and cancel the event
+                    if (shouldBlock) {
+                        e.preventDefault();
+                        $textarea.trigger('inputlimiter-limited');
+                        return false;
+                    }
+
+                    // Store the value and selection range before composition starts
+                    valueBeforeComposition = currentValue;
+                    selectionStartBeforeComposition = selectionStart;
+                    selectionEndBeforeComposition = selectionEnd;
                 }
 
+                isComposing = true;
                 return e;
             };
 
@@ -748,31 +782,77 @@ function inputLimiter(interaction) {
                 if (_getFormat(interaction) !== 'xhtml') {
                     const currentValue = $textarea[0].value;
                     let shouldRevert = false;
+                    let shouldTruncate = false;
+
+                    // Check if there was a selection before composition
+                    const hadSelection = selectionStartBeforeComposition !== null &&
+                                        selectionEndBeforeComposition !== null &&
+                                        selectionEndBeforeComposition > selectionStartBeforeComposition;
 
                     // Check if the composition result exceeds the limit
                     if (validator && !validator.isValid(currentValue)) {
-                        shouldRevert = true;
-                    } else if (maxLength) {
+                        // Count chars excluding newlines (matching backend behavior)
+                        const originalLength = valueBeforeComposition ? valueBeforeComposition.replace(/[\r\n]/g, '').length : 0;
                         const currentLength = this.getCharsCount();
-                        if (currentLength > maxLength) {
+
+                        // If we were at/above limit with no selection, block insertion entirely
+                        if (!hadSelection && originalLength >= validator.getLimit() && currentLength > originalLength) {
                             shouldRevert = true;
+                        } else {
+                            // Otherwise truncate to limit
+                            shouldTruncate = true;
+                        }
+                    } else if (maxLength) {
+                        // Count chars excluding newlines (matching backend behavior)
+                        const originalLength = valueBeforeComposition ? valueBeforeComposition.replace(/[\r\n]/g, '').length : 0;
+                        const currentLength = this.getCharsCount();
+
+                        // If we were at/above limit with no selection, block any insertion that increases count
+                        if (!hadSelection && originalLength >= maxLength && currentLength > originalLength) {
+                            shouldRevert = true;
+                        }
+                        // Otherwise if over limit, truncate to limit
+                        else if (currentLength > maxLength) {
+                            shouldTruncate = true;
                         }
                     }
 
-                    // If the composition would exceed the limit, prevent insertion by restoring previous value
+                    // Revert: restore previous value (block insertion entirely)
                     if (shouldRevert && valueBeforeComposition !== null) {
                         $textarea[0].value = valueBeforeComposition;
                         // Restore cursor position
-                        if (cursorPositionBeforeComposition !== null) {
-                            $textarea[0].setSelectionRange(cursorPositionBeforeComposition, cursorPositionBeforeComposition);
+                        if (selectionStartBeforeComposition !== null) {
+                            $textarea[0].setSelectionRange(selectionStartBeforeComposition, selectionStartBeforeComposition);
                         }
+                        $textarea.trigger('inputlimiter-limited');
+                        _.defer(() => this.updateCounter());
+                    }
+                    else if (shouldTruncate) {
+                        let truncatedValue;
+                        if (validator) {
+                            truncatedValue = this._truncateToLimit(currentValue, validator);
+                        } else if (maxLength) {
+                            let count = 0;
+                            let result = '';
+                            for (let i = 0; i < currentValue.length && count < maxLength; i++) {
+                                result += currentValue[i];
+                                if (currentValue[i] !== '\n' && currentValue[i] !== '\r') {
+                                    count++;
+                                }
+                            }
+                            truncatedValue = result;
+                        }
+                        $textarea[0].value = truncatedValue;
+                        // Place cursor at end of truncated content
+                        $textarea[0].setSelectionRange(truncatedValue.length, truncatedValue.length);
                         $textarea.trigger('inputlimiter-limited');
                         _.defer(() => this.updateCounter());
                     }
 
                     // Clear stored values
                     valueBeforeComposition = null;
-                    cursorPositionBeforeComposition = null;
+                    selectionStartBeforeComposition = null;
+                    selectionEndBeforeComposition = null;
                 }
                 _.defer(() => this.updateCounter());
                 return e;
@@ -832,6 +912,11 @@ function inputLimiter(interaction) {
                 // cke.on('drop', nonKeyLimitHandler);
             } else {
                 const handleBlur = function(e) {
+                    // Skip truncation during IME composition
+                    if (isComposing) {
+                        return;
+                    }
+
                     if (validator) {
                         const currentValue = $textarea[0].value;
                         if (!validator.isValid(currentValue)) {
@@ -853,7 +938,7 @@ function inputLimiter(interaction) {
                 $textarea
                     .on('beforeinput.commonRenderer', handleBeforeInput.bind(this))
                     .on('input.commonRenderer', function() {
-                        if (validator) {
+                        if (!isComposing && validator) {
                             const currentValue = $textarea[0].value;
                             if (!validator.isValid(currentValue)) {
                                 $textarea[0].value = this._truncateToLimit(currentValue, validator);
