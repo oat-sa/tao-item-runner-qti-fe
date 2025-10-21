@@ -316,6 +316,15 @@ var patternMaskHelper = {
     },
 
     /**
+     * Used externally
+     * @param max
+     * @return {string}
+     */
+    createMaxCharPattern: function createMaxCharPattern(max) {
+        return '^[\\s\\S]{0,' + max.toString() + '}$';
+    },
+
+    /**
      * Helper functions
      * @private
      */
