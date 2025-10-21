@@ -851,7 +851,7 @@ function inputLimiter(interaction) {
                 };
 
                 $textarea
-                    .on('beforeinput.commonRenderer', handleBeforeInput)
+                    .on('beforeinput.commonRenderer', handleBeforeInput.bind(this))
                     .on('input.commonRenderer', function() {
                         if (validator) {
                             const currentValue = $textarea[0].value;
@@ -863,11 +863,11 @@ function inputLimiter(interaction) {
                         _.defer(() => this.updateCounter());
                     }.bind(this))
                     .on('compositionstart.commonRenderer', handleCompositionStart)
-                    .on('compositionend.commonRenderer', handleCompositionEnd)
+                    .on('compositionend.commonRenderer', handleCompositionEnd.bind(this))
                     .on('keyup.commonRenderer', patternHandler)
-                    .on('keydown.commonRenderer', keyLimitHandler)
-                    .on('paste.commonRenderer drop.commonRenderer', nonKeyLimitHandler)
-                    .on('blur.commonRenderer', handleBlur);
+                    .on('keydown.commonRenderer', keyLimitHandler.bind(this))
+                    .on('paste.commonRenderer drop.commonRenderer', nonKeyLimitHandler.bind(this))
+                    .on('blur.commonRenderer', handleBlur.bind(this));
             }
         },
 
