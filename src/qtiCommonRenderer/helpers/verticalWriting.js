@@ -29,6 +29,23 @@ export const getIsItemWritingModeVerticalRl = () => {
 };
 
 /**
+ * If element has 'vertical-rl' writing mode
+ * @param {jQuery} $container
+ * @returns {Boolean}
+ */
+export const getIsWritingModeVerticalRl = $container => {
+    if (!$container.length) {
+        return false;
+    }
+    const closestVertical = $container.get(0).closest('.writing-mode-vertical-rl');
+    if (closestVertical) {
+        const closestHorizontal = $container.get(0).closest('.writing-mode-horizontal-tb');
+        return !closestHorizontal || closestHorizontal.contains(closestVertical);
+    }
+    return false;
+};
+
+/**
  * In vertical-writing, it's preferred to show numbers with `text-combine-upright: all` style.
  * So find numbers in a string, and wrap them in a span with a special class.
  * For single digits, they can be replaced with "fullwidth digit" unicode symbol.

@@ -1,4 +1,5 @@
-<div {{#if attributes.id}}id="{{attributes.id}}"{{/if}} class="qti-interaction qti-blockInteraction qti-extendedTextInteraction{{#if attributes.class}} {{attributes.class}}{{/if}}" data-serial="{{serial}}" data-qti-class="extendedTextInteraction"{{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}>
+<div {{#if attributes.id}}id="{{attributes.id}}"{{/if}} class="qti-interaction qti-blockInteraction qti-extendedTextInteraction{{#if attributes.class}} {{attributes.class}}{{/if}}" data-serial="{{serial}}" data-qti-class="extendedTextInteraction"{{#if attributes.xml:lang}} lang="{{attributes.xml:lang}}"{{/if}}{{#if attributes.data-scrolling}} data-scrolling="{{attributes.data-scrolling}}"{{/if}}
+  {{#if attributes.data-scrolling-height}} data-scrolling-height="{{attributes.data-scrolling-height}}"{{/if}}>
     {{#if prompt}}{{{prompt}}}{{/if}}
     <div class="instruction-container"></div>
     {{#if multiple}}
