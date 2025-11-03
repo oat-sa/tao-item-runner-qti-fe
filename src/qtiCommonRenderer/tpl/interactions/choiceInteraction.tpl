@@ -11,6 +11,7 @@
   <div class="instruction-container"></div>
   <ol
     class="plain block-listing solid choice-area{{#if horizontal}} horizontal{{/if}} {{#if listStyle}}{{{listStyle}}}{{/if}}"
+    tabindex="-1"
     aria-labelledby="{{promptId}}"
   >
       {{#choices}}{{{.}}}{{/choices}}
