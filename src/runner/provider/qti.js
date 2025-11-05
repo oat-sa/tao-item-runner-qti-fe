@@ -103,7 +103,7 @@ var qtiItemRuntimeProvider = {
                 if (getIsItemWritingModeVerticalRl()) {
                     document.body.classList.add('item-writing-mode-vertical-rl');
                     if (isSafari()) {
-                        $itemBody.setAttribute('data-useragent-browser', 'safari');
+                        $itemBody.attr('data-useragent-browser', 'safari');
                     }
                 }
             } catch (e) {
