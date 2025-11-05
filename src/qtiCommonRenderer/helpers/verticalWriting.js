@@ -19,13 +19,16 @@ import $ from 'jquery';
 
 let isVerticalFormElementSupported = null;
 
+export const WRITING_MODE_VERTICAL_RL_CLASS = 'writing-mode-vertical-rl';
+export const WRITING_MODE_HORIZONTAL_TB_CLASS = 'writing-mode-horizontal-tb';
+
 /**
  * If item has 'vertical-rl' writing mode
  * @returns {Boolean}
  */
 export const getIsItemWritingModeVerticalRl = () => {
     const itemBody = $('.qti-itemBody');
-    return itemBody.hasClass('writing-mode-vertical-rl');
+    return itemBody.hasClass(WRITING_MODE_VERTICAL_RL_CLASS);
 };
 
 /**
@@ -37,12 +40,10 @@ export const getIsWritingModeVerticalRl = $container => {
     if (!$container.length) {
         return false;
     }
-    const closestVertical = $container.get(0).closest('.writing-mode-vertical-rl');
-    if (closestVertical) {
-        const closestHorizontal = $container.get(0).closest('.writing-mode-horizontal-tb');
-        return !closestHorizontal || closestHorizontal.contains(closestVertical);
-    }
-    return false;
+    const $wrtitingModeParent = $container.closest(
+        `.${WRITING_MODE_VERTICAL_RL_CLASS}, .${WRITING_MODE_HORIZONTAL_TB_CLASS}`
+    );
+    return $wrtitingModeParent.length && $wrtitingModeParent.hasClass(WRITING_MODE_VERTICAL_RL_CLASS);
 };
 
 /**

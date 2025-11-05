@@ -19,6 +19,7 @@
 import 'ui/waitForMedia';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/img';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
+import { getIsWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 
 export default {
     qtiClass: 'img',
@@ -26,9 +27,7 @@ export default {
     getContainer: containerHelper.get,
     render: function render(img, data) {
         const $img = containerHelper.get(img);
-        const $wrtitingModeParent = $img.closest('.writing-mode-vertical-rl, .writing-mode-horizontal-tb');
-        const isVerticalWriting =
-            $wrtitingModeParent.length && $wrtitingModeParent.hasClass('writing-mode-vertical-rl');
+        const isVerticalWriting = getIsWritingModeVerticalRl($img);
 
         if (isVerticalWriting) {
             if ($img.attr('width') && $img.attr('width').endsWith('%') && !$img.attr('height')) {
