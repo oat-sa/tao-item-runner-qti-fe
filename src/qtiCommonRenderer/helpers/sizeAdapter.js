@@ -19,8 +19,17 @@
 import $ from 'jquery';
 import adaptSize from 'util/adaptSize';
 import 'ui/waitForMedia';
+import { getIsWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 
 const itemSelector = '.add-option, .result-area .target, .choice-area .qti-choice';
+
+function adaptBlockSize($elements, isVertical) {
+    return isVertical ? adaptSize.width($elements) : adaptSize.height($elements);
+}
+
+function resetBlockSize($elements, isVertical) {
+    return isVertical ? $elements.width('auto') : adaptSize.resetHeight($elements);
+}
 
 export default {
     /**
@@ -45,18 +54,20 @@ export default {
                 $container = $($elements).first().parent();
         }
 
+        const isVertical = getIsWritingModeVerticalRl($container);
+
         $container.waitForMedia(function () {
             // Occasionally in caching scenarios, after waitForMedia(), image.height is reporting its naturalHeight instead of its CSS height
             // The timeout allows adaptSize.height() to work with the true rendered heights of elements, instead of naturalHeights
             setTimeout(() => {
-                adaptSize.height($elements);
+                adaptBlockSize($elements, isVertical);
 
                 // detect any CSS load, and adapt heights again after
                 document.addEventListener(
                     'load',
                     e => {
                         if (e.target && e.target.rel === 'stylesheet') {
-                            adaptSize.height($elements);
+                            adaptBlockSize($elements, isVertical);
                         }
                     },
                     true
@@ -71,6 +82,6 @@ export default {
      * @param {jQueryElement|widget} target
      */
     resetSize(target) {
-        adaptSize.resetHeight(target.$container.find(itemSelector));
+        resetBlockSize(target.$container.find(itemSelector));
     }
 };
