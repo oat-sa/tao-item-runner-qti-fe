@@ -32,7 +32,7 @@ import sizeAdapter from 'taoQtiItem/qtiCommonRenderer/helpers/sizeAdapter';
 import adaptSize from 'util/adaptSize';
 import features from 'services/features';
 import {
-    getIsItemWritingModeVerticalRl,
+    getIsWritingModeVerticalRl,
     wrapDigitsInCombineUpright
 } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 
@@ -186,11 +186,12 @@ const _getRawResponse = function _getRawResponse(interaction) {
  * @param {Object} interaction - the interaction instance
  */
 const _setInstructions = function _setInstructions(interaction) {
+    const $container = containerHelper.get(interaction);
     const min = interaction.attr('minChoices');
     const max = interaction.attr('maxChoices');
     let msg;
     const choiceCount = _.size(interaction.getChoices());
-    const isVertical = getIsItemWritingModeVerticalRl();
+    const isVertical = getIsWritingModeVerticalRl($container);
 
     const highlightInvalidInput = function highlightInvalidInput($choice) {
         const $input = $choice.find('.real-label > input');

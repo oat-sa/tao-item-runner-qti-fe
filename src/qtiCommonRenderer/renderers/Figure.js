@@ -17,7 +17,7 @@
  */
 import context from 'context';
 import _ from 'lodash';
-import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
+import { getIsWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import imageTpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure-image';
 import widgetTpl from 'taoQtiItem/qtiCommonRenderer/tpl/figure-widget';
@@ -59,7 +59,7 @@ export default {
         if ($img.length && (DISABLE_FIGURE_WIDGET || $figure.prop('tagName') === 'FIGURE')) {
             // move width from image to figure
             if (
-                getIsItemWritingModeVerticalRl() &&
+                getIsWritingModeVerticalRl($figure) &&
                 $img.attr('height') &&
                 $img.attr('height').endsWith('%') &&
                 !$img.attr('width')
