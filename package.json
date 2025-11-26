@@ -53,7 +53,7 @@
         "@oat-sa/tao-core-libs": "^1.1.0",
         "@oat-sa/tao-core-sdk": "^3.3.1",
         "@oat-sa/tao-core-shared-libs": "^1.4.1",
-        "@oat-sa/tao-core-ui": "^3.10.0",
+        "@oat-sa/tao-core-ui": "^3.16.2",
         "@oat-sa/tao-item-runner": "^1.0.0",
         "@oat-sa/tao-qunit-testrunner": "^2.0.0",
         "async": "^0.2.10",
