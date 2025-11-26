@@ -36,7 +36,7 @@ import tooltip from 'ui/tooltip';
 import loggerFactory from 'core/logger';
 import converter from 'util/converter';
 import {
-    getIsItemWritingModeVerticalRl,
+    getIsWritingModeVerticalRl,
     wrapDigitsInCombineUpright
 } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 
@@ -63,7 +63,7 @@ function hideTooltip($input) {
  * @param {String} message
  */
 function showTooltip($input, theme, message) {
-    const isVertical = getIsItemWritingModeVerticalRl();
+    const isVertical = getIsWritingModeVerticalRl($input);
     message = wrapDigitsInCombineUpright(message, isVertical);
 
     if ($input.data('$tooltip')) {
@@ -263,13 +263,13 @@ function render(interaction) {
             }
         };
 
-        const handleCompositionStart = function() {
+        const handleCompositionStart = function () {
             // Store the value and cursor position before composition starts
             valueBeforeComposition = $input[0].value;
             cursorPositionBeforeComposition = $input[0].selectionStart;
         };
 
-        const handleCompositionEnd = function() {
+        const handleCompositionEnd = function () {
             const currentValue = $input[0].value;
             const currentLength = currentValue.length;
 

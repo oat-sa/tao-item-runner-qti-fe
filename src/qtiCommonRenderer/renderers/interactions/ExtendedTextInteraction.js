@@ -38,7 +38,7 @@ import tooltip from 'ui/tooltip';
 import converter from 'util/converter';
 import loggerFactory from 'core/logger';
 import {
-    getIsItemWritingModeVerticalRl,
+    getIsWritingModeVerticalRl,
     supportsVerticalFormElement
 } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
 
@@ -161,7 +161,7 @@ function render(interaction) {
 
                 $(document).on('themechange.themeloader', themeLoaded);
             } else {
-                const isVertical = getIsItemWritingModeVerticalRl();
+                const isVertical = getIsWritingModeVerticalRl($container);
                 if (isVertical) {
                     const textareaSupportsVertical = supportsVerticalFormElement();
                     if (!textareaSupportsVertical) {
@@ -394,7 +394,6 @@ function inputLimiter(interaction) {
     const expectedLines = interaction.attr('expectedLines');
     const patternMask = interaction.attr('patternMask');
     const isCke = _getFormat(interaction) === 'xhtml';
-    const isVertical = getIsItemWritingModeVerticalRl();
     let patternRegEx;
     let $textarea,
         $charsCounter,
@@ -591,7 +590,7 @@ function inputLimiter(interaction) {
              * @param {Event} e
              * @returns {boolean}
              */
-            const keyLimitHandler = function(e) {
+            const keyLimitHandler = function (e) {
                 if (isComposing) {
                     return;
                 }
@@ -601,8 +600,8 @@ function inputLimiter(interaction) {
                 }
 
                 const keyCode = e.data ? e.data.keyCode : e.which;
-                const wordsCount = maxWords && this.getWordsCount();
-                const charsCount = maxLength && this.getCharsCount();
+                let wordsCount = maxWords && this.getWordsCount();
+                let charsCount = maxLength && this.getCharsCount();
 
                 if (maxWords && wordsCount >= maxWords) {
                     let left, right, middle;
@@ -683,8 +682,8 @@ function inputLimiter(interaction) {
                         return cancelEvent(e);
                     }
                 } else if (maxLength || maxWords) {
-                    const charsCount = maxLength && this.getCharsCount();
-                    const wordsCount = maxWords && this.getWordsCount();
+                    charsCount = maxLength && this.getCharsCount();
+                    wordsCount = maxWords && this.getWordsCount();
                     const isEnterKey = keyCode === 13 || keyCode === 2228237;
 
                     if (maxLength && charsCount >= maxLength && !acceptKeyCode(keyCode) && !isEnterKey) {
@@ -718,7 +717,7 @@ function inputLimiter(interaction) {
              * @param {Event} e
              * @returns {boolean}
              */
-            const nonKeyLimitHandler = function(e) {
+            const nonKeyLimitHandler = function (e) {
                 let newValue;
 
                 if (typeof $(e.target).attr('data-clipboard') === 'string') {
@@ -771,7 +770,7 @@ function inputLimiter(interaction) {
                 _.defer(() => this.updateCounter());
             };
 
-            const handleCompositionStart = function(e) {
+            const handleCompositionStart = function (e) {
                 // Check if we should block composition entirely
                 if (_getFormat(interaction) !== 'xhtml') {
                     const currentValue = $textarea[0].value;
@@ -808,7 +807,7 @@ function inputLimiter(interaction) {
                 return e;
             };
 
-            const handleCompositionEnd = function(e) {
+            const handleCompositionEnd = function (e) {
                 isComposing = false;
                 hasCompositionJustEnded = true;
                 if (_getFormat(interaction) !== 'xhtml') {
@@ -817,14 +816,17 @@ function inputLimiter(interaction) {
                     let shouldTruncate = false;
 
                     // Check if there was a selection before composition
-                    const hadSelection = selectionStartBeforeComposition !== null &&
-                                        selectionEndBeforeComposition !== null &&
-                                        selectionEndBeforeComposition > selectionStartBeforeComposition;
+                    const hadSelection =
+                        selectionStartBeforeComposition !== null &&
+                        selectionEndBeforeComposition !== null &&
+                        selectionEndBeforeComposition > selectionStartBeforeComposition;
 
                     // Check if the composition result exceeds the limit
                     if (validator && !validator.isValid(currentValue)) {
                         // Count chars excluding newlines (matching backend behavior)
-                        const originalLength = valueBeforeComposition ? valueBeforeComposition.replace(/[\r\n]/g, '').length : 0;
+                        const originalLength = valueBeforeComposition
+                            ? valueBeforeComposition.replace(/[\r\n]/g, '').length
+                            : 0;
                         const currentLength = this.getCharsCount();
 
                         // If we were at/above limit with no selection, block insertion entirely
@@ -836,7 +838,9 @@ function inputLimiter(interaction) {
                         }
                     } else if (maxLength) {
                         // Count chars excluding newlines (matching backend behavior)
-                        const originalLength = valueBeforeComposition ? valueBeforeComposition.replace(/[\r\n]/g, '').length : 0;
+                        const originalLength = valueBeforeComposition
+                            ? valueBeforeComposition.replace(/[\r\n]/g, '').length
+                            : 0;
                         const currentLength = this.getCharsCount();
 
                         // If we were at/above limit with no selection, block any insertion that increases count
@@ -854,12 +858,14 @@ function inputLimiter(interaction) {
                         $textarea[0].value = valueBeforeComposition;
                         // Restore cursor position
                         if (selectionStartBeforeComposition !== null) {
-                            $textarea[0].setSelectionRange(selectionStartBeforeComposition, selectionStartBeforeComposition);
+                            $textarea[0].setSelectionRange(
+                                selectionStartBeforeComposition,
+                                selectionStartBeforeComposition
+                            );
                         }
                         $textarea.trigger('inputlimiter-limited');
                         _.defer(() => this.updateCounter());
-                    }
-                    else if (shouldTruncate) {
+                    } else if (shouldTruncate) {
                         let truncatedValue;
                         if (validator) {
                             truncatedValue = this._truncateToLimit(currentValue, validator);
@@ -890,7 +896,7 @@ function inputLimiter(interaction) {
                 return e;
             };
 
-            const handleBeforeInput = function(e) {
+            const handleBeforeInput = function (e) {
                 _.defer(() => this.updateCounter());
                 return e;
             };
@@ -943,7 +949,7 @@ function inputLimiter(interaction) {
                 // @todo: drop requires cke 4.5
                 // cke.on('drop', nonKeyLimitHandler);
             } else {
-                const handleBlur = function(e) {
+                const handleBlur = function (e) {
                     // Skip truncation during IME composition
                     if (isComposing) {
                         return;
@@ -969,16 +975,19 @@ function inputLimiter(interaction) {
 
                 $textarea
                     .on('beforeinput.commonRenderer', handleBeforeInput.bind(this))
-                    .on('input.commonRenderer', function() {
-                        if (!isComposing && validator) {
-                            const currentValue = $textarea[0].value;
-                            if (!validator.isValid(currentValue)) {
-                                $textarea[0].value = this._truncateToLimit(currentValue, validator);
-                                $textarea.trigger('inputlimiter-limited');
+                    .on(
+                        'input.commonRenderer',
+                        function () {
+                            if (!isComposing && validator) {
+                                const currentValue = $textarea[0].value;
+                                if (!validator.isValid(currentValue)) {
+                                    $textarea[0].value = this._truncateToLimit(currentValue, validator);
+                                    $textarea.trigger('inputlimiter-limited');
+                                }
                             }
-                        }
-                        _.defer(() => this.updateCounter());
-                    }.bind(this))
+                            _.defer(() => this.updateCounter());
+                        }.bind(this)
+                    )
                     .on('compositionstart.commonRenderer', handleCompositionStart)
                     .on('compositionend.commonRenderer', handleCompositionEnd.bind(this))
                     .on('keyup.commonRenderer', patternHandler)
@@ -1000,7 +1009,10 @@ function inputLimiter(interaction) {
             }
 
             if (patternMask && patternMaskHelper.isMaxEntryRestriction(patternMask)) {
-                return value.trim().split(/[\s.,:;?!&#%\/*+=]+/).filter(Boolean).length;
+                return value
+                    .trim()
+                    .split(/[\s.,:;?!&#%\/*+=]+/)
+                    .filter(Boolean).length;
             }
 
             return value.trim().replace(/\s+/gi, ' ').split(' ').length;
@@ -1050,7 +1062,10 @@ function inputLimiter(interaction) {
                 }
                 return truncated;
             } else if (validator.type === 'word') {
-                const words = currentValue.trim().split(/[\s.,:;?!&#%\/*+=]+/).filter(Boolean);
+                const words = currentValue
+                    .trim()
+                    .split(/[\s.,:;?!&#%\/*+=]+/)
+                    .filter(Boolean);
                 return words.slice(0, limit).join(' ');
             } else {
                 return currentValue.substring(0, limit);
@@ -1085,7 +1100,7 @@ function inputLimiter(interaction) {
  * @returns {Object|null} if safari & vertical-rl,`{ syncValue: () => void, destroy: () => void }` . Otherwise `null`.
  */
 function _patchSafariVerticalRl($textarea, serial) {
-    if (!getIsItemWritingModeVerticalRl() || !isSafari() || !supportsVerticalFormElement()) {
+    if (!getIsWritingModeVerticalRl($textarea) || !isSafari() || !supportsVerticalFormElement()) {
         return null;
     }
 

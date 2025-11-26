@@ -19,22 +19,52 @@
 import 'ui/waitForMedia';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/img';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
-import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
+import { getIsWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/helpers/verticalWriting';
+import { isSafari } from 'taoQtiItem/qtiCommonRenderer/helpers/userAgent';
 
 export default {
     qtiClass: 'img',
     template: tpl,
     getContainer: containerHelper.get,
     render: function render(img, data) {
-        if (getIsItemWritingModeVerticalRl()) {
-            const $img = containerHelper.get(img);
+        const $img = containerHelper.get(img);
+        const isVerticalWriting = getIsWritingModeVerticalRl($img);
+
+        if (isVerticalWriting) {
             if ($img.attr('width') && $img.attr('width').endsWith('%') && !$img.attr('height')) {
                 $img.attr('height', img.attr('width'));
                 $img.removeAttr('width');
             }
         }
-        return new Promise(function (resolve, reject) {
-            containerHelper.get(img).waitForMedia(resolve);
-        });
+
+        /** Safari + vertical writing mode or mixed wirting modes:
+         *   image isn't always painted after loading; so change opacity to force browser to repaint the whole scroll container area.
+         *   (browser has trouble with understanding which area to repaint, in scroll containers with different writing modes)
+         */
+        if (isSafari()) {
+            const $closest = $img.closest("[data-scrolling='true'], .writing-mode-vertical-rl");
+            if ($closest.length && !$closest.data('wait-for-img')) {
+                $closest.waitForMedia(() => {
+                    setTimeout(() => {
+                        if (!$closest.get(0).isConnected) {
+                            return;
+                        }
+                        $closest.removeData('wait-for-img');
+                        const opacityStyle = ';opacity:0.98';
+                        let style = $closest.attr('style') || '';
+                        $closest.attr('style', `${style}${opacityStyle}`);
+
+                        setTimeout(() => {
+                            if (!$closest.get(0).isConnected) {
+                                return;
+                            }
+                            style = ($closest.attr('style') || '').replace(opacityStyle, '');
+                            $closest.attr('style', style);
+                        }, 200);
+                    }, 0);
+                });
+            }
+            $closest.data('wait-for-img', true);
+        }
     }
 };
