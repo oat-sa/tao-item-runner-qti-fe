@@ -33,28 +33,29 @@ function resetBlockSize($elements, isVertical) {
 
 export default {
     /**
-     * Resize jQueryElement that have changed their dimensions due to a change of the content
+     * Resize jQueryElement/widget that have changed their dimensions due to a change of the content
      *
      * @param {jQueryElement|widget} target
      */
     adaptSize(target) {
         let $elements;
         let $container;
+        let isVertical;
 
         switch (true) {
             // widget
             case typeof target.$container !== 'undefined':
                 $elements = target.$container.find(itemSelector);
                 $container = target.$container;
+                isVertical = false;
                 break;
 
             // jquery elements
             default:
                 $elements = target;
                 $container = $($elements).first().parent();
+                isVertical = getIsWritingModeVerticalRl($container);
         }
-
-        const isVertical = getIsWritingModeVerticalRl($container);
 
         $container.waitForMedia(function () {
             // Occasionally in caching scenarios, after waitForMedia(), image.height is reporting its naturalHeight instead of its CSS height
@@ -77,11 +78,17 @@ export default {
     },
 
     /**
-     * Reset height to jQueryElement(s) to auto
+     * Reset height of widget to auto
      *
-     * @param {jQueryElement|widget} target
+     * @param {widget} target
      */
     resetSize(target) {
-        resetBlockSize(target.$container.find(itemSelector));
+        // widget
+        const $container = target.$container;
+        if ($container && $container.length) {
+            const $elements = $container.find(itemSelector);
+            const isVertical = false;
+            resetBlockSize($elements, isVertical);
+        }
     }
 };
