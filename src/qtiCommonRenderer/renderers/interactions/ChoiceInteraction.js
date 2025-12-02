@@ -184,14 +184,13 @@ const _getRawResponse = function _getRawResponse(interaction) {
  * Define the instructions for the interaction
  * @private
  * @param {Object} interaction - the interaction instance
+ * @param {boolean} isVertical - wrtiting mode
  */
-const _setInstructions = function _setInstructions(interaction) {
-    const $container = containerHelper.get(interaction);
+const _setInstructions = function _setInstructions(interaction, isVertical) {
     const min = interaction.attr('minChoices');
     const max = interaction.attr('maxChoices');
     let msg;
     const choiceCount = _.size(interaction.getChoices());
-    const isVertical = getIsWritingModeVerticalRl($container);
 
     const highlightInvalidInput = function highlightInvalidInput($choice) {
         const $input = $choice.find('.real-label > input');
@@ -338,16 +337,19 @@ const _setInstructions = function _setInstructions(interaction) {
  */
 const render = function render(interaction) {
     const $container = containerHelper.get(interaction);
+    const isVertical = getIsWritingModeVerticalRl($container);
 
     _pseudoLabel(interaction, $container);
 
-    _setInstructions(interaction);
+    _setInstructions(interaction, isVertical);
 
     if (interaction.attr('orientation') === 'horizontal') {
         const $elements = $('.add-option, .result-area .target, .choice-area .qti-choice', $container);
         sizeAdapter.adaptSize($elements);
 
-        $(document).on('themeapplied.choiceInteraction', () => adaptSize.height($elements));
+        $(document).on('themeapplied.choiceInteraction', () =>
+            isVertical ? adaptSize.width($elements) : adaptSize.height($elements)
+        );
     }
 };
 
