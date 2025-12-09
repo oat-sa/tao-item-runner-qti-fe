@@ -24,7 +24,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/graphicAssociateInteraction';
-import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/Graphic';
+import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/GraphicRedesign';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
@@ -72,15 +72,13 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     const dx = dest.x + dest.width / 2;
     const dy = dest.y + dest.height / 2;
 
-    //create a path with bullets at the beginning and the end
-    const srcBullet = interaction.paper.circle(sx, sy, 3).attr(graphic._style['assoc-bullet']);
-
-    const destBullet = interaction.paper.circle(dx, dy, 3).attr(graphic._style['assoc-bullet']);
-
+    const pathOuter = interaction.paper
+        .path('M' + sx + ',' + sy + 'L' + dx + ',' + dy)
+        .attr(graphic._style['assoc-line-outer']);
     const path = interaction.paper
-        .path('M' + sx + ',' + sy + 'L' + sx + ',' + sy)
-        .attr(graphic._style.assoc)
-        .animate({ path: 'M' + sx + ',' + sy + 'L' + dx + ',' + dy }, 300);
+        .path('M' + sx + ',' + sy + 'L' + dx + ',' + dy)
+        .attr(graphic._style['assoc-line-inner']);
+    //.animate({ path: 'M' + sx + ',' + sy + 'L' + dx + ',' + dy }, 300);
 
     //create an overall layer that make easier the path selection
     const layer = interaction.paper.path('M' + sx + ',' + sy + 'L' + dx + ',' + dy).attr(graphic._style['assoc-layer']);
@@ -104,7 +102,7 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     destElement.toFront();
 
     //add the path into a set
-    vset = [srcBullet, path, destBullet, layer, closerBg, closer];
+    vset = [path, pathOuter, layer, closerBg, closer];
     interaction._vsets.push(vset);
 
     //to identify the element of the set outside the context
