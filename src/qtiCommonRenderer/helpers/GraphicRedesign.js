@@ -26,6 +26,30 @@ import raphael from 'raphael';
 import scaleRaphael from 'scale.raphael';
 import { gstyle } from 'taoQtiItem/qtiCommonRenderer/renderers/graphic-style-redesign';
 
+//extend raphael: 'g'/'defs'/'clipPath' elements
+raphael.fn.elFromTagName = function (tagName, attrs, raphType) {
+    const node = document.createElementNS('http://www.w3.org/2000/svg', tagName);
+    const paper = this; // eslint-disable-line consistent-this
+    paper.canvas && paper.canvas.appendChild(node);
+    const raphEl = new raphael.el.constructor(node, paper);
+    raphEl.type = raphType || tagName; //to get bbox(); maybe smth else
+    if (attrs && Object.keys(attrs).length) {
+        raphEl.attr(attrs);
+    }
+    return raphEl;
+};
+raphael.fn.group = function (attrs) {
+    return this.elFromTagName('g', attrs, 'set');
+};
+raphael.el.appendChild = function (childRaphEl) {
+    this.node.appendChild(childRaphEl.node);
+};
+
+const hotspotStates = {
+    basic: 'basic',
+    active: 'active'
+};
+
 //maps the QTI shapes to Raphael shapes
 const shapeMap = {
     default: 'rect',
@@ -174,24 +198,56 @@ const clipPathSetter = {
 
 const clipPathDefSetter = {
     // raphael coords
-    poly: function (raphEl, coords) {
-        return prepareClipPathDef(raphEl, `<path d="${coords[0]}" />`);
+    poly: function (paper, coords) {
+        return prepareClipPathDef(paper, `<path d="${coords[0]}" />`);
     }
 };
 
-function prepareClipPathDef(raphEl, clipPathHtml) {
-    const svgNode = raphEl.node.closest('svg');
-    let defsNode = svgNode.querySelector('defs');
-    if (!defsNode) {
-        defsNode = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-        svgNode.insertBefore(defsNode, svgNode.firstChild);
+function prepareClipPathDef(paper, clipPathHtml) {
+    const defsElId = 'defs-el';
+    let defsEl = paper.getById(defsElId);
+    if (!defsEl) {
+        defsEl = paper.elFromTagName('defs');
+        defsEl.id = defsElId;
+        defsEl.toBack();
     }
-    const clipPathNode = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
-    clipPathNode.id = `clip${defsNode.querySelectorAll('clipPath').length}`;
-    clipPathNode.innerHTML = clipPathHtml;
-    defsNode.appendChild(clipPathNode);
+    const id = `clip-${defsEl.node.children.length}`;
+    const clipPathEl = paper.elFromTagName('clipPath');
+    clipPathEl.node.innerHTML = clipPathHtml;
+    clipPathEl.node.id = id;
+    defsEl.appendChild(clipPathEl);
+    return id;
+}
 
-    return clipPathNode.id;
+function getSelectableStateTransform(groupNode) {
+    const bbox = groupNode.getBBox(); //options: fill, stroke, clipped
+    const diff = 8; //px
+    const scaleX = (bbox.width + diff) / bbox.width;
+    const scaleY = (bbox.height + diff) / bbox.height;
+    //add to css var in style, use that val in transfor? add transform directly?
+    //transform-box: fill-box - center
+    const transformVal = `scaleX(${scaleX}) scaleY(${scaleY})`;
+    return transformVal;
+    //groupNode.setAttribute('transform', transformVal);
+}
+
+function getSelectableStateTransform2(raphEl) {
+    const bbox = raphEl.getBBox(); //options: fill, stroke, clipped
+    const diff = 8; //px
+    const scaleX = (bbox.width + diff) / bbox.width;
+    const scaleY = (bbox.height + diff) / bbox.height;
+    //add to css var in style, use that val in transfor? add transform directly?
+    //transform-box: fill-box - center
+    return Math.min(scaleX, scaleY);
+    //groupNode.setAttribute('transform', transformVal);
+}
+
+function removeDefaultStyle(raphEl) {
+    const node = raphEl.node;
+    node.removeAttribute('stroke');
+    node.removeAttribute('stroke-width');
+    node.removeAttribute('fill');
+    node.removeAttribute('stroke-dasharray');
 }
 
 /**
@@ -312,6 +368,11 @@ const GraphicHelper = {
             $container.trigger('resized.qti-widget');
         }
 
+        // ? not needed?
+        // paper.customAttributes.class = function (cls) {
+        //     return { class: cls };
+        // };
+
         return paper;
     },
 
@@ -327,73 +388,47 @@ const GraphicHelper = {
      * @param {Boolean} [options.hover = true] - to disable the default hover state
      * @param {Boolean} [options.touchEffect = true] - a circle appears on touch
      * @param {Boolean} [options.qtiCoords = true] - if the coords are in QTI format
+     * @param {String} [options.class="hotspot"] - css class for <g>
      * @returns {Raphael.Element} the created element
      */
     createElement: function (paper, type, coords, options) {
         const self = this;
-        let element;
+        let groupEl;
         const shaper = shapeMap[type] ? paper[shapeMap[type]] : paper[type];
         const shapeCoords = options.qtiCoords !== false ? self.raphaelCoords(paper, type, coords) : coords;
+        const stateCls = options.style || hotspotStates.basic;
 
         if (typeof shaper === 'function') {
-            element = shaper.apply(paper, shapeCoords);
-            if (element) {
-                if (options.id) {
-                    element.id = options.id;
-                }
-
-                if (options.title) {
-                    element.attr('title', options.title);
-                }
-
-                element.attr(gstyle[options.style || 'basic']).toFront();
-
-                //prevent issue in firefox 37
-                $(element.node).removeAttr('stroke-dasharray');
-
-                if (options.hover !== false) {
-                    element.hover(
-                        function () {
-                            if (!element.flashing) {
-                                self.updateElementState(this, 'hover');
-                            }
-                        },
-                        function () {
-                            if (!element.flashing) {
-                                self.updateElementState(
-                                    this,
-                                    this.active ? 'active' : this.selectable ? 'selectable' : 'basic'
-                                );
-                            }
-                        }
-                    );
-                }
-
-                if (options.touchEffect !== false) {
-                    element.touchstart(function () {
-                        self.createTouchCircle(paper, element.getBBox());
-                    });
-                }
-
-                //? group & clip the group
+            try {
                 let clipPathDefId;
                 if (clipPathDefSetter[type]) {
-                    clipPathDefId = clipPathDefSetter[type](element, shapeCoords);
+                    clipPathDefId = clipPathDefSetter[type](paper, shapeCoords);
                 }
 
-                const innerBorderEl = shaper.apply(paper, shapeCoords);
-                innerBorderEl.attr(gstyle['basic-inner-border']).toFront();
-                clipPathSetter[type](innerBorderEl, shapeCoords, clipPathDefId);
+                const innerEl = shaper.apply(paper, shapeCoords);
+                removeDefaultStyle(innerEl);
+                clipPathSetter[type](innerEl, shapeCoords, clipPathDefId);
 
-                const outerBorderEl = shaper.apply(paper, shapeCoords);
-                outerBorderEl.attr(gstyle['basic-outer-border']).toFront();
-                clipPathSetter[type](outerBorderEl, shapeCoords, clipPathDefId);
+                const outerEl = shaper.apply(paper, shapeCoords);
+                removeDefaultStyle(outerEl);
+                clipPathSetter[type](outerEl, shapeCoords, clipPathDefId);
+
+                groupEl = paper.group({ class: `hotspot ${stateCls}` });
+                groupEl.toFront();
+                groupEl.appendChild(innerEl);
+                groupEl.appendChild(outerEl);
+                if (options.id) {
+                    groupEl.id = options.id;
+                }
+            } catch (err) {
+                console.error(err);
+                throw err;
             }
         } else {
             throw new Error('Unable to find method ' + type + ' on paper');
         }
 
-        return element;
+        return groupEl;
     },
 
     /**
@@ -733,20 +768,17 @@ const GraphicHelper = {
      * Update the visual state of an Element
      * @param {Raphael.Element} element - the element to change the state
      * @param {String} state - the name of the state (from states) to switch to
-     * @param {String} [title] - a title linked to this step
      */
-    updateElementState: function (element, state, title) {
-        if (element && element.animate) {
-            element.animate(gstyle[state], 200, 'linear', function () {
-                element.attr(gstyle[state]); //for attr that don't animate
-
-                //preven issue in firefox 37
-                $(element.node).removeAttr('stroke-dasharray');
-            });
-
-            if (title) {
-                this.updateTitle(element, title);
+    updateElementState: function (element, state) {
+        console.trace('updateElementState', state, element);
+        if (element) {
+            if (state === hotspotStates.active) {
+                const scale = getSelectableStateTransform2(element);
+                element.animate({ transform: `s${scale}` }, 100, 'linear');
+            } else if (element.node.classList.contains(hotspotStates.active)) {
+                element.animate({ transform: '' }, 100, 'linear');
             }
+            element.attr({ class: `hotspot ${state}` });
         }
     },
 

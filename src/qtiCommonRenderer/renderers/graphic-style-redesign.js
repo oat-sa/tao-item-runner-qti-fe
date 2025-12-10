@@ -3,43 +3,36 @@ const colorBrand = '#266D9C';
 const colorLight = '#FFFFFF';
 
 export const gstyle = {
-    'basic-outer-border': {
+    //common
+    associated: {
+        stroke: colorBrand,
+        'stroke-width': 14,
+        'stroke-linejoin': 'round',
+        fill: colorBrand,
+        'fill-opacity': 0.5,
+        cursor: 'pointer'
+    },
+    'associated-outer': {
         stroke: colorLight,
         'stroke-width': 10,
         'stroke-linejoin': 'round',
         fill: 'none',
         cursor: 'pointer'
     },
-    'basic-inner-border': {
-        stroke: colorDark,
-        'stroke-width': 14,
-        'stroke-linejoin': 'round',
-        fill: 'none',
+    // GraphicAssociateInteraction
+    'assoc-line-outer': {
+        stroke: colorLight,
+        'stroke-width': 8,
+        'stroke-linecap': 'round',
         cursor: 'pointer'
     },
-    basic: {
-        stroke: 'none',
-        fill: colorBrand,
-        'fill-opacity': 0.2,
+    'assoc-line-inner': {
+        stroke: colorBrand,
+        'stroke-width': 2,
+        'stroke-linecap': 'round',
         cursor: 'pointer'
     },
-    hover: {
-        stroke: '#3E7DA7',
-        fill: '#0E5D91',
-        'fill-opacity': 0.3
-    },
-    selectable: {
-        'stroke-dasharray': '-',
-        stroke: '#3E7DA7',
-        fill: '#cccccc',
-        'fill-opacity': 0.5
-    },
-    active: {
-        stroke: '#3E7DA7',
-        'stroke-dasharray': '',
-        fill: '#0E5D91',
-        'fill-opacity': 0.5
-    },
+    /// OLD; remove if not used
     error: {
         stroke: '#C74155',
         'stroke-dasharray': '',
@@ -135,18 +128,6 @@ export const gstyle = {
     'target-success': {
         fill: '#0E914B',
         'fill-opacity': 1
-    },
-    'assoc-line-outer': {
-        stroke: colorLight,
-        'stroke-width': 12,
-        'stroke-linecap': 'round',
-        cursor: 'pointer'
-    },
-    'assoc-line-inner': {
-        stroke: colorBrand,
-        'stroke-width': 4,
-        'stroke-linecap': 'round',
-        cursor: 'pointer'
     },
     'assoc-layer': {
         'stroke-width': 12,
