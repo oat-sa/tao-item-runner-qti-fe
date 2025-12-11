@@ -39,15 +39,31 @@ raphael.fn.elFromTagName = function (tagName, attrs, raphType) {
     return raphEl;
 };
 raphael.fn.group = function (attrs) {
-    return this.elFromTagName('g', attrs, 'set');
+    const raphEl = this.elFromTagName('g', attrs, 'set');
+
+    const paper = this; // eslint-disable-line consistent-this
+    raphEl.childrenSet = paper.set();
+
+    const originalRemove = raphEl.remove;
+    raphEl.remove = function () {
+        this.childrenSet.forEach(childRaphEl => childRaphEl.remove());
+        this.childrenSet.clear();
+        originalRemove.apply(this);
+    };
+
+    return raphEl;
 };
 raphael.el.appendChild = function (childRaphEl) {
     this.node.appendChild(childRaphEl.node);
+    if (this.childrenSet) {
+        this.childrenSet.push(childRaphEl);
+    }
 };
 
 const hotspotStates = {
     basic: 'basic',
-    active: 'active'
+    active: 'active',
+    selectable: 'selectable'
 };
 
 //maps the QTI shapes to Raphael shapes
@@ -219,27 +235,12 @@ function prepareClipPathDef(paper, clipPathHtml) {
     return id;
 }
 
-function getSelectableStateTransform(groupNode) {
-    const bbox = groupNode.getBBox(); //options: fill, stroke, clipped
+function getSelectableStateTransform(raphEl) {
     const diff = 8; //px
+    const bbox = raphEl.getBBox();
     const scaleX = (bbox.width + diff) / bbox.width;
     const scaleY = (bbox.height + diff) / bbox.height;
-    //add to css var in style, use that val in transfor? add transform directly?
-    //transform-box: fill-box - center
-    const transformVal = `scaleX(${scaleX}) scaleY(${scaleY})`;
-    return transformVal;
-    //groupNode.setAttribute('transform', transformVal);
-}
-
-function getSelectableStateTransform2(raphEl) {
-    const bbox = raphEl.getBBox(); //options: fill, stroke, clipped
-    const diff = 8; //px
-    const scaleX = (bbox.width + diff) / bbox.width;
-    const scaleY = (bbox.height + diff) / bbox.height;
-    //add to css var in style, use that val in transfor? add transform directly?
-    //transform-box: fill-box - center
     return Math.min(scaleX, scaleY);
-    //groupNode.setAttribute('transform', transformVal);
 }
 
 function removeDefaultStyle(raphEl) {
@@ -407,16 +408,13 @@ const GraphicHelper = {
 
                 const innerEl = shaper.apply(paper, shapeCoords);
                 removeDefaultStyle(innerEl);
-                clipPathSetter[type](innerEl, shapeCoords, clipPathDefId);
-
                 const outerEl = shaper.apply(paper, shapeCoords);
                 removeDefaultStyle(outerEl);
-                clipPathSetter[type](outerEl, shapeCoords, clipPathDefId);
 
-                groupEl = paper.group({ class: `hotspot ${stateCls}` });
-                groupEl.toFront();
+                groupEl = paper.group({ class: `hotspot ${stateCls}` }).toFront();
                 groupEl.appendChild(innerEl);
                 groupEl.appendChild(outerEl);
+                clipPathSetter[type](groupEl, shapeCoords, clipPathDefId);
                 if (options.id) {
                     groupEl.id = options.id;
                 }
@@ -580,25 +578,6 @@ const GraphicHelper = {
         }
 
         return result;
-    },
-
-    /**
-     * Create a circle that animate and disapear from a shape.
-     *
-     * @param {Raphael.Paper} paper - the paper
-     * @param {Raphael.Element} element - used to get the bbox from
-     */
-    createTouchCircle: function (paper, bbox) {
-        const radius = bbox.width > bbox.height ? bbox.width : bbox.height;
-        const tCircle = paper.circle(bbox.x + bbox.width / 2, bbox.y + bbox.height / 2, radius);
-
-        tCircle.attr(gstyle['touch-circle']);
-
-        _.defer(function () {
-            tCircle.animate({ r: radius + 5, opacity: 0.7 }, 300, function () {
-                tCircle.remove();
-            });
-        });
     },
 
     /**
@@ -773,7 +752,7 @@ const GraphicHelper = {
         console.trace('updateElementState', state, element);
         if (element) {
             if (state === hotspotStates.active) {
-                const scale = getSelectableStateTransform2(element);
+                const scale = getSelectableStateTransform(element);
                 element.animate({ transform: `s${scale}` }, 100, 'linear');
             } else if (element.node.classList.contains(hotspotStates.active)) {
                 element.animate({ transform: '' }, 100, 'linear');

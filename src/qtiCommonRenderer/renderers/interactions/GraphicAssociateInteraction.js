@@ -28,6 +28,7 @@ import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/GraphicRedesign';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
+import { gstyle } from 'taoQtiItem/qtiCommonRenderer/renderers/graphic-style-redesign';
 
 /**
  * Get the element that has the active state
@@ -47,6 +48,35 @@ const _getActiveElement = function _getActiveElement(interaction) {
     return active;
 };
 
+const _getImage = function (interaction) {
+    return interaction.paper.getById('bg-image-' + interaction.serial);
+};
+
+/**
+ * @param {Raphael.Element} element
+ */
+const _markHotspotAsAssociated = function (element, toggleOn) {
+    if (typeof toggleOn === 'undefined') {
+        toggleOn = !element.node.getAttribute('data-associated');
+    }
+    if (toggleOn) {
+        element.node.setAttribute('data-associated', 'true');
+    } else {
+        element.node.removeAttribute('data-associated');
+    }
+};
+
+const _toggleLineSelectedMode = function (interaction, toggleOn) {
+    if (typeof toggleOn === 'undefined') {
+        toggleOn = !interaction.paper.canvas.classList.contains('line-selected');
+    }
+    if (toggleOn) {
+        interaction.paper.canvas.classList.add('line-selected');
+    } else {
+        interaction.paper.canvas.classList.remove('line-selected');
+    }
+};
+
 /**
  * Create a path from a src element to a destination.
  * The path is selectable and can be removed by itself
@@ -59,9 +89,6 @@ const _getActiveElement = function _getActiveElement(interaction) {
 const _createPath = function _createPath(interaction, srcElement, destElement, onRemove) {
     const $container = containerHelper.get(interaction);
 
-    //virtual set, not a raphael one, just to group the elements
-    let vset = [];
-
     //get the middle point of the source shape
     const src = srcElement.getBBox();
     const sx = src.x + src.width / 2;
@@ -72,81 +99,53 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     const dx = dest.x + dest.width / 2;
     const dy = dest.y + dest.height / 2;
 
-    const pathOuter = interaction.paper
+    const lineOuter = interaction.paper
         .path('M' + sx + ',' + sy + 'L' + dx + ',' + dy)
-        .attr(graphic._style['assoc-line-outer']);
-    const path = interaction.paper
+        .attr({ class: 'assoc-line-outer' });
+    const lineInner = interaction.paper
         .path('M' + sx + ',' + sy + 'L' + dx + ',' + dy)
-        .attr(graphic._style['assoc-line-inner']);
-    //.animate({ path: 'M' + sx + ',' + sy + 'L' + dx + ',' + dy }, 300);
-
-    //create an overall layer that make easier the path selection
-    const layer = interaction.paper.path('M' + sx + ',' + sy + 'L' + dx + ',' + dy).attr(graphic._style['assoc-layer']);
+        .attr({ class: 'assoc-line-inner' });
+    const lineHitbox = interaction.paper
+        .path('M' + sx + ',' + sy + 'L' + dx + ',' + dy)
+        .attr({ class: 'assoc-line-hitbox' });
+    const lineGroup = interaction.paper.group({ class: 'assoc-line' }).toFront().click(selectLine);
+    lineGroup.appendChild(lineOuter);
+    lineGroup.appendChild(lineInner);
+    lineGroup.appendChild(lineHitbox);
 
     //get the middle of the path
-    const midPath = layer.getPointAtLength(layer.getTotalLength() / 2);
+    const midPath = lineHitbox.getPointAtLength(lineHitbox.getTotalLength() / 2);
+    const closerRad = 10;
 
-    //create an hidden background for the closer
-    const closerBg = interaction.paper.circle(midPath.x, midPath.y, 9).attr(graphic._style['close-bg']).toBack();
+    const closerHitbox = interaction.paper
+        .circle(midPath.x, midPath.y, closerRad + 8)
+        .attr({ class: 'close-btn-hitbox' });
+    const closerBg = interaction.paper.circle(midPath.x - 1, midPath.y - 1, closerRad).attr({ class: 'close-btn-bg' });
+    const closerPath = interaction.paper
+        .path(gstyle.close.path)
+        .attr({ class: 'close-btn-path' })
+        .transform(`t${midPath.x - closerRad},${midPath.y - closerRad}s${1.3}`);
+    const closerGroup = interaction.paper.group({ class: 'close-btn' }).toFront().click(removeSet);
+    closerGroup.appendChild(closerHitbox);
+    closerGroup.appendChild(closerBg);
+    closerGroup.appendChild(closerPath);
 
-    //create an hidden closer
-    const closer = interaction.paper
-        .path(graphic._style.close.path)
-        .attr(graphic._style.close)
-        .transform('T' + (midPath.x - 9) + ',' + (midPath.y - 9))
-        .attr('title', __('Click again to remove'))
-        .toBack();
-
-    //the path is below the shapes
-    srcElement.toFront();
-    destElement.toFront();
-
-    //add the path into a set
-    vset = [path, pathOuter, layer, closerBg, closer];
-    interaction._vsets.push(vset);
-
-    //to identify the element of the set outside the context
-    vset.forEach(el => {
-        el.data('assoc-path', true);
-    });
-
-    //enable to select the path by clicking the invisible layer
-    layer.click(function selectLigne() {
-        if (closer.attrs.opacity === 0) {
-            showCloser();
-        } else {
-            hideCloser();
-        }
-    });
+    _markHotspotAsAssociated(srcElement, true);
+    _markHotspotAsAssociated(destElement, true);
 
     $container.on('unselect.graphicassociate', function () {
-        hideCloser();
+        _toggleLineSelectedMode(interaction, false);
     });
-
-    function showCloser() {
-        closerBg.toFront().animate({ opacity: 0.8 }, 300).click(removeSet);
-        closer.toFront().animate({ opacity: 1 }, 300).click(removeSet);
+    function selectLine() {
+        _toggleLineSelectedMode(interaction);
     }
-
-    function hideCloser() {
-        if (closerBg && closerBg.type) {
-            closerBg
-                .animate({ opacity: 0 }, 300, function () {
-                    closerBg.toBack();
-                })
-                .unclick();
-            closer
-                .animate({ opacity: 0 }, 300, function () {
-                    closer.toBack();
-                })
-                .unclick();
-        }
-    }
-
-    //remove set handler
     function removeSet() {
-        vset.forEach(item => item.remove());
-        interaction._vsets = _.without(interaction._vsets, vset);
+        _toggleLineSelectedMode(interaction, false);
+        closerGroup.remove();
+        lineGroup.remove();
+        _markHotspotAsAssociated(srcElement, false);
+        _markHotspotAsAssociated(destElement, false);
+
         if (typeof onRemove === 'function') {
             onRemove();
         }
@@ -240,7 +239,7 @@ const _getRawResponse = function _getRawResponse(interaction) {
  */
 const _paperUnSelect = function _paperUnSelect(interaction) {
     const $container = containerHelper.get(interaction);
-    const image = interaction.paper.getById('bg-image-' + interaction.serial);
+    const image = _getImage(interaction);
     if (image) {
         image.click(function () {
             _shapesUnSelectable(interaction);
@@ -307,7 +306,7 @@ const _renderChoice = function _renderChoice(interaction, choice) {
                 if (active) {
                     _shapesUnSelectable(interaction);
                 }
-                graphic.updateElementState(this, 'active', __('Select this area to start an association'));
+                graphic.updateElementState(this, 'active');
                 this.active = true;
                 _shapesSelectable(interaction, this);
             }
@@ -330,7 +329,6 @@ const render = function render(interaction) {
     return new Promise(function (resolve) {
         const $container = containerHelper.get(interaction);
         const background = interaction.object.attributes;
-        interaction._vsets = [];
 
         $container.off('resized.qti-widget.resolve').one('resized.qti-widget.resolve', resolve);
 
@@ -438,9 +436,12 @@ const resetResponse = function resetResponse(interaction) {
 
     if (interaction && interaction.paper) {
         //remove the paths, but outside the forEach as it is implemented as a linked list
+        _toggleLineSelectedMode(interaction, false);
         interaction.paper.forEach(function (elt) {
-            if (elt.data('assoc-path')) {
+            if (elt.node.classList.contains('close-btn') || elt.node.classList.contains('assoc-line')) {
                 toRemove.push(elt);
+            } else if (elt.node.classList.contains('hotspot')) {
+                _markHotspotAsAssociated(elt, false);
             }
         });
     }
