@@ -56,9 +56,6 @@ const _getImage = function (interaction) {
  * @param {Raphael.Element} element
  */
 const _markHotspotAsAssociated = function (element, toggleOn) {
-    if (typeof toggleOn === 'undefined') {
-        toggleOn = !element.node.getAttribute('data-associated');
-    }
     if (toggleOn) {
         element.node.setAttribute('data-associated', 'true');
     } else {
@@ -67,9 +64,6 @@ const _markHotspotAsAssociated = function (element, toggleOn) {
 };
 
 const _toggleLineSelectedMode = function (interaction, toggleOn) {
-    if (typeof toggleOn === 'undefined') {
-        toggleOn = !interaction.paper.canvas.classList.contains('line-selected');
-    }
     if (toggleOn) {
         interaction.paper.canvas.classList.add('line-selected');
     } else {
@@ -88,6 +82,7 @@ const _toggleLineSelectedMode = function (interaction, toggleOn) {
  */
 const _createPath = function _createPath(interaction, srcElement, destElement, onRemove) {
     const $container = containerHelper.get(interaction);
+    const paper = interaction.paper;
 
     //get the middle point of the source shape
     const src = srcElement.getBBox();
@@ -99,33 +94,31 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     const dx = dest.x + dest.width / 2;
     const dy = dest.y + dest.height / 2;
 
-    const lineOuter = interaction.paper
-        .path('M' + sx + ',' + sy + 'L' + dx + ',' + dy)
-        .attr({ class: 'assoc-line-outer' });
-    const lineInner = interaction.paper
-        .path('M' + sx + ',' + sy + 'L' + dx + ',' + dy)
-        .attr({ class: 'assoc-line-inner' });
-    const lineHitbox = interaction.paper
-        .path('M' + sx + ',' + sy + 'L' + dx + ',' + dy)
-        .attr({ class: 'assoc-line-hitbox' });
-    const lineGroup = interaction.paper.group({ class: 'assoc-line' }).toFront().click(selectLine);
+    const lineGroup = paper.group({ class: 'assoc-line' }).click(onLineClick);
+    const lineOuter = paper.path('M' + sx + ',' + sy + 'L' + dx + ',' + dy).attr({ class: 'assoc-line-outer' });
+    const lineInner = paper.path('M' + sx + ',' + sy + 'L' + dx + ',' + dy).attr({ class: 'assoc-line-inner' });
+    const lineHitbox = paper.path('M' + sx + ',' + sy + 'L' + dx + ',' + dy).attr({ class: 'assoc-line-hitbox' });
     lineGroup.appendChild(lineOuter);
     lineGroup.appendChild(lineInner);
     lineGroup.appendChild(lineHitbox);
 
     //get the middle of the path
     const midPath = lineHitbox.getPointAtLength(lineHitbox.getTotalLength() / 2);
-    const closerRad = 10;
 
-    const closerHitbox = interaction.paper
-        .circle(midPath.x, midPath.y, closerRad + 8)
-        .attr({ class: 'close-btn-hitbox' });
-    const closerBg = interaction.paper.circle(midPath.x - 1, midPath.y - 1, closerRad).attr({ class: 'close-btn-bg' });
-    const closerPath = interaction.paper
+    const closerRad = 14;
+    const closerHitboxRad = 20;
+    const closerPathHalfSize = 8;
+    const closerPathScale = 0.8;
+
+    const closerHitbox = paper.circle(midPath.x, midPath.y, closerHitboxRad).attr({ class: 'close-btn-hitbox' });
+    const closerBg = paper.circle(midPath.x, midPath.y, closerRad).attr({ class: 'close-btn-bg' });
+    const closerPath = paper
         .path(gstyle.close.path)
         .attr({ class: 'close-btn-path' })
-        .transform(`t${midPath.x - closerRad},${midPath.y - closerRad}s${1.3}`);
-    const closerGroup = interaction.paper.group({ class: 'close-btn' }).toFront().click(removeSet);
+        .transform(`t${midPath.x - closerPathHalfSize},${midPath.y - closerPathHalfSize}s${closerPathScale}`);
+    const closerGroup = paper.group({ class: 'close-btn' }).click(function () {
+        removeSet(onRemove);
+    });
     closerGroup.appendChild(closerHitbox);
     closerGroup.appendChild(closerBg);
     closerGroup.appendChild(closerPath);
@@ -133,21 +126,54 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     _markHotspotAsAssociated(srcElement, true);
     _markHotspotAsAssociated(destElement, true);
 
-    $container.on('unselect.graphicassociate', function () {
-        _toggleLineSelectedMode(interaction, false);
-    });
-    function selectLine() {
-        _toggleLineSelectedMode(interaction);
+    $container.on(`unselect.graphicassociate.${lineGroup.id}`, unselectLine);
+    $container.on(`resetresponse.graphicassociate.${lineGroup.id}`, removeSet);
+
+    function onLineClick() {
+        if (lineGroup.node.classList.contains('selected')) {
+            unselectLine();
+        } else {
+            selectLine();
+        }
     }
-    function removeSet() {
+
+    function selectLine() {
+        _toggleLineSelectedMode(interaction, true);
+        lineGroup.node.classList.add('selected');
+        [srcElement, destElement].forEach(raphEl => {
+            raphEl.node.setAttribute('data-for-selected-line', 'true');
+        });
+        [lineGroup, closerGroup].forEach(raphEl => {
+            raphEl.data({ insertBefore: raphEl.node.previousSiblingElement });
+            //not 'raphEl.insertBefore(..)' to not mess with el.prev/el.next/paper.top/paper.bottom'
+            raphEl.node.parentElement.insertBefore(raphEl.node, null);
+        });
+    }
+    function unselectLine() {
+        _toggleLineSelectedMode(interaction, false);
+        lineGroup.node.classList.remove('selected');
+        [srcElement, destElement].forEach(raphEl => {
+            raphEl.node.removeAttribute('data-for-selected-line');
+        });
+        [lineGroup, closerGroup].forEach(raphEl => {
+            raphEl.node.parentElement.insertBefore(raphEl.node, raphEl.data('insertBefore'));
+            raphEl.removeData('insertBefore');
+        });
+    }
+
+    function removeSet(removeCallback) {
+        $container.off(`unselect.graphicassociate.${lineGroup.id}`);
+        $container.off(`resetresponse.graphicassociate.${lineGroup.id}`);
+
         _toggleLineSelectedMode(interaction, false);
         closerGroup.remove();
         lineGroup.remove();
-        _markHotspotAsAssociated(srcElement, false);
-        _markHotspotAsAssociated(destElement, false);
+        [srcElement, destElement].forEach(raphEl => {
+            _markHotspotAsAssociated(raphEl, false);
+        });
 
-        if (typeof onRemove === 'function') {
-            onRemove();
+        if (typeof removeCallback === 'function') {
+            removeCallback();
         }
     }
 };
@@ -435,15 +461,8 @@ const resetResponse = function resetResponse(interaction) {
     });
 
     if (interaction && interaction.paper) {
-        //remove the paths, but outside the forEach as it is implemented as a linked list
-        _toggleLineSelectedMode(interaction, false);
-        interaction.paper.forEach(function (elt) {
-            if (elt.node.classList.contains('close-btn') || elt.node.classList.contains('assoc-line')) {
-                toRemove.push(elt);
-            } else if (elt.node.classList.contains('hotspot')) {
-                _markHotspotAsAssociated(elt, false);
-            }
-        });
+        const $container = containerHelper.get(interaction);
+        $container.trigger('resetresponse.graphicassociate');
     }
     toRemove.forEach(el => el.remove());
 };

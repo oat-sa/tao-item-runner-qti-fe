@@ -26,7 +26,7 @@ import raphael from 'raphael';
 import scaleRaphael from 'scale.raphael';
 import { gstyle } from 'taoQtiItem/qtiCommonRenderer/renderers/graphic-style-redesign';
 
-//extend raphael: 'g'/'defs'/'clipPath' elements
+// extend raphael
 raphael.fn.elFromTagName = function (tagName, attrs, raphType) {
     const node = document.createElementNS('http://www.w3.org/2000/svg', tagName);
     const paper = this; // eslint-disable-line consistent-this
@@ -38,6 +38,11 @@ raphael.fn.elFromTagName = function (tagName, attrs, raphType) {
     }
     return raphEl;
 };
+/**
+ * NB! Please create child elements *before* group, or el.next/el.prev and paper.top/paper.bottom might get messed up
+ * @param {*} attrs
+ * @returns
+ */
 raphael.fn.group = function (attrs) {
     const raphEl = this.elFromTagName('g', attrs, 'set');
 
@@ -53,8 +58,10 @@ raphael.fn.group = function (attrs) {
 
     return raphEl;
 };
+
 raphael.el.appendChild = function (childRaphEl) {
     this.node.appendChild(childRaphEl.node);
+
     if (this.childrenSet) {
         this.childrenSet.push(childRaphEl);
     }
@@ -300,6 +307,7 @@ const GraphicHelper = {
         const image = paper.image(options.img, 0, 0, imgWidth, imgHeight);
         image.id = options.imgId || image.id;
         paper.setViewBox(0, 0, imgWidth, imgHeight);
+        paper.scale = 1;
 
         resizer();
 
@@ -360,6 +368,9 @@ const GraphicHelper = {
 
                 if (containerWidth > 0) {
                     paper.changeSize(containerWidth, containerHeight, false, false);
+
+                    paper.scale = paper.width / paper.canvas.viewBox.baseVal.width;
+                    paper.canvas.style.setProperty('--paper-scale', paper.scale);
                 }
 
                 if (typeof options.resize === 'function') {
@@ -406,14 +417,16 @@ const GraphicHelper = {
                     clipPathDefId = clipPathDefSetter[type](paper, shapeCoords);
                 }
 
+                groupEl = paper.group({ class: `hotspot ${stateCls}` });
+
                 const innerEl = shaper.apply(paper, shapeCoords);
                 removeDefaultStyle(innerEl);
+                groupEl.appendChild(innerEl);
+
                 const outerEl = shaper.apply(paper, shapeCoords);
                 removeDefaultStyle(outerEl);
-
-                groupEl = paper.group({ class: `hotspot ${stateCls}` }).toFront();
-                groupEl.appendChild(innerEl);
                 groupEl.appendChild(outerEl);
+
                 clipPathSetter[type](groupEl, shapeCoords, clipPathDefId);
                 if (options.id) {
                     groupEl.id = options.id;
@@ -749,7 +762,6 @@ const GraphicHelper = {
      * @param {String} state - the name of the state (from states) to switch to
      */
     updateElementState: function (element, state) {
-        console.trace('updateElementState', state, element);
         if (element) {
             if (state === hotspotStates.active) {
                 const scale = getSelectableStateTransform(element);
