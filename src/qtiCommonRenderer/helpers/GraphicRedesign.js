@@ -395,7 +395,6 @@ const GraphicHelper = {
      * @param {String|Array.<Number>} coords - qti coords as a string or an array of number
      * @param {Object} [options] - additional creation options
      * @param {String} [options.id] - to set the new element id
-     * @param {String} [options.title] - to set the new element title
      * @param {String} [options.style = basic] - to default style
      * @param {Boolean} [options.hover = true] - to disable the default hover state
      * @param {Boolean} [options.touchEffect = true] - a circle appears on touch
@@ -419,11 +418,11 @@ const GraphicHelper = {
 
                 groupEl = paper.group({ class: `hotspot ${stateCls}` });
 
-                const innerEl = shaper.apply(paper, shapeCoords);
+                const innerEl = shaper.apply(paper, shapeCoords).attr({ class: 'hotspot-inner' });
                 removeDefaultStyle(innerEl);
                 groupEl.appendChild(innerEl);
 
-                const outerEl = shaper.apply(paper, shapeCoords);
+                const outerEl = shaper.apply(paper, shapeCoords).attr({ class: 'hotspot-outer' });
                 removeDefaultStyle(outerEl);
                 groupEl.appendChild(outerEl);
 

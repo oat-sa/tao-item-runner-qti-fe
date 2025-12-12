@@ -30,6 +30,24 @@ import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
 import { gstyle } from 'taoQtiItem/qtiCommonRenderer/renderers/graphic-style-redesign';
 
+const titles = {
+    get hotspotBasic() {
+        return __('Select this area to start an association');
+    },
+    hotspotActive: '',
+    hotspotNotSelectable: '',
+    get hotspotSelectable() {
+        return __('Select this area to finish an association');
+    },
+    get line() {
+        return __('Click to start removing');
+    },
+    lineSelected: '',
+    get closeBtn() {
+        return __('Click to remove');
+    }
+};
+
 /**
  * Get the element that has the active state
  * @private
@@ -94,7 +112,7 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     const dx = dest.x + dest.width / 2;
     const dy = dest.y + dest.height / 2;
 
-    const lineGroup = paper.group({ class: 'assoc-line' }).click(onLineClick);
+    const lineGroup = paper.group({ class: 'assoc-line' }).attr('title', titles.line).click(onLineClick);
     const lineOuter = paper.path('M' + sx + ',' + sy + 'L' + dx + ',' + dy).attr({ class: 'assoc-line-outer' });
     const lineInner = paper.path('M' + sx + ',' + sy + 'L' + dx + ',' + dy).attr({ class: 'assoc-line-inner' });
     const lineHitbox = paper.path('M' + sx + ',' + sy + 'L' + dx + ',' + dy).attr({ class: 'assoc-line-hitbox' });
@@ -116,9 +134,12 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
         .path(gstyle.close.path)
         .attr({ class: 'close-btn-path' })
         .transform(`t${midPath.x - closerPathHalfSize},${midPath.y - closerPathHalfSize}s${closerPathScale}`);
-    const closerGroup = paper.group({ class: 'close-btn' }).click(function () {
-        removeSet(onRemove);
-    });
+    const closerGroup = paper
+        .group({ class: 'close-btn' })
+        .attr('title', titles.closeBtn)
+        .click(function () {
+            removeSet(onRemove);
+        });
     closerGroup.appendChild(closerHitbox);
     closerGroup.appendChild(closerBg);
     closerGroup.appendChild(closerPath);
@@ -130,6 +151,7 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     $container.on(`resetresponse.graphicassociate.${lineGroup.id}`, removeSet);
 
     function onLineClick() {
+        $container.trigger('unselect-active-hotspot.graphicassociate');
         if (lineGroup.node.classList.contains('selected')) {
             unselectLine();
         } else {
@@ -140,6 +162,7 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     function selectLine() {
         _toggleLineSelectedMode(interaction, true);
         lineGroup.node.classList.add('selected');
+        lineGroup.attr('title', titles.lineSelected);
         [srcElement, destElement].forEach(raphEl => {
             raphEl.node.setAttribute('data-for-selected-line', 'true');
         });
@@ -152,6 +175,7 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     function unselectLine() {
         _toggleLineSelectedMode(interaction, false);
         lineGroup.node.classList.remove('selected');
+        lineGroup.attr('title', titles.line);
         [srcElement, destElement].forEach(raphEl => {
             raphEl.node.removeAttribute('data-for-selected-line');
         });
@@ -170,6 +194,7 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
         lineGroup.remove();
         [srcElement, destElement].forEach(raphEl => {
             _markHotspotAsAssociated(raphEl, false);
+            raphEl.node.removeAttribute('data-for-selected-line');
         });
 
         if (typeof removeCallback === 'function') {
@@ -208,14 +233,14 @@ const _shapesSelectable = function _shapesSelectable(interaction, active) {
         if (!assocs.includes(choice.id())) {
             const element = interaction.paper.getById(choice.serial);
             const assocsElement = element.data('assocs') || [];
-            if (
-                !element.active &&
-                element.id !== active.id &&
-                _isMatchable(element, active) &&
-                !assocsElement.includes(activeChoice.id())
-            ) {
-                element.selectable = true;
-                graphic.updateElementState(element, 'selectable');
+            if (!element.active && element.id !== active.id) {
+                if (_isMatchable(element, active) && !assocsElement.includes(activeChoice.id())) {
+                    element.selectable = true;
+                    graphic.updateElementState(element, 'selectable');
+                    element.attr('title', titles.hotspotSelectable);
+                } else {
+                    element.attr('title', titles.hotspotNotSelectable);
+                }
             }
         }
     });
@@ -233,6 +258,7 @@ const _shapesUnSelectable = function _shapesUnSelectable(interaction) {
             element.selectable = false;
             element.active = false;
             graphic.updateElementState(element, 'basic');
+            element.attr('title', titles.hotspotBasic);
         }
     });
 };
@@ -287,9 +313,9 @@ const _renderChoice = function _renderChoice(interaction, choice) {
 
     graphic
         .createElement(interaction.paper, shape, coords, {
-            id: choice.serial,
-            title: __('Select this area to start an association')
+            id: choice.serial
         })
+        .attr('title', titles.hotspotBasic)
         .data('max', choice.attr('matchMax'))
         .data('matching', 0)
         .removeData('assocs')
@@ -333,6 +359,7 @@ const _renderChoice = function _renderChoice(interaction, choice) {
                     _shapesUnSelectable(interaction);
                 }
                 graphic.updateElementState(this, 'active');
+                this.attr('title', titles.hotspotActive);
                 this.active = true;
                 _shapesSelectable(interaction, this);
             }
@@ -372,6 +399,9 @@ const render = function render(interaction) {
 
         //make the paper clear the selection by clicking it
         _paperUnSelect(interaction);
+        $container.on('unselect-active-hotspot.graphicassociate', function () {
+            _shapesUnSelectable(interaction);
+        });
 
         //set up the constraints instructions
         instructionMgr.minMaxChoiceInstructions(interaction, {
