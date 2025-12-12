@@ -40,7 +40,7 @@ const titles = {
         return __('Select this area to finish an association');
     },
     get line() {
-        return __('Click to start removing');
+        return __('Select line to remove');
     },
     lineSelected: '',
     get closeBtn() {
