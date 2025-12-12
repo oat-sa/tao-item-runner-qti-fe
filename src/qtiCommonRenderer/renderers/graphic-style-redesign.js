@@ -1,10 +1,4 @@
 export const gstyle = {
-    error: {
-        stroke: '#C74155',
-        'stroke-dasharray': '',
-        'fill-opacity': 0.5,
-        fill: '#661728'
-    },
     success: {
         stroke: '#C74155',
         'stroke-dasharray': '',

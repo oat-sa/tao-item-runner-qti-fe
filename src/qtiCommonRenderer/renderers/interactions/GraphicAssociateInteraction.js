@@ -73,8 +73,19 @@ const _getImage = function (interaction) {
 /**
  * @param {Raphael.Element} element
  */
-const _markHotspotAsAssociated = function (element, toggleOn) {
-    if (toggleOn) {
+const _toggleHotspotAssociatedStyle = function (interaction, element) {
+    let associated = false;
+    const choiceId = element.data('choiceId');
+    _.forEach(interaction.getChoices(), function (choice) {
+        const otherEl = interaction.paper.getById(choice.serial);
+        const assocs = otherEl.data('assocs');
+        if (assocs && assocs.length && (otherEl === element || assocs.includes(choiceId))) {
+            associated = true;
+            return false;
+        }
+    });
+
+    if (associated) {
         element.node.setAttribute('data-associated', 'true');
     } else {
         element.node.removeAttribute('data-associated');
@@ -144,8 +155,8 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     closerGroup.appendChild(closerBg);
     closerGroup.appendChild(closerPath);
 
-    _markHotspotAsAssociated(srcElement, true);
-    _markHotspotAsAssociated(destElement, true);
+    _toggleHotspotAssociatedStyle(interaction, srcElement);
+    _toggleHotspotAssociatedStyle(interaction, destElement);
 
     $container.on(`unselect.graphicassociate.${lineGroup.id}`, unselectLine);
     $container.on(`resetresponse.graphicassociate.${lineGroup.id}`, removeSet);
@@ -192,14 +203,15 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
         _toggleLineSelectedMode(interaction, false);
         closerGroup.remove();
         lineGroup.remove();
-        [srcElement, destElement].forEach(raphEl => {
-            _markHotspotAsAssociated(raphEl, false);
-            raphEl.node.removeAttribute('data-for-selected-line');
-        });
 
         if (typeof removeCallback === 'function') {
             removeCallback();
         }
+
+        [srcElement, destElement].forEach(raphEl => {
+            _toggleHotspotAssociatedStyle(interaction, raphEl);
+            raphEl.node.removeAttribute('data-for-selected-line');
+        });
     }
 };
 /**
@@ -316,6 +328,7 @@ const _renderChoice = function _renderChoice(interaction, choice) {
             id: choice.serial
         })
         .attr('title', titles.hotspotBasic)
+        .data('choiceId', choice.id()) //same as used in 'assocs' data
         .data('max', choice.attr('matchMax'))
         .data('matching', 0)
         .removeData('assocs')

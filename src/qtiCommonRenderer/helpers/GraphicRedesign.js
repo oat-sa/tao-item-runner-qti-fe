@@ -70,7 +70,8 @@ raphael.el.appendChild = function (childRaphEl) {
 const hotspotStates = {
     basic: 'basic',
     active: 'active',
-    selectable: 'selectable'
+    selectable: 'selectable',
+    error: 'error'
 };
 
 //maps the QTI shapes to Raphael shapes
