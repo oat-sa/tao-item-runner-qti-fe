@@ -37,9 +37,6 @@ const titles = {
     get hotspotSelectable() {
         return __('Select this area to finish an association');
     },
-    get line() {
-        return '';
-    },
     get closeBtn() {
         return __('Click to remove');
     }
@@ -86,14 +83,6 @@ const _toggleHotspotAssociatedStyle = function (interaction, element) {
         element.node.setAttribute('data-associated', 'true');
     } else {
         element.node.removeAttribute('data-associated');
-    }
-};
-
-const _toggleLineSelectedMode = function (interaction, toggleOn) {
-    if (toggleOn) {
-        interaction.paper.canvas.classList.add('line-selected');
-    } else {
-        interaction.paper.canvas.classList.remove('line-selected');
     }
 };
 
@@ -192,9 +181,9 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     const pathStr = 'M' + sx + ',' + sy + 'L' + dx + ',' + dy;
     const pathStartStr = 'M' + sx + ',' + sy + 'L' + sx + ',' + sy;
 
-    const lineGroup = paper.group({ class: 'assoc-line' }).attr('title', titles.line).click(onLineClick);
-    const lineOuter = paper.path(pathStartStr).animate({ path: pathStr }, 300).attr({ class: 'assoc-line-outer' });
-    const lineInner = paper.path(pathStartStr).animate({ path: pathStr }, 300).attr({ class: 'assoc-line-inner' });
+    const lineGroup = paper.group({ class: 'assoc-line' }).click(onLineClick);
+    const lineOuter = paper.path(pathStartStr).animate({ path: pathStr }, 200).attr({ class: 'assoc-line-outer' });
+    const lineInner = paper.path(pathStartStr).animate({ path: pathStr }, 200).attr({ class: 'assoc-line-inner' });
     const lineHitbox = paper.path(pathStr).attr({ class: 'assoc-line-hitbox' });
     lineGroup.appendChild(lineOuter);
     lineGroup.appendChild(lineInner);
@@ -239,39 +228,55 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
         }
     }
 
+    function createGlassLayer() {
+        const glassLayer = paper
+            .rect(0, 0, paper.w, paper.h)
+            .attr('class', 'glass-layer')
+            .click(function () {
+                _shapesUnSelectable(interaction);
+                $container.trigger('unselect.graphicassociate');
+            });
+        glassLayer.id = 'glassLayer';
+    }
+
+    function removeGlassLayer() {
+        const glassLayer = paper.getById('glassLayer');
+        if (glassLayer) {
+            glassLayer.remove();
+        }
+    }
+
     function selectLine() {
-        _toggleLineSelectedMode(interaction, true);
+        createGlassLayer();
         lineGroup.node.classList.add('selected');
-        lineGroup.attr('title', '');
         [srcElement, destElement].forEach(raphEl => {
             raphEl.node.setAttribute('data-for-selected-line', 'true');
         });
-        [lineGroup, closerGroup].forEach(raphEl => {
-            raphEl.data({ insertBefore: raphEl.node.previousSiblingElement });
-            //not 'raphEl.insertBefore(..)' to not mess with el.prev/el.next/paper.top/paper.bottom'
-            raphEl.node.parentElement.insertBefore(raphEl.node, null);
-        });
+        lineGroup.data({ prevSibling: lineGroup.node.previousElementSibling });
+        //not 'raphEl.toFront()' to not mess with el.prev/el.next/paper.top/paper.bottom'
+        lineGroup.node.parentElement.insertBefore(lineGroup.node, null);
+        lineGroup.node.after(closerGroup.node);
     }
     function unselectLine() {
-        _toggleLineSelectedMode(interaction, false);
         lineGroup.node.classList.remove('selected');
-        lineGroup.attr('title', titles.line);
         [srcElement, destElement].forEach(raphEl => {
             raphEl.node.removeAttribute('data-for-selected-line');
         });
-        [lineGroup, closerGroup].forEach(raphEl => {
-            raphEl.node.parentElement.insertBefore(raphEl.node, raphEl.data('insertBefore'));
-            raphEl.removeData('insertBefore');
-        });
+        if (lineGroup.data('prevSibling')) {
+            lineGroup.data('prevSibling').after(lineGroup.node);
+            lineGroup.node.after(closerGroup.node);
+        }
+        lineGroup.removeData('prevSibling');
+        removeGlassLayer();
     }
 
     function removeLine(removeCallback) {
         $container.off(`unselect.graphicassociate.${lineGroup.id}`);
         $container.off(`resetresponse.graphicassociate.${lineGroup.id}`);
 
-        _toggleLineSelectedMode(interaction, false);
         closerGroup.remove();
         lineGroup.remove();
+        removeGlassLayer();
 
         if (typeof removeCallback === 'function') {
             removeCallback();
