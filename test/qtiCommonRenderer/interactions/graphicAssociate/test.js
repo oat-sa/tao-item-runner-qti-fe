@@ -50,7 +50,7 @@ define([
 
     QUnit.test('renders correctly', function (assert) {
         const ready = assert.async();
-        assert.expect(12);
+        assert.expect(13);
 
         const $container = $(`#${fixtureContainerId}`);
 
@@ -61,17 +61,58 @@ define([
             .on('render', function () {
                 //Check DOM
                 assert.equal($container.children().length, 1, 'the container a elements');
-                assert.equal($container.children('.qti-item').length, 1, 'the container contains a the root element .qti-item');
-                assert.equal($container.find('.qti-itemBody').length, 1, 'the container contains a the body element .qti-itemBody');
-                assert.equal($container.find('.qti-interaction').length, 1, 'the container contains an interaction .qti-interaction');
-                assert.equal($container.find('.qti-interaction.qti-graphicAssociateInteraction').length, 1, 'the container contains a choice interaction .qti-graphicAssociateInteraction');
-                assert.equal($container.find('.qti-graphicAssociateInteraction .qti-prompt-container').length, 1, 'the interaction contains a prompt');
-                assert.equal($container.find('.qti-graphicAssociateInteraction .instruction-container').length, 1, 'the interaction contains a instruction box');
-                assert.equal($container.find('.qti-graphicAssociateInteraction .main-image-box').length, 1, 'the interaction contains a image');
-                assert.equal($container.find('.qti-graphicAssociateInteraction .main-image-box rect').length, 2, 'the interaction contains 2 gaps');
+                assert.equal(
+                    $container.children('.qti-item').length,
+                    1,
+                    'the container contains a the root element .qti-item'
+                );
+                assert.equal(
+                    $container.find('.qti-itemBody').length,
+                    1,
+                    'the container contains a the body element .qti-itemBody'
+                );
+                assert.equal(
+                    $container.find('.qti-interaction').length,
+                    1,
+                    'the container contains an interaction .qti-interaction'
+                );
+                assert.equal(
+                    $container.find('.qti-interaction.qti-graphicAssociateInteraction').length,
+                    1,
+                    'the container contains a choice interaction .qti-graphicAssociateInteraction'
+                );
+                assert.equal(
+                    $container.find('.qti-graphicAssociateInteraction .qti-prompt-container').length,
+                    1,
+                    'the interaction contains a prompt'
+                );
+                assert.equal(
+                    $container.find('.qti-graphicAssociateInteraction .instruction-container').length,
+                    1,
+                    'the interaction contains a instruction box'
+                );
+                assert.equal(
+                    $container.find('.qti-graphicAssociateInteraction .main-image-box').length,
+                    1,
+                    'the interaction contains a image'
+                );
+                assert.equal(
+                    $container.find('.qti-graphicAssociateInteraction .main-image-box g.hotspot').length,
+                    2,
+                    'the interaction contains 2 gaps'
+                );
+                assert.equal(
+                    $container.find('.qti-graphicAssociateInteraction .main-image-box g.hotspot').first().find('rect')
+                        .length,
+                    2,
+                    'gap is a rectangle'
+                );
 
                 //Check DOM data
-                assert.equal($container.children('.qti-item').data('identifier'), 'i615e93e7bc2fa8ebb4f196168fc52c', 'the .qti-item node has the right identifier'
+                assert.equal(
+                    $container.children('.qti-item').data('identifier'),
+                    'i615e93e7bc2fa8ebb4f196168fc52c',
+                    'the .qti-item node has the right identifier'
                 );
 
                 ready();
@@ -104,22 +145,26 @@ define([
             .render($container);
     });
 
-    QUnit.test('set the response', function (assert) {
+    QUnit.test('restores existing response', function (assert) {
         const ready = assert.async();
         const $container = $(`#${fixtureContainerId}`);
 
-        assert.expect(2);
+        assert.expect(4);
 
         runner = qtiItemRunner('qti', graphicAssociateData)
             .on('render', function () {
                 const interaction = this._item.getInteractions()[0];
                 const $canvas = $('.main-image-box svg', $container);
 
-                assert.equal($('path', $canvas).length, 0, 'There is no target');
+                assert.equal($('g.assoc-line', $canvas).length, 0, 'There is no target');
 
-                interaction.renderer.setResponse(interaction, { base: { pair: ["associablehotspot_1", "associablehotspot_2"] } });
+                interaction.renderer.setResponse(interaction, {
+                    base: { pair: ['associablehotspot_1', 'associablehotspot_2'] }
+                });
                 setTimeout(function () {
-                    assert.equal($('path', $canvas).length, 3, 'A target have been created');
+                    assert.equal($('g.assoc-line', $canvas).length, 1, 'A target has been created');
+                    assert.equal($('g.assoc-line path', $canvas).length, 3, 'Target includes a path');
+                    assert.equal($('g.close-btn', $canvas).length, 1, 'Close button for target has been created');
                     ready();
                 }, 50);
             })
@@ -128,11 +173,11 @@ define([
             .render($container);
     });
 
-    QUnit.test('resets the response', function (assert) {
+    QUnit.test('creates association by click on hotspots, resets the response', function (assert) {
         const ready = assert.async();
         const $container = $(`#${fixtureContainerId}`);
 
-        assert.expect(3);
+        assert.expect(6);
 
         assert.equal($container.length, 1, 'the item container exists');
 
@@ -141,17 +186,69 @@ define([
                 const interaction = this._item.getInteractions()[0];
                 const $canvas = $('.main-image-box svg', $container);
 
-                triggerMouseEvent($canvas.find('rect').get(0), 'click', { bubbles: true });
-                triggerMouseEvent($canvas.find('rect').get(1), 'click', { bubbles: true });
+                triggerMouseEvent($canvas.find('g.hotspot').first().find('rect').get(0), 'click', { bubbles: true });
+                triggerMouseEvent($canvas.find('g.hotspot').last().find('rect').get(0), 'click', { bubbles: true });
 
                 setTimeout(function () {
-                    let $target = $canvas.find('path');
-                    assert.equal($target.length, 3, 'an associate exists on image');
+                    assert.deepEqual(
+                        interaction.renderer.getResponse(interaction),
+                        {
+                            base: {
+                                pair: ['associablehotspot_1', 'associablehotspot_2']
+                            }
+                        },
+                        'response pair is set'
+                    );
+
+                    let $target = $canvas.find('g.assoc-line');
+                    assert.equal($target.length, 1, 'an association exists on image');
+                    assert.equal($('g.close-btn', $canvas).length, 1, 'close button exists on image');
 
                     interaction.renderer.resetResponse(interaction);
 
-                    $target = $canvas.find('path');
-                    assert.equal($target.length, 0, 'no associate exists on image');
+                    $target = $canvas.find('g.assoc-line');
+                    assert.equal($target.length, 0, 'no association exists on image');
+                    assert.equal($('g.close-btn', $canvas).length, 0, 'no close button exists on image');
+
+                    ready();
+                }, 50);
+            })
+            .assets(strategies)
+            .init()
+            .render($container);
+    });
+
+    QUnit.test('can delete the association by click on the line, then click on remove button', function (assert) {
+        const ready = assert.async();
+        const $container = $(`#${fixtureContainerId}`);
+
+        assert.expect(4);
+
+        runner = qtiItemRunner('qti', graphicAssociateData)
+            .on('render', function () {
+                const interaction = this._item.getInteractions()[0];
+                const $canvas = $('.main-image-box svg', $container);
+
+                interaction.renderer.setResponse(interaction, {
+                    base: { pair: ['associablehotspot_1', 'associablehotspot_2'] }
+                });
+                setTimeout(function () {
+                    let $line = $('g.assoc-line', $canvas);
+                    assert.equal($line.length, 1, 'There is one association');
+
+                    triggerMouseEvent($line.find('.assoc-line-outer').get(0), 'click', { bubbles: true });
+
+                    assert.ok($line.get(0).classList.contains('selected'), 'Line is selected on click');
+                    triggerMouseEvent($canvas.find('.close-btn-bg').get(0), 'click', { bubbles: true });
+
+                    assert.equal($('g.assoc-line', $canvas).length, 0, 'Line is removed');
+                    assert.deepEqual(
+                        interaction.renderer.getResponse(interaction),
+                        {
+                            base: null
+                        },
+                        'response pair is removed'
+                    );
 
                     ready();
                 }, 50);
