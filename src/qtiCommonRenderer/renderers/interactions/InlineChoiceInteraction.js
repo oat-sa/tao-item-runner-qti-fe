@@ -108,13 +108,17 @@ const render = function (interaction, options) {
         choiceTooltip = tooltip.warning($el, __('A choice must be selected'), {
             placement: isVertical ? 'right' : 'top'
         });
-        if ($container.val() === '') {
-            choiceTooltip.show();
-        }
-        //refresh tooltip position when all styles loaded.
+        //don't show immediately - wait for user interaction to avoid positioning issues
+        //in vertical writing mode on slow devices (Chromebook), the tooltip may be positioned
+        //incorrectly if shown before CSS styles are fully applied. The tooltip will be shown
+        //by the select2-close event handler (line 147) if the field is still empty.
+
+        //refresh tooltip position when all styles loaded (only if already visible)
         $(document).on(`themeapplied.inlineChoiceInteraction-${serial}`, () => {
-            choiceTooltip.hide();
-            choiceTooltip.show();
+            if (choiceTooltip._isOpen) {
+                choiceTooltip.hide();
+                choiceTooltip.show();
+            }
         });
     }
 
