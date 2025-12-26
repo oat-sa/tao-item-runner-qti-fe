@@ -3,6 +3,7 @@
     <div class="instruction-container"></div>
     <div class="image-editor solid">
         <div id='graphic-paper-{{serial}}' class="main-image-box"></div>
+        <div class="placed-fillers"></div>
         <div class="clearfix"></div>
         <ul class="none block-listing horizontal source">
             {{#gapImgs}}{{{.}}}{{/gapImgs}}

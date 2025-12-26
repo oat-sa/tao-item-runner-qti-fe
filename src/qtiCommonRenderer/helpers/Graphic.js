@@ -26,6 +26,8 @@ import raphael from 'raphael';
 import scaleRaphael from 'scale.raphael';
 import gstyle from 'taoQtiItem/qtiCommonRenderer/renderers/graphic-style';
 
+const elementClassName = 'hotspot';
+
 //maps the QTI shapes to Raphael shapes
 const shapeMap = {
     default: 'rect',
@@ -198,6 +200,7 @@ const GraphicHelper = {
         const image = paper.image(options.img, 0, 0, imgWidth, imgHeight);
         image.id = options.imgId || image.id;
         paper.setViewBox(0, 0, imgWidth, imgHeight);
+        paper.scale = 1;
 
         resizer();
 
@@ -258,10 +261,13 @@ const GraphicHelper = {
 
                 if (containerWidth > 0) {
                     paper.changeSize(containerWidth, containerHeight, false, false);
+
+                    paper.scale = paper.width / paper.canvas.viewBox.baseVal.width;
+                    paper.canvas.style.setProperty('--paper-scale', paper.scale);
                 }
 
                 if (typeof options.resize === 'function') {
-                    options.resize(containerWidth, factor);
+                    options.resize(containerWidth, factor, containerHeight);
                 }
             }
             $container.trigger('resized.qti-widget');
@@ -282,6 +288,7 @@ const GraphicHelper = {
      * @param {Boolean} [options.hover = true] - to disable the default hover state
      * @param {Boolean} [options.touchEffect = true] - a circle appears on touch
      * @param {Boolean} [options.qtiCoords = true] - if the coords are in QTI format
+     * @param {Boolean} [options.useCssClass = true] - use css class instead of `gstyle`
      * @returns {Raphael.Element} the created element
      */
     createElement: function (paper, type, coords, options) {
@@ -301,7 +308,14 @@ const GraphicHelper = {
                     element.attr('title', options.title);
                 }
 
-                element.attr(gstyle[options.style || 'basic']).toFront();
+                const styleName = options.style || 'basic';
+                if (options.useCssClass) {
+                    element.attr({ class: `${elementClassName} ${styleName}` });
+                } else {
+                    element.attr(gstyle[styleName]);
+                }
+
+                element.toFront();
 
                 //prevent issue in firefox 37
                 $(element.node).removeAttr('stroke-dasharray');
@@ -677,16 +691,20 @@ const GraphicHelper = {
      * @param {String} [title] - a title linked to this step
      */
     updateElementState: function (element, state, title) {
-        if (element && element.animate) {
-            element.animate(gstyle[state], 200, 'linear', function () {
-                element.attr(gstyle[state]); //for attr that don't animate
+        if (element) {
+            if (element.node.classList.contains(elementClassName)) {
+                element.attr({ class: `${elementClassName} ${state}` });
+            } else if (element.animate) {
+                element.animate(gstyle[state], 200, 'linear', function () {
+                    element.attr(gstyle[state]); //for attr that don't animate
 
-                //preven issue in firefox 37
-                $(element.node).removeAttr('stroke-dasharray');
-            });
+                    //preven issue in firefox 37
+                    $(element.node).removeAttr('stroke-dasharray');
+                });
 
-            if (title) {
-                this.updateTitle(element, title);
+                if (title) {
+                    this.updateTitle(element, title);
+                }
             }
         }
     },

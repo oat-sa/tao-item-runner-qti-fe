@@ -540,6 +540,101 @@ const GraphicHelper = {
         if (evt.length && evt[0] && typeof evt[0].f === 'function') {
             evt[0].f.apply(element, Array.prototype.slice.call(arguments, 2));
         }
+    },
+
+    //*************************** */
+    //*************************** */
+    //*************************** */
+    //*************************** */
+    //*************************** */
+    //*************************** */
+
+    /**
+     * Create an image with a padding and a border, using a set.
+     *
+     * @param {Raphael.Paper} paper - the paper
+     * @param {Object} options - image options
+     * @param {Number} options.left - x coord
+     * @param {Number} options.top - y coord
+     * @param {Number} options.width - image width
+     * @param {Number} options.height - image height
+     * @param {Number} options.url - image ulr
+     * @param {Number} [options.padding = 6] - a multiple of 2 is welcomed
+     * @param {Boolean} [options.border = false] - add a border around the image
+     * @param {Boolean} [options.shadow = false] - add a shadow back the image
+     * @returns {Raphael.Element} the created set, augmented of a move(x,y) method
+     */
+    createBorderedImage: function (paper, options) {
+        const padding = options.padding >= 0 ? options.padding : 6;
+        const halfPad = padding / 2;
+
+        const rx = options.left,
+            ry = options.top,
+            rw = options.width + padding,
+            rh = options.height + padding;
+
+        const ix = options.left + halfPad,
+            iy = options.top + halfPad,
+            iw = options.width,
+            ih = options.height;
+
+        const set = paper.set();
+
+        //create a rectangle with a padding and a border.
+        const rect = paper
+            .rect(rx, ry, rw, rh)
+            .attr(options.border ? gstyle['imageset-rect-stroke'] : gstyle['imageset-rect-no-stroke']);
+
+        //and an image centered into the rectangle.
+        const image = paper.image(options.url, ix, iy, iw, ih).attr(gstyle['imageset-img']);
+
+        if (options.shadow) {
+            set.push(
+                rect.glow({
+                    width: 2,
+                    offsetx: 1,
+                    offsety: 1
+                })
+            );
+        }
+
+        set.push(rect, image);
+
+        /**
+         * Add a move method to set that keep the given coords during an animation
+         * @private
+         * @param {Number} x - destination
+         * @param {Number} y - destination
+         * @param {Number} [duration = 400] - the animation duration
+         * @returns {Raphael.Element} the set for chaining
+         */
+        set.move = function move(x, y, duration) {
+            const animation = raphael.animation({ x: x, y: y }, duration || 400);
+            const elt = rect.animate(animation);
+            image.animateWith(elt, animation, { x: x + halfPad, y: y + halfPad }, duration || 400);
+            return set;
+        };
+
+        return set;
+    },
+
+    /**
+     * Update the title of an element (the attr method of Raphael adds only new node instead of updating exisitings).
+     * @param {Raphael.Element} element - the element to update the title
+     * @param {String} [title] - the new title
+     */
+    updateTitle: function (element, title) {
+        if (element && element.node) {
+            //removes all remaining titles nodes
+            _.forEach(element.node.children, function (child) {
+                if (child.nodeName.toLowerCase() === 'title') {
+                    element.node.removeChild(child);
+                }
+            });
+
+            //then set the new title
+            element.attr('title', title);
+        }
     }
 };
 

@@ -26,6 +26,7 @@ import __ from 'i18n';
 import module from 'module';
 import 'core/mouseEvent';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/graphicGapMatchInteraction';
+import placedFillerTpl from 'taoQtiItem/qtiCommonRenderer/tpl/choices/placedGapImg.graphicGapMatch';
 import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/Graphic';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
@@ -83,16 +84,14 @@ const _shapesSelectable = function _shapesSelectable(interaction) {
         const element = interaction.paper.getById(choice.serial);
         if (_isMatchable(element)) {
             element.selectable = true;
-            graphic.setStyle(element, 'selectable');
+            graphic.updateElementState(element, 'selectable');
             graphic.updateTitle(element, tooltip);
         }
     });
 
     //update the gap images tooltip
-    _.forEach(interaction.gapFillers, function (gapFiller) {
-        gapFiller.forEach(function (element) {
-            graphic.updateTitle(element, tooltip);
-        });
+    _.forEach(interaction.placedFillers, function ($placedFiller) {
+        $placedFiller.attr('title', tooltip);
     });
 };
 
@@ -106,16 +105,14 @@ const _shapesUnSelectable = function _shapesUnSelectable(interaction) {
         const element = interaction.paper.getById(choice.serial);
         if (element) {
             element.selectable = false;
-            graphic.setStyle(element, 'basic');
+            graphic.updateElementState(element, 'basic');
             graphic.updateTitle(element, __('Select an image first'));
         }
     });
 
     //update the gap images tooltip
-    _.forEach(interaction.gapFillers, function (gapFiller) {
-        gapFiller.forEach(function (element) {
-            graphic.updateTitle(element, __('Remove'));
-        });
+    _.forEach(interaction.placedFillers, function ($placedFiller) {
+        $placedFiller.attr('title', __('Remove'));
     });
 };
 
@@ -197,6 +194,7 @@ const _selectShape = function _selectShape(interaction, element, trackResponse) 
     //lookup for the active element
     const $container = containerHelper.get(interaction);
     const $gapList = $('ul', $container);
+    const $placedFillersContainer = $('.placed-fillers', $container);
     const $active = $gapList.find('.active:first');
     const $imageBox = $('.main-image-box', $container);
     const boxOffset = $imageBox.offset();
@@ -207,7 +205,7 @@ const _selectShape = function _selectShape(interaction, element, trackResponse) 
 
     if ($active.length) {
         //the macthing elements are linked to the shape
-        id = $active.data('identifier');
+        id = $active.attr('data-identifier');
         matching = element.data('matching') || [];
         matching.push(id);
         element.data('matching', matching);
@@ -247,27 +245,29 @@ const _selectShape = function _selectShape(interaction, element, trackResponse) 
 
                 //extract some coords for positioning
                 bbox = element.getBBox();
+                const scale = interaction.paper.scale;
+                const originalLeft = bbox.x + 8 * (currentCount - 1);
+                const originalTop = bbox.y + 8 * (currentCount - 1);
+                const originalWidth = $img.attr('width');
+                const originalHeight = $img.attr('height');
 
-                //create an image into the paper and move it to the selected shape
-                const gapFiller = graphic
-                    .createBorderedImage(interaction.paper, {
-                        url: $img.attr('src'),
-                        left: bbox.x + 8 * (currentCount - 1),
-                        top: bbox.y + 8 * (currentCount - 1),
-                        width: parseInt($img.attr('width'), 10),
-                        height: parseInt($img.attr('height'), 10),
-                        padding: 0,
-                        border: false,
-                        shadow: true
+                const $placedFiller = $(
+                    placedFillerTpl({
+                        id,
+                        src: $img.attr('src'),
+                        originalLeft,
+                        originalTop,
+                        originalWidth,
+                        originalHeight,
+                        left: scale * originalLeft,
+                        top: scale * originalTop,
+                        width: scale * originalWidth,
+                        height: scale * originalHeight
                     })
-                    .data('identifier', id)
-                    .toFront();
+                );
+                $placedFillersContainer.append($placedFiller);
 
-                const gapFillerImage = gapFiller[2].node;
-                interact(gapFillerImage).on('tap', function (e) {
-                    const target = e.currentTarget;
-                    const rElement = interaction.paper.getById(target.raphaelid);
-
+                interact($placedFiller.get(0)).on('tap', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -278,15 +278,11 @@ const _selectShape = function _selectShape(interaction, element, trackResponse) 
                         // ... or removing the existing gapfiller
                     } else {
                         //update the element matching array
-                        element.data(
-                            'matching',
-                            _.without(element.data('matching') || [], rElement.data('identifier'))
-                        );
+                        element.data('matching', _.without(element.data('matching') || [], id));
 
-                        //delete interaction.gapFillers[interaction.gapFillers.indexOf(gapFiller)];
-                        interaction.gapFillers = _.without(interaction.gapFillers, gapFiller);
+                        interaction.placedFillers = _.without(interaction.placedFillers, $placedFiller);
 
-                        gapFiller.remove();
+                        $placedFiller.remove();
 
                         _unsetChoice(interaction, $active);
 
@@ -294,7 +290,7 @@ const _selectShape = function _selectShape(interaction, element, trackResponse) 
                     }
                 });
 
-                interaction.gapFillers.push(gapFiller);
+                interaction.placedFillers.push($placedFiller);
 
                 containerHelper.triggerResponseChangeEvent(interaction);
             }
@@ -316,7 +312,9 @@ const _renderChoice = function _renderChoice(interaction, choice) {
         .createElement(interaction.paper, choice.attr('shape'), choice.attr('coords'), {
             id: choice.serial,
             title: __('Select an image first'),
-            hover: false
+            hover: false,
+            touchEffect: false,
+            useCssClass: true
         })
         .data('max', choice.attr('matchMax'))
         .data('matching', []);
@@ -330,20 +328,20 @@ const _renderChoice = function _renderChoice(interaction, choice) {
             overlap: 0.15,
             ondragenter: function () {
                 if (_isMatchable(rElement)) {
-                    graphic.setStyle(rElement, 'hover');
+                    graphic.updateElementState(rElement, 'hover');
                     activeDrop = rElement.node;
                 }
             },
             ondrop: function () {
                 if (_isMatchable(rElement)) {
-                    graphic.setStyle(rElement, 'selectable');
+                    graphic.updateElementState(rElement, 'selectable');
                     handleShapeSelect();
                     activeDrop = null;
                 }
             },
             ondragleave: function () {
                 if (_isMatchable(rElement)) {
-                    graphic.setStyle(rElement, 'selectable');
+                    graphic.updateElementState(rElement, 'selectable');
                     activeDrop = null;
                 }
             }
@@ -380,8 +378,7 @@ const _iFrameDragFix = function _iFrameDragFix(draggableSelector, target) {
  * @param {Object} interaction
  * @param {jQueryElement} $gapList - the list than contains the orderers
  */
-const _renderGapList = function _renderGapList(interaction, $gapList) {
-    const $container = containerHelper.get(interaction);
+const _renderGapFillersList = function _renderGapFillersList(interaction, $gapList) {
     const gapFillersSelector = $gapList.selector + ' li';
     let dragOptions;
     let scaleX, scaleY;
@@ -477,9 +474,10 @@ const render = function render(interaction) {
     return new Promise(function (resolve) {
         const $container = containerHelper.get(interaction);
         const $gapList = $('ul.source', $container);
+        const $placedFillersContainer = $('.placed-fillers', $container);
         const background = interaction.object.attributes;
 
-        interaction.gapFillers = [];
+        interaction.placedFillers = [];
 
         if (
             self.getOption &&
@@ -498,8 +496,8 @@ const render = function render(interaction) {
             img: self.resolveUrl(background.data),
             imgId: 'bg-image-' + interaction.serial,
             container: $container,
-            resize: function (newSize, factor) {
-                $gapList.css('max-width', newSize + 'px');
+            resize: function (newWidth, factor, newHeight) {
+                $gapList.css('max-width', newWidth + 'px');
                 if (factor !== 1) {
                     $gapList.find('img').each(function () {
                         const $img = $(this);
@@ -507,6 +505,18 @@ const render = function render(interaction) {
                         $img.height($img.attr('height') * factor);
                     });
                 }
+
+                $placedFillersContainer.css({ width: `${newWidth}px`, height: `${newHeight}px` });
+                $placedFillersContainer.find('.placed').each(function () {
+                    const $div = $(this);
+                    const $img = $div.find('img');
+                    $div.css({
+                        top: `${$div.attr('data-top') * factor}px`,
+                        left: `${$div.attr('data-left') * factor}px`
+                    });
+                    $img.width($img.attr('width') * factor);
+                    $img.height($img.attr('height') * factor);
+                });
             },
             responsive: $container.hasClass('responsive')
         });
@@ -515,7 +525,7 @@ const render = function render(interaction) {
         _.forEach(interaction.getChoices(), _.partial(_renderChoice, interaction));
 
         //create the list of gap images
-        _renderGapList(interaction, $gapList);
+        _renderGapFillersList(interaction, $gapList);
 
         //clicking the paper to reset selection
         _paperUnSelect(interaction);
@@ -607,8 +617,8 @@ const setResponse = function (interaction, response) {
 const resetResponse = function resetResponse(interaction) {
     _shapesUnSelectable(interaction);
 
-    _.forEach(interaction.gapFillers, function (gapFiller) {
-        interactUtils.tapOn(gapFiller.items[2][0]); // this refers to the gapFiller image
+    _.forEach(interaction.placedFillers, function ($placedFiller) {
+        interactUtils.tapOn($placedFiller);
     });
 };
 

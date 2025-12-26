@@ -213,6 +213,56 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     closerGroup.appendChild(closerBg);
     closerGroup.appendChild(closerPath);
 
+    //styles still set in css?
+    let mouseOnLine = false;
+    let mouseOnCloser = false;
+    lineGroup.hover(
+        function hoverIn(...args) {
+            console.log('hoverIn', ...args);
+            mouseOnLine = true;
+            //to front
+            lineGroup.data({ prevSibling: lineGroup.node.previousElementSibling });
+            //not 'raphEl.toFront()' to not mess with el.prev/el.next/paper.top/paper.bottom'
+            lineGroup.node.parentElement.insertBefore(lineGroup.node, null);
+            lineGroup.node.after(closerGroup.node);
+        },
+        function hoverOut(...args) {
+            console.log('hoverOut', ...args);
+            mouseOnLine = false;
+            setTimeout(() => {
+                //to back
+                //TODO: cehck aborted, reusbel
+                if (!mouseOnCloser && !mouseOnLine) {
+                    if (lineGroup.data('prevSibling')) {
+                        lineGroup.data('prevSibling').after(lineGroup.node);
+                        lineGroup.node.after(closerGroup.node);
+                    }
+                    lineGroup.removeData('prevSibling');
+                }
+            }, 200);
+        }
+    );
+    closerGroup.hover(
+        function hoverIn() {
+            mouseOnCloser = true;
+            //to front
+        },
+        function hoverOut() {
+            mouseOnCloser = false;
+            //to back
+            setTimeout(() => {
+                //to back
+                if (!mouseOnCloser && !mouseOnLine) {
+                    if (lineGroup.data('prevSibling')) {
+                        lineGroup.data('prevSibling').after(lineGroup.node);
+                        lineGroup.node.after(closerGroup.node);
+                    }
+                    lineGroup.removeData('prevSibling');
+                }
+            }, 200);
+        }
+    );
+
     _toggleHotspotAssociatedStyle(interaction, srcElement);
     _toggleHotspotAssociatedStyle(interaction, destElement);
 
