@@ -24,11 +24,11 @@ import $ from 'jquery';
 import _ from 'lodash';
 import __ from 'i18n';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/graphicAssociateInteraction';
-import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/GraphicRedesign';
+import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/Graphic';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
-import { gstyle } from 'taoQtiItem/qtiCommonRenderer/renderers/graphic-style-redesign';
+import gstyle from 'taoQtiItem/qtiCommonRenderer/renderers/graphic-style';
 
 const titles = {
     get hotspotBasic() {
@@ -36,6 +36,9 @@ const titles = {
     },
     get hotspotSelectable() {
         return __('Select this area to finish an association');
+    },
+    get line() {
+        return __('Select line to remove');
     },
     get closeBtn() {
         return __('Click to remove');
@@ -181,7 +184,7 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     const pathStr = 'M' + sx + ',' + sy + 'L' + dx + ',' + dy;
     const pathStartStr = 'M' + sx + ',' + sy + 'L' + sx + ',' + sy;
 
-    const lineGroup = paper.group({ class: 'assoc-line' }).click(onLineClick);
+    const lineGroup = paper.group({ class: 'assoc-line' }).attr('title', titles.line).click(onLineClick);
     const lineOuter = paper.path(pathStartStr).animate({ path: pathStr }, 200).attr({ class: 'assoc-line-outer' });
     const lineInner = paper.path(pathStartStr).animate({ path: pathStr }, 200).attr({ class: 'assoc-line-inner' });
     const lineHitbox = paper.path(pathStr).attr({ class: 'assoc-line-hitbox' });
@@ -212,56 +215,6 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     closerGroup.appendChild(closerHitbox);
     closerGroup.appendChild(closerBg);
     closerGroup.appendChild(closerPath);
-
-    //styles still set in css?
-    let mouseOnLine = false;
-    let mouseOnCloser = false;
-    lineGroup.hover(
-        function hoverIn(...args) {
-            console.log('hoverIn', ...args);
-            mouseOnLine = true;
-            //to front
-            lineGroup.data({ prevSibling: lineGroup.node.previousElementSibling });
-            //not 'raphEl.toFront()' to not mess with el.prev/el.next/paper.top/paper.bottom'
-            lineGroup.node.parentElement.insertBefore(lineGroup.node, null);
-            lineGroup.node.after(closerGroup.node);
-        },
-        function hoverOut(...args) {
-            console.log('hoverOut', ...args);
-            mouseOnLine = false;
-            setTimeout(() => {
-                //to back
-                //TODO: cehck aborted, reusbel
-                if (!mouseOnCloser && !mouseOnLine) {
-                    if (lineGroup.data('prevSibling')) {
-                        lineGroup.data('prevSibling').after(lineGroup.node);
-                        lineGroup.node.after(closerGroup.node);
-                    }
-                    lineGroup.removeData('prevSibling');
-                }
-            }, 200);
-        }
-    );
-    closerGroup.hover(
-        function hoverIn() {
-            mouseOnCloser = true;
-            //to front
-        },
-        function hoverOut() {
-            mouseOnCloser = false;
-            //to back
-            setTimeout(() => {
-                //to back
-                if (!mouseOnCloser && !mouseOnLine) {
-                    if (lineGroup.data('prevSibling')) {
-                        lineGroup.data('prevSibling').after(lineGroup.node);
-                        lineGroup.node.after(closerGroup.node);
-                    }
-                    lineGroup.removeData('prevSibling');
-                }
-            }, 200);
-        }
-    );
 
     _toggleHotspotAssociatedStyle(interaction, srcElement);
     _toggleHotspotAssociatedStyle(interaction, destElement);
@@ -306,6 +259,7 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
         //not 'raphEl.toFront()' to not mess with el.prev/el.next/paper.top/paper.bottom'
         lineGroup.node.parentElement.insertBefore(lineGroup.node, null);
         lineGroup.node.after(closerGroup.node);
+        lineGroup.attr('title', '');
     }
     function unselectLine() {
         lineGroup.node.classList.remove('selected');
@@ -317,6 +271,7 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
             lineGroup.node.after(closerGroup.node);
         }
         lineGroup.removeData('prevSibling');
+        lineGroup.attr('title', titles.line);
         removeGlassLayer();
     }
 
@@ -390,7 +345,7 @@ const _renderChoice = function _renderChoice(interaction, choice) {
     const maxAssociations = interaction.attr('maxAssociations');
 
     graphic
-        .createElement(interaction.paper, shape, coords, {
+        .createElement2(interaction.paper, shape, coords, {
             id: choice.serial
         })
         .data('choiceId', choice.id()) //same as used in 'assocs' data
