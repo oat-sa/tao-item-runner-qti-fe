@@ -97,12 +97,12 @@ define([
                     'the interaction contains a image'
                 );
                 assert.equal(
-                    $container.find('.qti-graphicAssociateInteraction .main-image-box g.hotspot').length,
+                    $container.find('.qti-graphicAssociateInteraction .main-image-box g.hotspot2').length,
                     2,
                     'the interaction contains 2 gaps'
                 );
                 assert.equal(
-                    $container.find('.qti-graphicAssociateInteraction .main-image-box g.hotspot').first().find('rect')
+                    $container.find('.qti-graphicAssociateInteraction .main-image-box g.hotspot2').first().find('rect')
                         .length,
                     2,
                     'gap is a rectangle'
@@ -186,8 +186,8 @@ define([
                 const interaction = this._item.getInteractions()[0];
                 const $canvas = $('.main-image-box svg', $container);
 
-                triggerMouseEvent($canvas.find('g.hotspot').first().find('rect').get(0), 'click', { bubbles: true });
-                triggerMouseEvent($canvas.find('g.hotspot').last().find('rect').get(0), 'click', { bubbles: true });
+                triggerMouseEvent($canvas.find('g.hotspot2').first().find('rect').get(0), 'click', { bubbles: true });
+                triggerMouseEvent($canvas.find('g.hotspot2').last().find('rect').get(0), 'click', { bubbles: true });
 
                 setTimeout(function () {
                     assert.deepEqual(

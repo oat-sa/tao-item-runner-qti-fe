@@ -42,10 +42,10 @@ let isDragAndDropEnabled;
 let activeDrop = null;
 
 /**
- * Global variable to count number of choice usages:
+ * Global variable to count number of gapfiller (image) usages:
  * @type {object}
  */
-const _choiceUsages = {};
+const _gapFillerUsages = {};
 
 /**
  * This options enables to support old items created with the wrong
@@ -77,21 +77,26 @@ const _isMatchable = function (element) {
  * @param {Object} interaction
  */
 const _shapesSelectable = function _shapesSelectable(interaction) {
+    const $container = containerHelper.get(interaction);
     const tooltip = __('Select the area to add an image');
 
-    //update the shape state
     _.forEach(interaction.getChoices(), function (choice) {
         const element = interaction.paper.getById(choice.serial);
         if (_isMatchable(element)) {
             element.selectable = true;
             graphic.updateElementState(element, 'selectable');
             graphic.updateTitle(element, tooltip);
+        } else {
+            graphic.updateTitle(element, '');
         }
     });
 
-    //update the gap images tooltip
+    const $placedFillersContainer = $('.placed-fillers', $container);
+    $placedFillersContainer.addClass('selectable');
+
     _.forEach(interaction.placedFillers, function ($placedFiller) {
-        $placedFiller.attr('title', tooltip);
+        const element = interaction.paper.getById($placedFiller.attr('data-shape-id'));
+        $placedFiller.attr('title', _isMatchable(element) ? tooltip : '');
     });
 };
 
@@ -101,6 +106,8 @@ const _shapesSelectable = function _shapesSelectable(interaction) {
  * @param {Object} interaction
  */
 const _shapesUnSelectable = function _shapesUnSelectable(interaction) {
+    const $container = containerHelper.get(interaction);
+
     _.forEach(interaction.getChoices(), function (choice) {
         const element = interaction.paper.getById(choice.serial);
         if (element) {
@@ -110,7 +117,9 @@ const _shapesUnSelectable = function _shapesUnSelectable(interaction) {
         }
     });
 
-    //update the gap images tooltip
+    const $placedFillersContainer = $('.placed-fillers', $container);
+    $placedFillersContainer.removeClass('selectable');
+
     _.forEach(interaction.placedFillers, function ($placedFiller) {
         $placedFiller.attr('title', __('Remove'));
     });
@@ -123,62 +132,103 @@ const _shapesUnSelectable = function _shapesUnSelectable(interaction) {
  */
 const _paperUnSelect = function _paperUnSelect(interaction) {
     const $container = containerHelper.get(interaction);
-    const $gapImages = $('ul > li', $container);
+    const $gapList = $('ul.source', $container);
+    const $gapFillers = $gapList.find('li', $container);
     const bgImage = interaction.paper.getById('bg-image-' + interaction.serial);
     if (bgImage) {
         interact(bgImage.node).on('tap', function () {
             _shapesUnSelectable(interaction);
-            $gapImages.removeClass('active');
+            $gapFillers.removeClass('active');
         });
     }
 };
 
 /**
- * Sets a choice and marks as disabled if at max
+ * Sets a gapfiller (= image) and marks as disabled if at max
  * @private
  * @param {Object} interaction
- * @param {JQuery Element} $choice
+ * @param {JQuery Element} $gapFiller
  */
-const _setChoice = function _setChoice(interaction, $choice) {
-    const choiceSerial = $choice.data('serial');
-    const choice = interaction.getGapImg(choiceSerial);
+const _setGapFiller = function _setGapFiller(interaction, $gapFiller) {
+    const gapFillerSerial = $gapFiller.data('serial');
+    const gapFiller = interaction.getGapImg(gapFillerSerial);
     let matchMax;
     let usages;
 
-    if (!_choiceUsages[choiceSerial]) {
-        _choiceUsages[choiceSerial] = 0;
+    if (!_gapFillerUsages[gapFillerSerial]) {
+        _gapFillerUsages[gapFillerSerial] = 0;
     }
 
-    _choiceUsages[choiceSerial]++;
+    _gapFillerUsages[gapFillerSerial]++;
 
-    // disable choice if maxium usage reached
-    if (!interaction.responseMappingMode && choice.attr('matchMax')) {
-        matchMax = +choice.attr('matchMax');
-        usages = +_choiceUsages[choiceSerial];
+    // disable gapfiller if maxium usage reached
+    if (!interaction.responseMappingMode && gapFiller.attr('matchMax')) {
+        matchMax = +gapFiller.attr('matchMax');
+        usages = +_gapFillerUsages[gapFillerSerial];
 
-        // note: if matchMax is 0, then test taker is allowed unlimited usage of that choice
+        // note: if matchMax is 0, then test taker is allowed unlimited usage of that gapfiller
         if (matchMax !== 0 && matchMax <= usages) {
-            $choice.addClass('disabled');
-            $choice.removeClass('selectable');
-            $choice.find('img').attr('draggable', 'false'); //prevent native drag of image (Chrome, mouse)
+            $gapFiller.addClass('disabled');
+            $gapFiller.removeClass('selectable');
+            $gapFiller.find('img').attr('draggable', 'false'); //prevent native drag of image (Chrome, mouse)
         }
     }
 };
 
 /**
- * Unset a choice and unmark as disabled
+ * Unset a gapfiller (= image) and unmark as disabled
  * @private
  * @param {Object} interaction
- * @param {JQuery Element} $choice
+ * @param {JQuery Element} $gapFiller
  */
-const _unsetChoice = function _unsetChoice(interaction, $choice) {
-    const choiceSerial = $choice.data('serial');
+const _unsetGapFiller = function _unsetGapFiller(interaction, $gapFiller) {
+    const gapFillerSerial = $gapFiller.data('serial');
 
-    _choiceUsages[choiceSerial]--;
+    _gapFillerUsages[gapFillerSerial]--;
 
-    $choice.removeClass('disabled');
-    $choice.addClass('selectable');
-    $choice.find('img').removeAttr('draggable');
+    $gapFiller.removeClass('disabled');
+    $gapFiller.addClass('selectable');
+    $gapFiller.find('img').removeAttr('draggable');
+};
+
+/**
+ *
+ * @param {Object} interaction
+ * @param {JQuery} $fromGapFiller
+ * @param {Raphael.Element|JQuery} toElement
+ * @param {Function} endCallback
+ */
+const _animateMoveGapFiller = function _animateMoveGapFiller(interaction, $fromGapFiller, toElement, endCallback) {
+    const $container = containerHelper.get(interaction);
+    const $imageBox = $('.main-image-box', $container);
+    const boxOffset = $imageBox.offset();
+
+    const fromOffset = $fromGapFiller.offset();
+    const toOffset = toElement.paper ? $(toElement.node).offset() : toElement.offset();
+
+    const $img = $fromGapFiller.find('img');
+    const $clone = $img.clone();
+    $clone.css({
+        position: 'absolute',
+        display: 'block',
+        'z-index': 10000,
+        opacity: 0.8,
+        top: fromOffset.top - boxOffset.top,
+        left: fromOffset.left - boxOffset.left
+    });
+
+    $clone.appendTo($imageBox);
+    $clone.animate(
+        {
+            top: toOffset.top - boxOffset.top,
+            left: toOffset.left - boxOffset.left
+        },
+        200,
+        function animationEnd() {
+            $clone.remove();
+            endCallback();
+        }
+    );
 };
 
 /**
@@ -189,15 +239,13 @@ const _unsetChoice = function _unsetChoice(interaction, $choice) {
  * @param {Boolean} [trackResponse = true] - if the selection trigger a response chane
  */
 const _selectShape = function _selectShape(interaction, element, trackResponse) {
-    let $img, $clone, id, bbox, shapeOffset, activeOffset, matching, currentCount;
+    let $img, id, bbox, matching, currentCount;
 
     //lookup for the active element
     const $container = containerHelper.get(interaction);
     const $gapList = $('ul', $container);
     const $placedFillersContainer = $('.placed-fillers', $container);
     const $active = $gapList.find('.active:first');
-    const $imageBox = $('.main-image-box', $container);
-    const boxOffset = $imageBox.offset();
 
     if (typeof trackResponse === 'undefined') {
         trackResponse = true;
@@ -218,83 +266,56 @@ const _selectShape = function _selectShape(interaction, element, trackResponse) 
         _shapesUnSelectable(interaction);
         $gapList.children().removeClass('active');
 
-        _setChoice(interaction, $active);
+        _setGapFiller(interaction, $active);
 
-        $clone = $img.clone();
-        shapeOffset = $(element.node).offset();
-        activeOffset = $active.offset();
+        _animateMoveGapFiller(interaction, $active, element, () => {
+            bbox = element.getBBox();
+            const scale = interaction.paper.scale;
+            const originalLeft = bbox.x + 8 * (currentCount - 1);
+            const originalTop = bbox.y + 8 * (currentCount - 1);
+            const originalWidth = $img.attr('width');
+            const originalHeight = $img.attr('height');
 
-        $clone.css({
-            position: 'absolute',
-            display: 'block',
-            'z-index': 10000,
-            opacity: 0.8,
-            top: activeOffset.top - boxOffset.top,
-            left: activeOffset.left - boxOffset.left
-        });
+            const $placedFiller = $(
+                placedFillerTpl({
+                    shapeId: element.id,
+                    id,
+                    src: $img.attr('src'),
+                    originalLeft,
+                    originalTop,
+                    originalWidth,
+                    originalHeight,
+                    left: scale * originalLeft,
+                    top: scale * originalTop,
+                    width: scale * originalWidth,
+                    height: scale * originalHeight
+                })
+            );
+            $placedFillersContainer.append($placedFiller);
+            interaction.placedFillers.push($placedFiller);
 
-        $clone.appendTo($imageBox);
-        $clone.animate(
-            {
-                top: shapeOffset.top - boxOffset.top,
-                left: shapeOffset.left - boxOffset.left
-            },
-            200,
-            function animationEnd() {
-                $clone.remove();
+            interact($placedFiller.get(0)).on('tap', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
 
-                //extract some coords for positioning
-                bbox = element.getBBox();
-                const scale = interaction.paper.scale;
-                const originalLeft = bbox.x + 8 * (currentCount - 1);
-                const originalTop = bbox.y + 8 * (currentCount - 1);
-                const originalWidth = $img.attr('width');
-                const originalHeight = $img.attr('height');
-
-                const $placedFiller = $(
-                    placedFillerTpl({
-                        id,
-                        src: $img.attr('src'),
-                        originalLeft,
-                        originalTop,
-                        originalWidth,
-                        originalHeight,
-                        left: scale * originalLeft,
-                        top: scale * originalTop,
-                        width: scale * originalWidth,
-                        height: scale * originalHeight
-                    })
-                );
-                $placedFillersContainer.append($placedFiller);
-
-                interact($placedFiller.get(0)).on('tap', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
+                if ($gapList.find('.active').length > 0) {
                     // adding a new gapfiller on the hotspot by simulating a click on the underlying shape...
-                    if ($gapList.find('.active').length > 0) {
-                        interactUtils.tapOn(element.node);
-
-                        // ... or removing the existing gapfiller
-                    } else {
-                        //update the element matching array
+                    interactUtils.tapOn(element.node);
+                } else {
+                    // ... or removing the existing gapfiller
+                    _animateMoveGapFiller(interaction, $placedFiller, $active, () => {
                         element.data('matching', _.without(element.data('matching') || [], id));
-
                         interaction.placedFillers = _.without(interaction.placedFillers, $placedFiller);
-
                         $placedFiller.remove();
-
-                        _unsetChoice(interaction, $active);
+                        _unsetGapFiller(interaction, $active);
 
                         containerHelper.triggerResponseChangeEvent(interaction);
-                    }
-                });
+                    });
+                }
+            });
 
-                interaction.placedFillers.push($placedFiller);
-
-                containerHelper.triggerResponseChangeEvent(interaction);
-            }
-        );
+            containerHelper.triggerResponseChangeEvent(interaction);
+        });
     }
 };
 
@@ -314,7 +335,8 @@ const _renderChoice = function _renderChoice(interaction, choice) {
             title: __('Select an image first'),
             hover: false,
             touchEffect: false,
-            useCssClass: true
+            useCssClass: true,
+            useClipPath: true
         })
         .data('max', choice.attr('matchMax'))
         .data('matching', []);
@@ -449,14 +471,26 @@ const _renderGapFillersList = function _renderGapFillersList(interaction, $gapLi
     }
 
     function _setActiveGapState($target) {
+        const $container = containerHelper.get(interaction);
+
         $gapList.children('li').removeClass('active');
         $target.addClass('active');
         _shapesSelectable(interaction);
+
+        $(document.body).on('click.graphic-gap-match', function (e) {
+            if (
+                !$container.get(0).contains(e.target) ||
+                (!e.target.closest('.qti-gapImg') && !e.target.closest('.main-image-box'))
+            ) {
+                _setInactiveGapState($target);
+            }
+        });
     }
 
     function _setInactiveGapState($target) {
         $target.removeClass('active');
         _shapesUnSelectable(interaction);
+        $(document.body).off('click.graphic-gap-match');
     }
 };
 
@@ -647,6 +681,7 @@ const destroy = function destroy(interaction) {
     if (interaction.paper) {
         const $container = containerHelper.get(interaction);
 
+        $(document.body).off('click.graphic-gap-match');
         $(window).off('resize.qti-widget.' + interaction.serial);
         $container.off('resize.qti-widget.' + interaction.serial);
 

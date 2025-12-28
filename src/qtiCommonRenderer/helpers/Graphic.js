@@ -392,6 +392,7 @@ const GraphicHelper = {
      * @param {Boolean} [options.touchEffect = true] - a circle appears on touch
      * @param {Boolean} [options.qtiCoords = true] - if the coords are in QTI format
      * @param {Boolean} [options.useCssClass = true] - use css class instead of `gstyle`
+     * @param {Boolean} [options.useClipPath = false] - clip element so that stroke doesn't go outside element size
      * @returns {Raphael.Element} the created element
      */
     createElement: function (paper, type, coords, options) {
@@ -401,6 +402,11 @@ const GraphicHelper = {
         const shapeCoords = options.qtiCoords !== false ? self.raphaelCoords(paper, type, coords) : coords;
 
         if (typeof shaper === 'function') {
+            let clipPathDefId;
+            if (options.useClipPath && clipPathDefSetter[type]) {
+                clipPathDefId = clipPathDefSetter[type](paper, shapeCoords);
+            }
+
             element = shaper.apply(paper, shapeCoords);
             if (element) {
                 if (options.id) {
@@ -445,6 +451,10 @@ const GraphicHelper = {
                     element.touchstart(function () {
                         self.createTouchCircle(paper, element.getBBox());
                     });
+                }
+
+                if (options.useClipPath) {
+                    clipPathSetter[type](element, shapeCoords, clipPathDefId);
                 }
             }
         } else {
