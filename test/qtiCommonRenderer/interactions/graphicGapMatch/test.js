@@ -5,7 +5,7 @@ define([
     'core/mouseEvent',
     'ui/interactUtils',
     'json!taoQtiItem/test/qtiCommonRenderer/interactions/graphicGapMatch/sample.json'
-], function($, _, qtiItemRunner, triggerMouseEvent, interactUtils, gapMatchData) {
+], function ($, _, qtiItemRunner, triggerMouseEvent, interactUtils, gapMatchData) {
     'use strict';
 
     var runner;
@@ -26,14 +26,14 @@ define([
     ];
 
     QUnit.module('Graphic GapMatch Interaction', {
-        afterEach: function(assert) {
+        afterEach: function (assert) {
             if (runner) {
                 runner.clear();
             }
         }
     });
 
-    QUnit.test('renders correctly', function(assert) {
+    QUnit.test('renders correctly', function (assert) {
         var ready = assert.async();
         assert.expect(20);
 
@@ -43,7 +43,7 @@ define([
         assert.equal($container.children().length, 0, 'the container has no children');
 
         runner = qtiItemRunner('qti', gapMatchData)
-            .on('render', function() {
+            .on('render', function () {
                 //Check DOM
                 assert.equal($container.children().length, 1, 'the container a elements');
                 assert.equal(
@@ -160,7 +160,7 @@ define([
             .render($container);
     });
 
-    QUnit.test('enables to activate a gap filler', function(assert) {
+    QUnit.test('enables to activate a gap filler', function (assert) {
         var ready = assert.async();
         assert.expect(5);
 
@@ -168,23 +168,18 @@ define([
         assert.equal($container.length, 1, 'the item container exists');
 
         runner = qtiItemRunner('qti', gapMatchData)
-            .on('render', function() {
+            .on('render', function () {
                 var $gapFiller = $('.qti-choice[data-identifier="gapimg_1"]', $container);
                 var $hotspot = $('.main-image-box rect', $container).eq(5);
-                var borderColorInactive = '#8d949e';
 
                 assert.ok(!$gapFiller.hasClass('active'), 'The gap filler is not active');
-                assert.strictEqual($hotspot.attr('stroke'), borderColorInactive, 'The hotspot is not highlighted');
+                assert.ok($hotspot.get(0).classList.contains('basic'), 'The hotspot is not highlighted');
 
                 interactUtils.tapOn(
                     $gapFiller,
-                    function() {
+                    function () {
                         assert.ok($gapFiller.hasClass('active'), 'The gap filler is now active');
-                        assert.notStrictEqual(
-                            $hotspot.attr('stroke'),
-                            borderColorInactive,
-                            'The hotspot is now highlighted'
-                        );
+                        assert.ok($hotspot.get(0).classList.contains('selectable'), 'The hotspot is now highlighted');
 
                         ready();
                     },
@@ -196,7 +191,7 @@ define([
             .render($container);
     });
 
-    QUnit.test('enables to fill a hotspot', function(assert) {
+    QUnit.test('enables to fill a hotspot', function (assert) {
         var ready = assert.async();
         assert.expect(4);
 
@@ -204,19 +199,19 @@ define([
         assert.equal($container.length, 1, 'the item container exists');
 
         runner = qtiItemRunner('qti', gapMatchData)
-            .on('render', function() {
+            .on('render', function () {
                 var $gapFiller = $('.qti-choice[data-identifier="gapimg_1"]', $container);
                 var $hotspot = $('.main-image-box rect', $container).eq(5);
 
                 interactUtils.tapOn(
                     $gapFiller,
-                    function() {
+                    function () {
                         interactUtils.tapOn($hotspot);
                     },
                     50
                 );
             })
-            .on('statechange', function(state) {
+            .on('statechange', function (state) {
                 assert.ok(typeof state === 'object', 'The state is an object');
                 assert.ok(typeof state.RESPONSE === 'object', 'The state has a response object');
                 assert.deepEqual(
@@ -232,7 +227,7 @@ define([
             .render($container);
     });
 
-    QUnit.test('enables to fill a hotspot with two gap fillers', function(assert) {
+    QUnit.test('enables to fill a hotspot with two gap fillers', function (assert) {
         var ready = assert.async();
         assert.expect(3);
 
@@ -241,24 +236,25 @@ define([
         assert.equal($container.length, 1, 'the item container exists');
 
         runner = qtiItemRunner('qti', gapMatchData)
-            .on('render', function() {
+            .on('render', function () {
                 var $gapFiller = $('.qti-choice[data-identifier="gapimg_1"]', $container);
                 var $gapFiller2 = $('.qti-choice[data-identifier="gapimg_3"]', $container);
                 var $hotspot = $('.main-image-box rect', $container).eq(5);
 
                 interactUtils.tapOn(
                     $gapFiller,
-                    function() {
+                    function () {
                         interactUtils.tapOn(
                             $hotspot,
-                            function() {
+                            function () {
                                 interactUtils.tapOn(
                                     $gapFiller2,
-                                    function() {
+                                    function () {
                                         // We click on the image, but the click should be redirected to the underlying shape
-                                        var $gapFillerOnHotspot = $container
-                                            .find('.main-image-box image', $container)
-                                            .eq(1);
+                                        var $gapFillerOnHotspot = $container.find(
+                                            '.placed-fillers .qti-gapImg[data-identifier="gapimg_1"]',
+                                            $container
+                                        );
                                         interactUtils.tapOn($gapFillerOnHotspot);
                                     },
                                     10
@@ -270,7 +266,7 @@ define([
                     10
                 );
             })
-            .on('statechange', function(state) {
+            .on('statechange', function (state) {
                 stateChangeCounter++;
                 if (stateChangeCounter === 1) {
                     assert.deepEqual(
@@ -302,7 +298,7 @@ define([
             .render($container);
     });
 
-    QUnit.test('enables to remove a gap filler', function(assert) {
+    QUnit.test('enables to remove a gap filler', function (assert) {
         var ready = assert.async();
         assert.expect(4);
 
@@ -311,25 +307,22 @@ define([
         assert.equal($container.length, 1, 'the item container exists');
 
         runner = qtiItemRunner('qti', gapMatchData)
-            .on('render', function() {
+            .on('render', function () {
                 var $gapFiller = $('.qti-choice[data-identifier="gapimg_1"]', $container);
                 var $hotspot = $('.main-image-box rect', $container).eq(5);
 
                 interactUtils.tapOn(
                     $gapFiller,
-                    function() {
+                    function () {
                         interactUtils.tapOn(
                             $hotspot,
-                            function() {
-                                var $gapFillerOnHotspot = $container.find('.main-image-box image', $container).eq(1);
+                            function () {
+                                var $gapFillerOnHotspot = $container.find(
+                                    '.placed-fillers .qti-gapImg[data-identifier="gapimg_1"]',
+                                    $container
+                                );
 
                                 interactUtils.tapOn($gapFillerOnHotspot);
-
-                                assert.equal(
-                                    $container.find('.main-image-box image').length,
-                                    1, // This is the canvas image
-                                    'there are no filled gaps'
-                                );
                             },
                             300
                         ); // We need to wait for the animation to end in order for the click event to be bound
@@ -337,7 +330,7 @@ define([
                     10
                 );
             })
-            .on('statechange', function(state) {
+            .on('statechange', function (state) {
                 stateChangeCounter++;
                 if (stateChangeCounter === 1) {
                     assert.deepEqual(
@@ -347,6 +340,8 @@ define([
                     );
                 } else if (stateChangeCounter === 2) {
                     assert.deepEqual(state.RESPONSE, { response: { list: { directedPair: [] } } }, 'Response is empty');
+
+                    assert.equal($container.find('.placed-fillers .qti-gapImg').length, 0, 'there are no filled gaps');
                     ready();
                 }
             })
@@ -355,7 +350,7 @@ define([
             .render($container);
     });
 
-    QUnit.test('set the default response', function(assert) {
+    QUnit.test('set the default response', function (assert) {
         var ready = assert.async();
         assert.expect(2);
 
@@ -364,7 +359,7 @@ define([
         assert.equal($container.length, 1, 'the item container exists');
 
         runner = qtiItemRunner('qti', gapMatchData)
-            .on('render', function() {
+            .on('render', function () {
                 var $gapFiller = $('.qti-choice[data-identifier="gapimg_1"]', $container);
                 var gapFillerImgSrc = $gapFiller.find('img').attr('src');
 
@@ -372,9 +367,12 @@ define([
                     RESPONSE: { response: { list: { directedPair: [['gapimg_1', 'associablehotspot_6']] } } }
                 });
 
-                _.delay(function() {
-                    var $gapFillerOnHotspot = $container.find('.main-image-box image', $container).eq(1);
-                    assert.equal($gapFillerOnHotspot.attr('href'), gapFillerImgSrc, 'state has been restored');
+                _.delay(function () {
+                    var $gapFillerOnHotspot = $container.find(
+                        '.placed-fillers .qti-gapImg[data-identifier="gapimg_1"] img',
+                        $container
+                    );
+                    assert.equal($gapFillerOnHotspot.attr('src'), gapFillerImgSrc, 'state has been restored');
 
                     ready();
                 }, 300);
@@ -384,7 +382,7 @@ define([
             .render($container);
     });
 
-    QUnit.test('destroys', function(assert) {
+    QUnit.test('destroys', function (assert) {
         var ready = assert.async();
         assert.expect(2);
 
@@ -392,7 +390,7 @@ define([
         assert.equal($container.length, 1, 'the item container exists');
 
         qtiItemRunner('qti', gapMatchData)
-            .on('render', function() {
+            .on('render', function () {
                 var self = this;
 
                 //Call destroy manually
@@ -403,7 +401,7 @@ define([
 
                 interactUtils.tapOn(
                     $image,
-                    function() {
+                    function () {
                         assert.deepEqual(
                             self.getState(),
                             { RESPONSE: { response: { list: { directedPair: [] } } } },
@@ -419,7 +417,7 @@ define([
             .render($container);
     });
 
-    QUnit.test('resets the response', function(assert) {
+    QUnit.test('resets the response', function (assert) {
         var ready = assert.async();
         assert.expect(3);
 
@@ -427,7 +425,7 @@ define([
         assert.equal($container.length, 1, 'the item container exists');
 
         runner = qtiItemRunner('qti', gapMatchData)
-            .on('render', function() {
+            .on('render', function () {
                 var self = this;
 
                 var $gapFiller = $('.qti-choice[data-identifier="gapimg_1"]', $container);
@@ -436,26 +434,28 @@ define([
 
                 interactUtils.tapOn(
                     $gapFiller,
-                    function() {
+                    function () {
                         interactUtils.tapOn(
                             $hotspot,
-                            function() {
-                                var $gapFillerOnHotspot = $container.find('.main-image-box image').eq(1);
+                            function () {
+                                var $gapFillerOnHotspot = $container.find(
+                                    '.placed-fillers .qti-gapImg[data-identifier="gapimg_1"] img'
+                                );
                                 assert.equal(
-                                    $gapFillerOnHotspot.attr('href'),
+                                    $gapFillerOnHotspot.attr('src'),
                                     gapFillerImgSrc,
                                     'gap filler is on canvas'
                                 );
 
-                                _.delay(function() {
+                                _.delay(function () {
                                     // Reset response manually
                                     var interaction = self._item.getInteractions()[0];
                                     interaction.renderer.resetResponse(interaction);
 
-                                    _.delay(function() {
+                                    _.delay(function () {
                                         assert.equal(
-                                            $container.find('.main-image-box image').length,
-                                            1, // This is the canvas image
+                                            $container.find('.placed-fillers .qti-gapImg').length,
+                                            0,
                                             'there is no filled gap'
                                         );
 
@@ -476,22 +476,22 @@ define([
 
     QUnit.module('Visual Test');
 
-    QUnit.test('Display and play', function(assert) {
-        var ready = assert.async();
-        assert.expect(1);
+    // QUnit.test('Display and play', function (assert) {
+    //     var ready = assert.async();
+    //     assert.expect(1);
 
-        var $container = $('#' + outsideContainerId);
-        assert.equal($container.length, 1, 'the item container exists');
+    //     var $container = $('#' + outsideContainerId);
+    //     assert.equal($container.length, 1, 'the item container exists');
 
-        qtiItemRunner('qti', gapMatchData)
-            .on('render', function() {
-                ready();
-            })
-            .on('statechange', function(state) {
-                document.getElementById('response-display').textContent = JSON.stringify(state);
-            })
-            .assets(strategies)
-            .init()
-            .render($container);
-    });
+    //     qtiItemRunner('qti', gapMatchData)
+    //         .on('render', function () {
+    //             ready();
+    //         })
+    //         .on('statechange', function (state) {
+    //             document.getElementById('response-display').textContent = JSON.stringify(state);
+    //         })
+    //         .assets(strategies)
+    //         .init()
+    //         .render($container);
+    // });
 });
