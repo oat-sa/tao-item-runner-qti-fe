@@ -303,14 +303,14 @@ const _selectShape = function _selectShape(interaction, element, trackResponse) 
                     interactUtils.tapOn(element.node);
                 } else {
                     // ... or removing the existing gapfiller
-                    _animateMoveGapFiller(interaction, $placedFiller, $active, () => {
-                        element.data('matching', _.without(element.data('matching') || [], id));
-                        interaction.placedFillers = _.without(interaction.placedFillers, $placedFiller);
-                        $placedFiller.remove();
-                        _unsetGapFiller(interaction, $active);
+                    _animateMoveGapFiller(interaction, $placedFiller, $active);
 
-                        containerHelper.triggerResponseChangeEvent(interaction);
-                    });
+                    element.data('matching', _.without(element.data('matching') || [], id));
+                    interaction.placedFillers = _.without(interaction.placedFillers, $placedFiller);
+                    $placedFiller.remove();
+                    _unsetGapFiller(interaction, $active);
+
+                    containerHelper.triggerResponseChangeEvent(interaction);
                 }
             });
 
