@@ -104,7 +104,7 @@ define([
                 assert.equal(
                     $container.find('.qti-graphicAssociateInteraction .main-image-box g.hotspot2').first().find('rect')
                         .length,
-                    2,
+                    3,
                     'gap is a rectangle'
                 );
 
@@ -163,7 +163,7 @@ define([
                 });
                 setTimeout(function () {
                     assert.equal($('g.assoc-line', $canvas).length, 1, 'A target has been created');
-                    assert.equal($('g.assoc-line path', $canvas).length, 3, 'Target includes a path');
+                    assert.equal($('g.assoc-line path', $canvas).length, 4, 'Target includes a path');
                     assert.equal($('g.close-btn', $canvas).length, 1, 'Close button for target has been created');
                     ready();
                 }, 50);
