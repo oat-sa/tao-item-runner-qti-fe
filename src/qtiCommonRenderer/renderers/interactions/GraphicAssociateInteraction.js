@@ -185,9 +185,11 @@ const _createPath = function _createPath(interaction, srcElement, destElement, o
     const pathStartStr = 'M' + sx + ',' + sy + 'L' + sx + ',' + sy;
 
     const lineGroup = paper.group({ class: 'assoc-line' }).attr('title', titles.line).click(onLineClick);
+    const lineShadow = paper.path(pathStartStr).animate({ path: pathStr }, 200).attr({ class: 'assoc-line-shadow' });
     const lineOuter = paper.path(pathStartStr).animate({ path: pathStr }, 200).attr({ class: 'assoc-line-outer' });
     const lineInner = paper.path(pathStartStr).animate({ path: pathStr }, 200).attr({ class: 'assoc-line-inner' });
     const lineHitbox = paper.path(pathStr).attr({ class: 'assoc-line-hitbox' });
+    lineGroup.appendChild(lineShadow);
     lineGroup.appendChild(lineOuter);
     lineGroup.appendChild(lineInner);
     lineGroup.appendChild(lineHitbox);
