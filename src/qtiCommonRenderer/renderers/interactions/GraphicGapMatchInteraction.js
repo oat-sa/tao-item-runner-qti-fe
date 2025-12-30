@@ -196,7 +196,7 @@ const _unsetGapFiller = function _unsetGapFiller(interaction, $gapFiller) {
  * @param {Object} interaction
  * @param {JQuery} $fromGapFiller
  * @param {Raphael.Element|JQuery} toElement
- * @param {Function} endCallback
+ * @param {Function?} endCallback
  */
 const _animateMoveGapFiller = function _animateMoveGapFiller(interaction, $fromGapFiller, toElement, endCallback) {
     const $container = containerHelper.get(interaction);
@@ -226,7 +226,9 @@ const _animateMoveGapFiller = function _animateMoveGapFiller(interaction, $fromG
         200,
         function animationEnd() {
             $clone.remove();
-            endCallback();
+            if (endCallback) {
+                endCallback();
+            }
         }
     );
 };
@@ -281,6 +283,7 @@ const _selectShape = function _selectShape(interaction, element, trackResponse) 
                     shapeId: element.id,
                     id,
                     src: $img.attr('src'),
+                    title: __('Remove'),
                     originalLeft,
                     originalTop,
                     originalWidth,

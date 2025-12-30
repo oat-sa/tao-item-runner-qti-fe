@@ -476,22 +476,22 @@ define([
 
     QUnit.module('Visual Test');
 
-    // QUnit.test('Display and play', function (assert) {
-    //     var ready = assert.async();
-    //     assert.expect(1);
+    QUnit.test('Display and play', function (assert) {
+        var ready = assert.async();
+        assert.expect(1);
 
-    //     var $container = $('#' + outsideContainerId);
-    //     assert.equal($container.length, 1, 'the item container exists');
+        var $container = $('#' + outsideContainerId);
+        assert.equal($container.length, 1, 'the item container exists');
 
-    //     qtiItemRunner('qti', gapMatchData)
-    //         .on('render', function () {
-    //             ready();
-    //         })
-    //         .on('statechange', function (state) {
-    //             document.getElementById('response-display').textContent = JSON.stringify(state);
-    //         })
-    //         .assets(strategies)
-    //         .init()
-    //         .render($container);
-    // });
+        qtiItemRunner('qti', gapMatchData)
+            .on('render', function () {
+                ready();
+            })
+            .on('statechange', function (state) {
+                document.getElementById('response-display').textContent = JSON.stringify(state);
+            })
+            .assets(strategies)
+            .init()
+            .render($container);
+    });
 });

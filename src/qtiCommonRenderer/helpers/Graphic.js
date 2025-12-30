@@ -490,19 +490,19 @@ const GraphicHelper = {
                 }
 
                 groupEl = paper.group({ class: `${ELEMENT_CLASS_NAME2} ${stateCls}` });
+                if (options.id) {
+                    groupEl.id = options.id;
+                }
 
                 const innerEl = shaper.apply(paper, shapeCoords).attr({ class: 'hotspot2-inner' });
                 removeDefaultStyle(innerEl);
                 groupEl.appendChild(innerEl);
+                clipPathSetter[type](innerEl, shapeCoords, clipPathDefId);
 
                 const outerEl = shaper.apply(paper, shapeCoords).attr({ class: 'hotspot2-outer' });
                 removeDefaultStyle(outerEl);
                 groupEl.appendChild(outerEl);
-
-                clipPathSetter[type](groupEl, shapeCoords, clipPathDefId);
-                if (options.id) {
-                    groupEl.id = options.id;
-                }
+                clipPathSetter[type](outerEl, shapeCoords, clipPathDefId);
             } catch (err) {
                 console.error(err);
                 throw err;
