@@ -494,6 +494,10 @@ const GraphicHelper = {
                     groupEl.id = options.id;
                 }
 
+                const shadowEl = shaper.apply(paper, shapeCoords).attr({ class: 'hotspot2-shadow' });
+                removeDefaultStyle(shadowEl);
+                groupEl.appendChild(shadowEl);
+
                 const innerEl = shaper.apply(paper, shapeCoords).attr({ class: 'hotspot2-inner' });
                 removeDefaultStyle(innerEl);
                 groupEl.appendChild(innerEl);
