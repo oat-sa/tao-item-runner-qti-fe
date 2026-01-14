@@ -217,7 +217,7 @@ const _animateMoveGapFiller = function _animateMoveGapFiller(interaction, $fromG
             top: toOffset.top - boxOffset.top,
             left: toOffset.left - boxOffset.left
         },
-        200,
+        300,
         function animationEnd() {
             $clone.remove();
             if (endCallback) {
@@ -344,12 +344,14 @@ const _selectShape = function _selectShape(interaction, element, trackResponse) 
                 e.preventDefault();
                 e.stopPropagation();
 
-                if ($gapList.find('.active').length > 0) {
-                    // adding a new gapfiller on the hotspot by simulating a click on the underlying shape...
-                    interactUtils.tapOn(element.node);
-                } else {
-                    // ... or removing the existing gapfiller
-                    _removePlacedGapFiller(interaction, $placedFiller);
+                if (!$placedFiller.hasClass('dragged')) {
+                    if ($gapList.find('.active').length > 0) {
+                        // adding a new gapfiller on the hotspot by simulating a click on the underlying shape...
+                        interactUtils.tapOn(element.node);
+                    } else {
+                        // ... or removing the existing gapfiller
+                        _removePlacedGapFiller(interaction, $placedFiller);
+                    }
                 }
             });
             if (isDragAndDropEnabled) {
