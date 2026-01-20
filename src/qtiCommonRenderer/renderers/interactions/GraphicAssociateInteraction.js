@@ -28,6 +28,22 @@ import graphic from 'taoQtiItem/qtiCommonRenderer/helpers/Graphic';
 import pciResponse from 'taoQtiItem/qtiCommonRenderer/helpers/PciResponse';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 import instructionMgr from 'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager';
+import gstyle from 'taoQtiItem/qtiCommonRenderer/renderers/graphic-style';
+
+const titles = {
+    get hotspotBasic() {
+        return __('Select this area to start an association');
+    },
+    get hotspotSelectable() {
+        return __('Select this area to finish an association');
+    },
+    get line() {
+        return __('Select line to remove');
+    },
+    get closeBtn() {
+        return __('Click to remove');
+    }
+};
 
 /**
  * Get the element that has the active state
@@ -47,113 +63,32 @@ const _getActiveElement = function _getActiveElement(interaction) {
     return active;
 };
 
+const _getImage = function (interaction) {
+    return interaction.paper.getById('bg-image-' + interaction.serial);
+};
+
 /**
- * Create a path from a src element to a destination.
- * The path is selectable and can be removed by itself
- * @private
- * @param {Object} interaction
- * @param {Raphael.Element} srcElement - the path starts from this shape
- * @param {Raphael.Element} destElement - the path ends to this shape
- * @param {Function} onRemove - called back on path remove
+ * @param {Raphael.Element} element
  */
-const _createPath = function _createPath(interaction, srcElement, destElement, onRemove) {
-    const $container = containerHelper.get(interaction);
-
-    //virtual set, not a raphael one, just to group the elements
-    let vset = [];
-
-    //get the middle point of the source shape
-    const src = srcElement.getBBox();
-    const sx = src.x + src.width / 2;
-    const sy = src.y + src.height / 2;
-
-    //get the middle point of the source shape
-    const dest = destElement.getBBox();
-    const dx = dest.x + dest.width / 2;
-    const dy = dest.y + dest.height / 2;
-
-    //create a path with bullets at the beginning and the end
-    const srcBullet = interaction.paper.circle(sx, sy, 3).attr(graphic._style['assoc-bullet']);
-
-    const destBullet = interaction.paper.circle(dx, dy, 3).attr(graphic._style['assoc-bullet']);
-
-    const path = interaction.paper
-        .path('M' + sx + ',' + sy + 'L' + sx + ',' + sy)
-        .attr(graphic._style.assoc)
-        .animate({ path: 'M' + sx + ',' + sy + 'L' + dx + ',' + dy }, 300);
-
-    //create an overall layer that make easier the path selection
-    const layer = interaction.paper.path('M' + sx + ',' + sy + 'L' + dx + ',' + dy).attr(graphic._style['assoc-layer']);
-
-    //get the middle of the path
-    const midPath = layer.getPointAtLength(layer.getTotalLength() / 2);
-
-    //create an hidden background for the closer
-    const closerBg = interaction.paper.circle(midPath.x, midPath.y, 9).attr(graphic._style['close-bg']).toBack();
-
-    //create an hidden closer
-    const closer = interaction.paper
-        .path(graphic._style.close.path)
-        .attr(graphic._style.close)
-        .transform('T' + (midPath.x - 9) + ',' + (midPath.y - 9))
-        .attr('title', __('Click again to remove'))
-        .toBack();
-
-    //the path is below the shapes
-    srcElement.toFront();
-    destElement.toFront();
-
-    //add the path into a set
-    vset = [srcBullet, path, destBullet, layer, closerBg, closer];
-    interaction._vsets.push(vset);
-
-    //to identify the element of the set outside the context
-    vset.forEach(el => {
-        el.data('assoc-path', true);
-    });
-
-    //enable to select the path by clicking the invisible layer
-    layer.click(function selectLigne() {
-        if (closer.attrs.opacity === 0) {
-            showCloser();
-        } else {
-            hideCloser();
+const _toggleHotspotAssociatedStyle = function (interaction, element) {
+    let associated = false;
+    const choiceId = element.data('choiceId');
+    _.forEach(interaction.getChoices(), function (choice) {
+        const otherEl = interaction.paper.getById(choice.serial);
+        const assocs = otherEl.data('assocs');
+        if (assocs && assocs.length && (otherEl === element || assocs.includes(choiceId))) {
+            associated = true;
+            return false;
         }
     });
 
-    $container.on('unselect.graphicassociate', function () {
-        hideCloser();
-    });
-
-    function showCloser() {
-        closerBg.toFront().animate({ opacity: 0.8 }, 300).click(removeSet);
-        closer.toFront().animate({ opacity: 1 }, 300).click(removeSet);
-    }
-
-    function hideCloser() {
-        if (closerBg && closerBg.type) {
-            closerBg
-                .animate({ opacity: 0 }, 300, function () {
-                    closerBg.toBack();
-                })
-                .unclick();
-            closer
-                .animate({ opacity: 0 }, 300, function () {
-                    closer.toBack();
-                })
-                .unclick();
-        }
-    }
-
-    //remove set handler
-    function removeSet() {
-        vset.forEach(item => item.remove());
-        interaction._vsets = _.without(interaction._vsets, vset);
-        if (typeof onRemove === 'function') {
-            onRemove();
-        }
+    if (associated) {
+        element.node.setAttribute('data-associated', 'true');
+    } else {
+        element.node.removeAttribute('data-associated');
     }
 };
+
 /**
  * Check if a shape can accept matches
  * @private
@@ -182,18 +117,20 @@ const _shapesSelectable = function _shapesSelectable(interaction, active) {
 
     //update the shape state
     _.forEach(choices, function (choice) {
+        const element = interaction.paper.getById(choice.serial);
         if (!assocs.includes(choice.id())) {
-            const element = interaction.paper.getById(choice.serial);
             const assocsElement = element.data('assocs') || [];
-            if (
-                !element.active &&
-                element.id !== active.id &&
-                _isMatchable(element, active) &&
-                !assocsElement.includes(activeChoice.id())
-            ) {
-                element.selectable = true;
-                graphic.updateElementState(element, 'selectable');
+            if (!element.active && element.id !== active.id) {
+                if (_isMatchable(element) && !assocsElement.includes(activeChoice.id())) {
+                    element.selectable = true;
+                    graphic.updateElementState(element, 'selectable');
+                    element.attr('title', titles.hotspotSelectable);
+                } else {
+                    element.attr('title', '');
+                }
             }
+        } else {
+            element.attr('title', '');
         }
     });
 };
@@ -210,8 +147,155 @@ const _shapesUnSelectable = function _shapesUnSelectable(interaction) {
             element.selectable = false;
             element.active = false;
             graphic.updateElementState(element, 'basic');
+            if (_isMatchable(element)) {
+                element.attr('title', titles.hotspotBasic);
+                element.node.setAttribute('data-matchable', 'true');
+            } else {
+                element.attr('title', '');
+                element.node.removeAttribute('data-matchable');
+            }
         }
     });
+};
+
+/**
+ * Create a path from a src element to a destination.
+ * The path is selectable and can be removed by itself
+ * @private
+ * @param {Object} interaction
+ * @param {Raphael.Element} srcElement - the path starts from this shape
+ * @param {Raphael.Element} destElement - the path ends to this shape
+ * @param {Function} onRemove - called back on path remove
+ */
+const _createPath = function _createPath(interaction, srcElement, destElement, onRemove) {
+    const $container = containerHelper.get(interaction);
+    const paper = interaction.paper;
+
+    //get the middle point of the source shape
+    const src = srcElement.getBBox();
+    const sx = src.x + src.width / 2;
+    const sy = src.y + src.height / 2;
+
+    //get the middle point of the source shape
+    const dest = destElement.getBBox();
+    const dx = dest.x + dest.width / 2;
+    const dy = dest.y + dest.height / 2;
+
+    const pathStr = 'M' + sx + ',' + sy + 'L' + dx + ',' + dy;
+    const pathStartStr = 'M' + sx + ',' + sy + 'L' + sx + ',' + sy;
+
+    const lineGroup = paper.group({ class: 'assoc-line' }).attr('title', titles.line).click(onLineClick);
+    const lineShadow = paper.path(pathStartStr).animate({ path: pathStr }, 200).attr({ class: 'assoc-line-shadow' });
+    const lineOuter = paper.path(pathStartStr).animate({ path: pathStr }, 200).attr({ class: 'assoc-line-outer' });
+    const lineInner = paper.path(pathStartStr).animate({ path: pathStr }, 200).attr({ class: 'assoc-line-inner' });
+    const lineHitbox = paper.path(pathStr).attr({ class: 'assoc-line-hitbox' });
+    lineGroup.appendChild(lineShadow);
+    lineGroup.appendChild(lineOuter);
+    lineGroup.appendChild(lineInner);
+    lineGroup.appendChild(lineHitbox);
+
+    //get the middle of the path
+    const midPath = lineHitbox.getPointAtLength(lineHitbox.getTotalLength() / 2);
+
+    const closerRad = 14;
+    const closerHitboxRad = 20;
+    const closerPathHalfSize = 8;
+    const closerPathScale = 0.8;
+
+    const closerHitbox = paper.circle(midPath.x, midPath.y, closerHitboxRad).attr({ class: 'close-btn-hitbox' });
+    const closerBg = paper.circle(midPath.x, midPath.y, closerRad).attr({ class: 'close-btn-bg' });
+    const closerPath = paper
+        .path(gstyle.close.path)
+        .attr({ class: 'close-btn-path' })
+        .transform(`t${midPath.x - closerPathHalfSize},${midPath.y - closerPathHalfSize}s${closerPathScale}`);
+    const closerGroup = paper
+        .group({ class: 'close-btn' })
+        .attr('title', titles.closeBtn)
+        .click(function () {
+            removeLine(onRemove);
+        });
+    closerGroup.appendChild(closerHitbox);
+    closerGroup.appendChild(closerBg);
+    closerGroup.appendChild(closerPath);
+
+    _toggleHotspotAssociatedStyle(interaction, srcElement);
+    _toggleHotspotAssociatedStyle(interaction, destElement);
+
+    $container.on(`unselect.graphicassociate.${lineGroup.id}`, unselectLine);
+    $container.on(`resetresponse.graphicassociate.${lineGroup.id}`, removeLine);
+
+    function onLineClick() {
+        $container.trigger('unselect-active-hotspot.graphicassociate');
+        if (lineGroup.node.classList.contains('selected')) {
+            unselectLine();
+        } else {
+            selectLine();
+        }
+    }
+
+    function createGlassLayer() {
+        const glassLayer = paper
+            .rect(0, 0, paper.w, paper.h)
+            .attr('class', 'glass-layer')
+            .click(function () {
+                _shapesUnSelectable(interaction);
+                $container.trigger('unselect.graphicassociate');
+            });
+        glassLayer.id = 'glassLayer';
+    }
+
+    function removeGlassLayer() {
+        const glassLayer = paper.getById('glassLayer');
+        if (glassLayer) {
+            glassLayer.remove();
+        }
+    }
+
+    function selectLine() {
+        createGlassLayer();
+        lineGroup.node.classList.add('selected');
+        [srcElement, destElement].forEach(raphEl => {
+            raphEl.node.setAttribute('data-for-selected-line', 'true');
+        });
+        lineGroup.data({ prevSibling: lineGroup.node.previousElementSibling });
+        //not 'raphEl.toFront()' to not mess with el.prev/el.next/paper.top/paper.bottom'
+        lineGroup.node.parentElement.insertBefore(lineGroup.node, null);
+        lineGroup.node.after(closerGroup.node);
+        lineGroup.attr('title', '');
+    }
+    function unselectLine() {
+        lineGroup.node.classList.remove('selected');
+        [srcElement, destElement].forEach(raphEl => {
+            raphEl.node.removeAttribute('data-for-selected-line');
+        });
+        if (lineGroup.data('prevSibling')) {
+            lineGroup.data('prevSibling').after(lineGroup.node);
+            lineGroup.node.after(closerGroup.node);
+        }
+        lineGroup.removeData('prevSibling');
+        lineGroup.attr('title', titles.line);
+        removeGlassLayer();
+    }
+
+    function removeLine(removeCallback) {
+        $container.off(`unselect.graphicassociate.${lineGroup.id}`);
+        $container.off(`resetresponse.graphicassociate.${lineGroup.id}`);
+
+        closerGroup.remove();
+        lineGroup.remove();
+        removeGlassLayer();
+
+        if (typeof removeCallback === 'function') {
+            removeCallback();
+        }
+
+        [srcElement, destElement].forEach(raphEl => {
+            _toggleHotspotAssociatedStyle(interaction, raphEl);
+            raphEl.node.removeAttribute('data-for-selected-line');
+        });
+
+        _shapesUnSelectable(interaction);
+    }
 };
 
 /**
@@ -242,7 +326,7 @@ const _getRawResponse = function _getRawResponse(interaction) {
  */
 const _paperUnSelect = function _paperUnSelect(interaction) {
     const $container = containerHelper.get(interaction);
-    const image = interaction.paper.getById('bg-image-' + interaction.serial);
+    const image = _getImage(interaction);
     if (image) {
         image.click(function () {
             _shapesUnSelectable(interaction);
@@ -263,10 +347,10 @@ const _renderChoice = function _renderChoice(interaction, choice) {
     const maxAssociations = interaction.attr('maxAssociations');
 
     graphic
-        .createElement(interaction.paper, shape, coords, {
-            id: choice.serial,
-            title: __('Select this area to start an association')
+        .createElement2(interaction.paper, shape, coords, {
+            id: choice.serial
         })
+        .data('choiceId', choice.id()) //same as used in 'assocs' data
         .data('max', choice.attr('matchMax'))
         .data('matching', 0)
         .removeData('assocs')
@@ -309,7 +393,8 @@ const _renderChoice = function _renderChoice(interaction, choice) {
                 if (active) {
                     _shapesUnSelectable(interaction);
                 }
-                graphic.updateElementState(this, 'active', __('Select this area to start an association'));
+                graphic.updateElementState(this, 'active');
+                this.attr('title', '');
                 this.active = true;
                 _shapesSelectable(interaction, this);
             }
@@ -332,7 +417,6 @@ const render = function render(interaction) {
     return new Promise(function (resolve) {
         const $container = containerHelper.get(interaction);
         const background = interaction.object.attributes;
-        interaction._vsets = [];
 
         $container.off('resized.qti-widget.resolve').one('resized.qti-widget.resolve', resolve);
 
@@ -347,9 +431,13 @@ const render = function render(interaction) {
 
         //call render choice for each interaction's choices
         _.forEach(interaction.getChoices(), _.partial(_renderChoice, interaction));
+        _shapesUnSelectable(interaction);
 
         //make the paper clear the selection by clicking it
         _paperUnSelect(interaction);
+        $container.on('unselect-active-hotspot.graphicassociate', function () {
+            _shapesUnSelectable(interaction);
+        });
 
         //set up the constraints instructions
         instructionMgr.minMaxChoiceInstructions(interaction, {
@@ -439,12 +527,8 @@ const resetResponse = function resetResponse(interaction) {
     });
 
     if (interaction && interaction.paper) {
-        //remove the paths, but outside the forEach as it is implemented as a linked list
-        interaction.paper.forEach(function (elt) {
-            if (elt.data('assoc-path')) {
-                toRemove.push(elt);
-            }
-        });
+        const $container = containerHelper.get(interaction);
+        $container.trigger('resetresponse.graphicassociate');
     }
     toRemove.forEach(el => el.remove());
 };
