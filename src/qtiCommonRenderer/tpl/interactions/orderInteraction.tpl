@@ -10,7 +10,7 @@
             {{#choices}}{{{.}}}{{/choices}}
         </ul>
         <div class="arrow-bar middle">
-            <span class="icon-add-to-selection {{arrowIcon}}"></span>
+            <span class="icon-add-to-selection {{arrowIcon}} {{#equal attributes.order 'single'}} inactive{{/equal}}"></span>
         </div>
         <ul class="drag-container block-listing"></ul>
         <ul class="result-area decimal target solid block-listing {{#if horizontal}}horizontal{{/if}}">
