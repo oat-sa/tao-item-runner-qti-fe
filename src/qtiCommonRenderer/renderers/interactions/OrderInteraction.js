@@ -658,7 +658,7 @@ const getResponse = function (interaction) {
  * @returns {Object} custom data
  */
 const getCustomData = function (interaction, data) {
-    const position = interaction.attr('position') || 'top';
+    const position = interaction.attr('data-position') || 'top';
      const orientation = interaction.attr('orientation') === 'horizontal'
         ? 'horizontal'
         : 'vertical';
