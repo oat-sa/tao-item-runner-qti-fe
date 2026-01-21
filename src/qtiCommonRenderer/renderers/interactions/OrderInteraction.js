@@ -664,6 +664,7 @@ const getCustomData = function (interaction, data) {
         : 'vertical';
     return _.merge(data || {}, {
         horizontal: orientation === 'horizontal' && orientationSelectionEnabled,
+        position,
         arrowIcon: ARROW_DIRECTION[orientation][position]
     });
 };
