@@ -34,6 +34,21 @@ import interact from 'interact';
 import interactUtils from 'ui/interactUtils';
 
 const orientationSelectionEnabled = features.isVisible('taoQtiItem/creator/interaction/order/property/orientation');
+const ARROW_DIRECTION = {
+    vertical: {
+        top: 'icon-down',
+        bottom: 'icon-up',
+        left: 'icon-up',
+        right: 'icon-left'
+    },
+    horizontal: {
+        top: 'icon-down',
+        bottom: 'icon-up',
+        left: 'icon-left',
+        right: 'icon-right'
+    }
+};
+
 
 const _freezeSize = function ($container) {
     const $orderArea = $container.find('.order-interaction-area');
@@ -643,8 +658,13 @@ const getResponse = function (interaction) {
  * @returns {Object} custom data
  */
 const getCustomData = function (interaction, data) {
+    const position = interaction.attr('position') || 'top';
+     const orientation = interaction.attr('orientation') === 'horizontal'
+        ? 'horizontal'
+        : 'vertical';
     return _.merge(data || {}, {
-        horizontal: interaction.attr('orientation') === 'horizontal' && orientationSelectionEnabled
+        horizontal: orientation === 'horizontal' && orientationSelectionEnabled,
+        arrowIcon: ARROW_DIRECTION[orientation][position]
     });
 };
 
