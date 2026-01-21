@@ -38,7 +38,7 @@ const ARROW_DIRECTION = {
     vertical: {
         top: 'icon-down',
         bottom: 'icon-up',
-        left: 'icon-up',
+        left: 'icon-right',
         right: 'icon-left'
     },
     horizontal: {
@@ -658,7 +658,7 @@ const getResponse = function (interaction) {
  * @returns {Object} custom data
  */
 const getCustomData = function (interaction, data) {
-    const position = interaction.attr('data-position') || 'top';
+    const position = interaction.attr('data-position');
      const orientation = interaction.attr('orientation') === 'horizontal'
         ? 'horizontal'
         : 'vertical';
