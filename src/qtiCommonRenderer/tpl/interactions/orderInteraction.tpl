@@ -9,8 +9,8 @@
         <ul class="choice-area square source solid block-listing {{#if horizontal}}horizontal{{/if}}">
             {{#choices}}{{{.}}}{{/choices}}
         </ul>
-        <div class="arrow-bar middle">
-            <span class="icon-add-to-selection {{arrowIcon}} {{#equal attributes.order 'single'}} inactive{{/equal}}"></span>
+      <div class="arrow-bar middle">
+            <span class="icon-add-to-selection {{#if horizontal}}icon-down{{else}}icon-right{{/if}}"></span>
         </div>
         <ul class="drag-container block-listing"></ul>
         <ul class="result-area decimal target solid block-listing {{#if horizontal}}horizontal{{/if}}">
