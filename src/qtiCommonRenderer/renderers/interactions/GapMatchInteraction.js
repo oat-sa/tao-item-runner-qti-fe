@@ -22,7 +22,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import __ from 'i18n';
 import $ from 'jquery';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/gapMatchInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
@@ -106,16 +105,9 @@ var render = function (interaction) {
     var dragOptions;
     var scaleX, scaleY;
 
-    var $bin = $('<span>', { class: 'icon-undo remove-choice', title: __('remove') });
-
     var choiceSelector = $choiceArea.selector + ' .qti-choice';
     var gapSelector = $flowContainer.selector + ' .gapmatch-content';
     var filledGapSelector = gapSelector + '.filled';
-    var binSelector = $container.selector + ' .remove-choice';
-
-    var _getChoice = function (serial) {
-        return $choiceArea.find('[data-serial=' + serial + ']');
-    };
 
     var _setChoice = function ($choice, $target) {
         return setChoice(interaction, $choice, $target);
@@ -123,7 +115,6 @@ var render = function (interaction) {
 
     var _resetSelection = function () {
         if ($activeChoice) {
-            $flowContainer.find('.remove-choice').remove();
             $activeChoice.removeClass('deactivated active');
             $container.find('.empty').removeClass('empty');
             $activeChoice = null;
@@ -132,14 +123,6 @@ var render = function (interaction) {
 
     var _unsetChoice = function ($choice) {
         return unsetChoice(interaction, $choice);
-    };
-
-    var _isInsertionMode = function () {
-        return $activeChoice && !$activeChoice.hasClass('filled');
-    };
-
-    var _isModeEditing = function () {
-        return $activeChoice && $activeChoice.hasClass('filled');
     };
 
     // Drag & drop handlers
@@ -298,13 +281,6 @@ var render = function (interaction) {
         e.preventDefault();
     });
 
-    interact(binSelector).on('tap', function (e) {
-        e.stopPropagation();
-        _unsetChoice($activeChoice);
-        _resetSelection();
-        e.preventDefault();
-    });
-
     // Common handlers
 
     function _handleChoiceSelect($target) {
@@ -325,59 +301,27 @@ var render = function (interaction) {
     function _handleGapSelect($target) {
         var choiceSerial, targetSerial;
 
-        if (_isInsertionMode()) {
+        if ($activeChoice && !$activeChoice.hasClass('filled')) {
+            // place choice from the choice area
             choiceSerial = $activeChoice.data('serial');
             targetSerial = $target.data('serial');
 
             if (targetSerial !== choiceSerial) {
-                //set choices:
                 if (targetSerial) {
-                    _unsetChoice($target);
+                    _unsetChoice($target); //if swapping with existing placed choice
                 }
-
                 _setChoice($activeChoice, $target);
             }
 
             $activeChoice.removeClass('active');
             $container.find('.empty').removeClass('empty');
             $activeChoice = null;
-        } else if (_isModeEditing()) {
-            choiceSerial = $activeChoice.data('serial');
-            targetSerial = $target.data('serial');
-
-            if (targetSerial !== choiceSerial) {
-                _unsetChoice($activeChoice);
-                if (targetSerial) {
-                    //swapping:
-                    _unsetChoice($target);
-                    _setChoice(_getChoice(targetSerial), $activeChoice);
-                }
-                _setChoice(_getChoice(choiceSerial), $target);
-            }
-
-            _resetSelection();
         } else if ($target.data('serial') && $target.hasClass('filled')) {
+            //remove existing placed choice
             targetSerial = $target.data('serial');
 
-            $activeChoice = $target;
-            $activeChoice.addClass('active');
-
-            $flowContainer
-                .find('>li>div')
-                .filter(function () {
-                    return $target.data('serial') !== targetSerial;
-                })
-                .addClass('empty');
-
-            $choiceArea
-                .find('>li:not(.deactivated)')
-                .filter(function () {
-                    return $target.data('serial') !== targetSerial;
-                })
-                .addClass('empty');
-
-            //append trash bin:
-            $target.append($bin);
+            _unsetChoice($target);
+            _resetSelection();
         }
     }
 };
@@ -465,12 +409,10 @@ var destroy = function (interaction) {
     interact($container.selector).unset();
     interact($container.find('.choice-area').selector + ' .qti-choice').unset();
     interact($container.find('.qti-flow-container').selector + ' .gapmatch-content').unset();
-    interact($container.find('.remove-choice').selector).unset();
 
     //restore selection
     $container.find('.gapmatch-content').empty();
     $container.find('.active').removeClass('active');
-    $container.find('.remove-choice').remove();
     $container.find('.empty').removeClass('empty');
 
     //remove all references to a cache container
