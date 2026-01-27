@@ -36,8 +36,8 @@ import interactUtils from 'ui/interactUtils';
 var _choiceUsages = {};
 
 var setChoice = function (interaction, $choice, $target) {
-    var choiceSerial = $choice.data('serial'),
-        choice = interaction.getChoice(choiceSerial);
+    const choiceSerial = $choice.data('serial');
+    const choice = interaction.getChoice(choiceSerial);
 
     if (!_choiceUsages[choiceSerial]) {
         _choiceUsages[choiceSerial] = 0;
@@ -68,7 +68,7 @@ var unsetChoice = function (interaction, $choice) {
 
     _choiceUsages[serial]--;
 
-    $choice.removeClass('filled').removeData('serial').empty();
+    $choice.removeClass('filled').removeData('serial').html('&nbsp;');
 
     if (!interaction.swapping) {
         //set correct response
@@ -76,14 +76,19 @@ var unsetChoice = function (interaction, $choice) {
     }
 };
 
-var getChoice = function (interaction, identifier) {
-    var $container = containerHelper.get(interaction);
-    return $('.choice-area [data-identifier="' + identifier + '"]', $container);
+const getChoice = function (interaction, identifier) {
+    const $container = containerHelper.get(interaction);
+    return $(`.choice-area [data-identifier="${identifier}"]`, $container);
 };
 
-var getGap = function (interaction, identifier) {
-    var $container = containerHelper.get(interaction);
-    return $('.qti-flow-container [data-identifier="' + identifier + '"]', $container);
+const getChoiceBySerial = function (interaction, serial) {
+    const $container = containerHelper.get(interaction);
+    return $(`.choice-area [data-serial="${serial}"]`, $container);
+};
+
+const getGap = function (interaction, identifier) {
+    const $container = containerHelper.get(interaction);
+    return $(`.qti-flow-container [data-identifier="${identifier}"]`, $container);
 };
 
 /**
@@ -93,21 +98,22 @@ var getGap = function (interaction, identifier) {
  *
  * @param {object} interaction
  */
-var render = function (interaction) {
-    var $container = containerHelper.get(interaction);
-    var $choiceArea = $container.find('.choice-area');
-    var $flowContainer = $container.find('.qti-flow-container');
+const render = function (interaction) {
+    const $container = containerHelper.get(interaction);
+    const $choiceArea = $container.find('.choice-area');
+    const $flowContainer = $container.find('.qti-flow-container');
 
-    var $activeChoice = null;
-    var $activeDrop = null;
+    let $activeChoice = null;
+    let $activeDrop = null;
 
-    var isDragAndDropEnabled;
-    var dragOptions;
-    var scaleX, scaleY;
+    let isDragAndDropEnabled;
+    let dragOptions;
+    let scaleX, scaleY;
 
-    var choiceSelector = $choiceArea.selector + ' .qti-choice';
-    var gapSelector = $flowContainer.selector + ' .gapmatch-content';
-    var filledGapSelector = gapSelector + '.filled';
+    const choiceSelector = `${$choiceArea.selector} .qti-choice`;
+    const gapSelector = `${$flowContainer.selector} .gapmatch-content`;
+    const filledGapSelector = `${gapSelector}.filled`;
+    const freeGapSelector = `${gapSelector}:not(.filled)`;
 
     var _setChoice = function ($choice, $target) {
         return setChoice(interaction, $choice, $target);
@@ -187,8 +193,11 @@ var render = function (interaction) {
 
                         interactUtils.restoreOriginalPosition($target);
                         interactUtils.iFrameDragFixOff();
-
                         touchPatch.onend();
+
+                        _.defer(() => {
+                            _resetSelection();
+                        });
                     }
                 })
             )
@@ -220,22 +229,20 @@ var render = function (interaction) {
                         $target.removeClass('dragged');
 
                         interactUtils.restoreOriginalPosition($target);
-
-                        if ($activeChoice) {
-                            _unsetChoice($activeChoice);
-                            _resetSelection();
-                        }
                         interactUtils.iFrameDragFixOff();
-
                         touchPatch.onend();
+
+                        _.defer(() => {
+                            _resetSelection();
+                        });
                     }
                 })
             )
             .styleCursor(false)
             .actionChecker(touchPatch.actionChecker);
 
-        // makes gaps droppables
-        interact(gapSelector).dropzone({
+        // makes free gaps droppables
+        interact(freeGapSelector).dropzone({
             overlap: 0.05,
             ondragenter: function (e) {
                 var $target = $(e.target),
@@ -299,27 +306,24 @@ var render = function (interaction) {
     }
 
     function _handleGapSelect($target) {
-        var choiceSerial, targetSerial;
-
-        if ($activeChoice && !$activeChoice.hasClass('filled')) {
-            // place choice from the choice area
-            choiceSerial = $activeChoice.data('serial');
-            targetSerial = $target.data('serial');
-
-            if (targetSerial !== choiceSerial) {
-                if (targetSerial) {
-                    _unsetChoice($target); //if swapping with existing placed choice
+        if (!$target.hasClass('filled')) {
+            if ($activeChoice) {
+                // place choice from the choice area to the free gap,
+                // or move placed choice to another free gap
+                let $choice = $activeChoice;
+                if ($activeChoice.hasClass('filled')) {
+                    const choiceSerial = $activeChoice.data('serial');
+                    _unsetChoice($activeChoice);
+                    $choice = getChoiceBySerial(interaction, choiceSerial);
                 }
-                _setChoice($activeChoice, $target);
+                _setChoice($choice, $target);
+
+                $activeChoice.removeClass('active');
+                $container.find('.empty').removeClass('empty');
+                $activeChoice = null;
             }
-
-            $activeChoice.removeClass('active');
-            $container.find('.empty').removeClass('empty');
-            $activeChoice = null;
-        } else if ($target.data('serial') && $target.hasClass('filled')) {
+        } else if (!$activeChoice) {
             //remove existing placed choice
-            targetSerial = $target.data('serial');
-
             _unsetChoice($target);
             _resetSelection();
         }
