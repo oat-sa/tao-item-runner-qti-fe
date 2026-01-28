@@ -353,6 +353,12 @@ const render = function (interaction) {
             }
         } else if (!$activeChoice) {
             //remove existing placed choice
+            const $animatedClone = interactUtils.animateMoveElement({
+                $appendTo: $choiceArea,
+                $fromElement: $target,
+                $toElement: getChoiceBySerial(interaction, $target.data('serial'))
+            });
+            $animatedClone.addClass('animated');
             _unsetChoice($target);
             _resetSelection();
         }
