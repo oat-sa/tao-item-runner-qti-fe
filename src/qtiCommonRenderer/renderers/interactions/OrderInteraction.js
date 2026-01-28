@@ -644,7 +644,8 @@ const getResponse = function (interaction) {
  */
 const getCustomData = function (interaction, data) {
     return _.merge(data || {}, {
-        horizontal: interaction.attr('orientation') === 'horizontal' && orientationSelectionEnabled
+        horizontal: interaction.attr('orientation') === 'horizontal' && orientationSelectionEnabled,
+        position: interaction.attr('data-position')
     });
 };
 
