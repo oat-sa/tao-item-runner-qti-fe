@@ -121,8 +121,10 @@ const render = function (interaction) {
 
     var _resetSelection = function () {
         if ($activeChoice) {
-            $activeChoice.removeClass('deactivated active');
+            $activeChoice.removeClass('active');
             $container.find('.empty').removeClass('empty');
+            $choiceArea.removeClass('droppable dropzone');
+            $(document.body).off('click.gap-match');
             $activeChoice = null;
         }
     };
@@ -212,7 +214,7 @@ const render = function (interaction) {
                         var $target = $(e.target);
                         var scale;
                         $target.addClass('dragged');
-                        _handleFilledGapSelect($target);
+                        _handleChoiceSelect($target);
 
                         _iFrameDragFix(filledGapSelector, e.target);
                         scale = interactUtils.calculateScale(e.target);
@@ -267,6 +269,31 @@ const render = function (interaction) {
                 $activeDrop = null;
             }
         });
+
+        //makes choices container droppable
+        interact($choiceArea.selector).dropzone({
+            overlap: 0.15,
+            ondragenter: function (e) {
+                const $target = $(e.target);
+                if ($target.hasClass('droppable')) {
+                    $target.addClass('dropzone');
+                }
+            },
+            ondrop: function (e) {
+                const $target = $(e.target);
+                if ($target.hasClass('droppable')) {
+                    $target.removeClass('dropzone');
+
+                    if ($activeChoice) {
+                        _unsetChoice($activeChoice);
+                        _resetSelection();
+                    }
+                }
+            },
+            ondragleave: function (e) {
+                $(e.target).removeClass('dropzone');
+            }
+        });
     }
 
     // Point & click handlers
@@ -298,11 +325,16 @@ const render = function (interaction) {
 
         $activeChoice = $target.addClass('active');
         $(gapSelector).addClass('empty');
-    }
 
-    function _handleFilledGapSelect($target) {
-        $activeChoice = $target;
-        $(gapSelector).addClass('active');
+        if ($target.hasClass('filled')) {
+            $choiceArea.addClass('droppable');
+        }
+
+        $(document.body).on('click.gap-match', function (e) {
+            if (!$container.get(0).contains(e.target)) {
+                _resetSelection();
+            }
+        });
     }
 
     function _handleGapSelect($target) {
@@ -317,10 +349,7 @@ const render = function (interaction) {
                     $choice = getChoiceBySerial(interaction, choiceSerial);
                 }
                 _setChoice($choice, $target);
-
-                $activeChoice.removeClass('active');
-                $container.find('.empty').removeClass('empty');
-                $activeChoice = null;
+                _resetSelection();
             }
         } else if (!$activeChoice) {
             //remove existing placed choice
@@ -413,6 +442,7 @@ var destroy = function (interaction) {
     interact($container.selector).unset();
     interact($container.find('.choice-area').selector + ' .qti-choice').unset();
     interact($container.find('.qti-flow-container').selector + ' .gapmatch-content').unset();
+    $(document.body).off('click.gap-match');
 
     //restore selection
     $container.find('.gapmatch-content').empty();
