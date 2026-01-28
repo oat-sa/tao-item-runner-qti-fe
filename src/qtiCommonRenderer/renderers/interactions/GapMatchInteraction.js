@@ -113,7 +113,6 @@ const render = function (interaction) {
     const choiceSelector = `${$choiceArea.selector} .qti-choice`;
     const gapSelector = `${$flowContainer.selector} .gapmatch-content`;
     const filledGapSelector = `${gapSelector}.filled`;
-    const freeGapSelector = `${gapSelector}:not(.filled)`;
 
     var _setChoice = function ($choice, $target) {
         return setChoice(interaction, $choice, $target);
@@ -243,8 +242,8 @@ const render = function (interaction) {
             .styleCursor(false)
             .actionChecker(touchPatch.actionChecker);
 
-        // makes free gaps droppables
-        interact(freeGapSelector).dropzone({
+        // makes gaps droppables
+        interact(gapSelector).dropzone({
             overlap: 0.05,
             ondragenter: function (e) {
                 var $target = $(e.target),
@@ -337,31 +336,45 @@ const render = function (interaction) {
         });
     }
 
+    function _animateChoiceMovement($fromElement, $toElement) {
+        const $animatedClone = interactUtils.animateMoveElement({
+            $appendTo: $choiceArea,
+            $fromElement,
+            $toElement
+        });
+        $animatedClone.addClass('animated');
+    }
+
     function _handleGapSelect($target) {
-        if (!$target.hasClass('filled')) {
-            if ($activeChoice) {
-                // place choice from the choice area to the free gap,
-                // or move placed choice to another free gap
-                let $choice = $activeChoice;
-                if ($activeChoice.hasClass('filled')) {
-                    const choiceSerial = $activeChoice.data('serial');
-                    _unsetChoice($activeChoice);
-                    $choice = getChoiceBySerial(interaction, choiceSerial);
-                }
-                _setChoice($choice, $target);
-                _resetSelection();
+        const choiceSerial = $activeChoice && $activeChoice.data('serial');
+        const targetSerial = $target.data('serial');
+
+        const isInserting = $activeChoice && !$activeChoice.hasClass('filled') && targetSerial !== choiceSerial;
+        const isMoving = $activeChoice && $activeChoice.hasClass('filled') && targetSerial !== choiceSerial;
+        const isRemoving = $target.hasClass('filled') && !$activeChoice;
+
+        if (isInserting) {
+            // place choice from the choice area to the gap.
+            if (targetSerial) {
+                // remove existing placed choice if gap is filled.
+                _unsetChoice($target);
             }
-        } else if (!$activeChoice) {
+            _setChoice($activeChoice, $target);
+        } else if (isMoving) {
+            // move placed choice to another gap.
+            _unsetChoice($activeChoice);
+            if (targetSerial) {
+                // remove existing placed choice if gap is filled.
+                _unsetChoice($target);
+            }
+            _setChoice(getChoiceBySerial(interaction, choiceSerial), $target);
+        } else if (isRemoving) {
             //remove existing placed choice
-            const $animatedClone = interactUtils.animateMoveElement({
-                $appendTo: $choiceArea,
-                $fromElement: $target,
-                $toElement: getChoiceBySerial(interaction, $target.data('serial'))
-            });
-            $animatedClone.addClass('animated');
+            _animateChoiceMovement($target, getChoiceBySerial(interaction, targetSerial));
             _unsetChoice($target);
-            _resetSelection();
         }
+
+        _resetSelection();
     }
 };
 
