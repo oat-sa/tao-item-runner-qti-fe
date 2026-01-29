@@ -15,7 +15,7 @@
         <ul class="drag-container block-listing"></ul>
         <ul class="result-area decimal target solid block-listing {{#if horizontal}}horizontal{{/if}}">
         </ul>
-        <div class="arrow-bar">
+        <div class="arrow-bar results inactive">
             <span class="icon-move-before {{#if horizontal}}icon-left{{else}}icon-up{{/if}} inactive"></span>
             <span class="icon-move-after {{#if horizontal}}icon-right{{else}}icon-down{{/if}} inactive"></span>
         </div>
