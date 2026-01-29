@@ -306,7 +306,6 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
                     shapeId: element.id,
                     id,
                     src: $img.attr('src'),
-                    title: __('Remove'),
                     originalLeft,
                     originalTop,
                     originalWidth,
@@ -377,6 +376,11 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
                     .styleCursor(false)
                     .actionChecker(touchPatch.actionChecker);
             }
+
+            $placedFiller.addClass('no-hover');
+            $placedFiller.on('mouseleave.placed-no-hover', function () {
+                $placedFiller.off('mouseleave.placed-no-hover').removeClass('no-hover').attr('title', __('Remove'));
+            });
         };
 
         // animate unless moving placed filler to another shape, or unless restoring initial response
