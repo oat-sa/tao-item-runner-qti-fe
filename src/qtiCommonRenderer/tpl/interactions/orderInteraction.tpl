@@ -8,17 +8,13 @@
         <ul class="choice-area square source solid block-listing {{#if horizontal}}horizontal{{/if}}">
             {{#choices}}{{{.}}}{{/choices}}
         </ul>
-        <div class="arrow-bar middle">
-            <span class="icon-add-to-selection {{#if horizontal}}icon-down{{else}}icon-right{{/if}}"></span>
-            <span class="icon-remove-from-selection {{#if horizontal}}icon-up{{else}}icon-left{{/if}} inactive"></span>
+        <div class="arrow-bar">
+            <span class="arrow icon-add-to-selection {{#if horizontal}}icon-down{{else}}icon-right{{/if}}"></span>
+            <span class="arrow icon-remove-from-selection {{#if horizontal}}icon-up{{else}}icon-left{{/if}} inactive"></span>
         </div>
         <ul class="drag-container block-listing"></ul>
         <ul class="result-area decimal target solid block-listing {{#if horizontal}}horizontal{{/if}}">
         </ul>
-        <div class="arrow-bar results inactive">
-            <span class="icon-move-before {{#if horizontal}}icon-left{{else}}icon-up{{/if}} inactive"></span>
-            <span class="icon-move-after {{#if horizontal}}icon-right{{else}}icon-down{{/if}} inactive"></span>
-        </div>
     </div>
     <div class="notification-container"></div>
 </div>

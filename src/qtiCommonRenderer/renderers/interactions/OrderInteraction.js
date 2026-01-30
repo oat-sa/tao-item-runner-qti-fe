@@ -142,11 +142,8 @@ const render = function (interaction) {
     const $container = containerHelper.get(interaction),
         $choiceArea = $container.find('.choice-area'),
         $resultArea = $container.find('.result-area'),
-        $resultsArrowBar = $container.find('.arrow-bar.results'),
         $iconAdd = $container.find('.icon-add-to-selection'),
         $iconRemove = $container.find('.icon-remove-from-selection'),
-        $iconBefore = $container.find('.icon-move-before'),
-        $iconAfter = $container.find('.icon-move-after'),
         choiceSelector = `${$choiceArea.selector} >li:not(.deactivated)`,
         resultSelector = `${$resultArea.selector} >li`,
         $dragContainer = $container.find('.drag-container'),
@@ -172,20 +169,12 @@ const render = function (interaction) {
 
     const _activeControls = function _activeControls() {
         $iconAdd.addClass('inactive');
-        $resultsArrowBar.removeClass('inactive').addClass('active');
         $iconRemove.removeClass('inactive').addClass('active');
-        $iconBefore.removeClass('inactive').addClass('active');
-        $iconAfter.removeClass('inactive').addClass('active');
-        _freezeSize($container);
     };
 
     const _resetControls = function _resetControls() {
         $iconAdd.removeClass('inactive');
-        $resultsArrowBar.removeClass('active').addClass('inactive');
         $iconRemove.removeClass('active').addClass('inactive');
-        $iconBefore.removeClass('active').addClass('inactive');
-        $iconAfter.removeClass('active').addClass('inactive');
-        _freezeSize($container);
     };
 
     const _setSelection = function _setSelection($choice) {
@@ -305,26 +294,6 @@ const render = function (interaction) {
 
         e.stopPropagation();
         _removeChoice();
-    });
-
-    interact($iconBefore.selector).on('tap', function (e) {
-        //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
-        if ($(e.currentTarget).closest('.qti-item').hasClass('prevent-click-handler')) {
-            return;
-        }
-
-        e.stopPropagation();
-        _moveResultBefore();
-    });
-
-    interact($iconAfter.selector).on('tap', function (e) {
-        //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
-        if ($(e.currentTarget).closest('.qti-item').hasClass('prevent-click-handler')) {
-            return;
-        }
-
-        e.stopPropagation();
-        _moveResultAfter();
     });
 
     // Drag & drop handlers
@@ -667,8 +636,6 @@ const destroy = function (interaction) {
         '.result-area >li',
         '.icon-add-to-selection',
         '.icon-remove-from-selection',
-        '.icon-move-before',
-        '.icon-move-after'
     ];
     if (interaction.data('touchPatch')) {
         interaction.data('touchPatch').destroy();
