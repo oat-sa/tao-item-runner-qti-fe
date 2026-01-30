@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2019 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2026 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -617,9 +617,26 @@ const getResponse = function (interaction) {
  * @returns {Object} custom data
  */
 const getCustomData = function (interaction, data) {
+    const ARROW_DIRECTION = {
+        top: 'icon-down',
+        bottom: 'icon-up',
+        left: 'icon-right',
+        right: 'icon-left'
+    };
+
+    const oppositeDirections = {
+        'icon-up': 'icon-down',
+        'icon-down': 'icon-up',
+        'icon-left': 'icon-right',
+        'icon-right': 'icon-left'
+    };
+    const position = interaction.attr('data-position');
+    const addIcon = ARROW_DIRECTION[position];
     return _.merge(data || {}, {
         horizontal: interaction.attr('orientation') === 'horizontal' && orientationSelectionEnabled,
-        position: interaction.attr('data-position')
+        position,
+        addIcon,
+        removeIcon: oppositeDirections[addIcon]
     });
 };
 
