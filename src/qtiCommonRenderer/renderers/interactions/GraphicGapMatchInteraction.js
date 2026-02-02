@@ -377,10 +377,16 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
                     .actionChecker(touchPatch.actionChecker);
             }
 
-            $placedFiller.addClass('no-hover');
-            $placedFiller.on('mouseleave.placed-no-hover', function () {
-                $placedFiller.off('mouseleave.placed-no-hover').removeClass('no-hover').attr('title', __('Remove'));
-            });
+            setTimeout(() => {
+                if ($placedFiller.get(0).matches(':hover')) {
+                    $placedFiller.addClass('no-hover').on('mouseleave.graphic-gap-match-placed', function () {
+                        $placedFiller
+                            .off('mouseleave.graphic-gap-match-placed')
+                            .removeClass('no-hover')
+                            .attr('title', __('Remove'));
+                    });
+                }
+            }, 0);
         };
 
         // animate unless moving placed filler to another shape, or unless restoring initial response
