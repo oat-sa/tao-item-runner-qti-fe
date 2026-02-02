@@ -9,8 +9,8 @@
             {{#choices}}{{{.}}}{{/choices}}
         </ul>
         <div class="arrow-bar">
-            <span class="arrow icon-add-to-selection {{addIcon}}"></span>
-            <span class="arrow icon-remove-from-selection {{removeIcon}} inactive"></span>
+            <span class="arrow icon-add-to-selection {{iconAdd}}"></span>
+            <span class="arrow icon-remove-from-selection inactive"></span>
         </div>
         <ul class="drag-container block-listing"></ul>
         <ul class="result-area decimal target solid block-listing {{#if horizontal}}horizontal{{/if}}">

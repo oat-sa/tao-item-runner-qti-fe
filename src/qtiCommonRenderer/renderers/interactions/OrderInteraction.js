@@ -232,24 +232,6 @@ const render = function (interaction) {
         _resetSelection();
     };
 
-    const _moveResultBefore = function _moveResultBefore() {
-        const $prev = $activeChoice.prev();
-
-        if ($prev.length) {
-            $prev.before($activeChoice);
-            containerHelper.triggerResponseChangeEvent(interaction);
-        }
-    };
-
-    const _moveResultAfter = function _moveResultAfter() {
-        const $next = $activeChoice.next();
-
-        if ($next.length) {
-            $next.after($activeChoice);
-            containerHelper.triggerResponseChangeEvent(interaction);
-        }
-    };
-
     // Point & click handlers
 
     interact($container.selector).on('tap', function () {
@@ -617,26 +599,17 @@ const getResponse = function (interaction) {
  * @returns {Object} custom data
  */
 const getCustomData = function (interaction, data) {
-    const ARROW_DIRECTION = {
+    const iconAddDirection = {
         top: 'icon-down',
         bottom: 'icon-up',
         left: 'icon-right',
         right: 'icon-left'
     };
-
-    const oppositeDirections = {
-        'icon-up': 'icon-down',
-        'icon-down': 'icon-up',
-        'icon-left': 'icon-right',
-        'icon-right': 'icon-left'
-    };
     const position = interaction.attr('data-position');
-    const addIcon = ARROW_DIRECTION[position];
     return _.merge(data || {}, {
         horizontal: interaction.attr('orientation') === 'horizontal' && orientationSelectionEnabled,
         position,
-        addIcon,
-        removeIcon: oppositeDirections[addIcon]
+        iconAdd: iconAddDirection[position]
     });
 };
 
