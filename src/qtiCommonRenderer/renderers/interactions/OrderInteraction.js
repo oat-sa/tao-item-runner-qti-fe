@@ -325,6 +325,18 @@ const render = function (interaction) {
                         const $target = $(e.target);
                         let scale;
                         $target.addClass('dragged');
+                        const rect = e.target.getBoundingClientRect();
+                        const styles = window.getComputedStyle(e.target);
+                        $target.css({
+                            width: rect.width + 'px',
+                            height: rect.height + 'px',
+                            lineHeight: styles.lineHeight,
+                            boxSizing: 'border-box',
+                            paddingTop: styles.paddingTop,
+                            paddingBottom: styles.paddingBottom,
+                            paddingLeft: styles.paddingLeft,
+                            paddingRight: styles.paddingRight
+                        });
 
                         _iFrameDragFix(choiceSelector, e.target);
                         scale = interactUtils.calculateScale(e.target);
@@ -343,7 +355,16 @@ const render = function (interaction) {
                     onend: function (e) {
                         const $target = $(e.target);
                         $target.removeClass('dragged');
-
+                        $target.css({
+                            width: '',
+                            height: '',
+                            lineHeight: '',
+                            boxSizing: '',
+                            paddingTop: '',
+                            paddingBottom: '',
+                            paddingLeft: '',
+                            paddingRight: ''
+                        });
                         interactUtils.restoreOriginalPosition($target);
                         interactUtils.iFrameDragFixOff();
 
@@ -362,6 +383,18 @@ const render = function (interaction) {
                         const $target = $(e.target);
                         let scale;
                         $target.addClass('dragged');
+                        const rect = e.target.getBoundingClientRect();
+                        const styles = window.getComputedStyle(e.target);
+                        $target.css({
+                            width: rect.width + 'px',
+                            height: rect.height + 'px',
+                            lineHeight: styles.lineHeight,
+                            boxSizing: 'border-box',
+                            paddingTop: styles.paddingTop,
+                            paddingBottom: styles.paddingBottom,
+                            paddingLeft: styles.paddingLeft,
+                            paddingRight: styles.paddingRight
+                        });
 
                         _setSelection($target);
 
@@ -394,10 +427,20 @@ const render = function (interaction) {
                             hasBeenDroppedInResultArea = $target.parent === $resultArea;
 
                         $target.removeClass('dragged');
+                        $target.css({
+                            width: '',
+                            height: '',
+                            lineHeight: '',
+                            boxSizing: '',
+                            paddingTop: '',
+                            paddingBottom: '',
+                            paddingLeft: '',
+                            paddingRight: ''
+                        });
                         $dragContainer.hide();
 
-                        if (!hasBeenDroppedInResultArea) {
-                            _removeChoice();
+                        if (!_isValidDrop()) {
+                            $resultArea.append($target);
                         }
 
                         interactUtils.restoreOriginalPosition($target);
@@ -434,72 +477,71 @@ const render = function (interaction) {
             }
         });
     }
+    function _isValidDrop() {
+        return $.contains($resultArea.get(0), $dropzoneElement.get(0));
+    }
 
     function _isDropzoneVisible() {
         return $.contains($container.get(0), $dropzoneElement.get(0));
     }
 
     function _insertDropzone($dragged) {
-        const draggedMiddle = _getMiddleOf($dragged),
-            previousMiddle = {
-                x: 0,
-                y: 0
-            };
-        let insertPosition;
+        const draggedMiddle = _getMiddleOf($dragged);
+        const $items = $(resultSelector);
 
-        // look for position where to insert dropzone
-        $(resultSelector).each(function (index) {
-            const currentMiddle = _getMiddleOf($(this));
+        if (!$items.length) {
+            $resultArea.append($dropzoneElement);
+            return;
+        }
 
-            if (orientation !== 'horizontal') {
-                if (draggedMiddle.y > previousMiddle.y && draggedMiddle.y < currentMiddle.y) {
-                    insertPosition = index;
-                    return false;
-                }
-                previousMiddle.y = currentMiddle.y;
-            } else {
-                if (draggedMiddle.x > previousMiddle.x && draggedMiddle.x < currentMiddle.x) {
-                    insertPosition = index;
-                    return false;
-                }
-                previousMiddle.x = currentMiddle.x;
+        const $lastItem = $items.last();
+        const lastBox = $lastItem.get(0).getBoundingClientRect();
+
+        if (orientation === 'horizontal') {
+            const isAfterLastRow =
+                draggedMiddle.y >= lastBox.top &&
+                draggedMiddle.y <= lastBox.bottom &&
+                draggedMiddle.x > lastBox.right;
+
+            if (isAfterLastRow) {
+                $lastItem.after($dropzoneElement);
+                return;
+            }
+        } else {
+            if (draggedMiddle.y > lastBox.bottom) {
+                $lastItem.after($dropzoneElement);
+                return;
+            }
+        }
+
+        // Otherwise: find closest item
+        let closestIndex = null;
+        let closestDistance = Infinity;
+
+        $items.each(function (index) {
+            const middle = _getMiddleOf($(this));
+            const dx = draggedMiddle.x - middle.x;
+            const dy = draggedMiddle.y - middle.y;
+            const distance = dx * dx + dy * dy;
+
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestIndex = index;
             }
         });
-        // append dropzone to DOM
-        if (typeof insertPosition !== 'undefined') {
-            $(resultSelector).eq(insertPosition).before($dropzoneElement);
+
+        if (closestIndex !== null) {
+            $items.eq(closestIndex).before($dropzoneElement);
         } else {
-            // no index found, we just append to the end
             $resultArea.append($dropzoneElement);
         }
 
-        // style dropzone
-        $dropzoneElement.height($dragged.height());
+        $dropzoneElement.outerHeight($dragged.outerHeight(true));
         $dropzoneElement.find('div').text($dragged.text());
     }
 
     function _adjustDropzonePosition($dragged) {
-        const draggedBox = $dragged.get(0).getBoundingClientRect(),
-            $prevResult = $dropzoneElement.prev('.qti-choice'),
-            $nextResult = $dropzoneElement.next('.qti-choice'),
-            prevMiddle = $prevResult.length > 0 ? _getMiddleOf($prevResult) : false,
-            nextMiddle = $nextResult.length > 0 ? _getMiddleOf($nextResult) : false;
-
-        if (orientation !== 'horizontal') {
-            if (prevMiddle && draggedBox.top < prevMiddle.y) {
-                $prevResult.before($dropzoneElement);
-            }
-            if (nextMiddle && draggedBox.bottom > nextMiddle.y) {
-                $nextResult.after($dropzoneElement);
-            }
-        } else {
-            if (prevMiddle && draggedBox.left < prevMiddle.x) {
-                $prevResult.before($dropzoneElement);
-            }
-            if (nextMiddle && draggedBox.right > nextMiddle.x) {
-                $nextResult.after($dropzoneElement);
-            }
-        }
+        _insertDropzone($dragged);
     }
 
     function _getMiddleOf($element) {
