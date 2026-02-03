@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2019 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2026 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -144,8 +144,6 @@ const render = function (interaction) {
         $resultArea = $container.find('.result-area'),
         $iconAdd = $container.find('.icon-add-to-selection'),
         $iconRemove = $container.find('.icon-remove-from-selection'),
-        $iconBefore = $container.find('.icon-move-before'),
-        $iconAfter = $container.find('.icon-move-after'),
         choiceSelector = `${$choiceArea.selector} >li:not(.deactivated)`,
         resultSelector = `${$resultArea.selector} >li`,
         $dragContainer = $container.find('.drag-container'),
@@ -172,15 +170,11 @@ const render = function (interaction) {
     const _activeControls = function _activeControls() {
         $iconAdd.addClass('inactive');
         $iconRemove.removeClass('inactive').addClass('active');
-        $iconBefore.removeClass('inactive').addClass('active');
-        $iconAfter.removeClass('inactive').addClass('active');
     };
 
     const _resetControls = function _resetControls() {
         $iconAdd.removeClass('inactive');
         $iconRemove.removeClass('active').addClass('inactive');
-        $iconBefore.removeClass('active').addClass('inactive');
-        $iconAfter.removeClass('active').addClass('inactive');
     };
 
     const _setSelection = function _setSelection($choice) {
@@ -238,24 +232,6 @@ const render = function (interaction) {
         _resetSelection();
     };
 
-    const _moveResultBefore = function _moveResultBefore() {
-        const $prev = $activeChoice.prev();
-
-        if ($prev.length) {
-            $prev.before($activeChoice);
-            containerHelper.triggerResponseChangeEvent(interaction);
-        }
-    };
-
-    const _moveResultAfter = function _moveResultAfter() {
-        const $next = $activeChoice.next();
-
-        if ($next.length) {
-            $next.after($activeChoice);
-            containerHelper.triggerResponseChangeEvent(interaction);
-        }
-    };
-
     // Point & click handlers
 
     interact($container.selector).on('tap', function () {
@@ -300,26 +276,6 @@ const render = function (interaction) {
 
         e.stopPropagation();
         _removeChoice();
-    });
-
-    interact($iconBefore.selector).on('tap', function (e) {
-        //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
-        if ($(e.currentTarget).closest('.qti-item').hasClass('prevent-click-handler')) {
-            return;
-        }
-
-        e.stopPropagation();
-        _moveResultBefore();
-    });
-
-    interact($iconAfter.selector).on('tap', function (e) {
-        //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
-        if ($(e.currentTarget).closest('.qti-item').hasClass('prevent-click-handler')) {
-            return;
-        }
-
-        e.stopPropagation();
-        _moveResultAfter();
     });
 
     // Drag & drop handlers
@@ -369,6 +325,18 @@ const render = function (interaction) {
                         const $target = $(e.target);
                         let scale;
                         $target.addClass('dragged');
+                        const rect = e.target.getBoundingClientRect();
+                        const styles = window.getComputedStyle(e.target);
+                        $target.css({
+                            width: rect.width + 'px',
+                            height: rect.height + 'px',
+                            lineHeight: styles.lineHeight,
+                            boxSizing: 'border-box',
+                            paddingTop: styles.paddingTop,
+                            paddingBottom: styles.paddingBottom,
+                            paddingLeft: styles.paddingLeft,
+                            paddingRight: styles.paddingRight
+                        });
 
                         _iFrameDragFix(choiceSelector, e.target);
                         scale = interactUtils.calculateScale(e.target);
@@ -387,7 +355,16 @@ const render = function (interaction) {
                     onend: function (e) {
                         const $target = $(e.target);
                         $target.removeClass('dragged');
-
+                        $target.css({
+                            width: '',
+                            height: '',
+                            lineHeight: '',
+                            boxSizing: '',
+                            paddingTop: '',
+                            paddingBottom: '',
+                            paddingLeft: '',
+                            paddingRight: ''
+                        });
                         interactUtils.restoreOriginalPosition($target);
                         interactUtils.iFrameDragFixOff();
 
@@ -406,6 +383,18 @@ const render = function (interaction) {
                         const $target = $(e.target);
                         let scale;
                         $target.addClass('dragged');
+                        const rect = e.target.getBoundingClientRect();
+                        const styles = window.getComputedStyle(e.target);
+                        $target.css({
+                            width: rect.width + 'px',
+                            height: rect.height + 'px',
+                            lineHeight: styles.lineHeight,
+                            boxSizing: 'border-box',
+                            paddingTop: styles.paddingTop,
+                            paddingBottom: styles.paddingBottom,
+                            paddingLeft: styles.paddingLeft,
+                            paddingRight: styles.paddingRight
+                        });
 
                         _setSelection($target);
 
@@ -438,10 +427,20 @@ const render = function (interaction) {
                             hasBeenDroppedInResultArea = $target.parent === $resultArea;
 
                         $target.removeClass('dragged');
+                        $target.css({
+                            width: '',
+                            height: '',
+                            lineHeight: '',
+                            boxSizing: '',
+                            paddingTop: '',
+                            paddingBottom: '',
+                            paddingLeft: '',
+                            paddingRight: ''
+                        });
                         $dragContainer.hide();
 
-                        if (!hasBeenDroppedInResultArea) {
-                            _removeChoice();
+                        if (!_isValidDrop()) {
+                            $resultArea.append($target);
                         }
 
                         interactUtils.restoreOriginalPosition($target);
@@ -478,72 +477,71 @@ const render = function (interaction) {
             }
         });
     }
+    function _isValidDrop() {
+        return $.contains($resultArea.get(0), $dropzoneElement.get(0));
+    }
 
     function _isDropzoneVisible() {
         return $.contains($container.get(0), $dropzoneElement.get(0));
     }
 
     function _insertDropzone($dragged) {
-        const draggedMiddle = _getMiddleOf($dragged),
-            previousMiddle = {
-                x: 0,
-                y: 0
-            };
-        let insertPosition;
+        const draggedMiddle = _getMiddleOf($dragged);
+        const $items = $(resultSelector);
 
-        // look for position where to insert dropzone
-        $(resultSelector).each(function (index) {
-            const currentMiddle = _getMiddleOf($(this));
+        if (!$items.length) {
+            $resultArea.append($dropzoneElement);
+            return;
+        }
 
-            if (orientation !== 'horizontal') {
-                if (draggedMiddle.y > previousMiddle.y && draggedMiddle.y < currentMiddle.y) {
-                    insertPosition = index;
-                    return false;
-                }
-                previousMiddle.y = currentMiddle.y;
-            } else {
-                if (draggedMiddle.x > previousMiddle.x && draggedMiddle.x < currentMiddle.x) {
-                    insertPosition = index;
-                    return false;
-                }
-                previousMiddle.x = currentMiddle.x;
+        const $lastItem = $items.last();
+        const lastBox = $lastItem.get(0).getBoundingClientRect();
+
+        if (orientation === 'horizontal') {
+            const isAfterLastRow =
+                draggedMiddle.y >= lastBox.top &&
+                draggedMiddle.y <= lastBox.bottom &&
+                draggedMiddle.x > lastBox.right;
+
+            if (isAfterLastRow) {
+                $lastItem.after($dropzoneElement);
+                return;
+            }
+        } else {
+            if (draggedMiddle.y > lastBox.bottom) {
+                $lastItem.after($dropzoneElement);
+                return;
+            }
+        }
+
+        // Otherwise: find closest item
+        let closestIndex = null;
+        let closestDistance = Infinity;
+
+        $items.each(function (index) {
+            const middle = _getMiddleOf($(this));
+            const dx = draggedMiddle.x - middle.x;
+            const dy = draggedMiddle.y - middle.y;
+            const distance = dx * dx + dy * dy;
+
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestIndex = index;
             }
         });
-        // append dropzone to DOM
-        if (typeof insertPosition !== 'undefined') {
-            $(resultSelector).eq(insertPosition).before($dropzoneElement);
+
+        if (closestIndex !== null) {
+            $items.eq(closestIndex).before($dropzoneElement);
         } else {
-            // no index found, we just append to the end
             $resultArea.append($dropzoneElement);
         }
 
-        // style dropzone
-        $dropzoneElement.height($dragged.height());
+        $dropzoneElement.outerHeight($dragged.outerHeight(true));
         $dropzoneElement.find('div').text($dragged.text());
     }
 
     function _adjustDropzonePosition($dragged) {
-        const draggedBox = $dragged.get(0).getBoundingClientRect(),
-            $prevResult = $dropzoneElement.prev('.qti-choice'),
-            $nextResult = $dropzoneElement.next('.qti-choice'),
-            prevMiddle = $prevResult.length > 0 ? _getMiddleOf($prevResult) : false,
-            nextMiddle = $nextResult.length > 0 ? _getMiddleOf($nextResult) : false;
-
-        if (orientation !== 'horizontal') {
-            if (prevMiddle && draggedBox.top < prevMiddle.y) {
-                $prevResult.before($dropzoneElement);
-            }
-            if (nextMiddle && draggedBox.bottom > nextMiddle.y) {
-                $nextResult.after($dropzoneElement);
-            }
-        } else {
-            if (prevMiddle && draggedBox.left < prevMiddle.x) {
-                $prevResult.before($dropzoneElement);
-            }
-            if (nextMiddle && draggedBox.right > nextMiddle.x) {
-                $nextResult.after($dropzoneElement);
-            }
-        }
+        _insertDropzone($dragged);
     }
 
     function _getMiddleOf($element) {
@@ -643,8 +641,24 @@ const getResponse = function (interaction) {
  * @returns {Object} custom data
  */
 const getCustomData = function (interaction, data) {
+    const iconAddDirection = {
+        top: 'icon-down',
+        bottom: 'icon-up',
+        left: 'icon-right',
+        right: 'icon-left'
+    };
+    const iconRemoveDirection = {
+        top: 'icon-up',
+        bottom: 'icon-down', 
+        left: 'icon-left',
+        right: 'icon-right'
+    };
+    const position = interaction.attr('data-position');
     return _.merge(data || {}, {
-        horizontal: interaction.attr('orientation') === 'horizontal' && orientationSelectionEnabled
+        horizontal: interaction.attr('orientation') === 'horizontal' && orientationSelectionEnabled,
+        position,
+        iconAdd: iconAddDirection[position],
+        iconRemove: iconRemoveDirection[position]
     });
 };
 
@@ -661,8 +675,6 @@ const destroy = function (interaction) {
         '.result-area >li',
         '.icon-add-to-selection',
         '.icon-remove-from-selection',
-        '.icon-move-before',
-        '.icon-move-after'
     ];
     if (interaction.data('touchPatch')) {
         interaction.data('touchPatch').destroy();
