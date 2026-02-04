@@ -332,6 +332,7 @@ function getResponse(interaction) {
     const responseDeclaration = interaction.getResponseDeclaration();
     const baseType = responseDeclaration.attr('baseType');
     const numericBase = attributes.base || 10;
+    const patternMask = attributes.patternMask;
     const multiple = !!(
         attributes.maxStrings &&
         (responseDeclaration.attr('cardinality') === 'multiple' ||
@@ -346,8 +347,11 @@ function getResponse(interaction) {
 
         $container.find('input').each(function (i) {
             const editorValue = $(this).val();
+            const isInvalid = patternMask && $(this).hasClass('field-error');
 
-            if (attributes.placeholderText && value === attributes.placeholderText) {
+            if (isInvalid) {
+                values[i] = '';
+            } else if (attributes.placeholderText && value === attributes.placeholderText) {
                 values[i] = '';
             } else {
                 const convertedValue = converter.convert(editorValue);
@@ -365,7 +369,11 @@ function getResponse(interaction) {
 
         ret.list[baseType] = values;
     } else {
-        if (attributes.placeholderText && _getTextareaValue(interaction) === attributes.placeholderText) {
+        const isInvalid = patternMask && $container.hasClass('invalid');
+
+        if (isInvalid) {
+            value = '';
+        } else if (attributes.placeholderText && _getTextareaValue(interaction) === attributes.placeholderText) {
             value = '';
         } else {
             if (baseType === 'integer') {
