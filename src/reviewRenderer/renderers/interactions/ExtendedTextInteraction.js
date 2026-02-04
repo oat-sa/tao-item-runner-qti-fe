@@ -272,7 +272,7 @@ const getResponse = interaction => {
     if (multiple) {
         values = [];
 
-        $container.find('.text-container').each(i => {
+        $container.find('.text-container').each(function (i) {
             const $el = $(this);
 
             if (attributes.placeholderText && $el.innerText === attributes.placeholderText) {
