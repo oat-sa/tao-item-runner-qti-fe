@@ -63,7 +63,7 @@ const render = interaction => {
                 expectedLength = parseInt(expectedLength, 10);
 
                 if (expectedLength > 0) {
-                    $el.each(() => {
+                    $el.each(function () {
                         $(this).css('width', expectedLength + 'em');
                     });
                 }
@@ -80,7 +80,7 @@ const render = interaction => {
                 placeholderType = 'first';
 
                 if (placeholderType === 'multiple') {
-                    $el.each(() => {
+                    $el.each(function () {
                         $(this).attr('placeholder', placeholderText);
                     });
                 } else if (placeholderType === 'first') {
