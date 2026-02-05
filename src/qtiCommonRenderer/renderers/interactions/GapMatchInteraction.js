@@ -22,7 +22,6 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 import _ from 'lodash';
-import __ from 'i18n';
 import $ from 'jquery';
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/interactions/gapMatchInteraction';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
@@ -37,8 +36,8 @@ import interactUtils from 'ui/interactUtils';
 var _choiceUsages = {};
 
 var setChoice = function (interaction, $choice, $target) {
-    var choiceSerial = $choice.data('serial'),
-        choice = interaction.getChoice(choiceSerial);
+    const choiceSerial = $choice.data('serial');
+    const choice = interaction.getChoice(choiceSerial);
 
     if (!_choiceUsages[choiceSerial]) {
         _choiceUsages[choiceSerial] = 0;
@@ -69,7 +68,7 @@ var unsetChoice = function (interaction, $choice) {
 
     _choiceUsages[serial]--;
 
-    $choice.removeClass('filled').removeData('serial').empty();
+    $choice.removeClass('filled').removeData('serial').html('&nbsp;');
 
     if (!interaction.swapping) {
         //set correct response
@@ -77,14 +76,19 @@ var unsetChoice = function (interaction, $choice) {
     }
 };
 
-var getChoice = function (interaction, identifier) {
-    var $container = containerHelper.get(interaction);
-    return $('.choice-area [data-identifier="' + identifier + '"]', $container);
+const getChoice = function (interaction, identifier) {
+    const $container = containerHelper.get(interaction);
+    return $(`.choice-area [data-identifier="${identifier}"]`, $container);
 };
 
-var getGap = function (interaction, identifier) {
-    var $container = containerHelper.get(interaction);
-    return $('.qti-flow-container [data-identifier="' + identifier + '"]', $container);
+const getChoiceBySerial = function (interaction, serial) {
+    const $container = containerHelper.get(interaction);
+    return $(`.choice-area [data-serial="${serial}"]`, $container);
+};
+
+const getGap = function (interaction, identifier) {
+    const $container = containerHelper.get(interaction);
+    return $(`.qti-flow-container [data-identifier="${identifier}"]`, $container);
 };
 
 /**
@@ -94,28 +98,21 @@ var getGap = function (interaction, identifier) {
  *
  * @param {object} interaction
  */
-var render = function (interaction) {
-    var $container = containerHelper.get(interaction);
-    var $choiceArea = $container.find('.choice-area');
-    var $flowContainer = $container.find('.qti-flow-container');
+const render = function (interaction) {
+    const $container = containerHelper.get(interaction);
+    const $choiceArea = $container.find('.choice-area');
+    const $flowContainer = $container.find('.qti-flow-container');
 
-    var $activeChoice = null;
-    var $activeDrop = null;
+    let $activeChoice = null;
+    let $activeDrop = null;
 
-    var isDragAndDropEnabled;
-    var dragOptions;
-    var scaleX, scaleY;
+    let isDragAndDropEnabled;
+    let dragOptions;
+    let scaleX, scaleY;
 
-    var $bin = $('<span>', { class: 'icon-undo remove-choice', title: __('remove') });
-
-    var choiceSelector = $choiceArea.selector + ' .qti-choice';
-    var gapSelector = $flowContainer.selector + ' .gapmatch-content';
-    var filledGapSelector = gapSelector + '.filled';
-    var binSelector = $container.selector + ' .remove-choice';
-
-    var _getChoice = function (serial) {
-        return $choiceArea.find('[data-serial=' + serial + ']');
-    };
+    const choiceSelector = `${$choiceArea.selector} .qti-choice`;
+    const gapSelector = `${$flowContainer.selector} .gapmatch-content`;
+    const filledGapSelector = `${gapSelector}.filled`;
 
     var _setChoice = function ($choice, $target) {
         return setChoice(interaction, $choice, $target);
@@ -123,23 +120,16 @@ var render = function (interaction) {
 
     var _resetSelection = function () {
         if ($activeChoice) {
-            $flowContainer.find('.remove-choice').remove();
-            $activeChoice.removeClass('deactivated active');
+            $activeChoice.removeClass('active');
             $container.find('.empty').removeClass('empty');
+            $choiceArea.removeClass('droppable dropzone');
+            $(document.body).off('click.gap-match');
             $activeChoice = null;
         }
     };
 
     var _unsetChoice = function ($choice) {
         return unsetChoice(interaction, $choice);
-    };
-
-    var _isInsertionMode = function () {
-        return $activeChoice && !$activeChoice.hasClass('filled');
-    };
-
-    var _isModeEditing = function () {
-        return $activeChoice && $activeChoice.hasClass('filled');
     };
 
     // Drag & drop handlers
@@ -204,8 +194,11 @@ var render = function (interaction) {
 
                         interactUtils.restoreOriginalPosition($target);
                         interactUtils.iFrameDragFixOff();
-
                         touchPatch.onend();
+
+                        _.defer(() => {
+                            _resetSelection();
+                        });
                     }
                 })
             )
@@ -220,7 +213,7 @@ var render = function (interaction) {
                         var $target = $(e.target);
                         var scale;
                         $target.addClass('dragged');
-                        _handleFilledGapSelect($target);
+                        _handleChoiceSelect($target);
 
                         _iFrameDragFix(filledGapSelector, e.target);
                         scale = interactUtils.calculateScale(e.target);
@@ -237,14 +230,12 @@ var render = function (interaction) {
                         $target.removeClass('dragged');
 
                         interactUtils.restoreOriginalPosition($target);
-
-                        if ($activeChoice) {
-                            _unsetChoice($activeChoice);
-                            _resetSelection();
-                        }
                         interactUtils.iFrameDragFixOff();
-
                         touchPatch.onend();
+
+                        _.defer(() => {
+                            _resetSelection();
+                        });
                     }
                 })
             )
@@ -277,6 +268,31 @@ var render = function (interaction) {
                 $activeDrop = null;
             }
         });
+
+        //makes choices container droppable
+        interact($choiceArea.selector).dropzone({
+            overlap: 0.15,
+            ondragenter: function (e) {
+                const $target = $(e.target);
+                if ($target.hasClass('droppable')) {
+                    $target.addClass('dropzone');
+                }
+            },
+            ondrop: function (e) {
+                const $target = $(e.target);
+                if ($target.hasClass('droppable')) {
+                    $target.removeClass('dropzone');
+
+                    if ($activeChoice) {
+                        _unsetChoice($activeChoice);
+                        _resetSelection();
+                    }
+                }
+            },
+            ondragleave: function (e) {
+                $(e.target).removeClass('dropzone');
+            }
+        });
     }
 
     // Point & click handlers
@@ -298,13 +314,6 @@ var render = function (interaction) {
         e.preventDefault();
     });
 
-    interact(binSelector).on('tap', function (e) {
-        e.stopPropagation();
-        _unsetChoice($activeChoice);
-        _resetSelection();
-        e.preventDefault();
-    });
-
     // Common handlers
 
     function _handleChoiceSelect($target) {
@@ -315,70 +324,57 @@ var render = function (interaction) {
 
         $activeChoice = $target.addClass('active');
         $(gapSelector).addClass('empty');
+
+        if ($target.hasClass('filled')) {
+            $choiceArea.addClass('droppable');
+        }
+
+        $(document.body).on('click.gap-match', function (e) {
+            if (!$container.get(0).contains(e.target)) {
+                _resetSelection();
+            }
+        });
     }
 
-    function _handleFilledGapSelect($target) {
-        $activeChoice = $target;
-        $(gapSelector).addClass('active');
+    function _animateChoiceMovement($fromElement, $toElement) {
+        const $animatedClone = interactUtils.animateMoveElement({
+            $appendTo: $choiceArea,
+            $fromElement,
+            $toElement
+        });
+        $animatedClone.addClass('animated');
     }
 
     function _handleGapSelect($target) {
-        var choiceSerial, targetSerial;
+        const choiceSerial = $activeChoice && $activeChoice.data('serial');
+        const targetSerial = $target.data('serial');
 
-        if (_isInsertionMode()) {
-            choiceSerial = $activeChoice.data('serial');
-            targetSerial = $target.data('serial');
+        const isInserting = $activeChoice && !$activeChoice.hasClass('filled') && targetSerial !== choiceSerial;
+        const isMoving = $activeChoice && $activeChoice.hasClass('filled') && targetSerial !== choiceSerial;
+        const isRemoving = $target.hasClass('filled') && !$activeChoice;
 
-            if (targetSerial !== choiceSerial) {
-                //set choices:
-                if (targetSerial) {
-                    _unsetChoice($target);
-                }
-
-                _setChoice($activeChoice, $target);
+        if (isInserting) {
+            // place choice from the choice area to the gap.
+            if (targetSerial) {
+                // remove existing placed choice if gap is filled.
+                _unsetChoice($target);
             }
-
-            $activeChoice.removeClass('active');
-            $container.find('.empty').removeClass('empty');
-            $activeChoice = null;
-        } else if (_isModeEditing()) {
-            choiceSerial = $activeChoice.data('serial');
-            targetSerial = $target.data('serial');
-
-            if (targetSerial !== choiceSerial) {
-                _unsetChoice($activeChoice);
-                if (targetSerial) {
-                    //swapping:
-                    _unsetChoice($target);
-                    _setChoice(_getChoice(targetSerial), $activeChoice);
-                }
-                _setChoice(_getChoice(choiceSerial), $target);
+            _setChoice($activeChoice, $target);
+        } else if (isMoving) {
+            // move placed choice to another gap.
+            _unsetChoice($activeChoice);
+            if (targetSerial) {
+                // remove existing placed choice if gap is filled.
+                _unsetChoice($target);
             }
-
-            _resetSelection();
-        } else if ($target.data('serial') && $target.hasClass('filled')) {
-            targetSerial = $target.data('serial');
-
-            $activeChoice = $target;
-            $activeChoice.addClass('active');
-
-            $flowContainer
-                .find('>li>div')
-                .filter(function () {
-                    return $target.data('serial') !== targetSerial;
-                })
-                .addClass('empty');
-
-            $choiceArea
-                .find('>li:not(.deactivated)')
-                .filter(function () {
-                    return $target.data('serial') !== targetSerial;
-                })
-                .addClass('empty');
-
-            //append trash bin:
-            $target.append($bin);
+            _setChoice(getChoiceBySerial(interaction, choiceSerial), $target);
+        } else if (isRemoving) {
+            //remove existing placed choice
+            _animateChoiceMovement($target, getChoiceBySerial(interaction, targetSerial));
+            _unsetChoice($target);
         }
+
+        _resetSelection();
     }
 };
 
@@ -465,12 +461,11 @@ var destroy = function (interaction) {
     interact($container.selector).unset();
     interact($container.find('.choice-area').selector + ' .qti-choice').unset();
     interact($container.find('.qti-flow-container').selector + ' .gapmatch-content').unset();
-    interact($container.find('.remove-choice').selector).unset();
+    $(document.body).off('click.gap-match');
 
     //restore selection
     $container.find('.gapmatch-content').empty();
     $container.find('.active').removeClass('active');
-    $container.find('.remove-choice').remove();
     $container.find('.empty').removeClass('empty');
 
     //remove all references to a cache container
