@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>qtiCommonRenderer helper Graphic</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function () {
+                require(['qunitEnv'], function () {
+                    define('raphael', function () {
+                        function Raphael() {}
+                        Raphael.type = 'SVG';
+                        Raphael.fn = {};
+                        Raphael.el = {
+                            constructor: function (node, paper) {
+                                this.node = node;
+                                this.paper = paper;
+                                this.attr = function () {};
+                            }
+                        };
+                        return Raphael;
+                    });
+                    define('scale.raphael', function () {
+                        return function () {
+                            return {
+                                image() {
+                                    return { node: document.createElement('img') };
+                                },
+                                setViewBox() {},
+                                scale: 1,
+                                w: 100,
+                                width: 100,
+                                height: 100
+                            };
+                        };
+                    });
+                    require(['taoQtiItem/test/qtiCommonRenderer/helpers/graphic/test'], function () {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+    </body>
+</html>

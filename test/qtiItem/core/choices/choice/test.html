@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>qtiItem core Choice</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function () {
+                require(['qunitEnv'], function () {
+                    define('taoQtiItem/qtiItem/core/IdentifiedElement', function () {
+                        function extend(def) {
+                            function Klass() {
+                                if (typeof def.init === 'function') {
+                                    def.init.apply(this, arguments);
+                                }
+                            }
+                            Klass.prototype._super = function () {
+                                return false;
+                            };
+                            Object.keys(def).forEach(key => {
+                                Klass.prototype[key] = def[key];
+                            });
+                            return Klass;
+                        }
+                        return { extend };
+                    });
+                    require(['taoQtiItem/test/qtiItem/core/choices/choice/test'], function () {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+    </body>
+</html>

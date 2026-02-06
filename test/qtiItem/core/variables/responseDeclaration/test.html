@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>qtiItem core ResponseDeclaration</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function () {
+                require(['qunitEnv'], function () {
+                    define('taoQtiItem/qtiItem/core/variables/VariableDeclaration', function () {
+                        function extend(def) {
+                            function Klass() {
+                                if (typeof def.init === 'function') {
+                                    def.init.apply(this, arguments);
+                                }
+                            }
+                            Klass.prototype._super = function () {
+                                return { base: true };
+                            };
+                            Klass.prototype.attr = function () {
+                                return null;
+                            };
+                            Klass.prototype.id = function () {
+                                return '';
+                            };
+                            Klass.prototype.getRootElement = function () {
+                                return { getInteractions: () => [] };
+                            };
+                            Klass.prototype.getComposingElements = function () {
+                                return {};
+                            };
+                            Object.keys(def).forEach(key => {
+                                Klass.prototype[key] = def[key];
+                            });
+                            return Klass;
+                        }
+                        return { extend };
+                    });
+                    require(['taoQtiItem/test/qtiItem/core/variables/responseDeclaration/test'], function () {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+    </body>
+</html>
