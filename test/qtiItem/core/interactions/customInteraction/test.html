@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>qtiItem core CustomInteraction</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function () {
+                require(['qunitEnv'], function () {
+                    define('taoQtiItem/qtiItem/core/interactions/Interaction', function () {
+                        function extend(def) {
+                            function Klass() {
+                                if (typeof def.init === 'function') {
+                                    def.init.apply(this, arguments);
+                                }
+                            }
+                            Klass.prototype._super = function () {
+                                return { base: true };
+                            };
+                            Klass.prototype.getRenderer = function () {
+                                return null;
+                            };
+                            Klass.prototype.data = function () {
+                                return null;
+                            };
+                            Object.keys(def).forEach(key => {
+                                Klass.prototype[key] = def[key];
+                            });
+                            return Klass;
+                        }
+                        return { extend };
+                    });
+                    define('taoQtiItem/qtiItem/helper/rendererConfig', function () {
+                        return {
+                            getOptionsFromArguments() {
+                                return { data: {} };
+                            }
+                        };
+                    });
+                    define('taoQtiItem/qtiItem/helper/maxScore', function () {
+                        return {
+                            customInteractionBased() {
+                                return 0;
+                            }
+                        };
+                    });
+                    define('taoQtiItem/qtiItem/mixin/CustomElement', function () {
+                        return { augment() {} };
+                    });
+                    define('taoQtiItem/qtiItem/mixin/NamespacedElement', function () {
+                        return { augment() {} };
+                    });
+                    require(['taoQtiItem/test/qtiItem/core/interactions/customInteraction/test'], function () {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+    </body>
+</html>

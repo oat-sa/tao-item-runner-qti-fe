@@ -291,7 +291,7 @@ define([
                                     10
                                 );
                             },
-                            300
+                            400
                         ); // We need to wait for the animation to end in order for the click event to be bound
                     },
                     10
@@ -360,7 +360,7 @@ define([
                                     }
                                 );
                             },
-                            300
+                            400
                         ); // We need to wait for the animation to end in order for the click event to be bound
                     },
                     10
@@ -411,7 +411,7 @@ define([
                     assert.equal($gapFillerOnHotspot.attr('src'), gapFillerImgSrc, 'state has been restored');
 
                     ready();
-                }, 300);
+                }, 400);
             })
             .assets(strategies)
             .init()
@@ -503,7 +503,7 @@ define([
                                     }
                                 );
                             },
-                            300
+                            400
                         );
                     },
                     100
