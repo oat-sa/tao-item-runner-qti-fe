@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>qtiCommonRenderer renderers basic</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function () {
+                require(['qunitEnv'], function () {
+                    define('taoQtiItem/qtiRunner/core/Renderer', function () {
+                        return {
+                            build(locations, name, options) {
+                                return `rendered-${name}`;
+                            }
+                        };
+                    });
+                    define('taoQtiItem/qtiCommonRenderer/renderers/config', function () {
+                        return {
+                            locations: ['stub'],
+                            name: 'common',
+                            options: {}
+                        };
+                    });
+                    require(['taoQtiItem/test/qtiCommonRenderer/renderers/basic/test'], function () {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+    </body>
+</html>
