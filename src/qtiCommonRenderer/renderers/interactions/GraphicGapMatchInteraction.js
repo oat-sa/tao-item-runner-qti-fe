@@ -195,36 +195,14 @@ const _setGapFiller = function _setGapFiller(interaction, $gapFiller) {
 const _animateMoveGapFiller = function _animateMoveGapFiller(interaction, $fromGapFiller, toElement, endCallback) {
     const $container = containerHelper.get(interaction);
     const $imageBox = $('.main-image-box', $container);
-    const boxOffset = $imageBox.offset();
 
-    const fromOffset = $fromGapFiller.offset();
-    const toOffset = toElement.paper ? $(toElement.node).offset() : toElement.offset();
-
-    const $img = $fromGapFiller.find('img');
-    const $clone = $img.clone();
-    $clone.css({
-        position: 'absolute',
-        display: 'block',
-        'z-index': 10000,
-        opacity: 0.8,
-        top: fromOffset.top - boxOffset.top,
-        left: fromOffset.left - boxOffset.left
+    const $clone = interactUtils.animateMoveElement({
+        $appendTo: $imageBox,
+        $fromElement: $fromGapFiller.find('img'),
+        $toElement: toElement.paper ? $(toElement.node) : toElement,
+        endCallback
     });
-
-    $clone.appendTo($imageBox);
-    $clone.animate(
-        {
-            top: toOffset.top - boxOffset.top,
-            left: toOffset.left - boxOffset.left
-        },
-        300,
-        function animationEnd() {
-            $clone.remove();
-            if (endCallback) {
-                endCallback();
-            }
-        }
-    );
+    $clone.css({ opacity: 0.8 });
 };
 
 /**
@@ -328,7 +306,6 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
                     shapeId: element.id,
                     id,
                     src: $img.attr('src'),
-                    title: __('Remove'),
                     originalLeft,
                     originalTop,
                     originalWidth,
@@ -399,6 +376,17 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
                     .styleCursor(false)
                     .actionChecker(touchPatch.actionChecker);
             }
+
+            setTimeout(() => {
+                if ($placedFiller.get(0).matches(':hover')) {
+                    $placedFiller.addClass('no-hover').on('mouseleave.graphic-gap-match-placed', function () {
+                        $placedFiller
+                            .off('mouseleave.graphic-gap-match-placed')
+                            .removeClass('no-hover')
+                            .attr('title', __('Remove'));
+                    });
+                }
+            }, 0);
         };
 
         // animate unless moving placed filler to another shape, or unless restoring initial response
