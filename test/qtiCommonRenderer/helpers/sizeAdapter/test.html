@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>qtiCommonRenderer helper sizeAdapter</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function () {
+                require(['qunitEnv'], function () {
+                    define('util/adaptSize', function () {
+                        return {
+                            width($elements) {
+                                $elements.data('width-called', true);
+                            },
+                            height($elements) {
+                                $elements.data('height-called', true);
+                            },
+                            resetHeight($elements) {
+                                $elements.data('reset-called', true);
+                            }
+                        };
+                    });
+                    define('taoQtiItem/qtiCommonRenderer/helpers/verticalWriting', function () {
+                        let isVertical = false;
+                        return {
+                            getIsWritingModeVerticalRl() {
+                                return isVertical;
+                            },
+                            __setVertical(value) {
+                                isVertical = value;
+                            }
+                        };
+                    });
+                    define('ui/waitForMedia', ['jquery'], function ($) {
+                        if (!$.fn.waitForMedia) {
+                            $.fn.waitForMedia = function (cb) {
+                                if (typeof cb === 'function') {
+                                    cb();
+                                }
+                                return this;
+                            };
+                        }
+                        return {};
+                    });
+                    require(['taoQtiItem/test/qtiCommonRenderer/helpers/sizeAdapter/test'], function () {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+    </body>
+</html>

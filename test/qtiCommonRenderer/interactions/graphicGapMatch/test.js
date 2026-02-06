@@ -11,6 +11,31 @@ define([
     var runner;
     var fixtureContainerId = 'item-container';
     var outsideContainerId = 'outside-container';
+    var POLL_INTERVAL = 50;
+    var POLL_TIMEOUT = 1500;
+
+    function waitForPlacedFiller($container, identifier, onFound, onTimeout) {
+        var start = Date.now();
+
+        (function poll() {
+            var $gapFillerOnHotspot = $container.find(
+                '.placed-fillers .qti-gapImg[data-identifier="' + identifier + '"]',
+                $container
+            );
+
+            if ($gapFillerOnHotspot.length) {
+                onFound($gapFillerOnHotspot);
+                return;
+            }
+
+            if (Date.now() - start >= POLL_TIMEOUT) {
+                onTimeout();
+                return;
+            }
+
+            setTimeout(poll, POLL_INTERVAL);
+        })();
+    }
 
     //Override asset loading in order to resolve it from the runtime location
     var strategies = [
@@ -251,11 +276,17 @@ define([
                                     $gapFiller2,
                                     function () {
                                         // We click on the image, but the click should be redirected to the underlying shape
-                                        var $gapFillerOnHotspot = $container.find(
-                                            '.placed-fillers .qti-gapImg[data-identifier="gapimg_1"]',
-                                            $container
+                                        waitForPlacedFiller(
+                                            $container,
+                                            'gapimg_1',
+                                            function ($gapFillerOnHotspot) {
+                                                interactUtils.tapOn($gapFillerOnHotspot);
+                                            },
+                                            function () {
+                                                assert.ok(false, 'Expected placed gap filler on hotspot');
+                                                ready();
+                                            }
                                         );
-                                        interactUtils.tapOn($gapFillerOnHotspot);
                                     },
                                     10
                                 );
@@ -317,12 +348,17 @@ define([
                         interactUtils.tapOn(
                             $hotspot,
                             function () {
-                                var $gapFillerOnHotspot = $container.find(
-                                    '.placed-fillers .qti-gapImg[data-identifier="gapimg_1"]',
-                                    $container
+                                waitForPlacedFiller(
+                                    $container,
+                                    'gapimg_1',
+                                    function ($gapFillerOnHotspot) {
+                                        interactUtils.tapOn($gapFillerOnHotspot);
+                                    },
+                                    function () {
+                                        assert.ok(false, 'Expected placed gap filler on hotspot');
+                                        ready();
+                                    }
                                 );
-
-                                interactUtils.tapOn($gapFillerOnHotspot);
                             },
                             400
                         ); // We need to wait for the animation to end in order for the click event to be bound
@@ -438,30 +474,34 @@ define([
                         interactUtils.tapOn(
                             $hotspot,
                             function () {
-                                var $gapFillerOnHotspot = $container.find(
-                                    '.placed-fillers .qti-gapImg[data-identifier="gapimg_1"] img'
-                                );
-                                assert.equal(
-                                    $gapFillerOnHotspot.attr('src'),
-                                    gapFillerImgSrc,
-                                    'gap filler is on canvas'
-                                );
+                                waitForPlacedFiller(
+                                    $container,
+                                    'gapimg_1',
+                                    function ($gapFillerOnHotspot) {
+                                        var $img = $gapFillerOnHotspot.find('img');
+                                        assert.equal($img.attr('src'), gapFillerImgSrc, 'gap filler is on canvas');
 
-                                _.delay(function () {
-                                    // Reset response manually
-                                    var interaction = self._item.getInteractions()[0];
-                                    interaction.renderer.resetResponse(interaction);
+                                        _.delay(function () {
+                                            // Reset response manually
+                                            var interaction = self._item.getInteractions()[0];
+                                            interaction.renderer.resetResponse(interaction);
 
-                                    _.delay(function () {
-                                        assert.equal(
-                                            $container.find('.placed-fillers .qti-gapImg').length,
-                                            0,
-                                            'there is no filled gap'
-                                        );
+                                            _.delay(function () {
+                                                assert.equal(
+                                                    $container.find('.placed-fillers .qti-gapImg').length,
+                                                    0,
+                                                    'there is no filled gap'
+                                                );
 
+                                                ready();
+                                            }, 100);
+                                        }, 100);
+                                    },
+                                    function () {
+                                        assert.ok(false, 'Expected placed gap filler on hotspot');
                                         ready();
-                                    }, 100);
-                                }, 100);
+                                    }
+                                );
                             },
                             400
                         );

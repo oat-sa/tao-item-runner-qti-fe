@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>qtiItem mixin CustomElement</title>
+        <script type="text/javascript" src="/environment/require.js"></script>
+        <script type="text/javascript">
+            require(['/environment/config.js'], function () {
+                require(['qunitEnv'], function () {
+                    define('taoQtiItem/qtiItem/mixin/Mixin', function () {
+                        return {
+                            augment() {}
+                        };
+                    });
+                    require(['taoQtiItem/test/qtiItem/mixin/customElement/test'], function () {
+                        QUnit.start();
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+    </body>
+</html>
