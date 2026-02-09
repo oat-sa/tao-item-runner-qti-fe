@@ -308,7 +308,7 @@ const _getRawResponse = function _getRawResponse(interaction) {
     let responses = [];
     _.forEach(interaction.getChoices(), function (choice) {
         const element = interaction.paper.getById(choice.serial);
-        const assocs = element.data('assocs');
+        const assocs = element ? element.data('assocs') : null;
         if (element && assocs) {
             responses = responses.concat(
                 _.map(assocs, function (id) {
