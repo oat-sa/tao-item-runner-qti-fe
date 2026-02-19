@@ -304,12 +304,12 @@ function render(interaction) {
             .on('compositionend.commonRenderer', handleCompositionEnd);
     } else if (attributes.patternMask) {
         const updatePatternMaskTooltip = () => {
-            const regex = new RegExp(attributes.patternMask);
+            const validator = patternMaskHelper.createValidator(attributes.patternMask);
 
             hideTooltip($input);
 
             if ($input.val()) {
-                if (regex.test($input.val())) {
+                if (validator.isValid($input.val())) {
                     $input.removeClass('error');
                 } else {
                     $input.addClass('error');
