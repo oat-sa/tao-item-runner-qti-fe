@@ -135,12 +135,12 @@ function validateDecimalInput($input, { allowMinusOnly = false, withTooltip = tr
         if (withTooltip) {
             const decimalError = thousandsSeparator
                 ? __(
-                      'Invalid value, use %s %s for decimal point and %s %s for thousands separator.',
-                      decimalSeparator,
-                      decimalSeparatorName,
-                      thousandsSeparator,
-                      thousandsSeparatorName
-                  )
+                    'Invalid value, use %s %s for decimal point and %s %s for thousands separator.',
+                    decimalSeparator,
+                    decimalSeparatorName,
+                    thousandsSeparator,
+                    thousandsSeparatorName
+                )
                 : __('Invalid value, use %s %s for decimal point.', decimalSeparator, decimalSeparatorName);
             showTooltip($input, 'error', decimalError);
         } else {
@@ -395,8 +395,10 @@ function getResponse(interaction) {
     const inputValue = $input.val();
     let value;
 
+    const patternMask = interaction.attr('patternMask');
+
     if (
-        (attributes.patternMask && $input.hasClass('error')) ||
+        (patternMask && $input.hasClass('error')) ||
         (attributes.placeholderText && inputValue === attributes.placeholderText)
     ) {
         //invalid response or response equals to the placeholder text are considered empty
