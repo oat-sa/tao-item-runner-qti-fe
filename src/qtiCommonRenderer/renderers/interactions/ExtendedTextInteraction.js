@@ -428,7 +428,7 @@ function inputLimiter(interaction) {
             maxWords = _.isNaN(maxWords) ? 0 : maxWords;
             maxLength = _.isNaN(maxLength) ? 0 : maxLength;
             if (!maxLength && !maxWords) {
-                patternRegEx = new RegExp(patternMask);
+                patternRegEx = true;
             }
             $maxLengthCounter.html(maxLength);
             $maxWordsCounter.text(maxWords);
@@ -738,8 +738,8 @@ function inputLimiter(interaction) {
                     newValue = e.originalEvent.clipboardData
                         ? e.originalEvent.clipboardData.getData('text')
                         : e.originalEvent.dataTransfer.getData('text') ||
-                          e.originalEvent.dataTransfer.getData('text/plain') ||
-                          '';
+                        e.originalEvent.dataTransfer.getData('text/plain') ||
+                        '';
                 }
 
                 // prevent insertion of non-limited data
@@ -1308,13 +1308,13 @@ function _getTextareaValue(interaction, raw) {
  * @param {string} pattern
  */
 function _setPattern($element, pattern) {
-    const patt = new RegExp(pattern);
+    const validator = patternMaskHelper.createValidator(pattern);
 
     //test when some data is entering in the input field
     //@todo plug the validator + tooltip
     $element.on('keyup.commonRenderer', function () {
         $element.removeClass('field-error');
-        if (!patt.test($element.val())) {
+        if (!validator.isValid($element.val())) {
             $element.addClass('field-error');
         }
     });
