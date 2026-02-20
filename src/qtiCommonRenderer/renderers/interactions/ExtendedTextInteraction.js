@@ -332,6 +332,7 @@ function getResponse(interaction) {
     const responseDeclaration = interaction.getResponseDeclaration();
     const baseType = responseDeclaration.attr('baseType');
     const numericBase = attributes.base || 10;
+    const patternMask = attributes.patternMask;
     const multiple = !!(
         attributes.maxStrings &&
         (responseDeclaration.attr('cardinality') === 'multiple' ||
@@ -346,8 +347,11 @@ function getResponse(interaction) {
 
         $container.find('input').each(function (i) {
             const editorValue = $(this).val();
+            const isInvalid = patternMask && $(this).hasClass('field-error');
 
-            if (attributes.placeholderText && value === attributes.placeholderText) {
+            if (isInvalid) {
+                values[i] = '';
+            } else if (attributes.placeholderText && value === attributes.placeholderText) {
                 values[i] = '';
             } else {
                 const convertedValue = converter.convert(editorValue);
@@ -365,7 +369,11 @@ function getResponse(interaction) {
 
         ret.list[baseType] = values;
     } else {
-        if (attributes.placeholderText && _getTextareaValue(interaction) === attributes.placeholderText) {
+        const isInvalid = patternMask && $container.hasClass('invalid');
+
+        if (isInvalid) {
+            value = '';
+        } else if (attributes.placeholderText && _getTextareaValue(interaction) === attributes.placeholderText) {
             value = '';
         } else {
             if (baseType === 'integer') {
@@ -420,7 +428,7 @@ function inputLimiter(interaction) {
             maxWords = _.isNaN(maxWords) ? 0 : maxWords;
             maxLength = _.isNaN(maxLength) ? 0 : maxLength;
             if (!maxLength && !maxWords) {
-                patternRegEx = new RegExp(patternMask);
+                patternRegEx = true;
             }
             $maxLengthCounter.html(maxLength);
             $maxWordsCounter.text(maxWords);
@@ -730,8 +738,8 @@ function inputLimiter(interaction) {
                     newValue = e.originalEvent.clipboardData
                         ? e.originalEvent.clipboardData.getData('text')
                         : e.originalEvent.dataTransfer.getData('text') ||
-                          e.originalEvent.dataTransfer.getData('text/plain') ||
-                          '';
+                        e.originalEvent.dataTransfer.getData('text/plain') ||
+                        '';
                 }
 
                 // prevent insertion of non-limited data
@@ -1300,13 +1308,13 @@ function _getTextareaValue(interaction, raw) {
  * @param {string} pattern
  */
 function _setPattern($element, pattern) {
-    const patt = new RegExp(pattern);
+    const validator = patternMaskHelper.createValidator(pattern);
 
     //test when some data is entering in the input field
     //@todo plug the validator + tooltip
     $element.on('keyup.commonRenderer', function () {
         $element.removeClass('field-error');
-        if (!patt.test($element.val())) {
+        if (!validator.isValid($element.val())) {
             $element.addClass('field-error');
         }
     });
