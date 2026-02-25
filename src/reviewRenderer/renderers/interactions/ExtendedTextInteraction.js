@@ -334,6 +334,11 @@ const setResponse = (interaction, response) => {
     }
 
     if (response.base && typeof response.base[baseType] !== 'undefined') {
+        if (baseType === 'string' && ['plain', 'preformatted'].includes(interaction.attributes?.format)) {
+            const clonedResponse = _.cloneDeep(response);
+            clonedResponse.base[baseType] = _.escape(clonedResponse.base[baseType]);
+            response = clonedResponse;
+        }
         setText(interaction, response.base[baseType]);
     } else if (response.list && response.list[baseType]) {
         for (let i in response.list[baseType]) {
