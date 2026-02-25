@@ -2,13 +2,16 @@ define([
     'jquery',
     'lodash',
     'taoQtiItem/runner/qtiItemRunner',
+    'taoQtiItem/runner/interaction/extendedTextInteraction/renderer',
     'json!taoQtiItem/test/samples/json/postcard.json',
     'json!taoQtiItem/test/samples/json/formated-card.json'
-], function ($, _, qtiItemRunner, itemDataPlain, itemDataXhtml) {
+], function ($, _, qtiItemRunner, extendedTextRenderer, itemDataPlain, itemDataXhtml) {
     'use strict';
 
     var runner;
     var fixtureContainerId = 'item-container-';
+
+    extendedTextRenderer.register && extendedTextRenderer.register();
 
     /** PLAIN **/
 
@@ -86,6 +89,11 @@ define([
         response: { base: { string: 'test' } },
         expected: { base: { string: 'test' } },
         value: 'test'
+    }, {
+        title: 'filled response with markup',
+        response: { base: { string: '<strong>test</strong>' } },
+        expected: { base: { string: '<strong>test</strong>' } },
+        value: '&lt;strong&gt;test&lt;/strong&gt;'
     }, {
         title: 'empty response',
         response: { base: { string: '' } },
