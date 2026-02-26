@@ -2,7 +2,7 @@ define([
     'jquery',
     'lodash',
     'taoQtiItem/runner/qtiItemRunner',
-    'taoQtiItem/runner/interaction/extendedTextInteraction/renderer',
+    'taoQtiItem/reviewRenderer/renderers/interactions/ExtendedTextInteraction',
     'json!taoQtiItem/test/samples/json/postcard.json',
     'json!taoQtiItem/test/samples/json/formated-card.json'
 ], function ($, _, qtiItemRunner, extendedTextRenderer, itemDataPlain, itemDataXhtml) {
