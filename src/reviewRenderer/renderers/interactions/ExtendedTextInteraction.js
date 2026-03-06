@@ -237,10 +237,13 @@ const resetResponse = interaction => {
 };
 
 const setText = (interaction, text) => {
+    if (['plain', 'preformatted'].includes(_getFormat(interaction))) {
+        containerHelper.get(interaction).find('.text-container')[0].innerText = text;
+    } else {
+        containerHelper.get(interaction).find('.text-container')[0].innerHTML = text;
+    }
+
     const limiter = inputLimiter(interaction);
-
-    containerHelper.get(interaction).find('.text-container')[0].innerHTML = text;
-
     if (limiter.enabled) {
         limiter.updateCounter();
     }
@@ -334,10 +337,7 @@ const setResponse = (interaction, response) => {
     }
 
     if (response.base && typeof response.base[baseType] !== 'undefined') {
-        const value = (baseType === 'string' && ['plain', 'preformatted'].includes(_getFormat(interaction)))
-            ? _.escape(response.base[baseType])
-            : response.base[baseType];
-        setText(interaction, value);
+        setText(interaction, response.base[baseType]);
     } else if (response.list && response.list[baseType]) {
         for (let i in response.list[baseType]) {
             const serial = typeof response.list.serial === 'undefined' ? '' : response.list.serial[i];

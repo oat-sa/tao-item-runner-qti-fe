@@ -93,7 +93,7 @@ define([
         title: 'filled response with markup',
         response: { base: { string: '<strong>test</strong>' } },
         expected: { base: { string: '<strong>test</strong>' } },
-        value: '&lt;strong&gt;test&lt;/strong&gt;'
+        value: '<strong>test</strong>'
     }, {
         title: 'empty response',
         response: { base: { string: '' } },
@@ -134,7 +134,7 @@ define([
                 );
 
                 assert.equal(
-                    $container.find('.text-container')[0].innerHTML,
+                    $container.find('.text-container')[0].innerText,
                     data.value,
                     'the textarea displays the loaded response'
                 );
