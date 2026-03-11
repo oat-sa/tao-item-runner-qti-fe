@@ -237,10 +237,13 @@ const resetResponse = interaction => {
 };
 
 const setText = (interaction, text) => {
+    if (['plain', 'preformatted'].includes(_getFormat(interaction))) {
+        containerHelper.get(interaction).find('.text-container')[0].innerText = text;
+    } else {
+        containerHelper.get(interaction).find('.text-container')[0].innerHTML = text;
+    }
+
     const limiter = inputLimiter(interaction);
-
-    containerHelper.get(interaction).find('.text-container')[0].innerHTML = text;
-
     if (limiter.enabled) {
         limiter.updateCounter();
     }
