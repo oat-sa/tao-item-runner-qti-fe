@@ -2,13 +2,16 @@ define([
     'jquery',
     'lodash',
     'taoQtiItem/runner/qtiItemRunner',
+    'taoQtiItem/reviewRenderer/renderers/interactions/ExtendedTextInteraction',
     'json!taoQtiItem/test/samples/json/postcard.json',
     'json!taoQtiItem/test/samples/json/formated-card.json'
-], function ($, _, qtiItemRunner, itemDataPlain, itemDataXhtml) {
+], function ($, _, qtiItemRunner, extendedTextRenderer, itemDataPlain, itemDataXhtml) {
     'use strict';
 
     var runner;
     var fixtureContainerId = 'item-container-';
+
+    extendedTextRenderer.register && extendedTextRenderer.register();
 
     /** PLAIN **/
 
@@ -87,6 +90,11 @@ define([
         expected: { base: { string: 'test' } },
         value: 'test'
     }, {
+        title: 'filled response with markup',
+        response: { base: { string: '<strong>test</strong>' } },
+        expected: { base: { string: '<strong>test</strong>' } },
+        value: '<strong>test</strong>'
+    }, {
         title: 'empty response',
         response: { base: { string: '' } },
         expected: { base: { string: '' } },
@@ -126,7 +134,7 @@ define([
                 );
 
                 assert.equal(
-                    $container.find('.text-container')[0].innerHTML,
+                    $container.find('.text-container')[0].innerText,
                     data.value,
                     'the textarea displays the loaded response'
                 );

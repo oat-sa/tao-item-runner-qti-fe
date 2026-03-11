@@ -63,7 +63,7 @@ const render = interaction => {
                 expectedLength = parseInt(expectedLength, 10);
 
                 if (expectedLength > 0) {
-                    $el.each(() => {
+                    $el.each(function () {
                         $(this).css('width', expectedLength + 'em');
                     });
                 }
@@ -80,7 +80,7 @@ const render = interaction => {
                 placeholderType = 'first';
 
                 if (placeholderType === 'multiple') {
-                    $el.each(() => {
+                    $el.each(function () {
                         $(this).attr('placeholder', placeholderText);
                     });
                 } else if (placeholderType === 'first') {
@@ -237,10 +237,13 @@ const resetResponse = interaction => {
 };
 
 const setText = (interaction, text) => {
+    if (['plain', 'preformatted'].includes(_getFormat(interaction))) {
+        containerHelper.get(interaction).find('.text-container')[0].innerText = text;
+    } else {
+        containerHelper.get(interaction).find('.text-container')[0].innerHTML = text;
+    }
+
     const limiter = inputLimiter(interaction);
-
-    containerHelper.get(interaction).find('.text-container')[0].innerHTML = text;
-
     if (limiter.enabled) {
         limiter.updateCounter();
     }
@@ -272,7 +275,7 @@ const getResponse = interaction => {
     if (multiple) {
         values = [];
 
-        $container.find('.text-container').each(i => {
+        $container.find('.text-container').each(function (i) {
             const $el = $(this);
 
             if (attributes.placeholderText && $el.innerText === attributes.placeholderText) {
