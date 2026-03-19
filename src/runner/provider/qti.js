@@ -100,11 +100,11 @@ var qtiItemRuntimeProvider = {
                         $itemBody.attr('dir', locale.getLanguageDirection(itemLang));
                     }
                 }
+                if (isSafari()) {
+                    $itemBody.attr('data-useragent-browser', 'safari');
+                }
                 if (getIsItemWritingModeVerticalRl()) {
                     document.body.classList.add('item-writing-mode-vertical-rl');
-                    if (isSafari()) {
-                        $itemBody.attr('data-useragent-browser', 'safari');
-                    }
                 }
             } catch (e) {
                 self.trigger('error', __('Error in template rendering: %s', e.message));
