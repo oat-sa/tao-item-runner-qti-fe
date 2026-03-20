@@ -176,7 +176,6 @@ const render = function (interaction) {
         $iconRemove.removeClass('inactive').addClass('active');
         $iconBefore.removeClass('inactive').addClass('active');
         $iconAfter.removeClass('inactive').addClass('active');
-        _freezeSize($container);
     };
 
     const _resetControls = function _resetControls() {
@@ -185,7 +184,6 @@ const render = function (interaction) {
         $iconRemove.removeClass('active').addClass('inactive');
         $iconBefore.removeClass('active').addClass('inactive');
         $iconAfter.removeClass('active').addClass('inactive');
-        _freezeSize($container);
     };
 
     const _setSelection = function _setSelection($choice) {
