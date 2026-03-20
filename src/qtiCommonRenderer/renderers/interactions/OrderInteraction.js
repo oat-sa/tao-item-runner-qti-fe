@@ -142,7 +142,6 @@ const render = function (interaction) {
     const $container = containerHelper.get(interaction),
         $choiceArea = $container.find('.choice-area'),
         $resultArea = $container.find('.result-area'),
-        $resultsArrowBar = $container.find('.arrow-bar.results'),
         $iconAdd = $container.find('.icon-add-to-selection'),
         $iconRemove = $container.find('.icon-remove-from-selection'),
         $iconBefore = $container.find('.icon-move-before'),
@@ -172,7 +171,6 @@ const render = function (interaction) {
 
     const _activeControls = function _activeControls() {
         $iconAdd.addClass('inactive');
-        $resultsArrowBar.removeClass('inactive').addClass('active');
         $iconRemove.removeClass('inactive').addClass('active');
         $iconBefore.removeClass('inactive').addClass('active');
         $iconAfter.removeClass('inactive').addClass('active');
@@ -180,7 +178,6 @@ const render = function (interaction) {
 
     const _resetControls = function _resetControls() {
         $iconAdd.removeClass('inactive');
-        $resultsArrowBar.removeClass('active').addClass('inactive');
         $iconRemove.removeClass('active').addClass('inactive');
         $iconBefore.removeClass('active').addClass('inactive');
         $iconAfter.removeClass('active').addClass('inactive');
