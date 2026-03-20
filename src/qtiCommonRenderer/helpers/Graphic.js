@@ -128,6 +128,9 @@ const qti2raphCoordsMapper = {
             }
         }
 
+        // close the path
+        coords.push('Z');
+
         return [coords.join(' ')];
     }
 };
