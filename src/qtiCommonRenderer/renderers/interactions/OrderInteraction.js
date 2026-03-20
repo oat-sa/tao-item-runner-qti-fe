@@ -605,18 +605,11 @@ const getCustomData = function (interaction, data) {
         left: 'icon-right',
         right: 'icon-left'
     };
-    const iconRemoveDirection = {
-        top: 'icon-up',
-        bottom: 'icon-down', 
-        left: 'icon-left',
-        right: 'icon-right'
-    };
     const position = interaction.attr('data-position');
     return _.merge(data || {}, {
         horizontal: interaction.attr('orientation') === 'horizontal' && orientationSelectionEnabled,
         position,
-        iconAdd: iconAddDirection[position],
-        iconRemove: iconRemoveDirection[position]
+        iconAdd: iconAddDirection[position]
     });
 };
 
