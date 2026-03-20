@@ -45,8 +45,10 @@ function _fixSafariCaption($table) {
     if ($caption.length) {
         $caption.addClass('no-block-size').wrapInner('<span/>');
         const resizeObserverCallback = entry => {
-            const captionBlockSize = entry.borderBoxSize[0].blockSize;
-            $table.get(0).style.setProperty('--caption-block-size', `${captionBlockSize}px`);
+            requestAnimationFrame(() => {
+                const captionBlockSize = entry.borderBoxSize[0].blockSize;
+                $table.get(0).style.setProperty('--caption-block-size', `${captionBlockSize}px`);
+            });
         };
         resizeObserverHelper.observe($table.find('caption > span'), resizeObserverCallback);
         $table.data('resizeObserverCallback', resizeObserverCallback);
