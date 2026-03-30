@@ -422,6 +422,19 @@ var Element = Class.extend({
     },
     unset: function () {
         return Element.unsetElement(this.serial);
+    },
+    /**
+     * Clean up an element rendering.
+     * Ask the renderer to run destroy if exists.
+     *
+     * @throws {Error} if no renderer is found
+     * @returns {Promise?} the element destroy step can be async and can return an optional Promise
+     */
+    clear: function () {
+        var renderer = this.getRenderer();
+        if (renderer && _.isFunction(renderer.destroy)) {
+            return renderer.destroy(this);
+        }
     }
 });
 

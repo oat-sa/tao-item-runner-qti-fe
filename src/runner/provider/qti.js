@@ -193,8 +193,10 @@ var qtiItemRuntimeProvider = {
 
         if (self._item) {
             Promise.all(
-                this._item.getInteractions().map(function (interaction) {
-                    return interaction.clear();
+                Object.values(this._item.getComposingElements()).map(function (element) {
+                    if (element && typeof element.clear === 'function') {
+                        element.clear();
+                    }
                 })
             )
                 .then(function () {

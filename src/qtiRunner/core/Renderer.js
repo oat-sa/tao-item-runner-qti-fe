@@ -507,8 +507,6 @@ const Renderer = function (options) {
             if (_.isFunction(renderer.destroy)) {
                 ret = renderer.destroy.call(this, qtiInteraction);
             }
-        } else {
-            throw new Error('no renderer registered under the name : ' + qtiClass);
         }
         return ret;
     };
