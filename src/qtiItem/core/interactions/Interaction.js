@@ -198,20 +198,6 @@ var QtiInteraction = Element.extend({
         }
     },
 
-    /**
-     * Clean up an interaction rendering.
-     * Ask the renderer to run destroy if exists.
-     *
-     * @throws {Error} if no renderer is found
-     * @returns {Promise?} the interaction destroy step can be async and can return an optional Promise
-     */
-    clear: function () {
-        var renderer = this.getRenderer();
-        if (renderer && _.isFunction(renderer.destroy)) {
-            return renderer.destroy(this);
-        }
-    },
-
     toArray: function () {
         var arr = this._super();
         arr.choices = {};
