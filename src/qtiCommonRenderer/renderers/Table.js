@@ -25,12 +25,22 @@ function render(table) {
 
     if (getIsWritingModeVerticalRl($table)) {
         _fixSafariCaption($table);
+        _fixSafariTheadTbody($table);
     }
 }
 
 function destroy(table) {
     const $table = containerHelper.get(table);
     _destroySafariCaption($table);
+}
+
+/**
+ * Safari + `writing-mode: vertical-rl`:
+ *  in css we'll be setting `display:contents` on thead/tbody, but this breaks VoiceOver a11y, so add roles to restore it.
+ * @param {JQuery} $table
+ */
+function _fixSafariTheadTbody($table) {
+    $table.find('thead, tbody').attr('role', 'rowgroup');
 }
 
 /**
