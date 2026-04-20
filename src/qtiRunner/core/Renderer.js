@@ -101,7 +101,7 @@ const _dependencies = {
     choiceInteraction: ['simpleChoice'],
     gapMatchInteraction: ['gap', 'gapText'],
     graphicAssociateInteraction: ['associableHotspot'],
-    graphicGapMatchInteraction: ['associableHotspot', 'gapImg'],
+    graphicGapMatchInteraction: ['associableHotspot', 'gapImg', 'gapText'],
     graphicOrderInteraction: ['hotspotChoice'],
     hotspotInteraction: ['hotspotChoice'],
     hottextInteraction: ['hottext'],
