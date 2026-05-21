@@ -8,13 +8,17 @@
         <ul class="choice-area square source solid block-listing {{#if horizontal}}horizontal{{/if}}">
             {{#choices}}{{{.}}}{{/choices}}
         </ul>
-        <div class="arrow-bar">
+        <div class="arrow-bar middle">
             <span class="arrow icon-add-to-selection {{iconAdd}}"></span>
             <span class="arrow icon-remove-from-selection {{iconRemove}} inactive"></span>
         </div>
         <ul class="drag-container block-listing"></ul>
         <ul class="result-area decimal target solid block-listing {{#if horizontal}}horizontal{{/if}}">
         </ul>
+        <div class="arrow-bar">
+            <span class="arrow icon-move-before {{moveBeforeIcon}} inactive"></span>
+            <span class="arrow icon-move-after {{moveAfterIcon}} inactive"></span>
+        </div>
     </div>
     <div class="notification-container"></div>
 </div>
