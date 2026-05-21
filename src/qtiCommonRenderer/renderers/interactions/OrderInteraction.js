@@ -144,6 +144,8 @@ const render = function (interaction) {
         $resultArea = $container.find('.result-area'),
         $iconAdd = $container.find('.icon-add-to-selection'),
         $iconRemove = $container.find('.icon-remove-from-selection'),
+        $iconBefore = $container.find('.icon-move-before'),
+        $iconAfter = $container.find('.icon-move-after'),
         choiceSelector = `${$choiceArea.selector} >li:not(.deactivated)`,
         resultSelector = `${$resultArea.selector} >li`,
         $dragContainer = $container.find('.drag-container'),
@@ -170,11 +172,15 @@ const render = function (interaction) {
     const _activeControls = function _activeControls() {
         $iconAdd.addClass('inactive');
         $iconRemove.removeClass('inactive').addClass('active');
+        $iconBefore.removeClass('inactive').addClass('active');
+        $iconAfter.removeClass('inactive').addClass('active');
     };
 
     const _resetControls = function _resetControls() {
         $iconAdd.removeClass('inactive');
         $iconRemove.removeClass('active').addClass('inactive');
+        $iconBefore.removeClass('active').addClass('inactive');
+        $iconAfter.removeClass('active').addClass('inactive');
     };
 
     const _setSelection = function _setSelection($choice) {
@@ -232,6 +238,24 @@ const render = function (interaction) {
         _resetSelection();
     };
 
+    const _moveResultBefore = function _moveResultBefore() {
+        const $prev = $activeChoice && $activeChoice.prev();
+
+        if ($prev && $prev.length) {
+            $prev.before($activeChoice);
+            containerHelper.triggerResponseChangeEvent(interaction);
+        }
+    };
+
+    const _moveResultAfter = function _moveResultAfter() {
+        const $next = $activeChoice && $activeChoice.next();
+
+        if ($next && $next.length) {
+            $next.after($activeChoice);
+            containerHelper.triggerResponseChangeEvent(interaction);
+        }
+    };
+
     // Point & click handlers
 
     interact($container.selector).on('tap', function () {
@@ -276,6 +300,26 @@ const render = function (interaction) {
 
         e.stopPropagation();
         _removeChoice();
+    });
+
+    interact($iconBefore.selector).on('tap', function (e) {
+        //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
+        if ($(e.currentTarget).closest('.qti-item').hasClass('prevent-click-handler')) {
+            return;
+        }
+
+        e.stopPropagation();
+        _moveResultBefore();
+    });
+
+    interact($iconAfter.selector).on('tap', function (e) {
+        //if tts component is loaded and click-to-speak function is activated - we should prevent this listener to go further
+        if ($(e.currentTarget).closest('.qti-item').hasClass('prevent-click-handler')) {
+            return;
+        }
+
+        e.stopPropagation();
+        _moveResultAfter();
     });
 
     // Drag & drop handlers
@@ -654,11 +698,15 @@ const getCustomData = function (interaction, data) {
         right: 'icon-right'
     };
     const position = interaction.attr('data-position');
+    const horizontal = interaction.attr('orientation') === 'horizontal' && orientationSelectionEnabled;
+
     return _.merge(data || {}, {
-        horizontal: interaction.attr('orientation') === 'horizontal' && orientationSelectionEnabled,
+        horizontal,
         position,
         iconAdd: iconAddDirection[position],
-        iconRemove: iconRemoveDirection[position]
+        iconRemove: iconRemoveDirection[position],
+        moveBeforeIcon: horizontal ? 'icon-left' : 'icon-up',
+        moveAfterIcon: horizontal ? 'icon-right' : 'icon-down'
     });
 };
 
@@ -675,6 +723,8 @@ const destroy = function (interaction) {
         '.result-area >li',
         '.icon-add-to-selection',
         '.icon-remove-from-selection',
+        '.icon-move-before',
+        '.icon-move-after',
     ];
     if (interaction.data('touchPatch')) {
         interaction.data('touchPatch').destroy();
