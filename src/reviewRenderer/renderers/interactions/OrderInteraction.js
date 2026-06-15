@@ -40,6 +40,14 @@ const _freezeSize = function($container) {
 const render = function(interaction) {
     const $container = containerHelper.get(interaction);
 
+    const orderState = interaction.attr('data-order') || interaction.attr('order');
+    if (orderState === 'single') {
+        const $choiceArea = $container.find('.choice-area');
+        const $resultArea = $container.find('.result-area');
+        $container.addClass('test-preview');
+        $resultArea.append($choiceArea.children('.qti-choice'));
+    }
+
     //bind event listener in case the attributes change dynamically on runtime
     $(document).on('attributeChange.qti-widget.commonRenderer', (e) => e.preventDefault());
 
