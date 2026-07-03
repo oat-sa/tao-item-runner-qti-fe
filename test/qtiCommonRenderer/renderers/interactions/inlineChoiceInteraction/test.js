@@ -27,13 +27,18 @@ define([
 
         containerHelper.setContext($fixture);
 
+        const interaction = {
+            getSerial: () => interactionSerial,
+            attr: name => (name === 'required' ? false : undefined),
+            getResponse() {
+                return inlineChoiceInteractionRenderer.getResponse(interaction);
+            }
+        };
+
         return {
             $fixture,
             $listbox,
-            interaction: {
-                getSerial: () => interactionSerial,
-                attr: name => (name === 'required' ? false : undefined)
-            }
+            interaction
         };
     };
 
