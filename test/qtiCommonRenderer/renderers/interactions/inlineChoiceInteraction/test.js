@@ -13,13 +13,17 @@ define([
         const $fixture = $('<div class="qti-item"><div class="qti-itemBody" dir="ltr"></div></div>').appendTo(
             '#qunit-fixture'
         );
-        const $listbox = $(`
-            <span role="listbox" class="qti-interaction qti-inlineChoiceInteraction" data-serial="${interactionSerial}">
-                <span role="option" data-identifier="empty"></span>
-                <span role="option" data-identifier="HOKKAIDO">${rubyMarkup}</span>
-                <span role="option" data-identifier="PLAIN">Plain</span>
-            </span>
-        `).appendTo($fixture.find('.qti-itemBody'));
+        const $listbox = $('<span>', {
+            role: 'listbox',
+            class: 'qti-interaction qti-inlineChoiceInteraction',
+            'data-serial': interactionSerial
+        })
+            .append(
+                $('<span>', { role: 'option', 'data-identifier': 'empty' }),
+                $('<span>', { role: 'option', 'data-identifier': 'HOKKAIDO' }).html(rubyMarkup),
+                $('<span>', { role: 'option', 'data-identifier': 'PLAIN' }).text('Plain')
+            )
+            .appendTo($fixture.find('.qti-itemBody'));
 
         containerHelper.setContext($fixture);
 
