@@ -30,6 +30,13 @@ define([
         const interaction = {
             getSerial: () => interactionSerial,
             attr: name => (name === 'required' ? false : undefined),
+            getResponseDeclaration() {
+                return {
+                    attr(name) {
+                        return name === 'baseType' ? 'identifier' : 'single';
+                    }
+                };
+            },
             getResponse() {
                 return inlineChoiceInteractionRenderer.getResponse(interaction);
             }
