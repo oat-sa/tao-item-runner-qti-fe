@@ -45,6 +45,8 @@ const _defaultOptions = {
 
 const optionSelector = 'span[role="option"]';
 
+const getOptionMarkup = opt => $(opt).html();
+
 /**
  * Init rendering, called after template injected into the DOM
  * All options are listed in the QTI v2.1 information model:
@@ -62,7 +64,7 @@ const render = function (interaction, options) {
     _.extend(opts, options);
 
     if (opts.allowEmpty && !required) {
-        $container.find(`span[data-identifier=${_emptyValue}]`).text(`--- ${__(`leave empty`)}---`);
+        $container.find(`span[data-identifier=${_emptyValue}]`).html(`--- ${__(`leave empty`)}---`);
     } else {
         $container.find(`span[data-identifier=${_emptyValue}]`).remove();
     }
@@ -84,7 +86,7 @@ const render = function (interaction, options) {
             .find(optionSelector)
             .map((i, opt) => ({
                 id: $(opt).data('identifier'),
-                markup: opt.outerHTML
+                markup: getOptionMarkup(opt)
             }))
             .get(),
         formatResult: function (result) {
@@ -93,6 +95,7 @@ const render = function (interaction, options) {
         formatSelection: function (data) {
             return data.markup;
         },
+        escapeMarkup: markup => markup,
         width: 'fit-content',
         placeholder: opts.placeholderText,
         minimumResultsForSearch: -1,

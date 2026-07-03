@@ -38,4 +38,32 @@ define([
             assert.strictEqual(renderer.getContainer, containerHelper.get, `${qtiClass} getContainer wired`);
         });
     });
+
+    QUnit.module('qtiCommonRenderer/renderers/choices/InlineChoice');
+
+    QUnit.test('getData converts ruby tag placeholders to HTML', function (assert) {
+        const data = {
+            body: '村田{ruby}{rb}真{/rb}{rt}まこと{/rt}{/ruby}の'
+        };
+
+        const result = inlineChoiceRenderer.getData({}, data);
+
+        assert.equal(result.body, '村田<ruby><rb>真</rb><rt>まこと</rt></ruby>の', 'ruby placeholders are converted');
+    });
+
+    QUnit.test('getData leaves body unchanged when no ruby tags are present', function (assert) {
+        const data = { body: 'Gloucester' };
+
+        const result = inlineChoiceRenderer.getData({}, data);
+
+        assert.equal(result.body, 'Gloucester', 'plain text body is unchanged');
+    });
+
+    QUnit.test('getData leaves body unchanged when body is not a string', function (assert) {
+        const data = { body: { nested: true } };
+
+        const result = inlineChoiceRenderer.getData({}, data);
+
+        assert.deepEqual(result.body, { nested: true }, 'non-string body is unchanged');
+    });
 });

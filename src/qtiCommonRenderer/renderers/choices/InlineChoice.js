@@ -24,8 +24,18 @@
 import tpl from 'taoQtiItem/qtiCommonRenderer/tpl/choices/inlineChoice';
 import containerHelper from 'taoQtiItem/qtiCommonRenderer/helpers/container';
 
+const rubyTags = /\{(ruby|rt|rb|rp)\}|\{\/(ruby|rt|rb|rp)\}/g;
+
 export default {
     qtiClass: 'inlineChoice',
     getContainer: containerHelper.get,
+    getData(choice, data) {
+        if (data && typeof data.body === 'string') {
+            data.body = data.body.replace(rubyTags, (match, open, close) =>
+                open ? `<${open}>` : `</${close}>`
+            );
+        }
+        return data;
+    },
     template: tpl
 };
