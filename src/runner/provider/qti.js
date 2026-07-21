@@ -40,6 +40,117 @@ import { getIsItemWritingModeVerticalRl } from 'taoQtiItem/qtiCommonRenderer/hel
 import { isSafari } from 'taoQtiItem/qtiCommonRenderer/helpers/userAgent';
 
 var timeout = (context.timeout > 0 ? context.timeout + 1 : 30) * 1000;
+const stackedSeparatorClass = 'separator-between-columns-stacked';
+
+function isColumnElement(element) {
+    return Array.from(element.classList || []).some(className => className.indexOf('col-') === 0);
+}
+
+function getSeparatorOrientation(previousColumn, currentColumn) {
+    const previousRect = previousColumn.getBoundingClientRect();
+    const currentRect = currentColumn.getBoundingClientRect();
+    const deltaX = Math.abs(currentRect.left - previousRect.left);
+    const deltaY = Math.abs(currentRect.top - previousRect.top);
+
+    return deltaY > deltaX ? 'horizontal' : 'vertical';
+}
+
+function clearSeparatorLineExtent(column) {
+    column.style.removeProperty('--separator-row-offset-start');
+    column.style.removeProperty('--separator-row-offset-end');
+}
+
+function updateSeparatorLayout(rootElement) {
+    rootElement.querySelectorAll('.qti-itemBody.separator-between-columns').forEach(itemBody => {
+        const rows = Array.from(itemBody.children).filter(
+            child => child.classList && child.classList.contains('grid-row')
+        );
+
+        rows.forEach(row => {
+            const rowRect = row.getBoundingClientRect();
+            const columns = Array.from(row.children).filter(isColumnElement);
+
+            columns.forEach((column, index) => {
+                clearSeparatorLineExtent(column);
+
+                if (index === 0) {
+                    return;
+                }
+
+                const columnRect = column.getBoundingClientRect();
+                column.style.setProperty('--separator-row-offset-start', `${columnRect.left - rowRect.left}px`);
+                column.style.setProperty('--separator-row-offset-end', `${rowRect.right - columnRect.right}px`);
+            });
+
+            const hasStackedColumns = columns.some((column, index) => {
+                if (index === 0) {
+                    return false;
+                }
+
+                return getSeparatorOrientation(columns[index - 1], column) === 'horizontal';
+            });
+
+            row.classList.toggle(stackedSeparatorClass, hasStackedColumns);
+        });
+    });
+}
+
+function clearSeparatorLayout(provider) {
+    if (provider._separatorLayoutCleanup) {
+        provider._separatorLayoutCleanup();
+        provider._separatorLayoutCleanup = null;
+    }
+}
+
+function setupSeparatorLayout(provider, rootElement) {
+    let secondAnimationFrameId;
+    let delayedTimeoutId;
+    let resizeObserver;
+
+    const scheduleSeparatorLayoutUpdate = () => {
+        updateSeparatorLayout(rootElement);
+
+        if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(() => {
+                updateSeparatorLayout(rootElement);
+                secondAnimationFrameId = requestAnimationFrame(() => updateSeparatorLayout(rootElement));
+            });
+        }
+
+        delayedTimeoutId = setTimeout(() => updateSeparatorLayout(rootElement), 100);
+    };
+
+    const handleResize = _.debounce(scheduleSeparatorLayoutUpdate, 50);
+
+    clearSeparatorLayout(provider);
+    scheduleSeparatorLayoutUpdate();
+
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(scheduleSeparatorLayoutUpdate);
+    }
+
+    if (typeof ResizeObserver !== 'undefined') {
+        resizeObserver = new ResizeObserver(handleResize);
+        rootElement.querySelectorAll('.qti-itemBody.separator-between-columns').forEach(itemBody => {
+            resizeObserver.observe(itemBody);
+        });
+    } else {
+        $(window).on('resize.separator-layout orientationchange.separator-layout', handleResize);
+    }
+
+    provider._separatorLayoutCleanup = () => {
+        if (secondAnimationFrameId) {
+            cancelAnimationFrame(secondAnimationFrameId);
+        }
+        if (delayedTimeoutId) {
+            clearTimeout(delayedTimeoutId);
+        }
+        if (resizeObserver) {
+            resizeObserver.disconnect();
+        }
+        $(window).off('.separator-layout');
+    };
+}
 
 /**
  * @exports taoQtiItem/runner/provider/qti
@@ -145,6 +256,8 @@ var qtiItemRuntimeProvider = {
                     })
                 ])
                     .then(function () {
+                        setupSeparatorLayout(self, elt);
+
                         $(elt)
                             .off('responseChange')
                             .on('responseChange', function () {
@@ -162,6 +275,9 @@ var qtiItemRuntimeProvider = {
                                 if (themeLoader) {
                                     themeLoader.change(themeName);
                                 }
+                                _.defer(function () {
+                                    updateSeparatorLayout(elt);
+                                });
                             });
 
                         /**
@@ -203,6 +319,7 @@ var qtiItemRuntimeProvider = {
                     self._item.clear();
 
                     $(elt).off('responseChange').off('endattempt').off('themechange').off('feedback').empty();
+                    clearSeparatorLayout(self);
 
                     if (self._renderer) {
                         self._renderer.unload();
@@ -217,6 +334,7 @@ var qtiItemRuntimeProvider = {
                     self.trigger('error', __('Something went wrong while destroying an interaction: %s', err.message));
                 });
         } else {
+            clearSeparatorLayout(self);
             done();
         }
     },

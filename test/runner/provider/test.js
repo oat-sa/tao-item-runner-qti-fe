@@ -25,13 +25,52 @@ define([
     'lodash',
     'taoItems/runner/api/itemRunner',
     'taoQtiItem/runner/provider/qti',
-    'taoQtiItem/portableElementRegistry/icRegistry',
+    'taoQtiItem/runner/provider/manager/userModules',
+    'taoQtiItem/qtiItem/core/Element',
+    'taoQtiItem/qtiItem/core/Loader',
+    'taoQtiItem/qtiItem/helper/modalFeedback',
     'json!taoQtiItem/test/samples/json/space-shuttle.json'
-], function ($, _, itemRunner, qtiRuntimeProvider, icRegistry, itemData) {
+], function ($, _, itemRunner, qtiRuntimeProvider, userModules, Element, QtiLoader, modalFeedbackHelper, itemData) {
     'use strict';
 
     var runner;
     var containerId = 'item-container';
+
+    function createProvider(overrides) {
+        return _.assign(
+            Object.create(qtiRuntimeProvider),
+            {
+                assetManager: {},
+                options: {
+                    view: 'default'
+                },
+                trigger: function () {}
+            },
+            overrides
+        );
+    }
+
+    function mockUserAgent(userAgent) {
+        var hasOwnUserAgent = Object.prototype.hasOwnProperty.call(window.navigator, 'userAgent');
+        var originalOwnDescriptor = hasOwnUserAgent
+            ? Object.getOwnPropertyDescriptor(window.navigator, 'userAgent')
+            : null;
+
+        Object.defineProperty(window.navigator, 'userAgent', {
+            configurable: true,
+            get: function () {
+                return userAgent;
+            }
+        });
+
+        return function restoreUserAgent() {
+            if (originalOwnDescriptor) {
+                Object.defineProperty(window.navigator, 'userAgent', originalOwnDescriptor);
+            } else {
+                delete window.navigator.userAgent;
+            }
+        };
+    }
 
     QUnit.module('Provider API');
 
@@ -535,13 +574,390 @@ define([
     });
 
     QUnit.module('Provider PIC', {
-        beforeEach: function (assert) {
-            icRegistry.resetProviders();
-        },
         afterEach: function (assert) {
-            runner.clear();
+            if (runner) {
+                runner.clear();
+                runner = null;
+            }
             itemRunner.providers = null;
-            icRegistry.resetProviders();
         }
+    });
+
+    QUnit.test('render configures separators, browser flags and portable element providers', function (assert) {
+        var ready = assert.async();
+        var container = document.getElementById(containerId);
+        assert.timeout(5000);
+        var triggerCalls = [];
+        var themeChanges = [];
+        var observedBodies = [];
+        var itemCleared = false;
+        var rendererUnloaded = false;
+        var restoreUserAgent = mockUserAgent('Mozilla/5.0 (Macintosh) Safari/605.1.15');
+        var originalUserModulesLoad = userModules.load;
+        var originalResizeObserver = window.ResizeObserver;
+
+        function restore() {
+            restoreUserAgent();
+            userModules.load = originalUserModulesLoad;
+            window.ResizeObserver = originalResizeObserver;
+        }
+
+        userModules.load = function () {
+            return Promise.resolve();
+        };
+        window.ResizeObserver = function () {
+            this.observe = function (element) {
+                observedBodies.push(element);
+            };
+            this.disconnect = function () {
+                observedBodies.push('disconnect');
+            };
+        };
+
+        var provider = createProvider({
+            _renderer: {
+                getThemeLoader: function () {
+                    return {
+                        change: function (themeName) {
+                            themeChanges.push(themeName);
+                        }
+                    };
+                },
+                unload: function () {
+                    rendererUnloaded = true;
+                }
+            },
+            getState: function () {
+                return { mockState: true };
+            },
+            getResponses: function () {
+                return { mockResponse: true };
+            },
+            trigger: function (name, payload) {
+                triggerCalls.push({ name: name, payload: payload });
+            }
+        });
+
+        provider._item = {
+            bdy: {
+                attr: function (name) {
+                    return name === 'dir' ? 'rtl' : undefined;
+                }
+            },
+            render: function () {
+                return (
+                    '<div class="qti-item" lang="en">' +
+                    '<div class="qti-itemBody separator-between-columns writing-mode-vertical-rl">' +
+                    '<div class="grid-row">' +
+                    '<div class="col-6"></div>' +
+                    '<div class="col-6"></div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>'
+                );
+            },
+            postRender: function () {
+                var row = container.querySelector('.grid-row');
+                var columns = row.children;
+
+                row.getBoundingClientRect = function () {
+                    return {
+                        left: 0,
+                        right: 300,
+                        top: 0
+                    };
+                };
+                columns[0].getBoundingClientRect = function () {
+                    return {
+                        left: 0,
+                        right: 100,
+                        top: 0
+                    };
+                };
+                columns[1].getBoundingClientRect = function () {
+                    return {
+                        left: 0,
+                        right: 100,
+                        top: 100
+                    };
+                };
+
+                return [];
+            },
+            getInteractions: function () {
+                return [];
+            },
+            getElements: function () {
+                return [];
+            },
+            getComposingElements: function () {
+                return {};
+            },
+            clear: function () {
+                itemCleared = true;
+            }
+        };
+
+        provider.render(
+            container,
+            function () {
+                try {
+                    var itemBody = container.querySelector('.qti-itemBody');
+                    var row = container.querySelector('.grid-row');
+                    var columns = row.children;
+
+                    assert.equal(itemBody.getAttribute('dir'), 'rtl', 'body direction comes from the item body');
+                    assert.equal(
+                        itemBody.getAttribute('data-useragent-browser'),
+                        'safari',
+                        'Safari flag is added to the item body'
+                    );
+                    assert.ok(
+                        document.body.classList.contains('item-writing-mode-vertical-rl'),
+                        'vertical writing mode is reflected on the document body'
+                    );
+                    assert.equal(
+                        columns[1].style.getPropertyValue('--separator-row-offset-start'),
+                        '0px',
+                        'separator start offset is set from the column position'
+                    );
+                    assert.equal(
+                        columns[1].style.getPropertyValue('--separator-row-offset-end'),
+                        '200px',
+                        'separator end offset is set from the column position'
+                    );
+                    assert.ok(
+                        row.classList.contains('separator-between-columns-stacked'),
+                        'stacked separator class is applied when columns wrap'
+                    );
+                    assert.equal(observedBodies.length, 1, 'separator layout starts observing matching item bodies');
+
+                    $(container).trigger('responseChange');
+                    $(container).trigger('endattempt', 'RESPONSE_1');
+                    $(container).trigger('themechange', 'contrast');
+
+                    assert.deepEqual(
+                        _.map(triggerCalls, 'name'),
+                        ['listpic', 'statechange', 'responsechange', 'endattempt'],
+                        'rendered item emits PIC listing and forwards response events'
+                    );
+                    assert.deepEqual(themeChanges, ['contrast'], 'theme changes are forwarded to the renderer');
+
+                    provider.clear(container, function () {
+                        try {
+                            assert.ok(itemCleared, 'item clear hook is called');
+                            assert.ok(rendererUnloaded, 'renderer unload hook is called');
+                            assert.ok(observedBodies.includes('disconnect'), 'separator layout observer is disconnected');
+                            assert.ok(
+                                !document.body.classList.contains('item-writing-mode-vertical-rl'),
+                                'vertical writing mode class is removed on clear'
+                            );
+                            assert.equal(provider._item, null, 'provider item reference is cleared');
+                        } catch (error) {
+                            assert.ok(false, error.message);
+                        }
+
+                        restore();
+                        ready();
+                    });
+                } catch (error) {
+                    restore();
+                    assert.ok(false, error.message);
+                    ready();
+                }
+            }
+        );
+    });
+
+    QUnit.test('render derives direction from language and keeps explicit direction', function (assert) {
+        var ready = assert.async();
+        var container = document.getElementById(containerId);
+        assert.timeout(5000);
+        var originalUserModulesLoad = userModules.load;
+
+        function createItem(markup) {
+            return {
+                bdy: {
+                    attr: function () {
+                        return undefined;
+                    }
+                },
+                render: function () {
+                    return markup;
+                },
+                postRender: function () {
+                    return [];
+                },
+                getInteractions: function () {
+                    return [];
+                },
+                getElements: function () {
+                    return [];
+                },
+                getComposingElements: function () {
+                    return {};
+                },
+                clear: function () {}
+            };
+        }
+
+        userModules.load = function () {
+            return Promise.resolve();
+        };
+
+        var provider = createProvider({
+            _item: createItem('<div class="qti-item" lang="en"><div class="qti-itemBody"></div></div>')
+        });
+
+        provider.render(container, function () {
+            assert.equal(
+                container.querySelector('.qti-itemBody').getAttribute('dir'),
+                'ltr',
+                'body direction falls back to the item language when none is provided'
+            );
+
+            provider.clear(container, function () {
+                provider._item = createItem('<div class="qti-item" lang="en"><div class="qti-itemBody" dir="rtl"></div></div>');
+
+                provider.render(container, function () {
+                    assert.equal(
+                        container.querySelector('.qti-itemBody').getAttribute('dir'),
+                        'rtl',
+                        'body direction is preserved when the item already sets it'
+                    );
+
+                    provider.clear(container, function () {
+                        userModules.load = originalUserModulesLoad;
+                        ready();
+                    });
+                });
+            });
+        });
+    });
+
+    QUnit.module('Provider helper methods');
+
+    QUnit.test('getState and setState include PIC info controls', function (assert) {
+        var interactionState;
+        var picState;
+        var originalIsA = Element.isA;
+        var interaction = {
+            attr: function (name) {
+                return name === 'responseIdentifier' ? 'RESPONSE' : undefined;
+            },
+            getState: function () {
+                return { response: { base: null } };
+            },
+            setState: function (state) {
+                interactionState = state;
+            }
+        };
+        var infoControl = {
+            attr: function (name) {
+                return name === 'id' ? 'PIC_1' : undefined;
+            },
+            getState: function () {
+                return { open: true };
+            },
+            setState: function (state) {
+                picState = state;
+            }
+        };
+        var nonInfoControl = {
+            attr: function () {
+                return 'IGNORED';
+            },
+            setState: function () {
+                assert.ok(false, 'non info-control elements should not receive PIC state');
+            }
+        };
+        var provider = createProvider({
+            _item: {
+                getInteractions: function () {
+                    return [interaction];
+                },
+                getElements: function () {
+                    return [infoControl, nonInfoControl];
+                }
+            }
+        });
+
+        Element.isA = function (element, qtiClass) {
+            return qtiClass === 'infoControl' && element === infoControl;
+        };
+
+        assert.deepEqual(
+            provider.getState(),
+            {
+                RESPONSE: { response: { base: null } },
+                pic: {
+                    PIC_1: { open: true }
+                }
+            },
+            'state contains both interaction and PIC state'
+        );
+
+        provider.setState({
+            RESPONSE: { response: { base: { identifier: 'Atlantis' } } },
+            pic: {
+                PIC_1: { open: false }
+            }
+        });
+
+        assert.deepEqual(
+            interactionState,
+            { response: { base: { identifier: 'Atlantis' } } },
+            'interaction state is restored from the saved state'
+        );
+        assert.deepEqual(picState, { open: false }, 'PIC state is restored for matching info controls');
+
+        Element.isA = originalIsA;
+    });
+
+    QUnit.test('renderFeedbacks loads feedbacks with the current renderer', function (assert) {
+        var ready = assert.async();
+        assert.timeout(5000);
+        var feedbacks = [{ identifier: 'feedback-1' }];
+        var itemSession = { FEEDBACK: true };
+        var renderingQueue = [{ feedback: 'render-me' }];
+        var originalLoadElements = QtiLoader.prototype.loadElements;
+        var originalGetFeedbacks = modalFeedbackHelper.getFeedbacks;
+        var provider = createProvider({
+            _item: {
+                getRenderer: function () {
+                    return {
+                        load: function (callback, loadedClasses) {
+                            assert.deepEqual(loadedClasses, ['modalFeedback'], 'loader classes are forwarded to the renderer');
+                            callback();
+                        }
+                    };
+                }
+            }
+        });
+
+        QtiLoader.prototype.loadElements = function (receivedFeedbacks, callback) {
+            assert.strictEqual(receivedFeedbacks, feedbacks, 'feedback definitions are passed to the loader');
+            callback.call(
+                {
+                    getLoadedClasses: function () {
+                        return ['modalFeedback'];
+                    }
+                },
+                { loadedFeedbacks: true }
+            );
+        };
+        modalFeedbackHelper.getFeedbacks = function (item, receivedSession) {
+            assert.deepEqual(item, { loadedFeedbacks: true }, 'loaded feedback item is forwarded to the helper');
+            assert.strictEqual(receivedSession, itemSession, 'item session is forwarded to the helper');
+            return renderingQueue;
+        };
+
+        provider.renderFeedbacks(feedbacks, itemSession, function (queue) {
+            assert.strictEqual(queue, renderingQueue, 'renderFeedbacks returns the queue produced by the helper');
+
+            QtiLoader.prototype.loadElements = originalLoadElements;
+            modalFeedbackHelper.getFeedbacks = originalGetFeedbacks;
+            ready();
+        });
     });
 });
