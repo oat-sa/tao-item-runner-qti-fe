@@ -134,8 +134,7 @@ function validateDecimalInput($input, { allowMinusOnly = false, withTooltip = tr
 
         if (withTooltip) {
             const decimalError = thousandsSeparator
-                ? __(
-                    'Invalid value, use %s %s for decimal point and %s %s for thousands separator.',
+                ? __('Invalid value, use %s %s for decimal point and %s %s for thousands separator.',
                     decimalSeparator,
                     decimalSeparatorName,
                     thousandsSeparator,
