@@ -64,7 +64,7 @@ const render = function (interaction, options) {
     _.extend(opts, options);
 
     if (opts.allowEmpty && !required) {
-        $container.find(`span[data-identifier=${_emptyValue}]`).html(`--- ${__(`leave empty`)}---`);
+        $container.find(`span[data-identifier=${_emptyValue}]`).html(`--- ${__('leave empty')}---`);
     } else {
         $container.find(`span[data-identifier=${_emptyValue}]`).remove();
     }
