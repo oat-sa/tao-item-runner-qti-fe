@@ -78,8 +78,7 @@ var getMessageWrongType = function getMessageWrongType(interaction, userSelected
             types: expectedTypeLabels
         });
     } else {
-        return __(
-            'Wrong type of file. Expected %s. The selected file has the mimetype "%s".',
+        return __('Wrong type of file. Expected %s. The selected file has the mimetype "%s".',
             expectedTypeLabels.join(__(' or ')),
             userSelectedType
         );
