@@ -697,7 +697,9 @@ const getCustomData = function (interaction, data) {
         left: 'icon-left',
         right: 'icon-right'
     };
-    const position = interaction.attr('data-position');
+    const position =
+        interaction.attr('data-position') ||
+        (interaction.attr('orientation') === 'horizontal' ? 'top' : 'left');
     const horizontal = interaction.attr('orientation') === 'horizontal' && orientationSelectionEnabled;
 
     return _.merge(data || {}, {
