@@ -27,6 +27,7 @@ var GraphicGapMatchInteraction = GraphicInteraction.extend({
     init: function init(serial, attributes) {
         this._super(serial, attributes);
         this.gapImgs = {};
+        this.gapTexts = {};
     },
     addGapImg: function addGapImg(gapImg) {
         if (Element.isA(gapImg, 'gapImg')) {
@@ -50,6 +51,28 @@ var GraphicGapMatchInteraction = GraphicInteraction.extend({
     getGapImg: function getGapImg(serial) {
         return this.gapImgs[serial];
     },
+    addGapText: function addGapText(gapText) {
+        if (Element.isA(gapText, 'gapText')) {
+            gapText.setRootElement(this.getRootElement() || null);
+            this.gapTexts[gapText.getSerial()] = gapText;
+        }
+    },
+    removeGapText: function removeGapImg(gapText) {
+        var serial = '';
+        if (typeof gapText === 'string') {
+            serial = gapText;
+        } else if (Element.isA(gapText, 'gapText')) {
+            serial = gapText.getSerial();
+        }
+        delete this.gapTexts[serial];
+        return this;
+    },
+    getGapTexts: function getGapTexts() {
+        return _.clone(this.gapTexts);
+    },
+    getGapText: function getGapText(serial) {
+        return this.gapTexts[serial];
+    },
     getChoiceByIdentifier: function getChoiceByIdentifier(identifier) {
         var choice = this._super(identifier);
         if (!choice) {
@@ -68,6 +91,10 @@ var GraphicGapMatchInteraction = GraphicInteraction.extend({
             elts[serial] = this.gapImgs[serial];
             elts = _.extend(elts, this.gapImgs[serial].getComposingElements());
         }
+        for (serial in this.gapTexts) {
+            elts[serial] = this.gapTexts[serial];
+            elts = _.extend(elts, this.gapTexts[serial].getComposingElements());
+        }
         return elts;
     },
     find: function find(serial) {
@@ -75,6 +102,9 @@ var GraphicGapMatchInteraction = GraphicInteraction.extend({
         if (!found) {
             if (this.gapImgs[serial]) {
                 found = { parent: this, element: this.gapImgs[serial] };
+            }
+            if (this.gapTexts[serial]) {
+                found = { parent: this, element: this.gapTexts[serial] };
             }
         }
         return found;
@@ -84,7 +114,8 @@ var GraphicGapMatchInteraction = GraphicInteraction.extend({
             args = rendererConfig.getOptionsFromArguments(arguments),
             renderer = args.renderer || this.getRenderer(),
             defaultData = {
-                gapImgs: []
+                gapImgs: [],
+                gapTexts: [],
             };
 
         //note: no choice shuffling option available for graphic gap match
@@ -94,17 +125,27 @@ var GraphicGapMatchInteraction = GraphicInteraction.extend({
                 defaultData.gapImgs.push(gapImgs[serial].render({}, null, '', renderer));
             }
         }
-
+        var gapTexts = this.getGapTexts();
+        for (serial in gapTexts) {
+            if (Element.isA(gapTexts[serial], 'choice')) {
+                defaultData.gapTexts.push(gapTexts[serial].render({}, null, '', renderer));
+            }
+        }
         return this._super(_.merge(defaultData, args.data), args.placeholder, args.subclass, renderer);
     },
     toArray: function toArray() {
         var serial,
             gapImgs,
+            gapTexts,
             arr = this._super();
         arr.gapImgs = {};
         gapImgs = this.getGapImgs();
         for (serial in gapImgs) {
             arr.gapImgs[serial] = gapImgs[serial].toArray();
+        }
+        gapTexts = this.getGapTexts();
+        for (serial in gapTexts) {
+            arr.gapTexts[serial] = gapTexts[serial].toArray();
         }
         return arr;
     },
@@ -113,10 +154,17 @@ var GraphicGapMatchInteraction = GraphicInteraction.extend({
             var pairs = [];
             var matchSet1 = maxScore.getMatchMaxOrderedChoices(graphicGapInteraction.getGapImgs());
             var matchSet2 = maxScore.getMatchMaxOrderedChoices(graphicGapInteraction.getChoices());
+            var matchSet3 = maxScore.getMatchMaxOrderedChoices(graphicGapInteraction.getGapTexts());
 
             _.forEach(matchSet1, function(choice1) {
                 _.forEach(matchSet2, function(choice2) {
                     pairs.push([choice1.id, choice2.id]);
+                });
+            });
+
+            _.forEach(matchSet3, function(choice3) {
+                _.forEach(matchSet2, function(choice2) {
+                    pairs.push([choice3.id, choice2.id]);
                 });
             });
 
