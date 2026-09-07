@@ -30,6 +30,9 @@ const Handlebars = require('handlebars');
 
 /**
  * Support of handlebars 1.3.0
+ * Approved exception (RFE-2211 / RFE-2192 / RFE-2199): keep the direct `handlebars@1.3.0`
+ * runtime for AMD consumers; `rollup-plugin-handlebars-plus` override pins Handlebars 4.x
+ * for the plugin's compile path.
  * TODO remove once migrated to hbs >= 3.0.0
  */
 const originalVisitor = Handlebars.Visitor;
