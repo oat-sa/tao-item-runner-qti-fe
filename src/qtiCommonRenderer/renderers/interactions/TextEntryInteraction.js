@@ -72,7 +72,14 @@ function showTooltip($input, theme, message) {
         let tooltipOptions = {
             theme: theme,
             trigger: 'manual',
-            placement: isVertical ? 'right' : 'top'
+            placement: isVertical ? 'right' : 'top',
+            popperOptions: {
+                positionFixed: false,
+                modifiers: {
+                    preventOverflow: { escapeWithReference: true },
+                    flip: { enabled: false }
+                }
+            }
         };
         const textEntryTooltip = tooltip.create($input, message, tooltipOptions);
 
