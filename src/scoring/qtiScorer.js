@@ -32,3 +32,4 @@ scorer.register('qti', qtiScoringProvider);
  * @exports taoQtiItem/scoring/qtiScorer
  */
 export default scorer;
+
