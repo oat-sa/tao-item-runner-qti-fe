@@ -161,7 +161,9 @@ const _paperUnSelect = function _paperUnSelect(interaction) {
  */
 const _setGapFiller = function _setGapFiller(interaction, $gapFiller) {
     const gapFillerSerial = $gapFiller.data('serial');
-    const gapFiller = interaction.getGapImg(gapFillerSerial);
+    const gapFiller =
+        interaction.getGapImg(gapFillerSerial) ||
+        (typeof interaction.getGapText === 'function' ? interaction.getGapText(gapFillerSerial) : null);
     let matchMax;
     let usages;
 
@@ -172,7 +174,7 @@ const _setGapFiller = function _setGapFiller(interaction, $gapFiller) {
     _gapFillerUsages[gapFillerSerial]++;
 
     // disable gapfiller if maxium usage reached
-    if (!interaction.responseMappingMode && gapFiller.attr('matchMax')) {
+    if (!interaction.responseMappingMode && gapFiller && gapFiller.attr('matchMax')) {
         matchMax = +gapFiller.attr('matchMax');
         usages = +_gapFillerUsages[gapFillerSerial];
 
@@ -195,11 +197,22 @@ const _setGapFiller = function _setGapFiller(interaction, $gapFiller) {
 const _animateMoveGapFiller = function _animateMoveGapFiller(interaction, $fromGapFiller, toElement, endCallback) {
     const $container = containerHelper.get(interaction);
     const $imageBox = $('.main-image-box', $container);
+    const $fromElement = $fromGapFiller.find('img').length ? $fromGapFiller.find('img') : $fromGapFiller;
+    const $toElement = toElement.paper ? $(toElement.node) : toElement;
+
+    // animateMoveElement() requires measurable elements: offset() is undefined
+    // for empty/detached jQuery sets, which crashes on tiles without an <img>.
+    if (!$fromElement.length || !$fromElement.offset() || !$toElement.length || !$toElement.offset()) {
+        if (endCallback) {
+            endCallback();
+        }
+        return;
+    }
 
     const $clone = interactUtils.animateMoveElement({
         $appendTo: $imageBox,
-        $fromElement: $fromGapFiller.find('img'),
-        $toElement: toElement.paper ? $(toElement.node) : toElement,
+        $fromElement,
+        $toElement,
         endCallback
     });
     $clone.css({ opacity: 0.8 });
@@ -298,24 +311,47 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
             const scale = interaction.paper.scale;
             const originalLeft = bbox.x + 8 * (currentCount - 1);
             const originalTop = bbox.y + 8 * (currentCount - 1);
-            const originalWidth = $img.attr('width');
-            const originalHeight = $img.attr('height');
+            const isTextFiller = !$img.length;
+            const originalWidth = isTextFiller ? $active.outerWidth() : $img.attr('width');
+            const originalHeight = isTextFiller ? $active.outerHeight() : $img.attr('height');
 
-            const $placedFiller = $(
-                placedFillerTpl({
-                    shapeId: element.id,
-                    id,
-                    src: $img.attr('src'),
-                    originalLeft,
-                    originalTop,
-                    originalWidth,
-                    originalHeight,
-                    left: scale * originalLeft,
-                    top: scale * originalTop,
-                    width: scale * originalWidth,
-                    height: scale * originalHeight
-                })
-            );
+            const $placedFiller = isTextFiller
+                ? $('<div/>')
+                      .addClass('qti-gapImg qti-gapText placed')
+                      .attr({
+                          'data-identifier': id,
+                          'data-shape-id': element.id,
+                          'data-top': originalTop,
+                          'data-left': originalLeft
+                      })
+                      .css({
+                          top: `${scale * originalTop}px`,
+                          left: `${scale * originalLeft}px`,
+                          width: `${scale * originalWidth}px`,
+                          minHeight: `${scale * originalHeight}px`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          textAlign: 'center',
+                          padding: '2px',
+                          boxSizing: 'border-box'
+                      })
+                      .text($active.text().trim())
+                : $(
+                      placedFillerTpl({
+                          shapeId: element.id,
+                          id,
+                          src: $img.attr('src'),
+                          originalLeft,
+                          originalTop,
+                          originalWidth,
+                          originalHeight,
+                          left: scale * originalLeft,
+                          top: scale * originalTop,
+                          width: scale * originalWidth,
+                          height: scale * originalHeight
+                      })
+                  );
             $placedFillersContainer.append($placedFiller);
             interaction.placedFillers.push($placedFiller);
 
