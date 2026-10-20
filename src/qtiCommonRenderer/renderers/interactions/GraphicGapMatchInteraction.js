@@ -47,6 +47,131 @@ let activeDrop = null;
  */
 const _gapFillerUsages = {};
 
+const PLACED_GAP_TEXT_MIN_WIDTH = 75;
+const PLACED_GAP_TEXT_MAX_WIDTH = 150;
+const PLACED_GAP_TEXT_MIN_HEIGHT = 60;
+const PLACED_GAP_TEXT_MAX_HEIGHT = 60;
+
+/**
+ * Width: up to gap-option max (source tile), shrink to fit hotspot, never below min (overflow OK).
+ *
+ * @param {Object} bbox - Raphael shape bounding box (paper coords)
+ * @param {JQuery} $sourceTile - gap text choice in the source bay
+ * @returns {{width: number, height: number}}
+ */
+const _getPlacedGapTextTileSize = function _getPlacedGapTextTileSize(bbox, $sourceTile) {
+    const optionMaxWidth = Math.min(
+        PLACED_GAP_TEXT_MAX_WIDTH,
+        Math.max(PLACED_GAP_TEXT_MIN_WIDTH, Math.ceil($sourceTile.outerWidth()) || PLACED_GAP_TEXT_MAX_WIDTH)
+    );
+    const optionMaxHeight = Math.min(
+        PLACED_GAP_TEXT_MAX_HEIGHT,
+        Math.max(PLACED_GAP_TEXT_MIN_HEIGHT, Math.ceil($sourceTile.outerHeight()) || PLACED_GAP_TEXT_MAX_HEIGHT)
+    );
+    const hotspotWidth = bbox && bbox.width ? Math.ceil(bbox.width) : optionMaxWidth;
+    const hotspotHeight = bbox && bbox.height ? Math.ceil(bbox.height) : optionMaxHeight;
+
+    return {
+        width: Math.max(PLACED_GAP_TEXT_MIN_WIDTH, Math.min(optionMaxWidth, hotspotWidth)),
+        height: Math.max(PLACED_GAP_TEXT_MIN_HEIGHT, Math.min(optionMaxHeight, hotspotHeight))
+    };
+};
+
+/**
+ * Center the placed text tile on the visible hotspot (paper bbox alone is wrong when
+ * the SVG is centered in .main-image-box or shapes use clip-path / stroke).
+ *
+ * @param {Raphael.Element} element
+ * @param {JQuery} $container
+ * @param {number} width - tile width in paper coords
+ * @param {number} height - tile height in paper coords
+ * @param {number} currentCount
+ * @param {number} scale - interaction.paper.scale
+ * @returns {{left: number, top: number}}
+ */
+const _getPlacedGapTextTilePosition = function _getPlacedGapTextTilePosition(
+    element,
+    $container,
+    width,
+    height,
+    currentCount,
+    scale
+) {
+    const $placedHost = $('.placed-fillers', $container);
+    const stackOffsetPx = 8 * (currentCount - 1) * scale;
+    const tileWidthPx = width * scale;
+    const tileHeightPx = height * scale;
+
+    if (element && element.node && $placedHost.length) {
+        const hostRect = $placedHost[0].getBoundingClientRect();
+        const shapeRect = element.node.getBoundingClientRect();
+
+        if (shapeRect.width > 0 && shapeRect.height > 0) {
+            const centerXpx = shapeRect.left + shapeRect.width / 2 - hostRect.left + stackOffsetPx;
+            const centerYpx = shapeRect.top + shapeRect.height / 2 - hostRect.top + stackOffsetPx;
+
+            return {
+                left: (centerXpx - tileWidthPx / 2) / scale,
+                top: (centerYpx - tileHeightPx / 2) / scale
+            };
+        }
+    }
+
+    const bbox = element.getBBox();
+    const stackOffset = 8 * (currentCount - 1);
+    const centerX = bbox.x + bbox.width / 2 + stackOffset;
+    const centerY = bbox.y + bbox.height / 2 + stackOffset;
+
+    return {
+        left: centerX - width / 2,
+        top: centerY - height / 2
+    };
+};
+
+const _applyPlacedGapTextTilePosition = function _applyPlacedGapTextTilePosition(
+    $placedFiller,
+    element,
+    $container,
+    width,
+    height,
+    currentCount,
+    scale
+) {
+    const tilePosition = _getPlacedGapTextTilePosition(element, $container, width, height, currentCount, scale);
+
+    const css = {
+        top: `${scale * tilePosition.top}px`,
+        left: `${scale * tilePosition.left}px`
+    };
+
+    if (!$placedFiller.hasClass('qti-gapText')) {
+        css.width = `${scale * width}px`;
+        css.height = `${scale * height}px`;
+        css.lineHeight = 'normal';
+        css.display = 'flex';
+        css.alignItems = 'center';
+        css.justifyContent = 'center';
+    }
+
+    $placedFiller
+        .attr({
+            'data-top': tilePosition.top,
+            'data-left': tilePosition.left,
+            'data-width': width,
+            'data-height': height
+        })
+        .css(css);
+
+    if (!$placedFiller.hasClass('qti-gapText')) {
+        $placedFiller.find('img').css({
+            width: `${scale * width}px`,
+            height: `${scale * height}px`,
+            display: 'block',
+            margin: 0
+        });
+    }
+};
+
 const dragOptions = {
     inertia: false,
     autoScroll: true,
@@ -309,11 +434,34 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
         const _createPlacedFiller = () => {
             bbox = element.getBBox();
             const scale = interaction.paper.scale;
-            const originalLeft = bbox.x + 8 * (currentCount - 1);
-            const originalTop = bbox.y + 8 * (currentCount - 1);
+            let originalLeft = bbox.x + 8 * (currentCount - 1);
+            let originalTop = bbox.y + 8 * (currentCount - 1);
             const isTextFiller = !$img.length;
-            const originalWidth = isTextFiller ? $active.outerWidth() : $img.attr('width');
-            const originalHeight = isTextFiller ? $active.outerHeight() : $img.attr('height');
+            let originalWidth;
+            let originalHeight;
+            let fullGapTextLabel;
+            let tilePosition;
+
+            if (isTextFiller) {
+                const tileSize = _getPlacedGapTextTileSize(bbox, $active);
+                originalWidth = tileSize.width;
+                originalHeight = tileSize.height;
+                fullGapTextLabel = $active.text().trim();
+            } else {
+                originalWidth = parseInt($img.attr('width'), 10) || 0;
+                originalHeight = parseInt($img.attr('height'), 10) || 0;
+            }
+
+            tilePosition = _getPlacedGapTextTilePosition(
+                element,
+                $container,
+                originalWidth,
+                originalHeight,
+                currentCount,
+                scale
+            );
+            originalLeft = tilePosition.left;
+            originalTop = tilePosition.top;
 
             const $placedFiller = isTextFiller
                 ? $('<div/>')
@@ -322,21 +470,23 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
                           'data-identifier': id,
                           'data-shape-id': element.id,
                           'data-top': originalTop,
-                          'data-left': originalLeft
+                          'data-left': originalLeft,
+                          'data-width': originalWidth,
+                          'data-height': originalHeight,
+                          'data-full-label': fullGapTextLabel
                       })
                       .css({
                           top: `${scale * originalTop}px`,
                           left: `${scale * originalLeft}px`,
                           width: `${scale * originalWidth}px`,
-                          minHeight: `${scale * originalHeight}px`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          textAlign: 'center',
-                          padding: '2px',
-                          boxSizing: 'border-box'
+                          height: `${scale * originalHeight}px`
                       })
-                      .text($active.text().trim())
+                      .append(
+                          $('<span class="placed-gap-text-label"/>')
+                              .text(fullGapTextLabel)
+                              .attr('title', fullGapTextLabel),
+                          $('<span class="placed-gap-text-tooltip" role="tooltip"/>').text(fullGapTextLabel)
+                      )
                 : $(
                       placedFillerTpl({
                           shapeId: element.id,
@@ -354,6 +504,27 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
                   );
             $placedFillersContainer.append($placedFiller);
             interaction.placedFillers.push($placedFiller);
+
+            _applyPlacedGapTextTilePosition(
+                $placedFiller,
+                element,
+                $container,
+                originalWidth,
+                originalHeight,
+                currentCount,
+                scale
+            );
+            window.requestAnimationFrame(function () {
+                _applyPlacedGapTextTilePosition(
+                    $placedFiller,
+                    element,
+                    $container,
+                    originalWidth,
+                    originalHeight,
+                    currentCount,
+                    scale
+                );
+            });
 
             containerHelper.triggerResponseChangeEvent(interaction);
 
@@ -676,8 +847,25 @@ const render = function render(interaction) {
                         top: `${$div.attr('data-top') * factor}px`,
                         left: `${$div.attr('data-left') * factor}px`
                     });
-                    $img.width($img.attr('width') * factor);
-                    $img.height($img.attr('height') * factor);
+                    if ($img.length) {
+                        const imgWidth = ($div.attr('data-width') || $img.attr('width')) * factor;
+                        const imgHeight = ($div.attr('data-height') || $img.attr('height')) * factor;
+
+                        $div.css({
+                            width: `${imgWidth}px`,
+                            height: `${imgHeight}px`,
+                            lineHeight: 'normal'
+                        });
+                        $img.css({
+                            width: `${imgWidth}px`,
+                            height: `${imgHeight}px`
+                        });
+                    } else if ($div.hasClass('qti-gapText')) {
+                        $div.css({
+                            width: `${$div.attr('data-width') * factor}px`,
+                            height: `${$div.attr('data-height') * factor}px`
+                        });
+                    }
                 });
             },
             responsive: $container.hasClass('responsive')
