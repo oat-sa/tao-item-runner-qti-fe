@@ -858,7 +858,10 @@ const render = function render(interaction) {
             imgId: 'bg-image-' + interaction.serial,
             container: $container,
             resize: function (newWidth, factor, newHeight) {
-                $gapList.css('max-width', newWidth + 'px');
+                $gapList.css({
+                    width: `${newWidth}px`,
+                    'max-width': `${newWidth}px`
+                });
                 if (factor !== 1) {
                     $gapList.find('img').each(function () {
                         const $img = $(this);
