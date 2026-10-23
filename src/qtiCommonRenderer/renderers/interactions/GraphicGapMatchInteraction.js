@@ -421,7 +421,7 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
 
     //lookup for the active element
     const $container = containerHelper.get(interaction);
-    const $gapList = $('ul', $container);
+    const $gapList = $('ul.source', $container);
     const $placedFillersContainer = $('.placed-fillers', $container);
 
     if (typeof trackResponse === 'undefined') {
@@ -620,9 +620,17 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
     }
 };
 
+function _resolveSourceGapFillerTarget($target) {
+    const $gapFiller = $target.closest('li.qti-gapImg, li.qti-gapText');
+
+    return $gapFiller.length ? $gapFiller : $target;
+}
+
 function _setActiveGapState(interaction, $target) {
     const $container = containerHelper.get(interaction);
-    const $gapList = $('ul', $container);
+    const $gapList = $('ul.source', $container);
+
+    $target = _resolveSourceGapFillerTarget($target);
 
     $gapList.children('li').removeClass('active');
     if (!$target.hasClass('placed')) {
@@ -630,10 +638,13 @@ function _setActiveGapState(interaction, $target) {
     }
     _shapesSelectable(interaction);
 
+    $(document.body).off('click.graphic-gap-match');
     $(document.body).on('click.graphic-gap-match', function (e) {
         if (
             !$container.get(0).contains(e.target) ||
-            (!e.target.closest('.qti-gapImg') && !e.target.closest('.main-image-box'))
+            (!e.target.closest('.qti-gapImg') &&
+                !e.target.closest('.qti-gapText') &&
+                !e.target.closest('.main-image-box'))
         ) {
             _setInactiveGapState(interaction, $target);
         }
@@ -766,7 +777,7 @@ const _renderGapFillersList = function _renderGapFillersList(interaction, $gapLi
             .draggable(
                 _.assign({}, dragOptions, {
                     onstart: function (e) {
-                        const $target = $(e.target);
+                        const $target = _resolveSourceGapFillerTarget($(e.target));
                         _setActiveGapState(interaction, $target);
                         $target.addClass('dragged');
 
@@ -798,6 +809,8 @@ const _renderGapFillersList = function _renderGapFillersList(interaction, $gapLi
     }
 
     function toggleActiveGapState($target) {
+        $target = _resolveSourceGapFillerTarget($target);
+
         if (!$target.hasClass('disabled')) {
             if ($target.hasClass('active')) {
                 _setInactiveGapState(interaction, $target);
