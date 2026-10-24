@@ -197,6 +197,29 @@ const dragOptions = {
     }
 };
 
+const _applySourceListLayout = function _applySourceListLayout($gapList) {
+    const listCss = {
+        display: 'flex',
+        flexWrap: 'nowrap',
+        alignItems: 'flex-start',
+        overflowX: 'auto',
+        overflowY: 'hidden',
+        width: '100%',
+        maxWidth: '100%',
+        minWidth: 0,
+        boxSizing: 'border-box',
+        marginLeft: 0,
+        marginRight: 0,
+        textAlign: 'left',
+        justifyContent: 'flex-start'
+    };
+
+    $gapList.css(listCss);
+    $gapList.children('li').css({
+        flex: '0 0 auto'
+    });
+};
+
 /**
  * This options enables to support old items created with the wrong
  * direction in the directedpairs.
@@ -848,6 +871,24 @@ const render = function render(interaction) {
             isDragAndDropEnabled = self.getOption('enableDragAndDrop').graphicGapMatch;
         }
 
+        const sourcePosition = interaction.attr('data-position') || '';
+        const usesSideSourceList =
+            sourcePosition === 'left' ||
+            sourcePosition === 'right' ||
+            $container.hasClass('qti-choices-left') ||
+            $container.hasClass('qti-choices-right');
+        const usesHorizontalSourceList = !usesSideSourceList;
+
+        if (usesHorizontalSourceList) {
+            $container.find('.image-editor').css({
+                float: 'none',
+                width: '100%',
+                maxWidth: '100%',
+                boxSizing: 'border-box'
+            });
+            _applySourceListLayout($gapList);
+        }
+
         $container.off('resized.qti-widget.resolve').one('resized.qti-widget.resolve', resolve);
 
         //create the paper
@@ -858,10 +899,14 @@ const render = function render(interaction) {
             imgId: 'bg-image-' + interaction.serial,
             container: $container,
             resize: function (newWidth, factor, newHeight) {
-                $gapList.css({
-                    width: `${newWidth}px`,
-                    'max-width': `${newWidth}px`
-                });
+                if (usesHorizontalSourceList) {
+                    _applySourceListLayout($gapList);
+                } else {
+                    $gapList.css({
+                        width: `${newWidth}px`,
+                        maxWidth: `${newWidth}px`
+                    });
+                }
                 if (factor !== 1) {
                     $gapList.find('img').each(function () {
                         const $img = $(this);
