@@ -324,9 +324,7 @@ const _paperUnSelect = function _paperUnSelect(interaction) {
  */
 const _setGapFiller = function _setGapFiller(interaction, $gapFiller) {
     const gapFillerSerial = $gapFiller.data('serial');
-    const gapFiller =
-        interaction.getGapImg(gapFillerSerial) ||
-        (typeof interaction.getGapText === 'function' ? interaction.getGapText(gapFillerSerial) : null);
+    const gapFiller = interaction.getGapImg(gapFillerSerial) || interaction.getChoices()[gapFillerSerial];
     let matchMax;
     let usages;
 
