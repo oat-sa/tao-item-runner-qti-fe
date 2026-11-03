@@ -476,7 +476,6 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
             let originalWidth;
             let originalHeight;
             let fullGapTextLabel;
-            let tilePosition;
 
             if (isTextFiller) {
                 const tileSize = _getPlacedGapTextTileSize($active, scale);
@@ -488,16 +487,18 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
                 originalHeight = parseInt($img.attr('height'), 10) || 0;
             }
 
-            tilePosition = _getPlacedGapTextTilePosition(
-                element,
-                $container,
-                originalWidth,
-                originalHeight,
-                currentCount,
-                scale
-            );
-            originalLeft = tilePosition.left;
-            originalTop = tilePosition.top;
+            if (isTextFiller) {
+                const tilePosition = _getPlacedGapTextTilePosition(
+                    element,
+                    $container,
+                    originalWidth,
+                    originalHeight,
+                    currentCount,
+                    scale
+                );
+                originalLeft = tilePosition.left;
+                originalTop = tilePosition.top;
+            }
 
             const $placedFiller = isTextFiller
                 ? $('<div/>')
@@ -541,16 +542,7 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
             $placedFillersContainer.append($placedFiller);
             interaction.placedFillers.push($placedFiller);
 
-            _applyPlacedGapTextTilePosition(
-                $placedFiller,
-                element,
-                $container,
-                originalWidth,
-                originalHeight,
-                currentCount,
-                scale
-            );
-            window.requestAnimationFrame(function () {
+            if (isTextFiller) {
                 _applyPlacedGapTextTilePosition(
                     $placedFiller,
                     element,
@@ -560,7 +552,18 @@ const _selectShape = function _selectShape(interaction, element, gapFillerId, tr
                     currentCount,
                     scale
                 );
-            });
+                window.requestAnimationFrame(function () {
+                    _applyPlacedGapTextTilePosition(
+                        $placedFiller,
+                        element,
+                        $container,
+                        originalWidth,
+                        originalHeight,
+                        currentCount,
+                        scale
+                    );
+                });
+            }
 
             containerHelper.triggerResponseChangeEvent(interaction);
 
