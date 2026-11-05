@@ -216,6 +216,68 @@ define([
             .render($container);
     });
 
+    QUnit.test('enables to fill a hotspot with a gap text tile', function (assert) {
+        var ready = assert.async();
+        assert.expect(7);
+
+        var stateChanged = false;
+        var $container = $('#' + fixtureContainerId);
+        assert.equal($container.length, 1, 'the item container exists');
+
+        runner = qtiItemRunner('qti', gapMatchData)
+            .on('render', function () {
+                var $gapFiller = $('.qti-choice[data-identifier="gapimg_1"]', $container);
+                var $hotspot = $('.main-image-box rect', $container).eq(5);
+
+                $gapFiller
+                    .removeClass('qti-gapImg')
+                    .addClass('qti-gapText')
+                    .empty()
+                    .append('<textarea class="gap-text-label">Gap Text Label</textarea>');
+
+                interactUtils.tapOn($gapFiller, function () {
+                    assert.ok($gapFiller.hasClass('active'), 'the text tile is active');
+                    assert.ok($hotspot.get(0).classList.contains('selectable'), 'the hotspot is highlighted');
+
+                    interactUtils.tapOn($hotspot);
+                });
+            })
+            .on('statechange', function (state) {
+                if (stateChanged) {
+                    return;
+                }
+                stateChanged = true;
+
+                assert.deepEqual(
+                    state.RESPONSE,
+                    { response: { list: { directedPair: [['gapimg_1', 'associablehotspot_6']] } } },
+                    'the text tile pair is selected'
+                );
+
+                waitForPlacedFiller(
+                    $container,
+                    'gapimg_1',
+                    function ($gapFillerOnHotspot) {
+                        assert.ok($gapFillerOnHotspot.hasClass('qti-gapText'), 'a text filler is placed on hotspot');
+                        assert.equal(
+                            $gapFillerOnHotspot.find('.placed-gap-text-label').text(),
+                            'Gap Text Label',
+                            'placed text label is kept'
+                        );
+                        assert.equal($gapFillerOnHotspot.get(0).nodeName, 'DIV', 'placed text filler is a div');
+                        ready();
+                    },
+                    function () {
+                        assert.ok(false, 'Expected placed gap text filler on hotspot');
+                        ready();
+                    }
+                );
+            })
+            .assets(strategies)
+            .init()
+            .render($container);
+    });
+
     QUnit.test('enables to fill a hotspot', function (assert) {
         var ready = assert.async();
         assert.expect(4);
@@ -388,7 +450,7 @@ define([
 
     QUnit.test('set the default response', function (assert) {
         var ready = assert.async();
-        assert.expect(2);
+        assert.expect(3);
 
         var $container = $('#' + fixtureContainerId);
 
@@ -404,10 +466,12 @@ define([
                 });
 
                 _.delay(function () {
+                    var $placedGapFillerContainer = $container.find('.placed-fillers .qti-gapImg[data-identifier="gapimg_1"]');
                     var $gapFillerOnHotspot = $container.find(
                         '.placed-fillers .qti-gapImg[data-identifier="gapimg_1"] img',
                         $container
                     );
+                    assert.equal($placedGapFillerContainer.get(0).nodeName, 'DIV', 'placed gap filler container is a div');
                     assert.equal($gapFillerOnHotspot.attr('src'), gapFillerImgSrc, 'state has been restored');
 
                     ready();

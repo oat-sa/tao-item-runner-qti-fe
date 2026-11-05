@@ -551,6 +551,9 @@ define([
             gapImg: {
                 qtiClass: 'gapImg',
             },
+            gapText: {
+                qtiClass: 'gapText',
+            },
         };
         const choiceInteractionData = {
             choices: {
@@ -588,6 +591,11 @@ define([
                     qtiClass: 'simpleChoice',
                     serial: 'graphicGapMatchInteractionChoice',
                 },
+                graphicGapMatchInteractionGapText: {
+                    qtiClass: 'gapText',
+                    serial: 'graphicGapMatchInteractionGapText',
+                    text: 'Gap text',
+                },
             },
         };
 
@@ -618,6 +626,12 @@ define([
                 graphicGapMatchInteractionElement.choices.graphicGapMatchInteractionChoice.serial,
                 'graphicGapMatchInteractionChoice',
                 'buildInteractionChoices assign choices to graphicGapMatchInteraction'
+            );
+
+            assert.equal(
+                graphicGapMatchInteractionElement.choices.graphicGapMatchInteractionGapText.serial,
+                'graphicGapMatchInteractionGapText',
+                'buildInteractionChoices assigns gapText choices to graphicGapMatchInteraction'
             );
 
             assert.equal(
