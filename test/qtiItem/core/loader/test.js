@@ -637,6 +637,12 @@ define([
             );
 
             assert.equal(
+                graphicGapMatchInteractionElement.gapTexts.graphicGapMatchInteractionGapText.bdy.bdy,
+                'Gap text',
+                'buildInteractionChoices assigns gapText filler content to graphicGapMatchInteraction'
+            );
+
+            assert.equal(
                 graphicGapMatchInteractionElement.gapImgs.gapImg.serial,
                 'gapImg',
                 'buildInteractionChoices assign gapImgs to graphicGapMatchInteraction'
