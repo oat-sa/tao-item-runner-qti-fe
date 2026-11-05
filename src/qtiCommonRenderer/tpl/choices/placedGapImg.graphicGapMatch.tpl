@@ -4,4 +4,4 @@
          height="{{originalHeight}}"
          style="width:{{width}}px;height:{{height}}px;"
     />
-</li>
+</div>

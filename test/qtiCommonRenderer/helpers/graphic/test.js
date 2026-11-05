@@ -106,6 +106,12 @@ define([
             '10,0,10,10',
             'path returns flattened coords'
         );
+
+        assert.equal(
+            GraphicHelper.qtiCoords(null, paper, 100),
+            '',
+            'returns empty string when element is missing'
+        );
     });
 
     QUnit.test('createTouchCircle animates and removes', function (assert) {
