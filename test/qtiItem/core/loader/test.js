@@ -586,15 +586,17 @@ define([
                     serial: 'gapImg',
                 }
             },
-            choices: {
-                graphicGapMatchInteractionChoice: {
-                    qtiClass: 'simpleChoice',
-                    serial: 'graphicGapMatchInteractionChoice',
-                },
+            gapTexts: {
                 graphicGapMatchInteractionGapText: {
                     qtiClass: 'gapText',
                     serial: 'graphicGapMatchInteractionGapText',
                     text: 'Gap text',
+                },
+            },
+            choices: {
+                graphicGapMatchInteractionChoice: {
+                    qtiClass: 'simpleChoice',
+                    serial: 'graphicGapMatchInteractionChoice',
                 },
             },
         };
@@ -629,15 +631,15 @@ define([
             );
 
             assert.equal(
-                graphicGapMatchInteractionElement.choices.graphicGapMatchInteractionGapText.serial,
+                graphicGapMatchInteractionElement.gapTexts.graphicGapMatchInteractionGapText.serial,
                 'graphicGapMatchInteractionGapText',
-                'buildInteractionChoices assigns gapText choices to graphicGapMatchInteraction'
+                'buildInteractionChoices assigns gapText fillers to graphicGapMatchInteraction'
             );
 
             assert.equal(
                 graphicGapMatchInteractionElement.gapImgs.gapImg.serial,
                 'gapImg',
-                'buildInteractionChoices assign choices to graphicGapMatchInteraction'
+                'buildInteractionChoices assign gapImgs to graphicGapMatchInteraction'
             );
 
             ready();
