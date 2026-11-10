@@ -7,6 +7,7 @@
         <div class="clearfix"></div>
         <ul class="none block-listing horizontal source">
             {{#gapImgs}}{{{.}}}{{/gapImgs}}
+            {{#gapTexts}}{{{.}}}{{/gapTexts}}
         </ul>
     </div>
 </div>
