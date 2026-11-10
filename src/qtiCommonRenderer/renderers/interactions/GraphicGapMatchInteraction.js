@@ -323,8 +323,11 @@ const _paperUnSelect = function _paperUnSelect(interaction) {
  * @param {JQuery Element} $gapFiller
  */
 const _setGapFiller = function _setGapFiller(interaction, $gapFiller) {
-    const gapFillerSerial = $gapFiller.data('serial');
-    const gapFiller = interaction.getGapImg(gapFillerSerial) || interaction.getChoices()[gapFillerSerial];
+    const gapFillerSerial = $gapFiller.closest('li[data-serial]').data('serial') || $gapFiller.data('serial');
+    const gapFiller =
+        interaction.getGapImg(gapFillerSerial) ||
+        interaction.getGapText(gapFillerSerial) ||
+        interaction.getChoices()[gapFillerSerial];
     let matchMax;
     let usages;
 
