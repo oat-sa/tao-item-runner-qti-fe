@@ -18,5 +18,5 @@
 
 export const isSafari = () => {
     const ua = navigator.userAgent.toLowerCase();
-    return ua.indexOf('safari') >= 0 && ua.indexOf('chrome') < 0;
+    return ua.indexOf('safari') >= 0 && ua.indexOf('chrome') < 0 && ua.indexOf('crios') < 0;
 };
