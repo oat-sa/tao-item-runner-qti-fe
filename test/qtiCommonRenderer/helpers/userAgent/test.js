@@ -8,6 +8,10 @@ define(['taoQtiItem/qtiCommonRenderer/helpers/userAgent'], function (userAgentHe
             'Mozilla/5.0 (iPad; CPU OS 17_7_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3 Mobile/15E148 Safari/604.1',
         chrome133Windows:
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
+        chrome157Mac:
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36',
+        chrome158IPad:
+            'Mozilla/5.0 (iPad; CPU OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/158.0.8127.35 Mobile/15E148 Safari/604.1',
         firefox135Windows: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0'
     };
 
@@ -27,6 +31,12 @@ define(['taoQtiItem/qtiCommonRenderer/helpers/userAgent'], function (userAgentHe
         assert.true(isSafari());
 
         mockAgent(agents.chrome133Windows);
+        assert.false(isSafari());
+
+        mockAgent(agents.chrome158IPad);
+        assert.false(isSafari());
+
+        mockAgent(agents.chrome157Mac);
         assert.false(isSafari());
 
         mockAgent(agents.firefox135Windows);
